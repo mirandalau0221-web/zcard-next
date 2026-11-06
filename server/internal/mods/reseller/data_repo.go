@@ -1,9 +1,9 @@
 package reseller
 
 // 分站核心（/// 核心，主站 admin 面先行）：
-// 申请/审核（等级+加价率区间）、定价引擎（4 模式 × 三级优先级 + 上下限）、
-// 分账账本（幂等/双阶段/水位缓存/重算）、防自购三查快照。
-// 域名验证与租户上下文贯穿、分站后台完整 API 面随 storefront 用户登录体系接续。
+// 申請/審核（等級+加價率區間）、定價引擎（4 模式 × 三級優先級 + 上下限）、
+// 分賬賬本（冪等/雙階段/水位緩存/重算）、防自購三查快照。
+// 域名驗證與租户上下文貫穿、分站後台完整 API 面隨 storefront 用户登錄體系接續。
 
 import (
 	"context"
@@ -26,40 +26,40 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/money"
 )
 
-// 哨兵错误。
+// 哨兵錯誤。
 var (
-	ErrNotFound       = errors.New("reseller: 记录不存在")
-	ErrDuplicateApply = errors.New("reseller.DUPLICATE_APPLY: 已有申请记录")
-	ErrMarkupExceed   = errors.New("reseller.MARKUP_EXCEED: 超过分站加价率上限")
-	ErrBelowBase      = errors.New("reseller.BELOW_BASE: 分站价不得低于主站基础价")
-	ErrNotApproved    = errors.New("reseller.NOT_APPROVED: 分站未过审")
+	ErrNotFound       = errors.New("reseller: 記錄不存在")
+	ErrDuplicateApply = errors.New("reseller.DUPLICATE_APPLY: 已有申請記錄")
+	ErrMarkupExceed   = errors.New("reseller.MARKUP_EXCEED: 超過分站加價率上限")
+	ErrBelowBase      = errors.New("reseller.BELOW_BASE: 分站價不得低於主站基礎價")
+	ErrNotApproved    = errors.New("reseller.NOT_APPROVED: 分站未過審")
 	ErrInsufficient   = errors.New("reseller.INSUFFICIENT_BALANCE")
 )
 
-// ResellerRepo 仓储。
+// ResellerRepo 倉儲。
 type ResellerRepo struct {
 	data *data.Data
 }
 
-// NewResellerRepo 构造。
+// NewResellerRepo 構造。
 func NewResellerRepo(d *data.Data) *ResellerRepo { return &ResellerRepo{data: d} }
 
-// ── 申请/审核 ─────────────────────────────────────────
+// ── 申請/審核 ─────────────────────────────────────────
 
-// ApplyInput 申请入参。
+// ApplyInput 申請入參。
 type ApplyInput struct {
 	UserID       uint64
 	Reason       string
 	DomainIntent string
 }
 
-// Apply 申请分站（一人一份：user_id 唯一；重复申请拒绝）。
+// Apply 申請分站（一人一份：user_id 唯一；重複申請拒絕）。
 func (r *ResellerRepo) Apply(ctx context.Context, in ApplyInput) (*ent.ResellerProfile, error) {
 	p, err := data.Client(ctx, r.data).ResellerProfile.Create().
 		SetUserID(in.UserID).
 		SetStatus(resellerprofile.StatusApplying).
 		SetApplyReason(in.Reason).
-		SetDefaultMarkupPercent(10). // 审核通过时可调；默认 10%
+		SetDefaultMarkupPercent(10). // 審核通過時可調；默認 10%
 		SetMaxMarkupPercent(50).
 		SetConfirmDays(7).
 		Save(ctx)
@@ -69,7 +69,7 @@ func (r *ResellerRepo) Apply(ctx context.Context, in ApplyInput) (*ent.ResellerP
 	return p, err
 }
 
-// Review 审核（approve=true 生成 approved；拒绝写 reject_reason）。
+// Review 審核（approve=true 生成 approved；拒絕寫 reject_reason）。
 func (r *ResellerRepo) Review(ctx context.Context, id uint64, approve bool, reason string, reviewedBy uint64, defaultMarkup, maxMarkup float64, confirmDays int32) (*ent.ResellerProfile, error) {
 	client := data.Client(ctx, r.data)
 	status := resellerprofile.StatusRejected
@@ -104,7 +104,7 @@ func (r *ResellerRepo) Review(ctx context.Context, id uint64, approve bool, reas
 	return p, nil
 }
 
-// ListProfiles 申请/分站列表。
+// ListProfiles 申請/分站列表。
 func (r *ResellerRepo) ListProfiles(ctx context.Context, status string, page, size int) ([]*ent.ResellerProfile, int, error) {
 	q := data.Client(ctx, r.data).ResellerProfile.Query().Order(ent.Desc(resellerprofile.FieldID))
 	if status != "" {
@@ -131,11 +131,11 @@ func (r *ResellerRepo) ProfileByUser(ctx context.Context, userID uint64) (*ent.R
 	return p, nil
 }
 
-// ── 定价引擎 ───────────────────────────────────────────
+// ── 定價引擎 ───────────────────────────────────────────
 
-// UpsertPricing 定价规则（SKU>商品>分站默认三级之一）。
-// value 语义随 mode：markup_percent=万分比；fixed_markup/fixed_price=分。
-// 上限校验：markup_percent 不得超 profile.max_markup_percent（百分×100）。
+// UpsertPricing 定價規則（SKU>商品>分站默認三級之一）。
+// value 語義隨 mode：markup_percent=萬分比；fixed_markup/fixed_price=分。
+// 上限校驗：markup_percent 不得超 profile.max_markup_percent（百分×100）。
 func (r *ResellerRepo) upsertPricing(ctx context.Context, subsiteID, productID, skuID uint64, mode string, value int64, maxMarkupPercent float64) (*ent.ResellerPricing, error) {
 	client := data.Client(ctx, r.data)
 	if mode == "markup_percent" && maxMarkupPercent > 0 && float64(value) > maxMarkupPercent*100 {
@@ -161,12 +161,12 @@ func (r *ResellerRepo) upsertPricing(ctx context.Context, subsiteID, productID, 
 		Save(ctx)
 }
 
-// ResolveUnitPrice 分站单价（listing 与 checkout 共用同一实现——1.x 铁律）。
-// 优先级：SKU 规则 > 商品规则 > 分站默认加价率 > 继承主站价。
-// 下限保护：结果不得低于 basePrice（主站基础价）。
+// ResolveUnitPrice 分站單價（listing 與 checkout 共用同一實現——1.x 鐵律）。
+// 優先級：SKU 規則 > 商品規則 > 分站默認加價率 > 繼承主站價。
+// 下限保護：結果不得低於 basePrice（主站基礎價）。
 func (r *ResellerRepo) ResolveUnitPrice(ctx context.Context, subsiteID, productID, skuID uint64, basePrice money.Cents) (money.Cents, error) {
 	client := data.Client(ctx, r.data)
-	// SKU 级
+	// SKU 級
 	if skuID > 0 {
 		if p, err := client.ResellerPricing.Query().Where(
 			resellerpricing.SubsiteIDEQ(subsiteID), resellerpricing.ProductIDEQ(productID),
@@ -175,31 +175,31 @@ func (r *ResellerRepo) ResolveUnitPrice(ctx context.Context, subsiteID, productI
 			return applyPricingMode(p.Mode, p.Value, basePrice)
 		}
 	}
-	// 商品级
+	// 商品級
 	if p, err := client.ResellerPricing.Query().Where(
 		resellerpricing.SubsiteIDEQ(subsiteID), resellerpricing.ProductIDEQ(productID),
 		resellerpricing.SkuIDEQ(0),
 	).Only(ctx); err == nil {
 		return applyPricingMode(p.Mode, p.Value, basePrice)
 	}
-	// 分站默认加价率（profiles.default_markup_percent——subsite_id 即 profile 主键）
+	// 分站默認加價率（profiles.default_markup_percent——subsite_id 即 profile 主鍵）
 	profile, err := client.ResellerProfile.Get(ctx, subsiteID)
 	if err == nil {
 		return applyPricingMode("markup_percent", int64(profile.DefaultMarkupPercent*100), basePrice)
 	}
-	// 继承主站价
+	// 繼承主站價
 	return basePrice, nil
 }
 
-// applyPricingMode 4 模式换算 + 下限保护。
-// value 语义：markup_percent=万分比；fixed_markup/fixed_price=分。
+// applyPricingMode 4 模式換算 + 下限保護。
+// value 語義：markup_percent=萬分比；fixed_markup/fixed_price=分。
 func applyPricingMode(mode resellerpricing.Mode, value int64, basePrice money.Cents) (money.Cents, error) {
 	base := int64(basePrice)
 	var out int64
 	switch string(mode) {
 	case "inherit":
 		out = base
-	case "markup_percent": // 万分比（1000 = +10%）
+	case "markup_percent": // 萬分比（1000 = +10%）
 		out = base + base*value/10000
 	case "fixed_markup":
 		out = base + value
@@ -210,22 +210,22 @@ func applyPricingMode(mode resellerpricing.Mode, value int64, basePrice money.Ce
 	}
 	final := money.Cents(out)
 	if final < basePrice {
-		return basePrice, ErrBelowBase // 下限保护（fixed_price/fixed_markup 可能低于）
+		return basePrice, ErrBelowBase // 下限保護（fixed_price/fixed_markup 可能低於）
 	}
 	return final, nil
 }
 
-// ── 分账账本 ───────────────────────────────────────────
+// ── 分賬賬本 ───────────────────────────────────────────
 
-// SettleInput 分账入账输入。
+// SettleInput 分賬入賬輸入。
 type SettleInput struct {
 	SubsiteID uint64
 	OrderID   uint64
-	Amount    money.Cents // 分站利润（subsite_markup 合计）
+	Amount    money.Cents // 分站利潤（subsite_markup 合計）
 }
 
-// SettleOrderProfit 订单分账入账（幂等键 order_profit:<orderID>；冻结 available_at）。
-// 入账前优先抵扣 pending 负债（利润先还债，与 affiliate 负债态同构）。
+// SettleOrderProfit 訂單分賬入賬（冪等鍵 order_profit:<orderID>；凍結 available_at）。
+// 入賬前優先抵扣 pending 負債（利潤先還債，與 affiliate 負債態同構）。
 func (r *ResellerRepo) SettleOrderProfit(ctx context.Context, in SettleInput) error {
 	if in.Amount <= 0 {
 		return nil
@@ -239,17 +239,17 @@ func (r *ResellerRepo) SettleOrderProfit(ctx context.Context, in SettleInput) er
 	if confirmDays <= 0 {
 		confirmDays = 7
 	}
-	// 负债优先抵扣（同事务；不足才产生净入账）
+	// 負債優先抵扣（同事務；不足才產生淨入賬）
 	net, err := r.settleDebt(ctx, in.SubsiteID, int64(in.Amount))
 	if err != nil {
 		return err
 	}
 	if net <= 0 {
-		// 利润全部用于抵债：negative 缓存减少（抵债额=入账额）
+		// 利潤全部用於抵債：negative 緩存減少（抵債額=入賬額）
 		return r.updateBalance(ctx, in.SubsiteID, 0, 0, -int64(in.Amount))
 	}
 	if net < int64(in.Amount) {
-		// 部分抵债：negative 减少差额
+		// 部分抵債：negative 減少差額
 		if err := r.updateBalance(ctx, in.SubsiteID, 0, 0, -(int64(in.Amount) - net)); err != nil {
 			return err
 		}
@@ -264,7 +264,7 @@ func (r *ResellerRepo) SettleOrderProfit(ctx context.Context, in SettleInput) er
 		SetIdempotencyKey(fmt.Sprintf("order_profit:%d", in.OrderID)).
 		Save(ctx)
 	if ent.IsConstraintError(err) {
-		return nil // 幂等 ACK
+		return nil // 冪等 ACK
 	}
 	if err != nil {
 		return err
@@ -272,7 +272,7 @@ func (r *ResellerRepo) SettleOrderProfit(ctx context.Context, in SettleInput) er
 	return r.refreshBalance(ctx, in.SubsiteID, net)
 }
 
-// ConfirmDue 到期确认（pending → available；cron）。
+// ConfirmDue 到期確認（pending → available；cron）。
 func (r *ResellerRepo) ConfirmDue(ctx context.Context, now time.Time, limit int) (int, error) {
 	client := data.Client(ctx, r.data)
 	rows, err := client.ResellerLedgerEntry.Query().
@@ -292,13 +292,13 @@ func (r *ResellerRepo) ConfirmDue(ctx context.Context, now time.Time, limit int)
 	return n, nil
 }
 
-// refreshBalance 余额缓存增量（available 维度——pending/locked 独立核算）。
+// refreshBalance 餘額緩存增量（available 維度——pending/locked 獨立核算）。
 func (r *ResellerRepo) refreshBalance(ctx context.Context, subsiteID uint64, delta int64) error {
 	return r.updateBalance(ctx, subsiteID, delta, 0, 0)
 }
 
-// updateBalance 余额缓存三维增量（available/locked/negative——提现锁定/打款/
-// 驳回/退款扣回/负债抵扣全部经此维护，缓存可由流水重算对账）。
+// updateBalance 餘額緩存三維增量（available/locked/negative——提現鎖定/打款/
+// 駁回/退款扣回/負債抵扣全部經此維護，緩存可由流水重算對賬）。
 func (r *ResellerRepo) updateBalance(ctx context.Context, subsiteID uint64, availDelta, lockedDelta, negDelta int64) error {
 	client := data.Client(ctx, r.data)
 	acc, err := client.ResellerBalanceAccount.Query().
@@ -321,7 +321,7 @@ func (r *ResellerRepo) updateBalance(ctx context.Context, subsiteID uint64, avai
 	return err
 }
 
-// RecomputeBalance 流水重算（对账函数——测试断言口径）。
+// RecomputeBalance 流水重算（對賬函數——測試斷言口徑）。
 func (r *ResellerRepo) RecomputeBalance(ctx context.Context, subsiteID uint64) (available, locked, negative int64, err error) {
 	client := data.Client(ctx, r.data)
 	rows, err := client.ResellerLedgerEntry.Query().
@@ -337,40 +337,40 @@ func (r *ResellerRepo) RecomputeBalance(ctx context.Context, subsiteID uint64) (
 			locked += e.Amount
 		case "pending":
 			if e.Amount >= 0 {
-				available += e.Amount // 冻结态计入可提快照（可用口径=available+pending 正数）
+				available += e.Amount // 凍結態計入可提快照（可用口徑=available+pending 正數）
 			} else {
 				negative += -e.Amount
 			}
 		case "withdrawn":
-			// 已提现不计
+			// 已提現不計
 		}
 	}
 	return available, locked, negative, nil
 }
 
-// ── 防自购三查 ─────────────────────────────────────────
+// ── 防自購三查 ─────────────────────────────────────────
 
-// ProfitEligible 防自购判定（下单快照落 orders.profit_eligible）。
-// 三查：买家==分站主 / 买家∈分站主上级链 / 买家∈同链分站主（互推）。
+// ProfitEligible 防自購判定（下單快照落 orders.profit_eligible）。
+// 三查：買家==分站主 / 買家∈分站主上級鏈 / 買家∈同鏈分站主（互推）。
 func (r *ResellerRepo) ProfitEligible(ctx context.Context, subsiteID, buyerID uint64) bool {
 	client := data.Client(ctx, r.data)
 	profile, err := client.ResellerProfile.Get(ctx, subsiteID)
 	if err != nil {
-		return true // 非分站单（主站直营）：默认分账资格=主站自身利润逻辑
+		return true // 非分站單（主站直營）：默認分賬資格=主站自身利潤邏輯
 	}
 	owner := profile.UserID
 	if buyerID == owner {
-		return false // 查一：分站主自购
+		return false // 查一：分站主自購
 	}
-	// 查二/三：买家与分站主的邀请链交叉（任一方向命中即视为关联自购）
+	// 查二/三：買家與分站主的邀請鏈交叉（任一方向命中即視為關聯自購）
 	buyer, err := client.User.Get(ctx, buyerID)
 	if err != nil {
 		return true
 	}
 	if buyer.InviteL1 == owner || buyer.InviteL2 == owner || buyer.InviteL3 == owner {
-		return false // 买家是分站主的下级
+		return false // 買家是分站主的下級
 	}
-	// 分站主是买家的下级（反向）
+	// 分站主是買家的下級（反向）
 	if owner != 0 {
 		if o, err := client.User.Get(ctx, owner); err == nil {
 			if o.InviteL1 == buyerID || o.InviteL2 == buyerID || o.InviteL3 == buyerID {
@@ -401,7 +401,7 @@ func (r *ResellerRepo) GetProfile(ctx context.Context, id uint64) (*ent.Reseller
 	return p, nil
 }
 
-// Ledger 账本流水（按状态筛选）。
+// Ledger 賬本流水（按狀態篩選）。
 func (r *ResellerRepo) Ledger(ctx context.Context, subsiteID uint64, status string, page, size int) ([]*ent.ResellerLedgerEntry, int, error) {
 	q := data.Client(ctx, r.data).ResellerLedgerEntry.Query().
 		Where(resellerledgerentry.SubsiteIDEQ(subsiteID)).
@@ -417,7 +417,7 @@ func (r *ResellerRepo) Ledger(ctx context.Context, subsiteID uint64, status stri
 	return rows, total, err
 }
 
-// GetBalance 余额缓存账户（缺失返回零值账户语义）。
+// GetBalance 餘額緩存賬户（缺失返回零值賬户語義）。
 func (r *ResellerRepo) GetBalance(ctx context.Context, subsiteID uint64) (*ent.ResellerBalanceAccount, error) {
 	acc, err := data.Client(ctx, r.data).ResellerBalanceAccount.Query().
 		Where(resellerbalanceaccount.SubsiteIDEQ(subsiteID)).Only(ctx)
@@ -438,7 +438,7 @@ func (r *ResellerRepo) ListSites(ctx context.Context, profileID uint64) ([]*ent.
 		All(ctx)
 }
 
-// GetSite 单站点。
+// GetSite 單站點。
 func (r *ResellerRepo) GetSite(ctx context.Context, id uint64) (*ent.ResellerSite, error) {
 	s, err := data.Client(ctx, r.data).ResellerSite.Get(ctx, id)
 	if err != nil {
@@ -450,7 +450,7 @@ func (r *ResellerRepo) GetSite(ctx context.Context, id uint64) (*ent.ResellerSit
 	return s, nil
 }
 
-// SetWhitelabel 白标设置。
+// SetWhitelabel 白標設置。
 func (r *ResellerRepo) SetWhitelabel(ctx context.Context, siteID uint64, siteName, logo, favicon string) error {
 	upd := data.Client(ctx, r.data).ResellerSite.UpdateOneID(siteID)
 	if siteName != "" {

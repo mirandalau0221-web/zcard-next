@@ -23,16 +23,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// LicenseOfferReply 套餐报价与购买前置状态。
+// LicenseOfferReply 套餐報價與購買前置狀態。
 type LicenseOfferReply struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// 月付价（分；默认 300 = 3U）
+	// 月付價（分；默認 300 = 3U）
 	MonthlyCents int64 `protobuf:"varint,1,opt,name=monthly_cents,json=monthlyCents,proto3" json:"monthly_cents,omitempty"`
-	// 年付价（分；默认 3000 = 30U）
+	// 年付價（分；默認 3000 = 30U）
 	YearlyCents int64 `protobuf:"varint,2,opt,name=yearly_cents,json=yearlyCents,proto3" json:"yearly_cents,omitempty"`
-	// 发行侧是否配置签发私钥（false = 本部署不开通在线购买）
+	// 發行側是否配置簽發私鑰（false = 本部署不開通在線購買）
 	Purchasable bool `protobuf:"varint,3,opt,name=purchasable,proto3" json:"purchasable,omitempty"`
-	// 本部署实例 ID（自购场景绑定预览；购买其他实例时填对方实例 ID）
+	// 本部署實例 ID（自購場景綁定預覽；購買其他實例時填對方實例 ID）
 	InstanceId    string `protobuf:"bytes,4,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -100,9 +100,9 @@ type PurchaseLicenseRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// monthly | yearly
 	Plan string `protobuf:"bytes,1,opt,name=plan,proto3" json:"plan,omitempty"`
-	// 目标实例 ID（空 = 绑定本部署实例——发行侧自测/内部发行场景）
+	// 目標實例 ID（空 = 綁定本部署實例——發行側自測/內部發行場景）
 	InstanceId string `protobuf:"bytes,2,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`
-	// 目标域名（可选；空 = 不限域名）
+	// 目標域名（可選；空 = 不限域名）
 	Domain        string `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -162,7 +162,7 @@ func (x *PurchaseLicenseRequest) GetDomain() string {
 type PurchaseLicenseReply struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	OrderId uint64                 `protobuf:"varint,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
-	// 许可证文件内容（JSON：license + signature；目标实例后台安装激活）
+	// 許可證文件內容（JSON：license + signature；目標實例後台安裝激活）
 	LicenseFile   string `protobuf:"bytes,2,opt,name=license_file,json=licenseFile,proto3" json:"license_file,omitempty"`
 	ExpiresAt     string `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // RFC3339
 	PaidCents     int64  `protobuf:"varint,4,opt,name=paid_cents,json=paidCents,proto3" json:"paid_cents,omitempty"`

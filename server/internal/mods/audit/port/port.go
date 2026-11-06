@@ -1,4 +1,4 @@
-// Package port 为 audit 模块对外契约（零依赖包）。
+// Package port 為 audit 模塊對外契約（零依賴包）。
 package port
 
 import (
@@ -9,37 +9,37 @@ import (
 	"time"
 )
 
-// SecurityEntry 安全审计条目（埋点入参）。
+// SecurityEntry 安全審計條目（埋點入參）。
 type SecurityEntry struct {
 	ActorType string // admin | user | guest | system
 	ActorID   uint64
 	Action    string // 事件名（identity.login_failed / card.decrypt / ...）
 	IP        string
-	Metadata  map[string]any // 关键 ID（明文卡密/凭据绝不入内）
+	Metadata  map[string]any // 關鍵 ID（明文卡密/憑據絕不入內）
 }
 
-// Auditor 安全审计端口（identity/inventory/authz 等模块消费，通道 A）。
-// 实现纪律：写失败不阻断业务（1.x SecurityAudit 纪律）。
+// Auditor 安全審計端口（identity/inventory/authz 等模塊消費，通道 A）。
+// 實現紀律：寫失敗不阻斷業務（1.x SecurityAudit 紀律）。
 type Auditor interface {
 	Security(ctx context.Context, e SecurityEntry)
 }
 
-// GateInput 风控闸门入参。
+// GateInput 風控閘門入參。
 type GateInput struct {
-	RiskIP string // 规范化 IP（IPv6 已按 /64 聚合）
-	UserID uint64 // 0 = 游客
-	// FetchFail 取货失败锁定键（非空时走失败计数锁定而非下单闸门）
+	RiskIP string // 規範化 IP（IPv6 已按 /64 聚合）
+	UserID uint64 // 0 = 遊客
+	// FetchFail 取貨失敗鎖定鍵（非空時走失敗計數鎖定而非下單閘門）
 	FetchFailKey string
 }
 
-// RiskGate 风控闸门端口（order 下单 / fulfillment 取货消费，通道 A）。
+// RiskGate 風控閘門端口（order 下單 / fulfillment 取貨消費，通道 A）。
 type RiskGate interface {
-	// Check 下单前闸门：IP 黑名单 → pending 闸门 → 频率限流（事务内复查防穿透）。
+	// Check 下單前閘門：IP 黑名單 → pending 閘門 → 頻率限流（事務內複查防穿透）。
 	Check(ctx context.Context, in GateInput) error
 	orderaccess.Gate
 }
 
-// NormalizeIP IP 规范化：IPv4 原样；IPv6 按 /64 聚合（orders.risk_ip 写入口统一）。
+// NormalizeIP IP 規範化：IPv4 原樣；IPv6 按 /64 聚合（orders.risk_ip 寫入口統一）。
 func NormalizeIP(ip string) string {
 	parsed := net.ParseIP(strings.TrimSpace(ip))
 	if parsed == nil {
@@ -52,17 +52,17 @@ func NormalizeIP(ip string) string {
 	return masked.String()
 }
 
-// TrafficDay 单日流量（PV/UV）。
+// TrafficDay 單日流量（PV/UV）。
 type TrafficDay struct {
 	Date string
 	PV   int64
 	UV   int64
 }
 
-// TrafficReader 访问统计读取端口（dashboard 工作台消费，通道 A）。
+// TrafficReader 訪問統計讀取端口（dashboard 工作台消費，通道 A）。
 type TrafficReader interface {
-	// CountOnlineUsers 在线用户数（最近 since 内有活跃心跳；分站隔离）。
+	// CountOnlineUsers 在線用户數（最近 since 內有活躍心跳；分站隔離）。
 	CountOnlineUsers(ctx context.Context, subsite uint64, since time.Time) (int64, error)
-	// TrafficByDay 近 N 天 PV/UV（不含缺日补零——调用方补齐日期序列）。
+	// TrafficByDay 近 N 天 PV/UV（不含缺日補零——調用方補齊日期序列）。
 	TrafficByDay(ctx context.Context, subsite uint64, days int) ([]TrafficDay, error)
 }

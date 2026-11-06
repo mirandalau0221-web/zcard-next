@@ -21,10 +21,10 @@ func (s *StoreSMSService) ListSMSProduct(ctx context.Context, r *storefrontv1.SM
 	}
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil || claims.Subject == 0 || claims.Realm != authn.RealmUser {
-		return nil, errors.Unauthorized("sms.LOGIN_REQUIRED", "请登录查看我的号码")
+		return nil, errors.Unauthorized("sms.LOGIN_REQUIRED", "請登錄查看我的號碼")
 	}
 	if r.ProductId == 0 || r.Page < 0 || r.Page > 1000000 {
-		return nil, errors.BadRequest("sms.INVALID_PAGE", "商品或页码无效")
+		return nil, errors.BadRequest("sms.INVALID_PAGE", "商品或頁碼無效")
 	}
 	page := max(int(r.Page), 1)
 	c := data.Client(ctx, s.svc.repo.data)

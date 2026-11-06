@@ -25,7 +25,7 @@ import (
 )
 
 var telegramOrderEvents = map[string]string{
-	events.OrderCreated: "新订单", events.OrderPaid: "付款成功", events.OrderDelivered: "发货完成", events.OrderRefunded: "退款成功",
+	events.OrderCreated: "新訂單", events.OrderPaid: "付款成功", events.OrderDelivered: "發貨完成", events.OrderRefunded: "退款成功",
 }
 
 func TelegramEvents() []string {
@@ -85,11 +85,11 @@ func telegramLogTarget(row *ent.NotificationLog) (notifyport.TelegramTarget, err
 	if raw, ok := row.Variables["telegram_topic_id"]; ok {
 		v, ok := raw.(string)
 		if !ok {
-			return t, fmt.Errorf("通知话题记录无效，已停止发送")
+			return t, fmt.Errorf("通知話題記錄無效，已停止發送")
 		}
 		n, err := strconv.ParseInt(v, 10, 64)
 		if err != nil || n <= 0 || n > 2147483647 {
-			return t, fmt.Errorf("通知话题记录无效，已停止发送")
+			return t, fmt.Errorf("通知話題記錄無效，已停止發送")
 		}
 		t.TopicID = n
 	}
@@ -168,7 +168,7 @@ func (d *Dispatcher) EnqueueTelegram(ctx context.Context, env events.Envelope) e
 		at = event.CreatedAt
 	}
 	amount := o.TotalAmount
-	amountLabel := "订单金额"
+	amountLabel := "訂單金額"
 	payChannel := o.PaymentChannel
 	if env.Type != events.OrderCreated {
 		p, err := client.Payment.Query().Where(payment.OrderID(o.ID), payment.StatusEQ(payment.StatusSuccess)).Order(ent.Desc(payment.FieldID)).First(ctx)
@@ -178,7 +178,7 @@ func (d *Dispatcher) EnqueueTelegram(ctx context.Context, env events.Envelope) e
 		if p != nil {
 			amount = p.Amount
 			payChannel = p.Channel
-			amountLabel = "支付金额"
+			amountLabel = "支付金額"
 		}
 	}
 	read := func(key string) (string, error) {
@@ -211,10 +211,10 @@ func (d *Dispatcher) EnqueueTelegram(ctx context.Context, env events.Envelope) e
 		name = string([]rune(name)[:30])
 	}
 	subject := html.EscapeString(name + " · " + telegramOrderEvents[env.Type])
-	lines := []string{"订单号：" + html.EscapeString(o.OrderNo), fmt.Sprintf("%s：%s %d.%02d", amountLabel, html.EscapeString(o.BaseCurrency), amount/100, amount%100), "支付渠道：" + html.EscapeString(payChannel), "事件时间：" + at.Format(time.RFC3339)}
+	lines := []string{"訂單號：" + html.EscapeString(o.OrderNo), fmt.Sprintf("%s：%s %d.%02d", amountLabel, html.EscapeString(o.BaseCurrency), amount/100, amount%100), "支付渠道：" + html.EscapeString(payChannel), "事件時間：" + at.Format(time.RFC3339)}
 	for i, it := range items {
 		if i >= 10 {
-			lines = append(lines, "更多商品请查看订单详情")
+			lines = append(lines, "更多商品請查看訂單詳情")
 			break
 		}
 		label := it.ProductName
@@ -225,13 +225,13 @@ func (d *Dispatcher) EnqueueTelegram(ctx context.Context, env events.Envelope) e
 			label = string([]rune(label)[:100]) + "…"
 		}
 		kind := string(it.FulfillmentType)
-		lines = append(lines, fmt.Sprintf("• %s × %d（%s）", html.EscapeString(label), it.Quantity, html.EscapeString(map[string]string{"auto": "自动发货", "manual": "人工服务", "upstream": "上游交付"}[kind])))
+		lines = append(lines, fmt.Sprintf("• %s × %d（%s）", html.EscapeString(label), it.Quantity, html.EscapeString(map[string]string{"auto": "自動發貨", "manual": "人工服務", "upstream": "上游交付"}[kind])))
 		if kind == "manual" || kind == "manual_service" {
-			lines = append(lines, "人工服务：请在后台查看并处理")
+			lines = append(lines, "人工服務：請在後台查看並處理")
 		}
 	}
 	if u, e := url.Parse(base); e == nil && (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" && u.User == nil {
-		lines = append(lines, `<a href="`+html.EscapeString(strings.TrimRight(base, "/")+path+"/order?order_no="+url.QueryEscape(o.OrderNo))+`">查看后台订单（需要登录）</a>`)
+		lines = append(lines, `<a href="`+html.EscapeString(strings.TrimRight(base, "/")+path+"/order?order_no="+url.QueryEscape(o.OrderNo))+`">查看後台訂單（需要登錄）</a>`)
 	}
 	// Escape after limiting individual fields; never split HTML entities/tags.
 	body := strings.Join(lines, "\n")
@@ -329,7 +329,7 @@ func (d *Dispatcher) deliverTelegramDue(ctx context.Context) error {
 		}
 		update := client.NotificationLog.Update().Where(notificationlog.ID(row.ID), notificationlog.LeaseUntilEQ(lease), notificationlog.StatusEQ(notificationlog.StatusPending)).ClearLeaseUntil().ClearNextAttemptAt().SetMessageID(messageID).SetErrorMessage("")
 		if status == notificationlog.StatusSkipped {
-			update.SetErrorMessage("通知已关闭或原接收位置已移除，未改投其他话题")
+			update.SetErrorMessage("通知已關閉或原接收位置已移除，未改投其他話題")
 		}
 		if sendErr != nil {
 			status = notificationlog.StatusFailed

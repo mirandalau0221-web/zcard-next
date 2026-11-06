@@ -61,14 +61,14 @@ const modes = Object.entries(lotteryMode).map(([value, label]) => ({
   label,
 }));
 const chanceModes = [
-  { label: "活动期间赠送一次", value: "once" },
-  { label: "每日赠送（不累计）", value: "daily" },
-  { label: "关闭自动赠送，仅后台补发", value: "manual" },
+  { label: "活動期間贈送一次", value: "once" },
+  { label: "每日贈送（不累計）", value: "daily" },
+  { label: "關閉自動贈送，僅後台補發", value: "manual" },
 ];
 const timezones = [
-  { label: "北京时间（UTC+8）", value: "Asia/Shanghai" },
-  { label: "越南时间（UTC+7）", value: "Asia/Ho_Chi_Minh" },
-  { label: "协调世界时（UTC）", value: "UTC" },
+  { label: "北京時間（UTC+8）", value: "Asia/Shanghai" },
+  { label: "越南時間（UTC+7）", value: "Asia/Ho_Chi_Minh" },
+  { label: "協調世界時（UTC）", value: "UTC" },
 ];
 const probability = computed(() =>
   form.value.prizes.reduce((n, p) => n + p.probability, 0),
@@ -86,7 +86,7 @@ const stateTag = (v: string) =>
             ? "warning"
             : "default",
     },
-    { default: () => lotteryState[v] || "未知状态" },
+    { default: () => lotteryState[v] || "未知狀態" },
   );
 async function load() {
   loading.value = true;
@@ -231,25 +231,25 @@ async function edit(row?: LotteryActivity, copy = false) {
   void searchProducts();
 }
 function validate() {
-  if (!form.value.name.trim()) return "请填写活动名称";
+  if (!form.value.name.trim()) return "請填寫活動名稱";
   if (!dateRange.value || dateRange.value[1] <= dateRange.value[0])
-    return "请选择正确的活动时间";
-  if (!form.value.prizes.length) return "请添加奖品";
+    return "請選擇正確的活動時間";
+  if (!form.value.prizes.length) return "請添加獎品";
   if (probability.value <= 0 || probability.value > 10000)
-    return "奖品概率合计须大于 0 且不超过 100%";
+    return "獎品概率合計須大於 0 且不超過 100%";
   for (const p of form.value.prizes) {
-    if (!p.name.trim()) return "请填写每种奖品的名称";
-    if (p.mode === "card" && !p.product_id) return "自动发卡需要选择商品";
+    if (!p.name.trim()) return "請填寫每種獎品的名稱";
+    if (p.mode === "card" && !p.product_id) return "自動髮卡需要選擇商品";
     if (
       p.mode === "card" &&
       (skuOptions[p.product_id]?.length || 0) > 0 &&
       !p.sku_id
     )
-      return "请选择奖品具体规格";
+      return "請選擇獎品具體規格";
     if (p.mode !== "card" && !p.content.trim())
-      return "请填写发放内容或领取说明";
+      return "請填寫發放內容或領取説明";
     if (!p.quantity || p.quantity < (p.issued || 0))
-      return "奖品数量不能少于已发数量";
+      return "獎品數量不能少於已發數量";
   }
   return "";
 }
@@ -265,7 +265,7 @@ async function save() {
     });
     if (!error) {
       showEdit.value = false;
-      window.$message?.success("活动配置已保存");
+      window.$message?.success("活動配置已保存");
       await load();
     }
   } finally {
@@ -279,7 +279,7 @@ async function change(row: LotteryActivity, status: string) {
   try {
     const { error } = await setLotteryStatus(row.id, status, row.revision);
     if (!error) {
-      window.$message?.success("活动状态已更新");
+      window.$message?.success("活動狀態已更新");
       await load();
     }
   } finally {
@@ -288,7 +288,7 @@ async function change(row: LotteryActivity, status: string) {
 }
 const columns: DataTableColumns<LotteryActivity> = [
   {
-    title: "活动",
+    title: "活動",
     key: "name",
     minWidth: 180,
     render: (r) =>
@@ -297,26 +297,26 @@ const columns: DataTableColumns<LotteryActivity> = [
         h(
           "small",
           { class: "text-gray-500" },
-          `#${r.id} · 规则版本 ${r.revision}`,
+          `#${r.id} · 規則版本 ${r.revision}`,
         ),
       ]),
   },
   {
-    title: "活动时间",
+    title: "活動時間",
     key: "time",
     minWidth: 190,
     render: (r) =>
       h("div", [h("div", time(r.start_at)), h("div", time(r.end_at))]),
   },
   {
-    title: "次数规则",
+    title: "次數規則",
     key: "chance",
     minWidth: 170,
     render: (r) =>
       `${chanceModes.find((m) => m.value === r.chance_mode)?.label || "—"}${r.chance_mode === "manual" ? "" : ` · ${r.chance_count} 次`}`,
   },
   {
-    title: "状态",
+    title: "狀態",
     key: "status",
     width: 95,
     render: (r) => stateTag(r.status),
@@ -345,12 +345,12 @@ const columns: DataTableColumns<LotteryActivity> = [
                       ].includes(r.status),
                       onClick: () => edit(r),
                     },
-                    { default: () => "编辑" },
+                    { default: () => "編輯" },
                   ),
                   h(
                     NButton,
                     { size: "tiny", onClick: () => edit(r, true) },
-                    { default: () => "复制" },
+                    { default: () => "複製" },
                   ),
                   ...(["draft", "paused"].includes(r.status)
                     ? [
@@ -366,10 +366,10 @@ const columns: DataTableColumns<LotteryActivity> = [
                                   type: "success",
                                   disabled: changing.value,
                                 },
-                                { default: () => "发布/恢复" },
+                                { default: () => "發佈/恢復" },
                               ),
                             default: () =>
-                              "发布后按规则发放次数和奖品，确认发布？",
+                              "發佈後按規則發放次數和獎品，確認發佈？",
                           },
                         ),
                       ]
@@ -383,7 +383,7 @@ const columns: DataTableColumns<LotteryActivity> = [
                             disabled: changing.value,
                             onClick: () => change(r, "paused"),
                           },
-                          { default: () => "暂停" },
+                          { default: () => "暫停" },
                         ),
                       ]
                     : []),
@@ -397,9 +397,9 @@ const columns: DataTableColumns<LotteryActivity> = [
                               h(
                                 NButton,
                                 { size: "tiny", disabled: changing.value },
-                                { default: () => "结束" },
+                                { default: () => "結束" },
                               ),
-                            default: () => "结束后停止新增抽奖，保留历史奖品。",
+                            default: () => "結束後停止新增抽獎，保留歷史獎品。",
                           },
                         ),
                       ]
@@ -414,10 +414,10 @@ const columns: DataTableColumns<LotteryActivity> = [
                               h(
                                 NButton,
                                 { size: "tiny", disabled: changing.value },
-                                { default: () => "归档" },
+                                { default: () => "歸檔" },
                               ),
                             default: () =>
-                              "归档活动并隐藏入口，保留历史领奖记录？",
+                              "歸檔活動並隱藏入口，保留歷史領獎記錄？",
                           },
                         ),
                       ]
@@ -425,7 +425,7 @@ const columns: DataTableColumns<LotteryActivity> = [
                   h(
                     NButton,
                     { size: "tiny", onClick: () => preview(r) },
-                    { default: () => "预览" },
+                    { default: () => "預覽" },
                   ),
                 ]
               : []),
@@ -436,14 +436,14 @@ const columns: DataTableColumns<LotteryActivity> = [
                   h(
                     NButton,
                     { size: "tiny", onClick: () => openGrant(r) },
-                    { default: () => "补次数" },
+                    { default: () => "補次數" },
                   ),
                 ]
               : []),
             h(
               NButton,
               { size: "tiny", onClick: () => history(r) },
-              { default: () => "规则历史" },
+              { default: () => "規則歷史" },
             ),
             h(
               NButton,
@@ -455,7 +455,7 @@ const columns: DataTableColumns<LotteryActivity> = [
                   loadRecords();
                 },
               },
-              { default: () => "中奖记录" },
+              { default: () => "中獎記錄" },
             ),
           ],
         },
@@ -525,7 +525,7 @@ async function grant() {
     });
     if (!error) {
       showGrant.value = false;
-      window.$message?.success("次数已补发");
+      window.$message?.success("次數已補發");
     }
   } finally {
     saving.value = false;
@@ -577,7 +577,7 @@ async function viewRecord(r: LotteryDraw) {
 async function reveal() {
   if (!selectedDraw.value) return;
   const { data, error } = await revealLotteryDraw(selectedDraw.value.draw_no);
-  if (!error && data) drawContent.value = data.content || "无发放内容";
+  if (!error && data) drawContent.value = data.content || "無發放內容";
 }
 async function deliver() {
   if (!selectedDraw.value) return;
@@ -589,7 +589,7 @@ async function deliver() {
     );
     if (!error) {
       selectedDraw.value = null;
-      window.$message?.success("已确认发放");
+      window.$message?.success("已確認發放");
       await loadRecords();
     }
   } finally {
@@ -597,9 +597,9 @@ async function deliver() {
   }
 }
 const recordColumns: DataTableColumns<LotteryDraw> = [
-  { title: "中奖编号", key: "draw_no", width: 280 },
+  { title: "中獎編號", key: "draw_no", width: 280 },
   {
-    title: "账号",
+    title: "賬號",
     key: "username",
     width: 150,
     render: (r) =>
@@ -614,33 +614,33 @@ const recordColumns: DataTableColumns<LotteryDraw> = [
               query: { keyword: r.username || String(r.user_id) },
             }),
         },
-        { default: () => `${r.username || "账号"} #${r.user_id}` },
+        { default: () => `${r.username || "賬號"} #${r.user_id}` },
       ),
   },
   {
-    title: "活动 / 奖品",
+    title: "活動 / 獎品",
     key: "prize",
     minWidth: 180,
     render: (r) =>
       h("div", [
         h("div", r.activity_name),
-        h("div", r.prize_name || "谢谢参与"),
+        h("div", r.prize_name || "謝謝參與"),
       ]),
   },
   {
-    title: "发放方式",
+    title: "發放方式",
     key: "mode",
     width: 140,
     render: (r) => lotteryMode[r.mode] || "—",
   },
   {
-    title: "状态",
+    title: "狀態",
     key: "status",
     width: 110,
     render: (r) => stateTag(r.status),
   },
   {
-    title: "时间",
+    title: "時間",
     key: "created_at",
     width: 170,
     render: (r) => time(r.created_at),
@@ -653,7 +653,7 @@ const recordColumns: DataTableColumns<LotteryDraw> = [
       h(
         NButton,
         { size: "small", onClick: () => viewRecord(r) },
-        { default: () => "详情" },
+        { default: () => "詳情" },
       ),
   },
 ];
@@ -663,23 +663,23 @@ onMounted(load);
 <template>
   <div class="lottery-admin">
     <NAlert type="info" class="mb-16px"
-      >免费抽奖按账号记录次数。系统发卡共用商品库存；人工奖品在中奖记录中确认发放。</NAlert
+      >免費抽獎按賬號記錄次數。系統髮卡共用商品庫存；人工獎品在中獎記錄中確認發放。</NAlert
     >
     <NTabs
       v-model:value="tab"
       type="segment"
       @update:value="(v) => v === 'records' && loadRecords()"
     >
-      <NTabPane name="activities" tab="活动管理">
+      <NTabPane name="activities" tab="活動管理">
         <div class="lottery-toolbar">
           <NButton
             v-if="checkAuth('lottery:write')"
             type="primary"
             @click="edit()"
-            >新建抽奖活动</NButton
+            >新建抽獎活動</NButton
           ><NInput
             v-model:value="keyword"
-            placeholder="搜索活动名称"
+            placeholder="搜索活動名稱"
             clearable
             style="max-width: 280px"
             @keyup.enter="
@@ -708,18 +708,18 @@ onMounted(load);
           @change="load"
         />
       </NTabPane>
-      <NTabPane name="records" tab="中奖记录">
+      <NTabPane name="records" tab="中獎記錄">
         <div class="lottery-toolbar">
           <NSelect
             v-model:value="recordActivity"
             :options="activities.map((a) => ({ label: a.name, value: a.id! }))"
-            placeholder="全部活动"
+            placeholder="全部活動"
             clearable
             filterable
             style="width: 210px"
           /><NInput
             v-model:value="recordKeyword"
-            placeholder="用户名或完整中奖编号"
+            placeholder="用户名或完整中獎編號"
             style="max-width: 240px"
             clearable
           /><NSelect
@@ -730,20 +730,20 @@ onMounted(load);
                 label: lotteryState[value],
               }))
             "
-            placeholder="全部状态"
+            placeholder="全部狀態"
             clearable
             style="width: 150px"
           /><NDatePicker
             v-model:value="recordRange"
             type="datetimerange"
             clearable
-          /><NCheckbox v-model:checked="includeMissed">包括未中奖</NCheckbox
+          /><NCheckbox v-model:checked="includeMissed">包括未中獎</NCheckbox
           ><NButton
             @click="
               recordPage = 1;
               loadRecords();
             "
-            >查询</NButton
+            >查詢</NButton
           >
         </div>
         <NDataTable
@@ -764,43 +764,43 @@ onMounted(load);
     <NModal
       v-model:show="showEdit"
       preset="card"
-      :title="form.id ? '编辑抽奖活动' : '新建抽奖活动'"
+      :title="form.id ? '編輯抽獎活動' : '新建抽獎活動'"
       class="lottery-modal"
       :mask-closable="!saving"
       :closable="!saving"
       :close-on-esc="!saving"
     >
       <NSteps :current="step" size="small" class="mb-24px"
-        ><NStep title="基本信息" /><NStep title="奖品设置" /><NStep
-          title="次数规则"
+        ><NStep title="基本信息" /><NStep title="獎品設置" /><NStep
+          title="次數規則"
       /></NSteps>
       <NForm label-placement="top">
         <div v-show="step === 1">
-          <NFormItem label="活动名称" required
+          <NFormItem label="活動名稱" required
             ><NInput
               v-model:value="form.name"
               :maxlength="100"
-              placeholder="例如：会员幸运抽奖" /></NFormItem
-          ><NFormItem label="活动时间" required
+              placeholder="例如：會員幸運抽獎" /></NFormItem
+          ><NFormItem label="活動時間" required
             ><NDatePicker
               v-model:value="dateRange"
               type="datetimerange"
               :is-date-disabled="() => false"
               class="w-full" /></NFormItem
-          ><NFormItem label="活动时区"
+          ><NFormItem label="活動時區"
             ><NSelect
               v-model:value="form.timezone"
               :options="timezones"
               :disabled="form.published" /></NFormItem
-          ><NFormItem label="活动图片（可选）"
+          ><NFormItem label="活動圖片（可選）"
             ><MediaField :value="form.image ? [form.image] : []" @update:value="urls => form.image = urls[0] || ''" /></NFormItem
-          ><NFormItem label="活动说明"
+          ><NFormItem label="活動説明"
             ><NInput
               v-model:value="form.description"
               type="textarea"
               :autosize="{ minRows: 4, maxRows: 10 }"
               :maxlength="5000"
-              placeholder="参与条件、活动时间及领取说明"
+              placeholder="參與條件、活動時間及領取説明"
           /></NFormItem>
         </div>
         <div v-show="step === 2">
@@ -809,10 +809,10 @@ onMounted(load);
               probability > 10000 || probability <= 0 ? 'warning' : 'success'
             "
             class="mb-16px"
-            >奖品概率合计 {{ (probability / 100).toFixed(2) }}%；谢谢参与
+            >獎品概率合計 {{ (probability / 100).toFixed(2) }}%；謝謝參與
             {{
               (Math.max(0, 10000 - probability) / 100).toFixed(2)
-            }}%。任一有概率的奖品耗尽后暂停抽奖，补足后恢复。</NAlert
+            }}%。任一有概率的獎品耗盡後暫停抽獎，補足後恢復。</NAlert
           >
           <div
             v-for="(p, i) in form.prizes"
@@ -821,23 +821,23 @@ onMounted(load);
           >
             <div class="flex items-center justify-between mb-12px">
               <b
-                >奖品 {{ i + 1
-                }}<span v-if="p.issued"> · 已发 {{ p.issued }} 份</span></b
+                >獎品 {{ i + 1
+                }}<span v-if="p.issued"> · 已發 {{ p.issued }} 份</span></b
               ><NButton
                 size="small"
                 quaternary
                 type="error"
                 @click="form.prizes.splice(i, 1)"
-                >移除奖项</NButton
+                >移除獎項</NButton
               >
             </div>
             <div class="lottery-form-grid">
-              <NFormItem label="奖品名称" required
+              <NFormItem label="獎品名稱" required
                 ><NInput
                   v-model:value="p.name"
                   :maxlength="100"
-                  placeholder="中奖时显示的名称" /></NFormItem
-              ><NFormItem label="发放方式" required
+                  placeholder="中獎時顯示的名稱" /></NFormItem
+              ><NFormItem label="發放方式" required
                 ><NSelect
                   v-model:value="p.mode"
                   :options="modes"
@@ -851,7 +851,7 @@ onMounted(load);
               /></NFormItem>
             </div>
             <template v-if="p.mode === 'card'"
-              ><NFormItem label="自动发卡商品" required
+              ><NFormItem label="自動髮卡商品" required
                 ><NSelect
                   :value="p.product_id || null"
                   :options="productOptions"
@@ -859,28 +859,28 @@ onMounted(load);
                   remote
                   filterable
                   :disabled="!!p.issued"
-                  placeholder="搜索在售自营卡密商品（上游商品不自动发奖）"
+                  placeholder="搜索在售自營卡密商品（上游商品不自動發獎）"
                   @search="searchProducts"
                   @update:value="(id) => selectProduct(p, id)" /></NFormItem
               ><NFormItem
                 v-if="skuOptions[p.product_id]?.length"
-                label="发奖规格"
+                label="發獎規格"
                 required
                 ><NSelect
                   v-model:value="p.sku_id"
                   :options="skuOptions[p.product_id]"
                   :disabled="!!p.issued"
-                  placeholder="请选择具体规格" /></NFormItem
+                  placeholder="請選擇具體規格" /></NFormItem
               ><NAlert type="warning" class="mb-12px"
-                >中奖会消耗该商品一张可用卡密，影响店铺可售库存。不支持上游代发、必填下单控件、靓号和发后即删商品。</NAlert
+                >中獎會消耗該商品一張可用卡密，影響店鋪可售庫存。不支持上游代發、必填下單控件、靚號和發後即刪商品。</NAlert
               ></template
             >
             <NFormItem
               v-else
               :label="
                 p.mode === 'manual'
-                  ? '中奖后的领取说明'
-                  : '中奖后自动显示的文字或链接'
+                  ? '中獎後的領取説明'
+                  : '中獎後自動顯示的文字或鏈接'
               "
               required
               ><NInput
@@ -890,12 +890,12 @@ onMounted(load);
                 :maxlength="10000"
                 :placeholder="
                   p.mode === 'manual'
-                    ? '例如：请联系客服，提供中奖编号领取。'
-                    : '每位中奖者获得同一份内容；不同卡密请选择系统发卡。'
+                    ? '例如：請聯繫客服，提供中獎編號領取。'
+                    : '每位中獎者獲得同一份內容；不同卡密請選擇系統髮卡。'
                 "
             /></NFormItem>
             <div class="lottery-form-grid">
-              <NFormItem label="中奖概率（%）" required
+              <NFormItem label="中獎概率（%）" required
                 ><NInputNumber
                   :value="p.probability / 100"
                   :min="0"
@@ -906,7 +906,7 @@ onMounted(load);
                   @update:value="
                     (v) => (p.probability = Math.round((v || 0) * 100))
                   " /></NFormItem
-              ><NFormItem label="活动可发总量（份）" required
+              ><NFormItem label="活動可發總量（份）" required
                 ><NInputNumber
                   v-model:value="p.quantity"
                   :min="Math.max(1, p.issued || 0)"
@@ -916,7 +916,7 @@ onMounted(load);
                   class="w-full"
               /></NFormItem>
             </div>
-            <NFormItem label="奖品图片（可选）"
+            <NFormItem label="獎品圖片（可選）"
               ><MediaField :value="p.image ? [p.image] : []" @update:value="urls => p.image = urls[0] || ''"
             /></NFormItem>
           </div>
@@ -925,20 +925,20 @@ onMounted(load);
             block
             :disabled="form.prizes.length >= 12"
             @click="addPrize"
-            >添加奖品（{{ form.prizes.length }}/12）</NButton
+            >添加獎品（{{ form.prizes.length }}/12）</NButton
           >
         </div>
         <div v-show="step === 3">
           <NAlert type="info" class="mb-16px"
-            >游客可查看，登录后才可参与。赠送次数按账号去重，重复登录或换设备不会重复领取。</NAlert
-          ><NFormItem label="自动赠送规则"
+            >遊客可查看，登錄後才可參與。贈送次數按賬號去重，重複登錄或換設備不會重複領取。</NAlert
+          ><NFormItem label="自動贈送規則"
             ><NSelect
               v-model:value="form.chance_mode"
               :options="chanceModes"
               :disabled="form.published" /></NFormItem
           ><NFormItem
             v-if="form.chance_mode !== 'manual'"
-            label="每次赠送次数"
+            label="每次贈送次數"
             required
             ><NInputNumber
               v-model:value="form.chance_count"
@@ -950,14 +950,14 @@ onMounted(load);
           <p>
             {{
               form.chance_mode === "daily"
-                ? "每日按活动时区重新领取，当日次数不累计到次日。"
+                ? "每日按活動時區重新領取，當日次數不累計到次日。"
                 : form.chance_mode === "manual"
-                  ? "关闭自动赠送后，需在活动列表中给指定账号补发次数。"
-                  : "每个账号在整个活动期间只领取一次，暂停或重新登录不会重置。"
+                  ? "關閉自動贈送後，需在活動列表中給指定賬號補發次數。"
+                  : "每個賬號在整個活動期間只領取一次，暫停或重新登錄不會重置。"
             }}
           </p>
           <p class="mt-12px text-gray-500">
-            发布后次数规则固定，需要更改请复制新活动。每次独立抽奖，允许重复中奖。
+            發佈後次數規則固定，需要更改請複製新活動。每次獨立抽獎，允許重複中獎。
           </p>
         </div>
       </NForm>
@@ -980,10 +980,10 @@ onMounted(load);
     <NModal
       v-model:show="showPreview"
       preset="card"
-      title="活动预览"
+      title="活動預覽"
       class="lottery-small-modal"
       ><NAlert type="info" class="mb-16px"
-        >演示预览，不扣次数，不发真实奖品。</NAlert
+        >演示預覽，不扣次數，不發真實獎品。</NAlert
       >
       <h3>{{ previewData?.name }}</h3>
       <p class="lottery-pre">{{ previewData?.description }}</p>
@@ -998,29 +998,29 @@ onMounted(load);
         </div>
       </div>
       <NButton type="primary" block class="mt-16px" @click="demo = true"
-        >模拟抽奖</NButton
+        >模擬抽獎</NButton
       ><NAlert v-if="demo" type="success" class="mt-12px"
-        >演示结果：获得“{{
+        >演示結果：獲得“{{
           previewData?.prizes[0]?.name
-        }}”。这里仅展示效果，未真实发奖。</NAlert
+        }}”。這裏僅展示效果，未真實發獎。</NAlert
       ></NModal
     >
     <NModal
       v-model:show="showGrant"
       preset="card"
-      title="补发抽奖次数"
+      title="補發抽獎次數"
       class="lottery-small-modal"
       :mask-closable="!saving"
       ><p class="mb-12px">
         {{ grantActivity?.name }} ·
         {{
           grantActivity?.chance_mode === "daily"
-            ? "补发次数当日有效"
-            : "补发次数活动期间有效"
+            ? "補發次數當日有效"
+            : "補發次數活動期間有效"
         }}
       </p>
       <NForm label-placement="top"
-        ><NFormItem label="用户账号" required
+        ><NFormItem label="用户賬號" required
           ><NSelect
             v-model:value="grantUser"
             :options="userOptions"
@@ -1028,13 +1028,13 @@ onMounted(load);
             remote
             placeholder="搜索用户名"
             @search="searchUsers" /></NFormItem
-        ><NFormItem label="补发次数" required
+        ><NFormItem label="補發次數" required
           ><NInputNumber
             v-model:value="grantCount"
             :min="1"
             :max="1000"
             :precision="0" /></NFormItem
-        ><NFormItem label="补发原因" required
+        ><NFormItem label="補發原因" required
           ><NInput
             v-model:value="grantRemark"
             type="textarea"
@@ -1047,7 +1047,7 @@ onMounted(load);
             :loading="saving"
             :disabled="!grantUser || !grantRemark.trim()"
             @click="grant"
-            >确认补发</NButton
+            >確認補發</NButton
           >
         </div></template
       ></NModal
@@ -1055,7 +1055,7 @@ onMounted(load);
     <NModal
       v-model:show="showHistory"
       preset="card"
-      title="活动规则历史"
+      title="活動規則歷史"
       class="lottery-small-modal"
       ><div
         v-for="row in historyItems"
@@ -1070,49 +1070,49 @@ onMounted(load);
           {{ p.quantity }} 份
         </p>
       </div>
-      <NEmpty v-if="!historyItems.length" description="暂无规则历史"
+      <NEmpty v-if="!historyItems.length" description="暫無規則歷史"
     /></NModal>
     <NModal
       :show="!!selectedDraw"
       preset="card"
-      title="中奖记录详情"
+      title="中獎記錄詳情"
       class="lottery-small-modal"
       @update:show="(v) => !v && (selectedDraw = null)"
       ><template v-if="selectedDraw"
         ><NDescriptions :column="1" bordered label-placement="left"
-          ><NDescriptionsItem label="中奖编号">{{
+          ><NDescriptionsItem label="中獎編號">{{
             selectedDraw.draw_no
           }}</NDescriptionsItem
           ><NDescriptionsItem label="用户"
             >{{ selectedDraw.username }} #{{
               selectedDraw.user_id
             }}</NDescriptionsItem
-          ><NDescriptionsItem label="活动 / 奖品"
+          ><NDescriptionsItem label="活動 / 獎品"
             >{{ selectedDraw.activity_name }} /
-            {{ selectedDraw.prize_name || "谢谢参与" }}</NDescriptionsItem
-          ><NDescriptionsItem label="状态">{{
+            {{ selectedDraw.prize_name || "謝謝參與" }}</NDescriptionsItem
+          ><NDescriptionsItem label="狀態">{{
             lotteryState[selectedDraw.status]
           }}</NDescriptionsItem
-          ><NDescriptionsItem label="中奖时间">{{
+          ><NDescriptionsItem label="中獎時間">{{
             time(selectedDraw.created_at)
           }}</NDescriptionsItem
-          ><NDescriptionsItem label="发放时间">{{
+          ><NDescriptionsItem label="發放時間">{{
             time(selectedDraw.delivered_at)
           }}</NDescriptionsItem
-          ><NDescriptionsItem label="奖品成本">{{
+          ><NDescriptionsItem label="獎品成本">{{
             formatMoney(selectedDraw.cost_cents || 0)
           }}</NDescriptionsItem
-          ><NDescriptionsItem label="发放备注">{{
+          ><NDescriptionsItem label="發放備註">{{
             selectedDraw.remark || "—"
           }}</NDescriptionsItem
-          ><NDescriptionsItem label="发放操作人">{{
-            selectedDraw.admin_id ? `#${selectedDraw.admin_id}` : "系统"
+          ><NDescriptionsItem label="發放操作人">{{
+            selectedDraw.admin_id ? `#${selectedDraw.admin_id}` : "系統"
           }}</NDescriptionsItem></NDescriptions
         ><NButton
           v-if="selectedDraw.status !== 'missed' && checkAuth('lottery:reveal')"
           class="mt-16px"
           @click="reveal"
-          >查看发放内容（记录审计）</NButton
+          >查看發放內容（記錄審計）</NButton
         >
         <pre v-if="drawContent" class="lottery-pre mt-12px">{{
           drawContent
@@ -1124,17 +1124,17 @@ onMounted(load);
             checkAuth('lottery:deliver')
           "
           ><NAlert type="warning" class="mt-16px mb-12px"
-            >请实际交付奖品后再确认，此操作不会自动给用户发送商品。</NAlert
+            >請實際交付獎品後再確認，此操作不會自動給用户發送商品。</NAlert
           ><NInput
             v-model:value="deliveryRemark"
-            placeholder="发放备注（可选）"
+            placeholder="發放備註（可選）"
             :maxlength="500"
           /><NPopconfirm @positive-click="deliver"
             ><template #trigger
               ><NButton type="primary" class="mt-12px" :loading="saving"
-                >确认已发放</NButton
+                >確認已發放</NButton
               ></template
-            >确认已经把奖品交付给此用户？</NPopconfirm
+            >確認已經把獎品交付給此用户？</NPopconfirm
           ></template
         ></template
       ></NModal

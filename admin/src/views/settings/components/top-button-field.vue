@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// 站点顶部自定义按钮设置（site.top_button JSON）：
-// {text, type: link|post|notice, url?, slug?}——外部链接 / 站内文章 / 站内公告三态跳转；
-// 文字留空 = 不显示；保存为 JSON。
+// 站點頂部自定義按鈕設置（site.top_button JSON）：
+// {text, type: link|post|notice, url?, slug?}——外部鏈接 / 站內文章 / 站內公告三態跳轉；
+// 文字留空 = 不顯示；保存為 JSON。
 import { computed, ref, watch } from "vue";
 import { NButton, NInput, NRadioButton, NRadioGroup, NSelect } from "naive-ui";
 import { fetchPosts } from "@/service/api";
@@ -14,7 +14,7 @@ const type = ref<"link" | "post" | "notice">("link");
 const url = ref("");
 const slug = ref<string | null>(null);
 
-// 文章/公告下拉（复用营销-轮播的既有模式：zhValue 解析 title_json）
+// 文章/公告下拉（複用營銷-輪播的既有模式：zhValue 解析 title_json）
 const posts = ref<any[]>([]);
 const postsLoading = ref(false);
 
@@ -50,7 +50,7 @@ function parse(v: string | null) {
     const o = JSON.parse(v || "null");
     if (o && typeof o === "object") {
       text.value = typeof o.text === "string" ? o.text : "";
-      // 兼容旧结构 {text,url}（无 type 字段按外部链接处理）
+      // 兼容舊結構 {text,url}（無 type 字段按外部鏈接處理）
       const t = o.type === "post" || o.type === "notice" ? o.type : "link";
       type.value = t;
       url.value = typeof o.url === "string" ? o.url : "";
@@ -58,7 +58,7 @@ function parse(v: string | null) {
       return;
     }
   } catch {
-    /* 非法 JSON 按空处理 */
+    /* 非法 JSON 按空處理 */
   }
   text.value = "";
   type.value = "link";
@@ -68,7 +68,7 @@ function parse(v: string | null) {
 parse(props.value);
 watch(() => props.value, parse);
 
-// 切换跳转类型：预载文章列表；清掉不属于新类型的旧值
+// 切換跳轉類型：預載文章列表；清掉不屬於新類型的舊值
 watch(type, (t) => {
   if (t !== "link") {
     loadPosts();
@@ -82,7 +82,7 @@ const enabled = computed(() => !!text.value.trim());
 
 function push() {
   const t = text.value.trim();
-  // 文字留空 = 不启用（存 null）；父级 setVal 统一 JSON.stringify
+  // 文字留空 = 不啓用（存 null）；父級 setVal 統一 JSON.stringify
   if (!t) {
     emit("update", null);
     return;
@@ -94,14 +94,14 @@ function push() {
   }
 }
 
-// 跳转目标描述（提示行用）
+// 跳轉目標描述（提示行用）
 const targetDesc = computed(() => {
   if (!enabled.value) return "";
   if (type.value === "link") {
-    return url.value.trim() ? `点击打开 ${url.value.trim()}（新窗口）` : "未填链接——按钮只显示不跳转";
+    return url.value.trim() ? `點擊打開 ${url.value.trim()}（新窗口）` : "未填鏈接——按鈕只顯示不跳轉";
   }
   const opt = postOptions.value.find((o) => o.value === slug.value);
-  return opt ? `点击跳转${type.value === "notice" ? "公告" : "文章"}「${opt.label}」` : "尚未选择目标文章";
+  return opt ? `點擊跳轉${type.value === "notice" ? "公告" : "文章"}「${opt.label}」` : "尚未選擇目標文章";
 });
 
 function clear() {
@@ -115,9 +115,9 @@ function clear() {
 <template>
   <div class="flex w-full flex-col gap-8px">
     <div class="flex items-center gap-8px">
-      <NInput v-model:value="text" size="small" class="w-140px shrink-0" placeholder="按钮文字，如 客服中心" @update:value="push" />
+      <NInput v-model:value="text" size="small" class="w-140px shrink-0" placeholder="按鈕文字，如 客服中心" @update:value="push" />
       <NRadioGroup v-model:value="type" size="small" @update:value="push">
-        <NRadioButton value="link">外部链接</NRadioButton>
+        <NRadioButton value="link">外部鏈接</NRadioButton>
         <NRadioButton value="post">文章</NRadioButton>
         <NRadioButton value="notice">公告</NRadioButton>
       </NRadioGroup>
@@ -129,7 +129,7 @@ function clear() {
         v-model:value="url"
         size="small"
         class="flex-1"
-        placeholder="跳转链接 https://…（留空则不跳转）"
+        placeholder="跳轉鏈接 https://…（留空則不跳轉）"
         @update:value="push"
       />
       <NSelect
@@ -141,18 +141,18 @@ function clear() {
         clearable
         :loading="postsLoading"
         :options="postOptions"
-        :placeholder="type === 'notice' ? '选择要跳转的公告文章' : '选择要跳转的文章'"
+        :placeholder="type === 'notice' ? '選擇要跳轉的公告文章' : '選擇要跳轉的文章'"
         @update:value="push"
       />
     </div>
     <div class="flex items-center gap-8px">
       <span class="text-11px text-gray-400">
-        {{ enabled ? `效果预览（将显示在 storefront 顶部导航）：${targetDesc}` : "文字留空 = 不显示；填写后显示在 storefront 顶部导航" }}
+        {{ enabled ? `效果預覽（將顯示在 storefront 頂部導航）：${targetDesc}` : "文字留空 = 不顯示；填寫後顯示在 storefront 頂部導航" }}
       </span>
       <span
         v-if="enabled"
         class="rounded-4px border border-primary px-8px py-2px text-12px font-500 text-primary"
-        :title="`按钮「${text}」在 storefront 顶部导航的显示效果`"
+        :title="`按鈕「${text}」在 storefront 頂部導航的顯示效果`"
       >
         {{ text }}
       </span>

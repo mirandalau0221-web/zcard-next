@@ -23,15 +23,15 @@ type Payment struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
-	// 关联订单（订单支付单；充值支付单为空）
+	// 關聯訂單（訂單支付單；充值支付單為空）
 	OrderID uint64 `json:"order_id,omitempty"`
-	// 关联充值单（充值支付单；订单支付单为空）
+	// 關聯充值單（充值支付單；訂單支付單為空）
 	RechargeOrderID uint64 `json:"recharge_order_id,omitempty"`
-	// 渠道码
+	// 渠道碼
 	Channel string `json:"channel,omitempty"`
-	// 发起时渠道身份；0 为历史流水
+	// 發起時渠道身份；0 為歷史流水
 	ChannelID uint64 `json:"channel_id,omitempty"`
 	// DriverSnapshot holds the value of the "driver_snapshot" field.
 	DriverSnapshot string `json:"driver_snapshot,omitempty"`
@@ -39,35 +39,35 @@ type Payment struct {
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// ReviewReason holds the value of the "review_reason" field.
 	ReviewReason string `json:"review_reason,omitempty"`
-	// 支付尝试的稳定网关订单号；旧流水保持 NULL
+	// 支付嘗試的穩定網關訂單號；舊流水保持 NULL
 	GatewayOrderRef string `json:"gateway_order_ref,omitempty"`
-	// 非敏感网关请求快照、租约及收银台地址
+	// 非敏感網關請求快照、租約及收銀台地址
 	GatewayContext json.RawMessage `json:"gateway_context,omitempty"`
-	// 网关单号（回调时回填）
+	// 網關單號（回調時回填）
 	ChannelOrderNo string `json:"channel_order_no,omitempty"`
-	// 应收（分，基础货币）
+	// 應收（分，基礎貨幣）
 	Amount int64 `json:"amount,omitempty"`
-	// 实收（分，回调核对；金额核对永远对基础货币）
+	// 實收（分，回調核對；金額核對永遠對基礎貨幣）
 	ChargedAmount int64 `json:"charged_amount,omitempty"`
-	// 渠道币种 ISO 码（空=CNY 同币直收）
+	// 渠道幣種 ISO 碼（空=CNY 同幣直收）
 	ChargedCurrency string `json:"charged_currency,omitempty"`
-	// 快照汇率（1 基础货币=rate 渠道币；0=未换算）
+	// 快照匯率（1 基礎貨幣=rate 渠道幣；0=未換算）
 	ExchangeRate float64 `json:"exchange_rate,omitempty"`
-	// 渠道金额单位精度快照；-1 为历史未记录，不能使用显示精度推断
+	// 渠道金額單位精度快照；-1 為歷史未記錄，不能使用顯示精度推斷
 	ChargedPrecision int32 `json:"charged_precision,omitempty"`
-	// 渠道币种应收最小单位（发适配器金额；回调精确核对）
+	// 渠道幣種應收最小單位（發適配器金額；回調精確核對）
 	ChargedUnits int64 `json:"charged_units,omitempty"`
-	// 用户支付手续费（分）
+	// 用户支付手續費（分）
 	Fee int64 `json:"fee,omitempty"`
-	// 支付本金、费率、承担方及方式快照；空为历史流水
+	// 支付本金、費率、承擔方及方式快照；空為歷史流水
 	PricingSnapshot json.RawMessage `json:"pricing_snapshot,omitempty"`
 	// Status holds the value of the "status" field.
 	Status payment.Status `json:"status,omitempty"`
 	// PaidAt holds the value of the "paid_at" field.
 	PaidAt time.Time `json:"paid_at,omitempty"`
-	// 回调原文（审计；不含敏感凭据）
+	// 回調原文（審計；不含敏感憑據）
 	Raw json.RawMessage `json:"raw,omitempty"`
-	// 业务幂等键（写接口 Idempotency-Key 头）
+	// 業務冪等鍵（寫接口 Idempotency-Key 頭）
 	IdempotencyKey string `json:"idempotency_key,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PaymentQuery when eager-loading is set.

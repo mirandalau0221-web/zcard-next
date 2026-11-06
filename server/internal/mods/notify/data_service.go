@@ -1,6 +1,6 @@
 package notify
 
-// 管理面 + 前台铃铛 API（）：模板 CRUD/预览、日志查询/重发、站内信。
+// 管理面 + 前台鈴鐺 API（）：模板 CRUD/預覽、日誌查詢/重發、站內信。
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminNotifyService 管理面通知服务。
+// AdminNotifyService 管理面通知服務。
 type AdminNotifyService struct {
 	adminv1.UnimplementedAdminNotifyServiceServer
 	repo      *NotifyRepo
@@ -29,12 +29,12 @@ type AdminNotifyService struct {
 	broadcast *BroadcastService
 }
 
-// NewAdminNotifyService 构造。
+// NewAdminNotifyService 構造。
 func NewAdminNotifyService(repo *NotifyRepo, disp *Dispatcher, broadcast *BroadcastService) *AdminNotifyService {
 	return &AdminNotifyService{repo: repo, disp: disp, broadcast: broadcast}
 }
 
-// UpsertTemplate 创建/更新模板。
+// UpsertTemplate 創建/更新模板。
 func (s *AdminNotifyService) UpsertTemplate(ctx context.Context, req *adminv1.UpsertNotifyTemplateRequest) (*adminv1.NotifyTemplate, error) {
 	locale := req.GetLocale()
 	if locale == "" {
@@ -60,7 +60,7 @@ func (s *AdminNotifyService) ListTemplates(ctx context.Context, _ *emptypb.Empty
 	return reply, nil
 }
 
-// PreviewTemplate 渲染预览（样例变量；不发送）。
+// PreviewTemplate 渲染預覽（樣例變量；不發送）。
 func (s *AdminNotifyService) PreviewTemplate(ctx context.Context, req *adminv1.PreviewTemplateRequest) (*adminv1.PreviewTemplateReply, error) {
 	locale := req.GetLocale()
 	if locale == "" {
@@ -77,7 +77,7 @@ func (s *AdminNotifyService) PreviewTemplate(ctx context.Context, req *adminv1.P
 	}, nil
 }
 
-// ListLogs 日志查询。
+// ListLogs 日誌查詢。
 func (s *AdminNotifyService) ListLogs(ctx context.Context, req *adminv1.ListNotifyLogsRequest) (*adminv1.ListNotifyLogsReply, error) {
 	page, size := notifyPageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListLogs(ctx, req.GetStatus(), req.GetEventType(), page, size, req.GetChannel())
@@ -97,11 +97,11 @@ func (s *AdminNotifyService) ListLogs(ctx context.Context, req *adminv1.ListNoti
 	return reply, nil
 }
 
-// ResendLog 重发（原变量重投）。
+// ResendLog 重發（原變量重投）。
 func (s *AdminNotifyService) ResendLog(ctx context.Context, req *adminv1.ResendNotifyLogRequest) (*emptypb.Empty, error) {
 	row, err := data.Client(ctx, s.repo.data).NotificationLog.Get(ctx, req.GetId())
 	if err != nil {
-		return nil, errors.NotFound("notify.NOT_FOUND", "发送记录不存在")
+		return nil, errors.NotFound("notify.NOT_FOUND", "發送記錄不存在")
 	}
 	c := s.disp.telegram()
 	if c == nil {
@@ -109,11 +109,11 @@ func (s *AdminNotifyService) ResendLog(ctx context.Context, req *adminv1.ResendN
 	}
 	cfg, err := c.tgConfig(ctx)
 	if err != nil {
-		return nil, errors.BadRequest("notify.NOT_CONFIGURED", "Telegram 配置读取失败")
+		return nil, errors.BadRequest("notify.NOT_CONFIGURED", "Telegram 配置讀取失敗")
 	}
 	target, err := telegramLogTarget(row)
 	if err != nil || !telegramTargetEnabled(cfg, row.EventType, target) {
-		return nil, errors.BadRequest("notify.TARGET_REMOVED", "通知已关闭或原接收位置已移除，请核对原 Chat ID 和 Topic ID")
+		return nil, errors.BadRequest("notify.TARGET_REMOVED", "通知已關閉或原接收位置已移除，請核對原 Chat ID 和 Topic ID")
 	}
 	n, err := data.Client(ctx, s.repo.data).NotificationLog.Update().Where(notificationlog.ID(req.GetId()), notificationlog.ChannelEQ(notificationlog.ChannelTelegram), notificationlog.DeliveryKeyNotNil(), notificationlog.StatusEQ(notificationlog.StatusFailed)).
 		SetStatus(notificationlog.StatusPending).SetAttempts(0).ClearLeaseUntil().SetNextAttemptAt(time.Now().UTC()).Save(ctx)
@@ -121,27 +121,27 @@ func (s *AdminNotifyService) ResendLog(ctx context.Context, req *adminv1.ResendN
 		return nil, err
 	}
 	if n == 0 {
-		return nil, errors.BadRequest("notify.RETRY_UNAVAILABLE", "仅可重试失败的 Telegram 投递任务")
+		return nil, errors.BadRequest("notify.RETRY_UNAVAILABLE", "僅可重試失敗的 Telegram 投遞任務")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// StoreNotificationService 前台铃铛。
+// StoreNotificationService 前台鈴鐺。
 type StoreNotificationService struct {
 	storefrontv1.UnimplementedStoreNotificationServiceServer
 	repo *NotifyRepo
 }
 
-// NewStoreNotificationService 构造。
+// NewStoreNotificationService 構造。
 func NewStoreNotificationService(repo *NotifyRepo) *StoreNotificationService {
 	return &StoreNotificationService{repo: repo}
 }
 
-// UnreadCount 未读数。
+// UnreadCount 未讀數。
 func (s *StoreNotificationService) UnreadCount(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.UnreadCountReply, error) {
 	userID := identityClaimsUserID(ctx)
 	if userID == 0 {
-		return &storefrontv1.UnreadCountReply{Count: 0}, nil // 游客无铃铛
+		return &storefrontv1.UnreadCountReply{Count: 0}, nil // 遊客無鈴鐺
 	}
 	n, err := s.repo.UnreadCount(ctx, userID)
 	if err != nil {
@@ -177,7 +177,7 @@ func (s *StoreNotificationService) ListNotifications(ctx context.Context, req *s
 	return reply, nil
 }
 
-// MarkRead 已读（id=0 全部）。
+// MarkRead 已讀（id=0 全部）。
 func (s *StoreNotificationService) MarkRead(ctx context.Context, req *storefrontv1.MarkReadRequest) (*emptypb.Empty, error) {
 	userID := identityClaimsUserID(ctx)
 	if userID == 0 {
@@ -189,7 +189,7 @@ func (s *StoreNotificationService) MarkRead(ctx context.Context, req *storefront
 	return &emptypb.Empty{}, nil
 }
 
-// SampleVars 预览样例变量（事件 → 白名单样例值）。
+// SampleVars 預覽樣例變量（事件 → 白名單樣例值）。
 func SampleVars(eventType string) map[string]string {
 	base := map[string]string{
 		"order_no": "T202608161234567890", "email": "buyer@example.com",
@@ -197,7 +197,7 @@ func SampleVars(eventType string) map[string]string {
 	}
 	switch eventType {
 	case "order.shipped":
-		base["carrier"] = "示例快递"
+		base["carrier"] = "示例快遞"
 		base["tracking_no"] = "TEST001"
 		base["shipment_id"] = "1"
 	case "order.delivered":
@@ -232,7 +232,7 @@ func notifyPageParams(page, pageSize int32) (int, int) {
 	return p, ps
 }
 
-// identityClaimsUserID 从上下文取用户 ID（storefront user realm JWT；未登录 0）。
+// identityClaimsUserID 從上下文取用户 ID（storefront user realm JWT；未登錄 0）。
 func identityClaimsUserID(ctx context.Context) uint64 {
 	if claims := identity.ClaimsFromContext(ctx); claims != nil {
 		return claims.Subject
@@ -240,9 +240,9 @@ func identityClaimsUserID(ctx context.Context) uint64 {
 	return 0
 }
 
-// ── 群发任务（）─────────────────────────────────────────
+// ── 羣發任務（）─────────────────────────────────────────
 
-// EstimateBroadcast 覆盖人数预估。
+// EstimateBroadcast 覆蓋人數預估。
 func (s *AdminNotifyService) EstimateBroadcast(ctx context.Context, req *adminv1.EstimateBroadcastRequest) (*adminv1.EstimateBroadcastReply, error) {
 	n, err := s.broadcast.EstimateAudience(ctx, req.GetTargetType(), req.GetTargetIds())
 	if err != nil {
@@ -251,7 +251,7 @@ func (s *AdminNotifyService) EstimateBroadcast(ctx context.Context, req *adminv1
 	return &adminv1.EstimateBroadcastReply{Audience: n}, nil
 }
 
-// CreateBroadcast 创建群发。
+// CreateBroadcast 創建羣發。
 func (s *AdminNotifyService) CreateBroadcast(ctx context.Context, req *adminv1.CreateBroadcastRequest) (*adminv1.Broadcast, error) {
 	b, err := s.broadcast.Create(ctx, BroadcastInput{
 		Title: req.GetTitle(), Content: req.GetContent(),
@@ -270,7 +270,7 @@ func (s *AdminNotifyService) CreateBroadcast(ctx context.Context, req *adminv1.C
 	return toBroadcastPB(b), nil
 }
 
-// ListBroadcasts 群发列表。
+// ListBroadcasts 羣發列表。
 func (s *AdminNotifyService) ListBroadcasts(ctx context.Context, req *adminv1.ListBroadcastsRequest) (*adminv1.ListBroadcastsReply, error) {
 	page, size := notifyPageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.broadcast.repo.ListBroadcasts(ctx, page, size)
@@ -284,7 +284,7 @@ func (s *AdminNotifyService) ListBroadcasts(ctx context.Context, req *adminv1.Li
 	return reply, nil
 }
 
-// CancelBroadcast 取消群发。
+// CancelBroadcast 取消羣發。
 func (s *AdminNotifyService) CancelBroadcast(ctx context.Context, req *adminv1.CancelBroadcastRequest) (*adminv1.Broadcast, error) {
 	b, err := s.broadcast.Cancel(ctx, req.GetId())
 	if err != nil {
@@ -326,23 +326,23 @@ func (s *AdminNotifyService) TestTelegram(ctx context.Context, req *adminv1.Test
 	}
 	cfg, err := c.tgConfig(ctx)
 	if err != nil {
-		return nil, errors.BadRequest("notify.NOT_CONFIGURED", "Telegram 配置读取失败")
+		return nil, errors.BadRequest("notify.NOT_CONFIGURED", "Telegram 配置讀取失敗")
 	}
 	if !telegramEnabled(cfg, "telegram.test") || len(telegramTargets(cfg)) == 0 {
-		return nil, errors.BadRequest("notify.NOT_CONFIGURED", "请先保存并启用 Telegram 通道、订单或低库存通知、Token 和接收位置")
+		return nil, errors.BadRequest("notify.NOT_CONFIGURED", "請先保存並啓用 Telegram 通道、訂單或低庫存通知、Token 和接收位置")
 	}
 	targets := telegramTargets(cfg)
 	if req.GetChatId() != "" || req.GetTopicId() != 0 {
 		target, err := notifyport.NormalizeTelegramTarget(notifyport.TelegramTarget{ChatID: req.GetChatId(), TopicID: req.GetTopicId()})
 		if err != nil || !telegramTargetEnabled(cfg, "telegram.test", target) {
-			return nil, errors.BadRequest("notify.INVALID_TARGET", "请先保存该接收位置，再发送测试消息")
+			return nil, errors.BadRequest("notify.INVALID_TARGET", "請先保存該接收位置，再發送測試消息")
 		}
 		targets = []notifyport.TelegramTarget{target}
 	}
 	eventID := uint64(time.Now().UnixNano())
 	reply := &adminv1.TestTelegramReply{}
 	err = data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
-		if err := s.repo.enqueueTelegram(ctx, eventID, "telegram.test", 0, "Telegram 通知测试", "这是一条管理员主动发送的测试消息。此测试用于核对订单和库存通知的接收位置，不包含卡密或查询密码。", targets); err != nil {
+		if err := s.repo.enqueueTelegram(ctx, eventID, "telegram.test", 0, "Telegram 通知測試", "這是一條管理員主動發送的測試消息。此測試用於核對訂單和庫存通知的接收位置，不包含卡密或查詢密碼。", targets); err != nil {
 			return err
 		}
 		keys := make([]string, 0, len(targets))
@@ -366,17 +366,17 @@ func (s *AdminNotifyService) TestEmail(ctx context.Context, req *adminv1.TestEma
 	subject := strings.TrimSpace(req.GetSubject())
 	content := strings.TrimSpace(req.GetContent())
 	if !validMailbox(recipient) || len(recipient) > 254 {
-		return nil, errors.BadRequest("notify.INVALID_EMAIL", "请填写有效的收件邮箱")
+		return nil, errors.BadRequest("notify.INVALID_EMAIL", "請填寫有效的收件郵箱")
 	}
 	if subject == "" || len(subject) > 300 || strings.ContainsAny(subject, "\r\n") {
-		return nil, errors.BadRequest("notify.INVALID_SUBJECT", "请填写邮件标题（最多 300 字节，不能包含换行）")
+		return nil, errors.BadRequest("notify.INVALID_SUBJECT", "請填寫郵件標題（最多 300 字節，不能包含換行）")
 	}
 	if content == "" || len(content) > 20000 {
-		return nil, errors.BadRequest("notify.INVALID_CONTENT", "请填写邮件内容（最多 20000 字节）")
+		return nil, errors.BadRequest("notify.INVALID_CONTENT", "請填寫郵件內容（最多 20000 字節）")
 	}
 	channel, ok := s.disp.channels["email"]
 	if !ok {
-		return nil, errors.BadRequest("notify.EMAIL_NOT_READY", "邮件通道未配置")
+		return nil, errors.BadRequest("notify.EMAIL_NOT_READY", "郵件通道未配置")
 	}
 	msg := notifyport.Message{Channel: "email", EventType: "email.test", BizType: "email_test", Locale: "zh_CN",
 		Recipient: recipient, Subject: subject, Body: "<pre>" + html.EscapeString(content) + "</pre>"}

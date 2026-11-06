@@ -1,7 +1,7 @@
 <template>
   <label v-if="enabledLocales.length > 1" class="language-switch">
-    <span class="sr-only">{{ t('选择语言') }}</span>
-    <select :value="locale" :aria-label="t('选择语言')" @change="change">
+    <span class="sr-only">{{ t('選擇語言') }}</span>
+    <select :value="locale" :aria-label="t('選擇語言')" @change="change">
       <option v-for="option in options" :key="option.value" :value="option.value">{{ option.label }}</option>
     </select>
   </label>

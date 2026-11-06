@@ -3,20 +3,20 @@ import { useThemeVars } from "naive-ui";
 
 const themeVars = useThemeVars();
 const slots = [
-  { id: "brand", title: "品牌推广", description: "广告位开放合作" },
-  { id: "partner", title: "合作伙伴", description: "支持 ZCard 持续开发" },
+  { id: "brand", title: "品牌推廣", description: "廣告位開放合作" },
+  { id: "partner", title: "合作伙伴", description: "支持 ZCard 持續開發" },
 ];
 </script>
 
 <template>
-  <div class="sponsor-slots" role="group" aria-label="广告赞助">
+  <div class="sponsor-slots" role="group" aria-label="廣告贊助">
     <a v-for="slot in slots" :key="slot.id" class="sponsor-slot" href="https://t.me/ZhonCard"
-      target="_blank" rel="noopener noreferrer" :aria-label="`${slot.title}广告位，前往 Telegram 洽谈（新窗口打开）`">
+      target="_blank" rel="noopener noreferrer" :aria-label="`${slot.title}廣告位，前往 Telegram 洽談（新窗口打開）`">
       <span class="sponsor-copy">
-        <span class="sponsor-title">{{ slot.title }} <span class="sponsor-label">广告</span></span>
+        <span class="sponsor-title">{{ slot.title }} <span class="sponsor-label">廣告</span></span>
         <span class="sponsor-description">{{ slot.description }}</span>
       </span>
-      <span class="sponsor-action" aria-hidden="true">洽谈 ↗</span>
+      <span class="sponsor-action" aria-hidden="true">洽談 ↗</span>
     </a>
   </div>
 </template>

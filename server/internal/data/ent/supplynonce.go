@@ -17,7 +17,7 @@ type SupplyNonce struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// api_key（命名空间隔离）
+	// api_key（命名空間隔離）
 	Key string `json:"key,omitempty"`
 	// Nonce holds the value of the "nonce" field.
 	Nonce string `json:"nonce,omitempty"`

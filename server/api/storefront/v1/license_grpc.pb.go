@@ -29,15 +29,15 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreLicenseService 专业套餐在线购买(：发行侧部署配置签发私钥后开放；
-// 支付 = 钱包余额扣款（充值管线入账的钱），签发与扣款同事务；购买人下载许可证
-// 文件后在目标实例后台安装激活）。
+// StoreLicenseService 專業套餐在線購買(：發行側部署配置簽發私鑰後開放；
+// 支付 = 錢包餘額扣款（充值管線入賬的錢），簽發與扣款同事務；購買人下載許可證
+// 文件後在目標實例後台安裝激活）。
 type StoreLicenseServiceClient interface {
-	// GetLicenseOffer 套餐报价（价格服务端裁决；instance_id 供目标实例绑定预览）。
+	// GetLicenseOffer 套餐報價（價格服務端裁決；instance_id 供目標實例綁定預覽）。
 	GetLicenseOffer(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*LicenseOfferReply, error)
-	// PurchaseLicense 购买（钱包扣款 → ed25519 签发 → 返回许可证文件）。
+	// PurchaseLicense 購買（錢包扣款 → ed25519 簽發 → 返回許可證文件）。
 	PurchaseLicense(ctx context.Context, in *PurchaseLicenseRequest, opts ...grpc.CallOption) (*PurchaseLicenseReply, error)
-	// ListLicenseOrders 购买记录（含许可证文件可重新下载）。
+	// ListLicenseOrders 購買記錄（含許可證文件可重新下載）。
 	ListLicenseOrders(ctx context.Context, in *ListLicenseOrdersRequest, opts ...grpc.CallOption) (*ListLicenseOrdersReply, error)
 }
 
@@ -83,15 +83,15 @@ func (c *storeLicenseServiceClient) ListLicenseOrders(ctx context.Context, in *L
 // All implementations must embed UnimplementedStoreLicenseServiceServer
 // for forward compatibility.
 //
-// StoreLicenseService 专业套餐在线购买(：发行侧部署配置签发私钥后开放；
-// 支付 = 钱包余额扣款（充值管线入账的钱），签发与扣款同事务；购买人下载许可证
-// 文件后在目标实例后台安装激活）。
+// StoreLicenseService 專業套餐在線購買(：發行側部署配置簽發私鑰後開放；
+// 支付 = 錢包餘額扣款（充值管線入賬的錢），簽發與扣款同事務；購買人下載許可證
+// 文件後在目標實例後台安裝激活）。
 type StoreLicenseServiceServer interface {
-	// GetLicenseOffer 套餐报价（价格服务端裁决；instance_id 供目标实例绑定预览）。
+	// GetLicenseOffer 套餐報價（價格服務端裁決；instance_id 供目標實例綁定預覽）。
 	GetLicenseOffer(context.Context, *emptypb.Empty) (*LicenseOfferReply, error)
-	// PurchaseLicense 购买（钱包扣款 → ed25519 签发 → 返回许可证文件）。
+	// PurchaseLicense 購買（錢包扣款 → ed25519 簽發 → 返回許可證文件）。
 	PurchaseLicense(context.Context, *PurchaseLicenseRequest) (*PurchaseLicenseReply, error)
-	// ListLicenseOrders 购买记录（含许可证文件可重新下载）。
+	// ListLicenseOrders 購買記錄（含許可證文件可重新下載）。
 	ListLicenseOrders(context.Context, *ListLicenseOrdersRequest) (*ListLicenseOrdersReply, error)
 	mustEmbedUnimplementedStoreLicenseServiceServer()
 }

@@ -24,13 +24,13 @@ const OperationStoreCartServiceRemoveCartItem = "/zcard.api.storefront.v1.StoreC
 const OperationStoreCartServiceUpdateCartItem = "/zcard.api.storefront.v1.StoreCartService/UpdateCartItem"
 
 type StoreCartServiceHTTPServer interface {
-	// AddCartItem AddCartItem 加购（同 user+product+sku 合并数量；商品须上架）。
+	// AddCartItem AddCartItem 加購（同 user+product+sku 合併數量；商品須上架）。
 	AddCartItem(context.Context, *AddCartItemRequest) (*CartItem, error)
-	// ListCart ListCart 我的购物车（商品快照联查；失效商品打标）。
+	// ListCart ListCart 我的購物車（商品快照聯查；失效商品打標）。
 	ListCart(context.Context, *emptypb.Empty) (*ListCartReply, error)
 	// RemoveCartItem RemoveCartItem 移除。
 	RemoveCartItem(context.Context, *RemoveCartItemRequest) (*emptypb.Empty, error)
-	// UpdateCartItem UpdateCartItem 改量（quantity=0 即删除）。
+	// UpdateCartItem UpdateCartItem 改量（quantity=0 即刪除）。
 	UpdateCartItem(context.Context, *UpdateCartItemRequest) (*CartItem, error)
 }
 
@@ -125,13 +125,13 @@ func _StoreCartService_RemoveCartItem0_HTTP_Handler(srv StoreCartServiceHTTPServ
 }
 
 type StoreCartServiceHTTPClient interface {
-	// AddCartItem AddCartItem 加购（同 user+product+sku 合并数量；商品须上架）。
+	// AddCartItem AddCartItem 加購（同 user+product+sku 合併數量；商品須上架）。
 	AddCartItem(ctx context.Context, req *AddCartItemRequest, opts ...http.CallOption) (rsp *CartItem, err error)
-	// ListCart ListCart 我的购物车（商品快照联查；失效商品打标）。
+	// ListCart ListCart 我的購物車（商品快照聯查；失效商品打標）。
 	ListCart(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListCartReply, err error)
 	// RemoveCartItem RemoveCartItem 移除。
 	RemoveCartItem(ctx context.Context, req *RemoveCartItemRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// UpdateCartItem UpdateCartItem 改量（quantity=0 即删除）。
+	// UpdateCartItem UpdateCartItem 改量（quantity=0 即刪除）。
 	UpdateCartItem(ctx context.Context, req *UpdateCartItemRequest, opts ...http.CallOption) (rsp *CartItem, err error)
 }
 
@@ -143,7 +143,7 @@ func NewStoreCartServiceHTTPClient(client *http.Client) StoreCartServiceHTTPClie
 	return &StoreCartServiceHTTPClientImpl{client}
 }
 
-// AddCartItem AddCartItem 加购（同 user+product+sku 合并数量；商品须上架）。
+// AddCartItem AddCartItem 加購（同 user+product+sku 合併數量；商品須上架）。
 func (c *StoreCartServiceHTTPClientImpl) AddCartItem(ctx context.Context, in *AddCartItemRequest, opts ...http.CallOption) (*CartItem, error) {
 	var out CartItem
 	pattern := "/api/v1/storefront/cart/items"
@@ -161,7 +161,7 @@ func (c *StoreCartServiceHTTPClientImpl) AddCartItem(ctx context.Context, in *Ad
 	return &out, nil
 }
 
-// ListCart ListCart 我的购物车（商品快照联查；失效商品打标）。
+// ListCart ListCart 我的購物車（商品快照聯查；失效商品打標）。
 func (c *StoreCartServiceHTTPClientImpl) ListCart(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListCartReply, error) {
 	var out ListCartReply
 	pattern := "/api/v1/storefront/cart"
@@ -195,7 +195,7 @@ func (c *StoreCartServiceHTTPClientImpl) RemoveCartItem(ctx context.Context, in 
 	return &out, nil
 }
 
-// UpdateCartItem UpdateCartItem 改量（quantity=0 即删除）。
+// UpdateCartItem UpdateCartItem 改量（quantity=0 即刪除）。
 func (c *StoreCartServiceHTTPClientImpl) UpdateCartItem(ctx context.Context, in *UpdateCartItemRequest, opts ...http.CallOption) (*CartItem, error) {
 	var out CartItem
 	pattern := "/api/v1/storefront/cart/items/{id}"

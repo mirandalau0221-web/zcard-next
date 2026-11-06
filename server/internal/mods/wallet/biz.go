@@ -1,10 +1,10 @@
 package wallet
 
-// 钱包与账务模块（）：Reference 幂等键构造器（InTx 内核见 data_intx.go）。
+// 錢包與賬務模塊（）：Reference 冪等鍵構造器（InTx 內核見 data_intx.go）。
 
 import "fmt"
 
-// Reference 幂等键构造（全账务统一规范，数据库架构 ）。
+// Reference 冪等鍵構造（全賬務統一規範，數據庫架構 ）。
 func Reference(kind string, ids ...uint64) string {
 	s := kind
 	for _, id := range ids {
@@ -13,7 +13,7 @@ func Reference(kind string, ids ...uint64) string {
 	return s
 }
 
-// 常用幂等键前缀。
+// 常用冪等鍵前綴。
 const (
 	RefOrderPay    = "order_pay"    // order_pay:<orderID>
 	RefOrderRefund = "order_refund" // order_refund:<id>:<seq>

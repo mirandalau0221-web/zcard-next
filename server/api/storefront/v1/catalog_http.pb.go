@@ -23,11 +23,11 @@ const OperationStoreCatalogServiceListCategories = "/zcard.api.storefront.v1.Sto
 const OperationStoreCatalogServiceListProducts = "/zcard.api.storefront.v1.StoreCatalogService/ListProducts"
 
 type StoreCatalogServiceHTTPServer interface {
-	// GetProduct GetProduct 商品详情（下架/隐藏商品返回 NOT_FOUND）。
+	// GetProduct GetProduct 商品詳情（下架/隱藏商品返回 NOT_FOUND）。
 	GetProduct(context.Context, *GetProductRequest) (*Product, error)
-	// ListCategories ListCategories 可见分类列表（hide=false + 分站白名单；导航/筛选用）。
+	// ListCategories ListCategories 可見分類列表（hide=false + 分站白名單；導航/篩選用）。
 	ListCategories(context.Context, *emptypb.Empty) (*ListCategoriesReply, error)
-	// ListProducts ListProducts 商品列表（上架 + 按排序；库存数用于购买校验，stock_visible 仅控制展示）。
+	// ListProducts ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsReply, error)
 }
 
@@ -99,11 +99,11 @@ func _StoreCatalogService_ListCategories0_HTTP_Handler(srv StoreCatalogServiceHT
 }
 
 type StoreCatalogServiceHTTPClient interface {
-	// GetProduct GetProduct 商品详情（下架/隐藏商品返回 NOT_FOUND）。
+	// GetProduct GetProduct 商品詳情（下架/隱藏商品返回 NOT_FOUND）。
 	GetProduct(ctx context.Context, req *GetProductRequest, opts ...http.CallOption) (rsp *Product, err error)
-	// ListCategories ListCategories 可见分类列表（hide=false + 分站白名单；导航/筛选用）。
+	// ListCategories ListCategories 可見分類列表（hide=false + 分站白名單；導航/篩選用）。
 	ListCategories(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListCategoriesReply, err error)
-	// ListProducts ListProducts 商品列表（上架 + 按排序；库存数用于购买校验，stock_visible 仅控制展示）。
+	// ListProducts ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
 	ListProducts(ctx context.Context, req *ListProductsRequest, opts ...http.CallOption) (rsp *ListProductsReply, err error)
 }
 
@@ -115,7 +115,7 @@ func NewStoreCatalogServiceHTTPClient(client *http.Client) StoreCatalogServiceHT
 	return &StoreCatalogServiceHTTPClientImpl{client}
 }
 
-// GetProduct GetProduct 商品详情（下架/隐藏商品返回 NOT_FOUND）。
+// GetProduct GetProduct 商品詳情（下架/隱藏商品返回 NOT_FOUND）。
 func (c *StoreCatalogServiceHTTPClientImpl) GetProduct(ctx context.Context, in *GetProductRequest, opts ...http.CallOption) (*Product, error) {
 	var out Product
 	pattern := "/api/v1/storefront/products/{id}"
@@ -132,7 +132,7 @@ func (c *StoreCatalogServiceHTTPClientImpl) GetProduct(ctx context.Context, in *
 	return &out, nil
 }
 
-// ListCategories ListCategories 可见分类列表（hide=false + 分站白名单；导航/筛选用）。
+// ListCategories ListCategories 可見分類列表（hide=false + 分站白名單；導航/篩選用）。
 func (c *StoreCatalogServiceHTTPClientImpl) ListCategories(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListCategoriesReply, error) {
 	var out ListCategoriesReply
 	pattern := "/api/v1/storefront/categories"
@@ -149,7 +149,7 @@ func (c *StoreCatalogServiceHTTPClientImpl) ListCategories(ctx context.Context, 
 	return &out, nil
 }
 
-// ListProducts ListProducts 商品列表（上架 + 按排序；库存数用于购买校验，stock_visible 仅控制展示）。
+// ListProducts ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
 func (c *StoreCatalogServiceHTTPClientImpl) ListProducts(ctx context.Context, in *ListProductsRequest, opts ...http.CallOption) (*ListProductsReply, error) {
 	var out ListProductsReply
 	pattern := "/api/v1/storefront/products"

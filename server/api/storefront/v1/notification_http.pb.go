@@ -23,11 +23,11 @@ const OperationStoreNotificationServiceMarkRead = "/zcard.api.storefront.v1.Stor
 const OperationStoreNotificationServiceUnreadCount = "/zcard.api.storefront.v1.StoreNotificationService/UnreadCount"
 
 type StoreNotificationServiceHTTPServer interface {
-	// ListNotifications ListNotifications 站内信列表。
+	// ListNotifications ListNotifications 站內信列表。
 	ListNotifications(context.Context, *ListNotificationsRequest) (*ListNotificationsReply, error)
-	// MarkRead MarkRead 标记已读（id=0 全部）。
+	// MarkRead MarkRead 標記已讀（id=0 全部）。
 	MarkRead(context.Context, *MarkReadRequest) (*emptypb.Empty, error)
-	// UnreadCount UnreadCount 未读数。
+	// UnreadCount UnreadCount 未讀數。
 	UnreadCount(context.Context, *emptypb.Empty) (*UnreadCountReply, error)
 }
 
@@ -96,11 +96,11 @@ func _StoreNotificationService_MarkRead0_HTTP_Handler(srv StoreNotificationServi
 }
 
 type StoreNotificationServiceHTTPClient interface {
-	// ListNotifications ListNotifications 站内信列表。
+	// ListNotifications ListNotifications 站內信列表。
 	ListNotifications(ctx context.Context, req *ListNotificationsRequest, opts ...http.CallOption) (rsp *ListNotificationsReply, err error)
-	// MarkRead MarkRead 标记已读（id=0 全部）。
+	// MarkRead MarkRead 標記已讀（id=0 全部）。
 	MarkRead(ctx context.Context, req *MarkReadRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// UnreadCount UnreadCount 未读数。
+	// UnreadCount UnreadCount 未讀數。
 	UnreadCount(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UnreadCountReply, err error)
 }
 
@@ -112,7 +112,7 @@ func NewStoreNotificationServiceHTTPClient(client *http.Client) StoreNotificatio
 	return &StoreNotificationServiceHTTPClientImpl{client}
 }
 
-// ListNotifications ListNotifications 站内信列表。
+// ListNotifications ListNotifications 站內信列表。
 func (c *StoreNotificationServiceHTTPClientImpl) ListNotifications(ctx context.Context, in *ListNotificationsRequest, opts ...http.CallOption) (*ListNotificationsReply, error) {
 	var out ListNotificationsReply
 	pattern := "/api/v1/storefront/notifications"
@@ -129,7 +129,7 @@ func (c *StoreNotificationServiceHTTPClientImpl) ListNotifications(ctx context.C
 	return &out, nil
 }
 
-// MarkRead MarkRead 标记已读（id=0 全部）。
+// MarkRead MarkRead 標記已讀（id=0 全部）。
 func (c *StoreNotificationServiceHTTPClientImpl) MarkRead(ctx context.Context, in *MarkReadRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/storefront/notifications/read"
@@ -147,7 +147,7 @@ func (c *StoreNotificationServiceHTTPClientImpl) MarkRead(ctx context.Context, i
 	return &out, nil
 }
 
-// UnreadCount UnreadCount 未读数。
+// UnreadCount UnreadCount 未讀數。
 func (c *StoreNotificationServiceHTTPClientImpl) UnreadCount(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*UnreadCountReply, error) {
 	var out UnreadCountReply
 	pattern := "/api/v1/storefront/notifications/unread-count"

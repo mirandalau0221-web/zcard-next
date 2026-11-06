@@ -21,7 +21,7 @@ type ProcurementOrder struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 触发采购的订单子项
+	// 觸發採購的訂單子項
 	OrderItemID uint64 `json:"order_item_id,omitempty"`
 	// ConnectionID holds the value of the "connection_id" field.
 	ConnectionID uint64 `json:"connection_id,omitempty"`
@@ -33,17 +33,17 @@ type ProcurementOrder struct {
 	FailStrategy procurementorder.FailStrategy `json:"fail_strategy,omitempty"`
 	// RetryCount holds the value of the "retry_count" field.
 	RetryCount int32 `json:"retry_count,omitempty"`
-	// 退避重试调度
+	// 退避重試調度
 	NextRetryAt time.Time `json:"next_retry_at,omitempty"`
-	// 巡检扫描锚点
+	// 巡檢掃描錨點
 	LastPollAt time.Time `json:"last_poll_at,omitempty"`
-	// 持久化上游请求号（新单随机生成，旧单保持原值）
+	// 持久化上游請求號（新單隨機生成，舊單保持原值）
 	DedupeKey string `json:"dedupe_key,omitempty"`
 	// TraceID holds the value of the "trace_id" field.
 	TraceID string `json:"trace_id,omitempty"`
-	// 最近失败原因（重试/审计）
+	// 最近失敗原因（重試/審計）
 	LastError string `json:"last_error,omitempty"`
-	// 上游退款单号（退款传导回填）
+	// 上游退款單號（退款傳導回填）
 	UpstreamRefundID string `json:"upstream_refund_id,omitempty"`
 	selectValues     sql.SelectValues
 }

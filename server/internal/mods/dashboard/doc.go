@@ -1,5 +1,5 @@
-// Package dashboard 工作台与报表模块（M1b v1）：指标口径层（data 层独立包，
-// 前端只消费不重算）、daily_stats 日结（low 队列聚合，不扫大表）、趋势图、商品排行。
+// Package dashboard 工作台與報表模塊（M1b v1）：指標口徑層（data 層獨立包，
+// 前端只消費不重算）、daily_stats 日結（low 隊列聚合，不掃大表）、趨勢圖、商品排行。
 //
-// 表：daily_stats / reconciliation_jobs / reconciliation_items（对账并入报表）。
+// 表：daily_stats / reconciliation_jobs / reconciliation_items（對賬併入報表）。
 package dashboard

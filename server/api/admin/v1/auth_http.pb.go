@@ -33,25 +33,25 @@ const OperationAdminAuthServiceResetTOTP = "/zcard.api.admin.v1.AdminAuthService
 
 type AdminAuthServiceHTTPServer interface {
 	CancelTOTP(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	// ChangePassword ChangePassword 修改当前账号密码，并使全部旧会话失效。
+	// ChangePassword ChangePassword 修改當前賬號密碼，並使全部舊會話失效。
 	ChangePassword(context.Context, *ChangeAdminPasswordRequest) (*emptypb.Empty, error)
-	// ConfirmTOTP ConfirmTOTP 验证一次确认绑定。
+	// ConfirmTOTP ConfirmTOTP 驗證一次確認綁定。
 	ConfirmTOTP(context.Context, *ConfirmTOTPRequest) (*RecoveryCodesReply, error)
-	// DisableTOTP DisableTOTP 解绑。
+	// DisableTOTP DisableTOTP 解綁。
 	DisableTOTP(context.Context, *ConfirmTOTPRequest) (*emptypb.Empty, error)
-	// EnableTOTP EnableTOTP 生成 TOTP 密钥（返回 otpauth URL 供二维码）。
+	// EnableTOTP EnableTOTP 生成 TOTP 密鑰（返回 otpauth URL 供二維碼）。
 	EnableTOTP(context.Context, *ConfirmTOTPRequest) (*EnableTOTPReply, error)
-	// GetCaptchaConfig GetCaptchaConfig 登录验证码开关（免鉴权；登录页据此条件渲染验证码区）。
+	// GetCaptchaConfig GetCaptchaConfig 登錄驗證碼開關（免鑑權；登錄頁據此條件渲染驗證碼區）。
 	GetCaptchaConfig(context.Context, *emptypb.Empty) (*CaptchaConfigReply, error)
-	// GetCaptchaImage GetCaptchaImage 登录图形验证码（免鉴权；captcha_admin_login 开启时登录页使用）。
+	// GetCaptchaImage GetCaptchaImage 登錄圖形驗證碼（免鑑權；captcha_admin_login 開啓時登錄頁使用）。
 	GetCaptchaImage(context.Context, *emptypb.Empty) (*CaptchaImageReply, error)
-	// GetProfile GetProfile 当前管理员信息与权限点清单（前端动态路由数据源，规划)。
+	// GetProfile GetProfile 當前管理員信息與權限點清單（前端動態路由數據源，規劃)。
 	GetProfile(context.Context, *emptypb.Empty) (*GetProfileReply, error)
-	// Login Login 管理员登录。密码 bcrypt 校验；TOTP 校验；captcha_admin_login 开启时图形验证码必填。
+	// Login Login 管理員登錄。密碼 bcrypt 校驗；TOTP 校驗；captcha_admin_login 開啓時圖形驗證碼必填。
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
-	// Logout Logout 登出（JWT 无状态，前端弃用令牌即可；接入 refresh 轮换后落 sessions）。
+	// Logout Logout 登出（JWT 無狀態，前端棄用令牌即可；接入 refresh 輪換後落 sessions）。
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
-	// RefreshToken RefreshToken 用 refresh token 换新令牌对（一次性轮换）。
+	// RefreshToken RefreshToken 用 refresh token 換新令牌對（一次性輪換）。
 	RefreshToken(context.Context, *RefreshTokenRequest) (*LoginReply, error)
 	ResetTOTP(context.Context, *ResetTOTPRequest) (*emptypb.Empty, error)
 }
@@ -302,25 +302,25 @@ func _AdminAuthService_DisableTOTP0_HTTP_Handler(srv AdminAuthServiceHTTPServer)
 
 type AdminAuthServiceHTTPClient interface {
 	CancelTOTP(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ChangePassword ChangePassword 修改当前账号密码，并使全部旧会话失效。
+	// ChangePassword ChangePassword 修改當前賬號密碼，並使全部舊會話失效。
 	ChangePassword(ctx context.Context, req *ChangeAdminPasswordRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ConfirmTOTP ConfirmTOTP 验证一次确认绑定。
+	// ConfirmTOTP ConfirmTOTP 驗證一次確認綁定。
 	ConfirmTOTP(ctx context.Context, req *ConfirmTOTPRequest, opts ...http.CallOption) (rsp *RecoveryCodesReply, err error)
-	// DisableTOTP DisableTOTP 解绑。
+	// DisableTOTP DisableTOTP 解綁。
 	DisableTOTP(ctx context.Context, req *ConfirmTOTPRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// EnableTOTP EnableTOTP 生成 TOTP 密钥（返回 otpauth URL 供二维码）。
+	// EnableTOTP EnableTOTP 生成 TOTP 密鑰（返回 otpauth URL 供二維碼）。
 	EnableTOTP(ctx context.Context, req *ConfirmTOTPRequest, opts ...http.CallOption) (rsp *EnableTOTPReply, err error)
-	// GetCaptchaConfig GetCaptchaConfig 登录验证码开关（免鉴权；登录页据此条件渲染验证码区）。
+	// GetCaptchaConfig GetCaptchaConfig 登錄驗證碼開關（免鑑權；登錄頁據此條件渲染驗證碼區）。
 	GetCaptchaConfig(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CaptchaConfigReply, err error)
-	// GetCaptchaImage GetCaptchaImage 登录图形验证码（免鉴权；captcha_admin_login 开启时登录页使用）。
+	// GetCaptchaImage GetCaptchaImage 登錄圖形驗證碼（免鑑權；captcha_admin_login 開啓時登錄頁使用）。
 	GetCaptchaImage(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CaptchaImageReply, err error)
-	// GetProfile GetProfile 当前管理员信息与权限点清单（前端动态路由数据源，规划)。
+	// GetProfile GetProfile 當前管理員信息與權限點清單（前端動態路由數據源，規劃)。
 	GetProfile(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetProfileReply, err error)
-	// Login Login 管理员登录。密码 bcrypt 校验；TOTP 校验；captcha_admin_login 开启时图形验证码必填。
+	// Login Login 管理員登錄。密碼 bcrypt 校驗；TOTP 校驗；captcha_admin_login 開啓時圖形驗證碼必填。
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
-	// Logout Logout 登出（JWT 无状态，前端弃用令牌即可；接入 refresh 轮换后落 sessions）。
+	// Logout Logout 登出（JWT 無狀態，前端棄用令牌即可；接入 refresh 輪換後落 sessions）。
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// RefreshToken RefreshToken 用 refresh token 换新令牌对（一次性轮换）。
+	// RefreshToken RefreshToken 用 refresh token 換新令牌對（一次性輪換）。
 	RefreshToken(ctx context.Context, req *RefreshTokenRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	ResetTOTP(ctx context.Context, req *ResetTOTPRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
@@ -350,7 +350,7 @@ func (c *AdminAuthServiceHTTPClientImpl) CancelTOTP(ctx context.Context, in *emp
 	return &out, nil
 }
 
-// ChangePassword ChangePassword 修改当前账号密码，并使全部旧会话失效。
+// ChangePassword ChangePassword 修改當前賬號密碼，並使全部舊會話失效。
 func (c *AdminAuthServiceHTTPClientImpl) ChangePassword(ctx context.Context, in *ChangeAdminPasswordRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/auth/password"
@@ -368,7 +368,7 @@ func (c *AdminAuthServiceHTTPClientImpl) ChangePassword(ctx context.Context, in 
 	return &out, nil
 }
 
-// ConfirmTOTP ConfirmTOTP 验证一次确认绑定。
+// ConfirmTOTP ConfirmTOTP 驗證一次確認綁定。
 func (c *AdminAuthServiceHTTPClientImpl) ConfirmTOTP(ctx context.Context, in *ConfirmTOTPRequest, opts ...http.CallOption) (*RecoveryCodesReply, error) {
 	var out RecoveryCodesReply
 	pattern := "/api/v1/admin/auth/totp/confirm"
@@ -386,7 +386,7 @@ func (c *AdminAuthServiceHTTPClientImpl) ConfirmTOTP(ctx context.Context, in *Co
 	return &out, nil
 }
 
-// DisableTOTP DisableTOTP 解绑。
+// DisableTOTP DisableTOTP 解綁。
 func (c *AdminAuthServiceHTTPClientImpl) DisableTOTP(ctx context.Context, in *ConfirmTOTPRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/auth/totp/disable"
@@ -404,7 +404,7 @@ func (c *AdminAuthServiceHTTPClientImpl) DisableTOTP(ctx context.Context, in *Co
 	return &out, nil
 }
 
-// EnableTOTP EnableTOTP 生成 TOTP 密钥（返回 otpauth URL 供二维码）。
+// EnableTOTP EnableTOTP 生成 TOTP 密鑰（返回 otpauth URL 供二維碼）。
 func (c *AdminAuthServiceHTTPClientImpl) EnableTOTP(ctx context.Context, in *ConfirmTOTPRequest, opts ...http.CallOption) (*EnableTOTPReply, error) {
 	var out EnableTOTPReply
 	pattern := "/api/v1/admin/auth/totp/enable"
@@ -422,7 +422,7 @@ func (c *AdminAuthServiceHTTPClientImpl) EnableTOTP(ctx context.Context, in *Con
 	return &out, nil
 }
 
-// GetCaptchaConfig GetCaptchaConfig 登录验证码开关（免鉴权；登录页据此条件渲染验证码区）。
+// GetCaptchaConfig GetCaptchaConfig 登錄驗證碼開關（免鑑權；登錄頁據此條件渲染驗證碼區）。
 func (c *AdminAuthServiceHTTPClientImpl) GetCaptchaConfig(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CaptchaConfigReply, error) {
 	var out CaptchaConfigReply
 	pattern := "/api/v1/admin/auth/captcha-config"
@@ -439,7 +439,7 @@ func (c *AdminAuthServiceHTTPClientImpl) GetCaptchaConfig(ctx context.Context, i
 	return &out, nil
 }
 
-// GetCaptchaImage GetCaptchaImage 登录图形验证码（免鉴权；captcha_admin_login 开启时登录页使用）。
+// GetCaptchaImage GetCaptchaImage 登錄圖形驗證碼（免鑑權；captcha_admin_login 開啓時登錄頁使用）。
 func (c *AdminAuthServiceHTTPClientImpl) GetCaptchaImage(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CaptchaImageReply, error) {
 	var out CaptchaImageReply
 	pattern := "/api/v1/admin/auth/captcha/image"
@@ -456,7 +456,7 @@ func (c *AdminAuthServiceHTTPClientImpl) GetCaptchaImage(ctx context.Context, in
 	return &out, nil
 }
 
-// GetProfile GetProfile 当前管理员信息与权限点清单（前端动态路由数据源，规划)。
+// GetProfile GetProfile 當前管理員信息與權限點清單（前端動態路由數據源，規劃)。
 func (c *AdminAuthServiceHTTPClientImpl) GetProfile(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetProfileReply, error) {
 	var out GetProfileReply
 	pattern := "/api/v1/admin/auth/profile"
@@ -473,7 +473,7 @@ func (c *AdminAuthServiceHTTPClientImpl) GetProfile(ctx context.Context, in *emp
 	return &out, nil
 }
 
-// Login Login 管理员登录。密码 bcrypt 校验；TOTP 校验；captcha_admin_login 开启时图形验证码必填。
+// Login Login 管理員登錄。密碼 bcrypt 校驗；TOTP 校驗；captcha_admin_login 開啓時圖形驗證碼必填。
 func (c *AdminAuthServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
 	var out LoginReply
 	pattern := "/api/v1/admin/auth/login"
@@ -491,7 +491,7 @@ func (c *AdminAuthServiceHTTPClientImpl) Login(ctx context.Context, in *LoginReq
 	return &out, nil
 }
 
-// Logout Logout 登出（JWT 无状态，前端弃用令牌即可；接入 refresh 轮换后落 sessions）。
+// Logout Logout 登出（JWT 無狀態，前端棄用令牌即可；接入 refresh 輪換後落 sessions）。
 func (c *AdminAuthServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/auth/logout"
@@ -509,7 +509,7 @@ func (c *AdminAuthServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutR
 	return &out, nil
 }
 
-// RefreshToken RefreshToken 用 refresh token 换新令牌对（一次性轮换）。
+// RefreshToken RefreshToken 用 refresh token 換新令牌對（一次性輪換）。
 func (c *AdminAuthServiceHTTPClientImpl) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...http.CallOption) (*LoginReply, error) {
 	var out LoginReply
 	pattern := "/api/v1/admin/auth/refresh"

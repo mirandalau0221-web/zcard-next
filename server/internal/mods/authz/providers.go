@@ -1,6 +1,6 @@
 package authz
 
-// wire providers（RbacUsecase 同时实现 port.Authorizer，跨模块消费经 port 绑定）。
+// wire providers（RbacUsecase 同時實現 port.Authorizer，跨模塊消費經 port 綁定）。
 
 import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/authz/port"
@@ -19,5 +19,5 @@ var ProviderSet = wire.NewSet(
 	wire.Bind(new(port.Authorizer), new(*RbacUsecase)),
 )
 
-// NewDirectory 权限目录（声明表构建；单例语义——声明在 init 期完成）。
+// NewDirectory 權限目錄（聲明表構建；單例語義——聲明在 init 期完成）。
 func NewDirectory() *Directory { return BuildDirectory() }

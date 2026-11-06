@@ -20,11 +20,11 @@ func classificationRevision(p *ent.Product) string {
 }
 func (s *AdminCatalogService) ClassifyProducts(ctx context.Context, req *adminv1.ClassifyProductsRequest) (*adminv1.ClassifyProductsReply, error) {
 	if len(req.Keywords) == 0 || len(req.Keywords)+len(req.Excludes) > 100 || req.CategoryId == 0 || len(req.Revisions) > 1000 {
-		return nil, fmt.Errorf("请输入关键词和目标分类，每次最多处理1000件商品")
+		return nil, fmt.Errorf("請輸入關鍵詞和目標分類，每次最多處理1000件商品")
 	}
 	for _, w := range append(append([]string{}, req.Keywords...), req.Excludes...) {
 		if strings.TrimSpace(w) == "" || utf8.RuneCountInString(w) > 100 {
-			return nil, fmt.Errorf("关键词须为1–100个字符")
+			return nil, fmt.Errorf("關鍵詞須為1–100個字符")
 		}
 	}
 	c := data.Client(ctx, s.repo.data)
@@ -34,7 +34,7 @@ func (s *AdminCatalogService) ClassifyProducts(ctx context.Context, req *adminv1
 		return nil, e
 	}
 	if !ok {
-		return nil, fmt.Errorf("目标分类不存在")
+		return nil, fmt.Errorf("目標分類不存在")
 	}
 	out := &adminv1.ClassifyProductsReply{}
 	if !req.Apply {
@@ -74,7 +74,7 @@ func (s *AdminCatalogService) ClassifyProducts(ctx context.Context, req *adminv1
 		return out, nil
 	}
 	if len(req.Revisions) == 0 {
-		return nil, fmt.Errorf("请先预览将要修改的商品")
+		return nil, fmt.Errorf("請先預覽將要修改的商品")
 	}
 	ids := make([]uint64, 0, len(req.Revisions))
 	for id := range req.Revisions {
@@ -88,7 +88,7 @@ func (s *AdminCatalogService) ClassifyProducts(ctx context.Context, req *adminv1
 			return e
 		}
 		if n != 1 {
-			return fmt.Errorf("目标分类已不存在，请重新预览")
+			return fmt.Errorf("目標分類已不存在，請重新預覽")
 		}
 		for _, id := range ids {
 			p, e := data.GuardProductWrite(ctx, s.repo.data, id)

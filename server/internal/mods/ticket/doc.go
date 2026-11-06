@@ -1,5 +1,5 @@
-// Package ticket 工单模块（M3）：售前/售后、优先级（含付费加急）、会话式处理、
-// 内部备注（用户不可见）、SLA 预留。担保交易争议仲裁复用工单（M4）。
+// Package ticket 工單模塊（M3）：售前/售後、優先級（含付費加急）、會話式處理、
+// 內部備註（用户不可見）、SLA 預留。擔保交易爭議仲裁複用工單（M4）。
 //
 // 表：tickets / ticket_messages。
 package ticket

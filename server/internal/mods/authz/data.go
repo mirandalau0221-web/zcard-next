@@ -1,6 +1,6 @@
 package authz
 
-// 角色/权限仓储（）：只读鉴权组 + 管理组 CRUD + 内置角色种子。
+// 角色/權限倉儲（）：只讀鑑權組 + 管理組 CRUD + 內置角色種子。
 
 import (
 	"context"
@@ -14,22 +14,22 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/rolepermission"
 )
 
-// 角色错误（service 层映射 reason）。
+// 角色錯誤（service 層映射 reason）。
 var (
 	ErrRoleNotFound = errors.New("authz: 角色不存在")
-	ErrRoleBuiltIn  = errors.New("authz: 内置角色受保护")
-	ErrRoleInUse    = errors.New("authz: 角色仍有员工挂载")
+	ErrRoleBuiltIn  = errors.New("authz: 內置角色受保護")
+	ErrRoleInUse    = errors.New("authz: 角色仍有員工掛載")
 )
 
-// RoleRepoImpl 角色仓储实现。
+// RoleRepoImpl 角色倉儲實現。
 type RoleRepoImpl struct {
 	data *data.Data
 }
 
-// NewRoleRepoImpl 构造。
+// NewRoleRepoImpl 構造。
 func NewRoleRepoImpl(d *data.Data) *RoleRepoImpl { return &RoleRepoImpl{data: d} }
 
-// RoleDetail 角色详情（含权限点集）。
+// RoleDetail 角色詳情（含權限點集）。
 type RoleDetail struct {
 	ID          uint64
 	Name        string
@@ -39,7 +39,7 @@ type RoleDetail struct {
 	Permissions []string
 }
 
-// PB 转协议对象。
+// PB 轉協議對象。
 func (r *RoleDetail) PB() *adminv1.Role {
 	return &adminv1.Role{
 		Id: r.ID, Name: r.Name, Code: r.Code, Description: r.Description,
@@ -47,7 +47,7 @@ func (r *RoleDetail) PB() *adminv1.Role {
 	}
 }
 
-// PermissionCodes 角色全部权限点（UNIQUE(role_id, permission_code)）。
+// PermissionCodes 角色全部權限點（UNIQUE(role_id, permission_code)）。
 func (r *RoleRepoImpl) PermissionCodes(ctx context.Context, roleID uint64) ([]string, error) {
 	rows, err := data.Client(ctx, r.data).RolePermission.Query().
 		Where(rolepermission.RoleID(roleID)).
@@ -76,7 +76,7 @@ func (r *RoleRepoImpl) Role(ctx context.Context, roleID uint64) (string, error) 
 	return row.Name, nil
 }
 
-// Roles 全部角色（含权限点集）。
+// Roles 全部角色（含權限點集）。
 func (r *RoleRepoImpl) Roles(ctx context.Context) ([]*RoleDetail, error) {
 	rows, err := data.Client(ctx, r.data).AdminRole.Query().Order(ent.Asc(adminrole.FieldID)).All(ctx)
 	if err != nil {
@@ -93,7 +93,7 @@ func (r *RoleRepoImpl) Roles(ctx context.Context) ([]*RoleDetail, error) {
 	return out, nil
 }
 
-// RoleByID 角色详情。
+// RoleByID 角色詳情。
 func (r *RoleRepoImpl) RoleByID(ctx context.Context, id uint64) (*RoleDetail, error) {
 	row, err := data.Client(ctx, r.data).AdminRole.Get(ctx, id)
 	if ent.IsNotFound(err) {
@@ -109,7 +109,7 @@ func (r *RoleRepoImpl) RoleByID(ctx context.Context, id uint64) (*RoleDetail, er
 	return d, nil
 }
 
-// CreateRole 创建角色 + 权限点集。
+// CreateRole 創建角色 + 權限點集。
 func (r *RoleRepoImpl) CreateRole(ctx context.Context, name, code, desc string, perms []string) (*RoleDetail, error) {
 	client := data.Client(ctx, r.data)
 	role, err := client.AdminRole.Create().SetName(name).SetCode(code).SetDescription(desc).Save(ctx)
@@ -122,7 +122,7 @@ func (r *RoleRepoImpl) CreateRole(ctx context.Context, name, code, desc string, 
 	return r.RoleByID(ctx, role.ID)
 }
 
-// UpdateRole 修改名称/描述（内置角色同样可改名称，code 不可改——接口不暴露 code 字段）。
+// UpdateRole 修改名稱/描述（內置角色同樣可改名稱，code 不可改——接口不暴露 code 字段）。
 func (r *RoleRepoImpl) UpdateRole(ctx context.Context, id uint64, name, desc string) (*RoleDetail, error) {
 	q := data.Client(ctx, r.data).AdminRole.UpdateOneID(id)
 	if name != "" {
@@ -140,7 +140,7 @@ func (r *RoleRepoImpl) UpdateRole(ctx context.Context, id uint64, name, desc str
 	return r.RoleByID(ctx, id)
 }
 
-// DeleteRole 删除（内置拒绝；有员工挂载拒绝；级联删权限点行）。
+// DeleteRole 刪除（內置拒絕；有員工掛載拒絕；級聯刪權限點行）。
 func (r *RoleRepoImpl) DeleteRole(ctx context.Context, id uint64) error {
 	client := data.Client(ctx, r.data)
 	role, err := client.AdminRole.Get(ctx, id)
@@ -166,7 +166,7 @@ func (r *RoleRepoImpl) DeleteRole(ctx context.Context, id uint64) error {
 	return client.AdminRole.DeleteOneID(id).Exec(ctx)
 }
 
-// SetPermissions 全量替换权限点（事务内删旧插新）。
+// SetPermissions 全量替換權限點（事務內刪舊插新）。
 func (r *RoleRepoImpl) SetPermissions(ctx context.Context, id uint64, perms []string) (*RoleDetail, error) {
 	client := data.Client(ctx, r.data)
 	if _, err := client.AdminRole.Get(ctx, id); err != nil {
@@ -198,18 +198,18 @@ func (r *RoleRepoImpl) replaceAll(ctx context.Context, roleID uint64, perms []st
 	})
 }
 
-// EnsureBuiltinRoles 落内置角色种子（幂等； 起 operator/support 覆盖 authz 只读
-// 与员工只读两个基础权限点，rbac_coverage_test 据此断言目录覆盖）。
+// EnsureBuiltinRoles 落內置角色種子（冪等； 起 operator/support 覆蓋 authz 只讀
+// 與員工只讀兩個基礎權限點，rbac_coverage_test 據此斷言目錄覆蓋）。
 //
-// 种子语义（2026-08-18 修订）：
-// - 仅在角色**新建**时写入权限点——已有角色（含被后台改过权限的内置角色）不覆盖，
-// 后台的 UpdateRolePermissions 编辑因此跨重启/重装保留；
-// - 例外：super_admin 的 * 通配是系统不变量，每次执行强制恢复（防误操作锁死超管）。
+// 種子語義（2026-08-18 修訂）：
+// - 僅在角色**新建**時寫入權限點——已有角色（含被後台改過權限的內置角色）不覆蓋，
+// 後台的 UpdateRolePermissions 編輯因此跨重啓/重裝保留；
+// - 例外：super_admin 的 * 通配是系統不變量，每次執行強制恢復（防誤操作鎖死超管）。
 func EnsureBuiltinRoles(ctx context.Context, client *ent.Client) error {
 	builtin := []struct{ code, name, desc string }{
-		{code: "super_admin", name: "超级管理员", desc: "全部权限（* 通配）"},
-		{code: "operator", name: "运营", desc: "商品/订单/设置读"},
-		{code: "support", name: "客服", desc: "工单/订单只读"},
+		{code: "super_admin", name: "超級管理員", desc: "全部權限（* 通配）"},
+		{code: "operator", name: "運營", desc: "商品/訂單/設置讀"},
+		{code: "support", name: "客服", desc: "工單/訂單隻讀"},
 	}
 	operatorPerms := []string{
 		"auth:profile", "auth:logout", "auth:totp",
@@ -231,7 +231,7 @@ func EnsureBuiltinRoles(ctx context.Context, client *ent.Client) error {
 		"lottery:read",
 		"lottery:deliver",
 		"dashboard:read",
-		// ：货源/采购/供货读权限（写操作超管专属）
+		// ：貨源/採購/供貨讀權限（寫操作超管專屬）
 		"supply:read",
 		"procurement:read",
 		"supplier:read",
@@ -259,7 +259,7 @@ func EnsureBuiltinRoles(ctx context.Context, client *ent.Client) error {
 		}
 		switch {
 		case b.code == "super_admin":
-			// 不变量：超管通配符每次强制（幂等替换为 *）
+			// 不變量：超管通配符每次強制（冪等替換為 *）
 			if err := syncRolePerms(ctx, client, role.ID, []string{"*"}); err != nil {
 				return err
 			}
@@ -272,7 +272,7 @@ func EnsureBuiltinRoles(ctx context.Context, client *ent.Client) error {
 	return nil
 }
 
-// syncRolePerms 种子权限同步（全量替换；运营角色权限目录增长时随发布更新）。
+// syncRolePerms 種子權限同步（全量替換；運營角色權限目錄增長時隨發佈更新）。
 func syncRolePerms(ctx context.Context, client *ent.Client, roleID uint64, perms []string) error {
 	if _, err := client.RolePermission.Delete().Where(rolepermission.RoleID(roleID)).Exec(ctx); err != nil {
 		return err

@@ -1,7 +1,7 @@
 package affiliate
 
-// 前台分销 API（）：推广码/团队/流水。管理侧列表经 dashboard 模块
-// （AdminDashboardService.ListCommissions 消费 port.CommissionReader，通道 A）。
+// 前台分銷 API（）：推廣碼/團隊/流水。管理側列表經 dashboard 模塊
+// （AdminDashboardService.ListCommissions 消費 port.CommissionReader，通道 A）。
 
 import (
 	"context"
@@ -16,24 +16,24 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// StoreAffiliateService 前台分销服务。
+// StoreAffiliateService 前台分銷服務。
 type StoreAffiliateService struct {
 	storefrontv1.UnimplementedStoreAffiliateServiceServer
 	settings notifyport.SettingsReader
 	repo     *CommissionRepo
-	users    *identity.UserRepo // 推广码懒生成（通道 A）
+	users    *identity.UserRepo // 推廣碼懶生成（通道 A）
 }
 
-// NewStoreAffiliateService 构造。
+// NewStoreAffiliateService 構造。
 func NewStoreAffiliateService(repo *CommissionRepo, users *identity.UserRepo, settings notifyport.SettingsReader) *StoreAffiliateService {
 	return &StoreAffiliateService{repo: repo, users: users, settings: settings}
 }
 
-// MyAffiliate 推广码 + 统计（invite_url 用请求 Host 拼绝对 URL；推广码懒生成）。
+// MyAffiliate 推廣碼 + 統計（invite_url 用請求 Host 拼絕對 URL；推廣碼懶生成）。
 func (s *StoreAffiliateService) MyAffiliate(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.MyAffiliateReply, error) {
 	userID := currentUID(ctx)
 	if userID == 0 {
-		return nil, fmt.Errorf("affiliate.UNAUTHORIZED: 请先登录")
+		return nil, fmt.Errorf("affiliate.UNAUTHORIZED: 請先登錄")
 	}
 	stats, err := s.repo.StatsByUser(ctx, userID)
 	if err != nil {
@@ -50,10 +50,10 @@ func (s *StoreAffiliateService) MyAffiliate(ctx context.Context, _ *emptypb.Empt
 	if cfg.Levels < 2 {
 		l2 = 0
 	}
-	// 推广码（懒生成——存量用户首次访问推广中心即补）
+	// 推廣碼（懶生成——存量用户首次訪問推廣中心即補）
 	promoCode := s.users.EnsurePromoCode(ctx, userID)
-	// 推广链接：请求 Host 拼绝对 URL（复制即可分享；无 Host 回退相对路径）。
-	// scheme 判定：本地开发 host 回退 http，其余一律 https（生产标准）。
+	// 推廣鏈接：請求 Host 拼絕對 URL（複製即可分享；無 Host 回退相對路徑）。
+	// scheme 判定：本地開發 host 回退 http，其餘一律 https（生產標準）。
 	inviteURL := fmt.Sprintf("/?ref=%s", promoCode)
 	if host := requestHost(ctx); host != "" {
 		scheme := "https"
@@ -75,9 +75,9 @@ func (s *StoreAffiliateService) MyAffiliate(ctx context.Context, _ *emptypb.Empt
 	}, nil
 }
 
-// requestHost 从 kratos transport 取请求 Host（拼绝对推广链接）。
-// 用 RequestFromServerContext（*Transport 实现 Transporter 小接口；直接断言
-// khttp.Context 巨型接口会失败——同 Payment 埋点中间件教训）。
+// requestHost 從 kratos transport 取請求 Host（拼絕對推廣鏈接）。
+// 用 RequestFromServerContext（*Transport 實現 Transporter 小接口；直接斷言
+// khttp.Context 巨型接口會失敗——同 Payment 埋點中間件教訓）。
 func requestHost(ctx context.Context) string {
 	if r, ok := khttp.RequestFromServerContext(ctx); ok {
 		h := r.Host
@@ -89,14 +89,14 @@ func requestHost(ctx context.Context) string {
 	return ""
 }
 
-// isLocalHost 本地开发 host 判定（推广链接回退 http scheme）。
+// isLocalHost 本地開發 host 判定（推廣鏈接回退 http scheme）。
 func isLocalHost(host string) bool {
 	host = strings.Split(host, ":")[0]
 	return host == "localhost" || host == "127.0.0.1" || host == "0.0.0.0" ||
 		len(host) > 6 && host[len(host)-6:] == ".local"
 }
 
-// ListTeam 下级列表（用户名脱敏）。
+// ListTeam 下級列表（用户名脱敏）。
 func (s *StoreAffiliateService) ListTeam(ctx context.Context, req *storefrontv1.ListTeamRequest) (*storefrontv1.ListTeamReply, error) {
 	userID := currentUID(ctx)
 	if userID == 0 {
@@ -150,7 +150,7 @@ func (s *StoreAffiliateService) ListCommissions(ctx context.Context, req *storef
 	return reply, nil
 }
 
-// maskName 用户名脱敏（首尾保留，中间 ***；≤2 位全掩）。
+// maskName 用户名脱敏（首尾保留，中間 ***；≤2 位全掩）。
 func maskName(name string) string {
 	runes := []rune(name)
 	if len(runes) <= 2 {

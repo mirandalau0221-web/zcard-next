@@ -1,6 +1,6 @@
 import { request } from "../request";
 
-// ── 工单工作台（ticket:read 查看 / ticket:write 回复·解决·关闭）──
+// ── 工單工作台（ticket:read 查看 / ticket:write 回覆·解決·關閉）──
 
 export function fetchTickets(params?: { status?: string; type?: string; order_no?: string; page?: number; page_size?: number }) {
   return request({

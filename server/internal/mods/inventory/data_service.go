@@ -1,6 +1,6 @@
 package inventory
 
-// admin API（；薄 transport——导入预览/确认/导出/列表/操作）。
+// admin API（；薄 transport——導入預覽/確認/導出/列表/操作）。
 
 import (
 	"context"
@@ -17,22 +17,22 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminInventoryService 库存管理服务。
+// AdminInventoryService 庫存管理服務。
 type AdminInventoryService struct {
 	adminv1.UnimplementedAdminInventoryServiceServer
 	repo *CardRepoImpl
 	data *data.Data
 }
 
-// NewAdminInventoryService 构造。
+// NewAdminInventoryService 構造。
 func NewAdminInventoryService(repo *CardRepoImpl, d *data.Data) *AdminInventoryService {
 	return &AdminInventoryService{repo: repo, data: d}
 }
 
-// ImportPreview 上传预览。
+// ImportPreview 上傳預覽。
 func (s *AdminInventoryService) ImportPreview(ctx context.Context, req *adminv1.ImportPreviewRequest) (*adminv1.ImportPreviewReply, error) {
 	if req.GetProductId() == 0 || len(req.GetLines()) == 0 {
-		return nil, errors.BadRequest("inventory.INVALID_INPUT", "商品 ID 与卡密行必填")
+		return nil, errors.BadRequest("inventory.INVALID_INPUT", "商品 ID 與卡密行必填")
 	}
 	p, err := s.repo.ParseLines(ctx, ImportInput{
 		ProductID:    req.GetProductId(),
@@ -42,7 +42,7 @@ func (s *AdminInventoryService) ImportPreview(ctx context.Context, req *adminv1.
 		Dedup:        req.GetDedup(),
 	})
 	if err != nil {
-		return nil, inventoryTransportError(err, "inventory.PREVIEW_FAILED", "预览失败")
+		return nil, inventoryTransportError(err, "inventory.PREVIEW_FAILED", "預覽失敗")
 	}
 	return &adminv1.ImportPreviewReply{
 		Total: int32(p.Total), DupInFile: int32(p.DupInFile), DupInDb: int32(p.DupInDB),
@@ -50,10 +50,10 @@ func (s *AdminInventoryService) ImportPreview(ctx context.Context, req *adminv1.
 	}, nil
 }
 
-// ImportConfirm 确认导入。
+// ImportConfirm 確認導入。
 func (s *AdminInventoryService) ImportConfirm(ctx context.Context, req *adminv1.ImportConfirmRequest) (*adminv1.ImportBatch, error) {
 	if req.GetProductId() == 0 || len(req.GetLines()) == 0 {
-		return nil, errors.BadRequest("inventory.INVALID_INPUT", "商品 ID 与卡密行必填")
+		return nil, errors.BadRequest("inventory.INVALID_INPUT", "商品 ID 與卡密行必填")
 	}
 	imp, err := s.repo.ImportConfirm(ctx, ImportInput{
 		ProductID:        req.GetProductId(),
@@ -68,7 +68,7 @@ func (s *AdminInventoryService) ImportConfirm(ctx context.Context, req *adminv1.
 		if data.IsProductLocked(err) || errors.Reason(err) == "inventory.PHYSICAL_PRODUCT" {
 			return nil, err
 		}
-		return nil, inventoryTransportError(err, "inventory.IMPORT_FAILED", "导入失败")
+		return nil, inventoryTransportError(err, "inventory.IMPORT_FAILED", "導入失敗")
 	}
 	// The write has committed; a metadata read failure must not turn it into an unknown import outcome.
 	infos, e := s.batchInfos(ctx, []*ent.CardImport{imp})
@@ -81,35 +81,35 @@ func (s *AdminInventoryService) ImportConfirm(ctx context.Context, req *adminv1.
 // ListImports 批次列表。
 func (s *AdminInventoryService) ListImports(ctx context.Context, req *adminv1.ListImportsRequest) (*adminv1.ListImportsReply, error) {
 	if req.GetLegacyOnly() && req.SkuId != nil {
-		return nil, errors.BadRequest("inventory.INVALID_INPUT", "历史未记录筛选不能同时指定导入规格")
+		return nil, errors.BadRequest("inventory.INVALID_INPUT", "歷史未記錄篩選不能同時指定導入規格")
 	}
 	rows, err := s.repo.ListImports(ctx, req.GetProductId(), req.SkuId, req.GetLegacyOnly())
 	if err != nil {
-		return nil, errors.InternalServer("inventory.LIST_FAILED", "读取批次失败")
+		return nil, errors.InternalServer("inventory.LIST_FAILED", "讀取批次失敗")
 	}
 	batches, err := s.batchInfos(ctx, rows)
 	if err != nil {
-		return nil, errors.InternalServer("inventory.LIST_FAILED", "读取批次失败")
+		return nil, errors.InternalServer("inventory.LIST_FAILED", "讀取批次失敗")
 	}
 	return &adminv1.ListImportsReply{Batches: batches}, nil
 }
 
-// CancelImport 撤销批次。
+// CancelImport 撤銷批次。
 func (s *AdminInventoryService) CancelImport(ctx context.Context, req *adminv1.CancelImportRequest) (*emptypb.Empty, error) {
 	if err := s.repo.CancelImport(ctx, req.GetId(), req.GetExpectedRevision()); err != nil {
 		if data.IsProductLocked(err) || errors.Reason(err) == "inventory.PHYSICAL_PRODUCT" {
 			return nil, err
 		}
-		return nil, inventoryTransportError(err, "inventory.CANCEL_FAILED", "撤销失败")
+		return nil, inventoryTransportError(err, "inventory.CANCEL_FAILED", "撤銷失敗")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// ListCards 卡密列表（掩码默认）。
+// ListCards 卡密列表（掩碼默認）。
 func (s *AdminInventoryService) ListCards(ctx context.Context, req *adminv1.ListCardsRequest) (*adminv1.ListCardsReply, error) {
 	p, err := s.repo.inventoryProduct(ctx, req.GetProductId())
 	if err != nil {
-		return nil, inventoryTransportError(err, "inventory.LIST_FAILED", "读取商品失败")
+		return nil, inventoryTransportError(err, "inventory.LIST_FAILED", "讀取商品失敗")
 	}
 	names, err := s.skuNames(ctx, p.ID, p.SubsiteID)
 	if err != nil {
@@ -133,11 +133,11 @@ func (s *AdminInventoryService) ListCards(ctx context.Context, req *adminv1.List
 	}
 	total, err := q.Clone().Count(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("inventory.LIST_FAILED", "读取卡密失败")
+		return nil, errors.InternalServer("inventory.LIST_FAILED", "讀取卡密失敗")
 	}
 	rows, err := q.Clone().Offset((page - 1) * size).Limit(size).Order(ent.Asc(card.FieldID)).All(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("inventory.LIST_FAILED", "读取卡密失败")
+		return nil, errors.InternalServer("inventory.LIST_FAILED", "讀取卡密失敗")
 	}
 	awards := map[uint64]string{}
 	ids := make([]uint64, 0, len(rows))
@@ -147,7 +147,7 @@ func (s *AdminInventoryService) ListCards(ctx context.Context, req *adminv1.List
 	if len(ids) > 0 {
 		draws, e := data.Client(ctx, s.data).LotteryDraw.Query().Where(lotterydraw.CardIDIn(ids...)).All(ctx)
 		if e != nil {
-			return nil, errors.InternalServer("inventory.LIST_FAILED", "读取发奖记录失败")
+			return nil, errors.InternalServer("inventory.LIST_FAILED", "讀取發獎記錄失敗")
 		}
 		for _, draw := range draws {
 			if draw.CardID != nil {
@@ -167,7 +167,7 @@ func (s *AdminInventoryService) ListCards(ctx context.Context, req *adminv1.List
 	return reply, nil
 }
 
-// maskPlain 管理员默认掩码（尾 4 位明文；解密失败降级为 ****，绝不 500——铁律 5/13）。
+// maskPlain 管理員默認掩碼（尾 4 位明文；解密失敗降級為 ****，絕不 500——鐵律 5/13）。
 func (s *AdminInventoryService) maskPlain(r *ent.Card) string {
 	if s.repo.Cipher == nil {
 		return "****"
@@ -179,16 +179,16 @@ func (s *AdminInventoryService) maskPlain(r *ent.Card) string {
 	return maskContent(plain)
 }
 
-// ExportCards 导出（card:export 权限已在 middleware 校验；此处内容解密）。
+// ExportCards 導出（card:export 權限已在 middleware 校驗；此處內容解密）。
 func (s *AdminInventoryService) ExportCards(ctx context.Context, req *adminv1.ExportCardsRequest) (*adminv1.ExportCardsReply, error) {
 	lines, err := s.repo.ExportCards(ctx, req.GetProductId(), req.SkuId)
 	if err != nil {
-		return nil, inventoryTransportError(err, "inventory.EXPORT_FAILED", "导出失败")
+		return nil, inventoryTransportError(err, "inventory.EXPORT_FAILED", "導出失敗")
 	}
 	return &adminv1.ExportCardsReply{Lines: lines}, nil
 }
 
-// ToggleCard 禁用/启用。
+// ToggleCard 禁用/啓用。
 func (s *AdminInventoryService) toggleCard(ctx context.Context, req *adminv1.ToggleCardRequest) (*emptypb.Empty, error) {
 	from, to := card.StatusAvailable, card.StatusDisabled
 	if req.GetEnable() {
@@ -205,13 +205,13 @@ func (s *AdminInventoryService) toggleCard(ctx context.Context, req *adminv1.Tog
 			return nil, err
 		}
 		if !ok {
-			return nil, errors.BadRequest("inventory.STATUS_INVALID", "仅可启用已禁用卡密或禁用可用卡密，已售出、已发奖和锁定卡密不能修改")
+			return nil, errors.BadRequest("inventory.STATUS_INVALID", "僅可啓用已禁用卡密或禁用可用卡密，已售出、已發獎和鎖定卡密不能修改")
 		}
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限已在 middleware 校验）。
+// ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限已在 middleware 校驗）。
 func (s *AdminInventoryService) ListPremiumCards(ctx context.Context, req *adminv1.ListPremiumCardsRequest) (*adminv1.ListPremiumCardsReply, error) {
 	p, err := s.repo.inventoryProduct(ctx, req.GetProductId())
 	if err != nil {
@@ -229,11 +229,11 @@ func (s *AdminInventoryService) ListPremiumCards(ctx context.Context, req *admin
 		)
 	total, err := q.Clone().Count(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("inventory.PREMIUM_LIST_FAILED", "读取靓号失败")
+		return nil, errors.InternalServer("inventory.PREMIUM_LIST_FAILED", "讀取靚號失敗")
 	}
 	rows, err := q.Clone().Order(ent.Asc(card.FieldID)).Limit(500).All(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("inventory.PREMIUM_LIST_FAILED", "读取靓号失败")
+		return nil, errors.InternalServer("inventory.PREMIUM_LIST_FAILED", "讀取靚號失敗")
 	}
 	reply := &adminv1.ListPremiumCardsReply{Total: int64(total)}
 	for _, r := range rows {
@@ -264,7 +264,7 @@ func toImportBatch(imp *ent.CardImport) *adminv1.ImportBatch {
 	}
 }
 
-// maskContent 掩码明文（尾 4 位；不足 4 位返回 ****）。
+// maskContent 掩碼明文（尾 4 位；不足 4 位返回 ****）。
 func maskContent(plain string) string {
 	if len(plain) <= 4 {
 		return "****"

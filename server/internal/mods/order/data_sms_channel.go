@@ -14,15 +14,15 @@ import (
 
 func (uc *OrderUsecase) retailSMSQuote(ctx context.Context, p *ent.Product, in CreateOrderInput, consume bool, no string) (*ent.SMSRetailQuote, error) {
 	if in.SMSQuoteID == "" {
-		return nil, fmt.Errorf("order.FORM_INVALID: 请在接码页面选择报价后购买")
+		return nil, fmt.Errorf("order.FORM_INVALID: 請在接碼頁面選擇報價後購買")
 	}
 	c := data.Client(ctx, uc.Data)
 	q, e := c.SMSRetailQuote.Query().Where(smsretailquote.ID(in.SMSQuoteID), smsretailquote.ProductID(p.ID), smsretailquote.UserID(in.UserID), smsretailquote.SubsiteID(in.SubsiteID)).Only(ctx)
 	if e != nil {
-		return nil, fmt.Errorf("order.FORM_INVALID: 接码报价不存在或不属于当前会员")
+		return nil, fmt.Errorf("order.FORM_INVALID: 接碼報價不存在或不屬於當前會員")
 	}
 	if q.ConsumedBy != "" || q.ExpiresAt <= time.Now().Unix() || q.ProductRevision != p.LockVersion || q.ConnectionID != p.UpstreamSourceID || q.UpstreamProductID != p.UpstreamProductCode || q.CostCents <= 0 {
-		return nil, fmt.Errorf("order.FORM_INVALID: 接码报价过期、已使用或金额变化，请重新选价")
+		return nil, fmt.Errorf("order.FORM_INVALID: 接碼報價過期、已使用或金額變化，請重新選價")
 	}
 	var rev string
 	if consume && uc.Data.Dialect != db.SQLite {
@@ -42,7 +42,7 @@ func (uc *OrderUsecase) retailSMSQuote(ctx context.Context, p *ent.Product, in C
 		return nil, e
 	}
 	if q.PricingRevision != rev {
-		return nil, fmt.Errorf("order.FORM_INVALID: 商品加价或货源账号已变化，请重新选价")
+		return nil, fmt.Errorf("order.FORM_INVALID: 商品加價或貨源賬號已變化，請重新選價")
 	}
 	if consume {
 		n, e := c.SMSRetailQuote.Update().Where(smsretailquote.ID(q.ID), smsretailquote.ConsumedBy(""), smsretailquote.ExpiresAtGT(time.Now().Unix())).SetConsumedBy(no).Save(ctx)
@@ -50,7 +50,7 @@ func (uc *OrderUsecase) retailSMSQuote(ctx context.Context, p *ent.Product, in C
 			return nil, e
 		}
 		if n != 1 {
-			return nil, fmt.Errorf("order.FORM_INVALID: 报价已使用")
+			return nil, fmt.Errorf("order.FORM_INVALID: 報價已使用")
 		}
 	}
 	return q, nil

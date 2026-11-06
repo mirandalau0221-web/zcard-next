@@ -21,13 +21,13 @@ type UserSession struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uint64 `json:"user_id,omitempty"`
-	// 最近活跃 IP
+	// 最近活躍 IP
 	IP string `json:"ip,omitempty"`
-	// 最近活跃时间（在线判定基准）
+	// 最近活躍時間（在線判定基準）
 	LastActiveAt time.Time `json:"last_active_at,omitempty"`
 	selectValues sql.SelectValues
 }

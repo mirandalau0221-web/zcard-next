@@ -23,7 +23,7 @@ type DailyStat struct {
 	StatDate string `json:"stat_date,omitempty"`
 	// orders/amount/profit/pay_success_rate...
 	Metric string `json:"metric,omitempty"`
-	// 维度（商品ID 等；空=总量）
+	// 維度（商品ID 等；空=總量）
 	DimensionKey string `json:"dimension_key,omitempty"`
 	// Value holds the value of the "value" field.
 	Value int64 `json:"value,omitempty"`

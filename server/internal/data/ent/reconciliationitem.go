@@ -28,7 +28,7 @@ type ReconciliationItem struct {
 	UpstreamOrderNo string `json:"upstream_order_no,omitempty"`
 	// Status holds the value of the "status" field.
 	Status reconciliationitem.Status `json:"status,omitempty"`
-	// 金额/状态差异
+	// 金額/狀態差異
 	DiffJSON map[string]interface{} `json:"diff_json,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt    time.Time `json:"created_at,omitempty"`

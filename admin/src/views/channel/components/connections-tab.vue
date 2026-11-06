@@ -1,8 +1,8 @@
 <script setup lang="ts">
-// 货源渠道管理（supply:read / supply:write 超管专属）：
-// 连接 CRUD（三类驱动凭据动态表单）/ 测试连接 / 手动同步（采集全量|增量 / 仅价格 /
-// 仅状态）/ 定时计划对话框（三 scope 间隔+时间窗+请求节奏）/ 限流状态徽标与倒计时 /
-// 同步任务抽屉（进度统计与取消）。
+// 貨源渠道管理（supply:read / supply:write 超管專屬）：
+// 連接 CRUD（三類驅動憑據動態表單）/ 測試連接 / 手動同步（採集全量|增量 / 僅價格 /
+// 僅狀態）/ 定時計劃對話框（三 scope 間隔+時間窗+請求節奏）/ 限流狀態徽標與倒計時 /
+// 同步任務抽屜（進度統計與取消）。
 import { computed, defineAsyncComponent, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import {
   NButton, NDataTable, NDropdown, NInput, NInputNumber, NModal, NForm, NFormItem,
@@ -32,19 +32,19 @@ const statusFilter = ref<"" | "active" | "disabled">("");
 
 const statusTabs = [
   { label: "全部", value: "", type: "default" as const },
-  { label: "已启用", value: "active", type: "success" as const },
+  { label: "已啓用", value: "active", type: "success" as const },
   { label: "已禁用", value: "disabled", type: "error" as const },
 ];
 
 const driverMeta: Record<string, { label: string; tag: "success" | "info" | "warning" }> = {
   zcard: { label: "ZCard", tag: "success" },
-  dujiao_next: { label: "独角数卡", tag: "info" },
-  acg_faka: { label: "异次元", tag: "warning" },
+  dujiao_next: { label: "獨角數卡", tag: "info" },
+  acg_faka: { label: "異次元", tag: "warning" },
 };
 
 const canWrite = () => checkAuth("supply:write");
 
-// ── 容器宽分档（full ≥1080 / mid ≥720 / compact）：任意屏宽下操作列完整可见，不依赖横向滚动 ──
+// ── 容器寬分檔（full ≥1080 / mid ≥720 / compact）：任意屏寬下操作列完整可見，不依賴橫向滾動 ──
 const wrapRef = ref<HTMLElement | null>(null);
 const { tier } = useResponsiveTier(wrapRef);
 
@@ -53,7 +53,7 @@ function fmtTime(ts?: number) {
   return new Date(ts * 1000).toLocaleString();
 }
 
-// ── 限流状态（AIMD 节奏器）──
+// ── 限流狀態（AIMD 節奏器）──
 const nowTick = ref(Date.now());
 let timer: ReturnType<typeof setInterval> | undefined;
 onMounted(() => {
@@ -64,23 +64,23 @@ onUnmounted(() => timer && clearInterval(timer));
 function rateLimitView(row: any): { label: string; type: "error" | "warning" | "success" } | null {
   if (!row.rate_limit_until) return null;
   const remain = row.rate_limit_until * 1000 - nowTick.value;
-  if (remain <= 0) return { label: "冷却已过（半开探测中）", type: "warning" };
+  if (remain <= 0) return { label: "冷卻已過（半開探測中）", type: "warning" };
   const min = Math.floor(remain / 60000);
   const sec = Math.floor((remain % 60000) / 1000);
-  return { label: `限流熔断 ${min}:${String(sec).padStart(2, "0")}`, type: "error" };
+  return { label: `限流熔斷 ${min}:${String(sec).padStart(2, "0")}`, type: "error" };
 }
 
-// scheduleSummary 定时计划概要（列表 ⏰ 标记与 title）。
+// scheduleSummary 定時計劃概要（列表 ⏰ 標記與 title）。
 function scheduleSummary(row: any): { on: boolean; tip: string } {
   try {
     const sch = JSON.parse(row.settings || "{}").schedule;
-    if (!sch?.enabled && !sch?.low_stock?.enabled) return { on: false, tip: "未启用定时同步" };
+    if (!sch?.enabled && !sch?.low_stock?.enabled) return { on: false, tip: "未啓用定時同步" };
     const parts: string[] = [];
-    if (sch.low_stock?.enabled) parts.push(`库存≤${sch.low_stock.threshold}：${sch.low_stock.interval}分钟检查`);
-    if (sch.enabled && sch.collect?.enabled) parts.push(`采集 ${sch.collect.interval}分钟`);
-    if (sch.enabled && sch.price?.enabled) parts.push(`价格 ${sch.price.interval}分钟`);
-    if (sch.enabled && sch.status?.enabled) parts.push(`状态 ${sch.status.interval}分钟`);
-    return { on: true, tip: parts.length ? `定时：${parts.join(" / ")}` : "定时总开关开（未启用任何任务）" };
+    if (sch.low_stock?.enabled) parts.push(`庫存≤${sch.low_stock.threshold}：${sch.low_stock.interval}分鐘檢查`);
+    if (sch.enabled && sch.collect?.enabled) parts.push(`採集 ${sch.collect.interval}分鐘`);
+    if (sch.enabled && sch.price?.enabled) parts.push(`價格 ${sch.price.interval}分鐘`);
+    if (sch.enabled && sch.status?.enabled) parts.push(`狀態 ${sch.status.interval}分鐘`);
+    return { on: true, tip: parts.length ? `定時：${parts.join(" / ")}` : "定時總開關開（未啓用任何任務）" };
   } catch {
     return { on: false, tip: "" };
   }
@@ -116,7 +116,7 @@ function onSearch() {
   load();
 }
 
-// ── 新增/编辑（驱动凭据动态表单）──
+// ── 新增/編輯（驅動憑據動態表單）──
 const showForm = ref(false);
 const saving = ref(false);
 const editingId = ref(0);
@@ -124,7 +124,7 @@ const form = reactive({
   name: "",
   driver: "zcard",
   base_url: "",
-  credentials: "", // JSON 明文（编辑留空 = 不改）
+  credentials: "", // JSON 明文（編輯留空 = 不改）
   exchange_rate: 1,
   price_markup_percent: 10,
   markupAmountYuan: 0,
@@ -145,7 +145,7 @@ const credFields = computed(() => {
     case "acg_faka":
       return [
         { key: "app_id", label: "商户ID（app_id）" },
-        { key: "app_key", label: "对接密钥（app_key）" },
+        { key: "app_key", label: "對接密鑰（app_key）" },
       ];
     default:
       return [
@@ -201,7 +201,7 @@ function openEdit(row: any) {
 async function submitForm() {
   if (saving.value) return;
   if (!form.name || !form.base_url) {
-    window.$message?.warning("名称与上游地址必填");
+    window.$message?.warning("名稱與上游地址必填");
     return;
   }
   let credentials = form.credentials;
@@ -222,7 +222,7 @@ async function submitForm() {
       stock_mode: form.stock_mode,
     };
     if (credentials) payload.credentials = credentials;
-    // settings：编辑时保留原值（定时计划单独维护），叠加失败策略
+    // settings：編輯時保留原值（定時計劃單獨維護），疊加失敗策略
     let baseSettings: Record<string, any> = {};
     if (editingId.value) {
       const row = connections.value.find((r) => r.id === editingId.value);
@@ -240,11 +240,11 @@ async function submitForm() {
     if (editingId.value) {
       const { error } = await updateSupplyConnection(editingId.value, payload);
       if (error) return;
-      window.$message?.success("连接已更新，已有商品将在执行价格同步时按规则处理");
+      window.$message?.success("連接已更新，已有商品將在執行價格同步時按規則處理");
     } else {
       const { error } = await createSupplyConnection(payload as any);
       if (error) return;
-      window.$message?.success("连接已创建");
+      window.$message?.success("連接已創建");
     }
     showForm.value = false;
     load();
@@ -253,7 +253,7 @@ async function submitForm() {
   }
 }
 
-// ── 测试连接 ──
+// ── 測試連接 ──
 const pinging = reactive<Record<number, boolean>>({});
 async function handlePing(row: any) {
   pinging[row.id] = true;
@@ -263,9 +263,9 @@ async function handlePing(row: any) {
       const d = data as any;
       if (d.ok === true) {
         const balance = d.balance_cents ?? d.balance ?? (d.currency ? 0 : -1);
-        window.$message?.success(`连接成功：${d.site_name || "上游"}，余额 ${balance == null || balance < 0 ? "未知" : formatMoney(balance)}`);
+        window.$message?.success(`連接成功：${d.site_name || "上游"}，餘額 ${balance == null || balance < 0 ? "未知" : formatMoney(balance)}`);
       } else {
-        window.$message?.error(`连接失败：${d.error || "上游未确认连接成功，请重试"}`);
+        window.$message?.error(`連接失敗：${d.error || "上游未確認連接成功，請重試"}`);
       }
       await load();
     }
@@ -274,11 +274,11 @@ async function handlePing(row: any) {
   }
 }
 
-// ── 同步任务 ──
+// ── 同步任務 ──
 function handleSync(row: any, scope: string, mode: string) {
   createSupplySyncTask({ connection_id: row.id, scope, mode }).then(({ error }) => {
     if (!error) {
-      window.$message?.success("同步任务已创建");
+      window.$message?.success("同步任務已創建");
       openTasks(row.id);
       load();
     }
@@ -317,7 +317,7 @@ function handleCancelTask(id: number) {
   cancelSupplySyncTask(id).then(() => loadTasks());
 }
 
-// 手动重跑（failed/canceled/done 均可按原参数重建任务）
+// 手動重跑（failed/canceled/done 均可按原參數重建任務）
 async function handleRerunTask(row: any) {
   if (row.scope === "import") { selectedImportTask.value = Number(row.id); return; }
   const { error } = await createSupplySyncTask({
@@ -326,72 +326,72 @@ async function handleRerunTask(row: any) {
     mode: row.error_code === "STOCK_QUERY_FAILED" ? "failed" : row.mode || "full",
   });
   if (!error) {
-    window.$message?.success("已重新创建任务");
+    window.$message?.success("已重新創建任務");
     loadTasks();
   }
 }
 
 const taskColumns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 48 },
-  { title: "范围", key: "scope", width: 56, render: (r) => ({ collect: "采集", price: "价格", status: "状态", stock: "库存", listing: "补货检查", import: "导入" } as any)[r.scope || "collect"] || r.scope },
-  { title: "模式", key: "mode", width: 64, ellipsis: { tooltip: true }, render: r => r.mode === "selected" ? "所选商品" : r.mode },
+  { title: "範圍", key: "scope", width: 56, render: (r) => ({ collect: "採集", price: "價格", status: "狀態", stock: "庫存", listing: "補貨檢查", import: "導入" } as any)[r.scope || "collect"] || r.scope },
+  { title: "模式", key: "mode", width: 64, ellipsis: { tooltip: true }, render: r => r.mode === "selected" ? "所選商品" : r.mode },
   {
-    title: "状态",
+    title: "狀態",
     key: "status",
     width: 84,
     render: (r) =>
       h(
         NTag,
         { size: "small", type: r.status === "done" ? "success" : r.status === "failed" ? "error" : r.status === "processing" ? "info" : r.status === "canceled" ? "default" : "warning", bordered: false },
-        { default: () => r.scope === "import" && r.error_code ? (r.status === "done" ? "部分需处理" : "需处理") : ({ done: "完成", failed: "失败", processing: "执行中", canceled: "已取消", pending: "排队中" } as any)[r.status] || r.status },
+        { default: () => r.scope === "import" && r.error_code ? (r.status === "done" ? "部分需處理" : "需處理") : ({ done: "完成", failed: "失敗", processing: "執行中", canceled: "已取消", pending: "排隊中" } as any)[r.status] || r.status },
       ),
   },
   {
-    title: "进度",
+    title: "進度",
     key: "processed",
     width: 140,
     render: (r) =>
       h("div", { class: "flex flex-col" }, [
         h("span", `${r.processed || 0}/${r.total || 0} 件`),
         r.current_stage
-          ? h("span", { class: "text-11px text-gray-400" }, `${stageText(r.current_stage)}${r.page ? ` · 第 ${r.page} 页` : ""}`)
+          ? h("span", { class: "text-11px text-gray-400" }, `${stageText(r.current_stage)}${r.page ? ` · 第 ${r.page} 頁` : ""}`)
           : null,
       ]),
   },
   {
-    title: "统计",
+    title: "統計",
     key: "stats",
     width: 200,
-    render: (r) => r.scope === "import" ? `已保存 ${Number(r.created || 0) + Number(r.updated || 0)} · 跳过 ${r.manual_skipped || 0} · 失败 ${r.failed_count || 0} · 库存待确认 ${r.stock_pending_count || 0}` :
+    render: (r) => r.scope === "import" ? `已保存 ${Number(r.created || 0) + Number(r.updated || 0)} · 跳過 ${r.manual_skipped || 0} · 失敗 ${r.failed_count || 0} · 庫存待確認 ${r.stock_pending_count || 0}` :
       h(
         "div",
         {
           class: "text-12px",
-          title: `新增 ${r.created || 0} · 更新 ${r.updated || 0} · 价格变更 ${r.price_updated || 0} · 保护跳过（人工改价或商品锁定）${r.manual_skipped || 0} · 隐藏 ${r.hidden || 0} · 对账下架 ${r.deleted || 0}`,
+          title: `新增 ${r.created || 0} · 更新 ${r.updated || 0} · 價格變更 ${r.price_updated || 0} · 保護跳過（人工改價或商品鎖定）${r.manual_skipped || 0} · 隱藏 ${r.hidden || 0} · 對賬下架 ${r.deleted || 0}`,
         },
         [
           h("span", { class: "text-success" }, `新${r.created || 0}`),
           " ",
           h("span", { class: "text-info" }, `更${r.updated || 0}`),
           " ",
-          h("span", { class: "text-primary" }, `价${r.price_updated || 0}`),
+          h("span", { class: "text-primary" }, `價${r.price_updated || 0}`),
           " ",
-          h("span", { class: "text-warning" }, `护${r.manual_skipped || 0}`),
+          h("span", { class: "text-warning" }, `護${r.manual_skipped || 0}`),
           " ",
           h("span", { class: "text-gray-400" }, `藏${r.hidden || 0}`),
           " ",
-          h("span", { class: "text-error" }, `删${r.deleted || 0}`),
+          h("span", { class: "text-error" }, `刪${r.deleted || 0}`),
         ],
       ),
   },
   {
-    title: "上游调用",
+    title: "上游調用",
     key: "error_code",
     minWidth: 150,
     ellipsis: { tooltip: true },
     render: (r) =>
       r.error_code
-        ? h("span", { title: r.error_context || "", class: "text-error" }, r.scope === "import" ? r.error_context : r.error_code === "STOCK_QUERY_FAILED" ? r.error_context || "库存查询失败" : `${r.error_code}`)
+        ? h("span", { title: r.error_context || "", class: "text-error" }, r.scope === "import" ? r.error_context : r.error_code === "STOCK_QUERY_FAILED" ? r.error_context || "庫存查詢失敗" : `${r.error_code}`)
         : h("span", { class: "text-gray-400" }, r.status === "done" ? "正常" : "-"),
   },
   {
@@ -400,12 +400,12 @@ const taskColumns: DataTableColumns<any> = [
     width: 96,
     render: (r) =>
       h("div", { class: "flex gap-4px" }, [
-        r.scope === "import" ? h(NButton, { size: "tiny", onClick: () => selectedImportTask.value = Number(r.id) }, { default: () => "查看进度" }) : null,
+        r.scope === "import" ? h(NButton, { size: "tiny", onClick: () => selectedImportTask.value = Number(r.id) }, { default: () => "查看進度" }) : null,
         r.scope !== "import" && (r.status === "processing" || r.status === "pending") && canWrite()
           ? h(NButton, { size: "tiny", quaternary: true, onClick: () => handleCancelTask(r.id) }, { default: () => "取消" })
           : null,
         r.scope !== "import" && ["failed", "canceled", "done"].includes(r.status) && canWrite()
-          ? h(NButton, { size: "tiny", type: "primary", quaternary: true, onClick: () => handleRerunTask(r) }, { default: () => r.error_code === "STOCK_QUERY_FAILED" ? "重试库存" : "重跑" })
+          ? h(NButton, { size: "tiny", type: "primary", quaternary: true, onClick: () => handleRerunTask(r) }, { default: () => r.error_code === "STOCK_QUERY_FAILED" ? "重試庫存" : "重跑" })
           : null,
       ]),
   },
@@ -415,9 +415,9 @@ function stageText(stage: string) {
   return (
     ({
       fetching_products: "拉取商品",
-      fetching_stock: "补查库存",
-      saving_products: "写入本地",
-      reconciling: "删除对账",
+      fetching_stock: "補查庫存",
+      saving_products: "寫入本地",
+      reconciling: "刪除對賬",
       finalizing: "收尾",
     } as Record<string, string>)[stage] || stage
   );
@@ -425,16 +425,16 @@ function stageText(stage: string) {
 
 function syncActions(row: any): DropdownOption[] {
   return [
-    { label: "采集（增量）", key: "collect:incremental", disabled: !canWrite() },
-    { label: "采集（全量 + 删除对账）", key: "collect:full", disabled: !canWrite() },
-    { label: "仅补查库存", key: "stock:full", disabled: !canWrite() },
-    { label: "仅重试失败库存", key: "stock:failed", disabled: !canWrite() },
-    { label: "仅同步价格", key: "price:incremental", disabled: !canWrite() },
-    { label: "仅同步上下架/库存", key: "status:incremental", disabled: !canWrite() },
+    { label: "採集（增量）", key: "collect:incremental", disabled: !canWrite() },
+    { label: "採集（全量 + 刪除對賬）", key: "collect:full", disabled: !canWrite() },
+    { label: "僅補查庫存", key: "stock:full", disabled: !canWrite() },
+    { label: "僅重試失敗庫存", key: "stock:failed", disabled: !canWrite() },
+    { label: "僅同步價格", key: "price:incremental", disabled: !canWrite() },
+    { label: "僅同步上下架/庫存", key: "status:incremental", disabled: !canWrite() },
   ];
 }
 
-// ── 交互式导入（ D）──
+// ── 交互式導入（ D）──
 const showImport = ref(false);
 const importConn = ref<any>(null);
 function openImport(row: any) {
@@ -442,7 +442,7 @@ function openImport(row: any) {
   showImport.value = true;
 }
 
-// ── 定时计划对话框（settings.schedule；S2/S3 参数）──
+// ── 定時計劃對話框（settings.schedule；S2/S3 參數）──
 const showSchedule = ref(false);
 const scheduleConn = ref<any>(null);
 const schedule = reactive({
@@ -456,31 +456,31 @@ const schedule = reactive({
   status: { enabled: false, interval: 60, windows: "" },
 });
 
-// scheduleStatus 执行状态面板数据（上次执行 + 下次预计）。
+// scheduleStatus 執行狀態面板數據（上次執行 + 下次預計）。
 const scheduleStatus = computed(() => {
   const conn = scheduleConn.value;
   if (!conn) return [];
-  const fmt = (ts?: number) => (ts ? new Date(ts * 1000).toLocaleString() : "从未执行");
+  const fmt = (ts?: number) => (ts ? new Date(ts * 1000).toLocaleString() : "從未執行");
   const next = (ts: number | undefined, intervalMin: number) => {
-    if (!ts) return "即将（首轮）";
+    if (!ts) return "即將（首輪）";
     const nextAt = new Date((ts + intervalMin * 60) * 1000);
-    return nextAt <= new Date() ? "到期（下轮扫描派发）" : nextAt.toLocaleString();
+    return nextAt <= new Date() ? "到期（下輪掃描派發）" : nextAt.toLocaleString();
   };
   return [
     {
-      label: "采集商品",
+      label: "採集商品",
       on: schedule.collect.enabled,
       last: fmt(conn.last_collect_at || conn.last_synced_at),
       next: next(conn.last_collect_at || conn.last_synced_at, schedule.collect.interval),
     },
     {
-      label: "同步价格",
+      label: "同步價格",
       on: schedule.price.enabled,
       last: fmt(conn.last_price_sync_at),
       next: next(conn.last_price_sync_at, schedule.price.interval),
     },
     {
-      label: "上下架/库存",
+      label: "上下架/庫存",
       on: schedule.status.enabled,
       last: fmt(conn.last_status_sync_at),
       next: next(conn.last_status_sync_at, schedule.status.interval),
@@ -515,8 +515,8 @@ function openSchedule(row: any) {
 
 const scheduleSaving = ref(false);
 const lowStockError = computed(() => !Number.isInteger(schedule.low_stock.threshold) || schedule.low_stock.threshold < 1 || schedule.low_stock.threshold > 1000000
-  ? "库存数量须为 1–1000000 的整数" : !Number.isInteger(schedule.low_stock.interval) || schedule.low_stock.interval < 5 || schedule.low_stock.interval > 1440
-  ? "检查间隔须为 5–1440 分钟的整数" : "");
+  ? "庫存數量須為 1–1000000 的整數" : !Number.isInteger(schedule.low_stock.interval) || schedule.low_stock.interval < 5 || schedule.low_stock.interval > 1440
+  ? "檢查間隔須為 5–1440 分鐘的整數" : "");
 async function submitSchedule() {
   if (lowStockError.value || scheduleSaving.value) return;
   scheduleSaving.value = true;
@@ -547,24 +547,24 @@ async function submitSchedule() {
   };
   const { error } = await updateSupplyConnection(scheduleConn.value.id, { settings: JSON.stringify(settings) });
   if (!error) {
-    window.$message?.success("定时计划已保存");
+    window.$message?.success("定時計劃已保存");
     showSchedule.value = false;
     load();
   }
   } finally { scheduleSaving.value = false; }
 }
 
-// ── 响应式列集：compact 只留 名称/限流/操作；mid 去掉 ID/余额/最近采集；full 全列 ──
-// 文本列只设 minWidth 不设 width（即弹性列，富余宽度自动分摊），maxWidth 封顶防宽屏上游地址无限膨胀留白。
+// ── 響應式列集：compact 只留 名稱/限流/操作；mid 去掉 ID/餘額/最近採集；full 全列 ──
+// 文本列只設 minWidth 不設 width（即彈性列，富餘寬度自動分攤），maxWidth 封頂防寬屏上游地址無限膨脹留白。
 function nameCol(t: TableTier) {
   return {
-    title: "名称",
+    title: "名稱",
     key: "name",
     minWidth: t === "compact" ? 96 : 120,
     maxWidth: t === "compact" ? 220 : 300,
     render: (row: any) => {
       const sch = scheduleSummary(row);
-      // compact 下被裁掉的列信息并入悬停提示
+      // compact 下被裁掉的列信息併入懸停提示
       const tip =
         t === "compact"
           ? `${row.name}${sch.on ? ` · ${sch.tip}` : ""}\n${driverMeta[row.driver]?.label || row.driver} · ${row.base_url}`
@@ -572,7 +572,7 @@ function nameCol(t: TableTier) {
       return h("div", { class: "flex min-w-0 items-center gap-4px" }, [
         h("span", { class: "truncate", title: tip }, row.name),
         row.last_ping_at > 0 && !row.last_ping_ok
-          ? h(NTag, { size: "small", type: "error", bordered: false, title: `最近测试：${fmtTime(row.last_ping_at)}\n${row.last_error || "连接失败"}` }, { default: () => "连接失败" })
+          ? h(NTag, { size: "small", type: "error", bordered: false, title: `最近測試：${fmtTime(row.last_ping_at)}\n${row.last_error || "連接失敗"}` }, { default: () => "連接失敗" })
           : null,
         sch.on ? h("span", { title: sch.tip, class: "cursor-help shrink-0" }, "⏰") : null,
       ]);
@@ -582,7 +582,7 @@ function nameCol(t: TableTier) {
 
 function typeCol() {
   return {
-    title: "类型",
+    title: "類型",
     key: "driver",
     width: 84,
     render: (row: any) => h(NTag, { size: "small", type: driverMeta[row.driver]?.tag || "default", bordered: false }, { default: () => driverMeta[row.driver]?.label || row.driver }),
@@ -591,7 +591,7 @@ function typeCol() {
 
 function rateCol(t: TableTier) {
   return {
-    title: "限流状态",
+    title: "限流狀態",
     key: "rate",
     align: "center" as const,
     width: t === "compact" ? 100 : t === "mid" ? 150 : 158,
@@ -599,50 +599,50 @@ function rateCol(t: TableTier) {
       const rl = rateLimitView(row);
       const delay = adaptiveDelayMs(row);
       if (t === "compact") {
-        const label = !rl ? "正常" : rl.type === "warning" ? "半开探测" : rl.label.replace("限流熔断", "熔断");
+        const label = !rl ? "正常" : rl.type === "warning" ? "半開探測" : rl.label.replace("限流熔斷", "熔斷");
         return h(NTag, { size: "tiny", type: rl?.type || "success", bordered: false }, { default: () => label });
       }
-      // 居中栈：状态徽章 + 自适应间隔说明（大厂表格徽章列惯例）
+      // 居中棧：狀態徽章 + 自適應間隔説明（大廠表格徽章列慣例）
       return h("div", { class: "flex flex-col items-center justify-center gap-2px" }, [
         rl
           ? h(NTag, { size: "tiny", type: rl.type, bordered: false }, { default: () => rl.label })
           : h(NTag, { size: "tiny", type: "success", bordered: false }, { default: () => "正常" }),
         delay > 0
-          ? h("span", { class: "text-11px whitespace-nowrap text-gray-400" }, `自适应间隔 ${(delay / 1000).toFixed(0)}s`)
+          ? h("span", { class: "text-11px whitespace-nowrap text-gray-400" }, `自適應間隔 ${(delay / 1000).toFixed(0)}s`)
           : null,
       ]);
     },
   };
 }
 
-// 操作列：full/mid 为「测试 + 同步▾ + 任务 + 更多▾」；compact 收进单个「操作▾」（功能不减）
+// 操作列：full/mid 為「測試 + 同步▾ + 任務 + 更多▾」；compact 收進單個「操作▾」（功能不減）
 function moreMenu(): DropdownOption[] {
-  const opts: DropdownOption[] = [{ label: "⏰ 定时计划", key: "schedule" }];
+  const opts: DropdownOption[] = [{ label: "⏰ 定時計劃", key: "schedule" }];
   if (canWrite())
     opts.push(
-      { label: "导入商品", key: "import" },
-      { label: "编辑", key: "edit" },
+      { label: "導入商品", key: "import" },
+      { label: "編輯", key: "edit" },
       { type: "divider", key: "dv" },
-      { label: "删除", key: "delete" },
+      { label: "刪除", key: "delete" },
     );
   return opts;
 }
 
 function compactMenu(row: any): DropdownOption[] {
-  const opts: DropdownOption[] = [{ label: "测试连接", key: "ping" }];
+  const opts: DropdownOption[] = [{ label: "測試連接", key: "ping" }];
   if (canWrite()) opts.push({ label: "同步", key: "sync", children: syncActions(row) });
-  opts.push({ label: "同步任务", key: "tasks" }, { label: "⏰ 定时计划", key: "schedule" });
+  opts.push({ label: "同步任務", key: "tasks" }, { label: "⏰ 定時計劃", key: "schedule" });
   if (canWrite())
     opts.push(
-      { label: "导入商品", key: "import" },
-      { label: "编辑", key: "edit" },
+      { label: "導入商品", key: "import" },
+      { label: "編輯", key: "edit" },
       { type: "divider", key: "dv" },
-      { label: "删除", key: "delete" },
+      { label: "刪除", key: "delete" },
     );
   return opts;
 }
 
-// 统一分发：形如 collect:incremental 的是同步子项，其余按 key 走 switch
+// 統一分發：形如 collect:incremental 的是同步子項，其餘按 key 走 switch
 function onRowAction(row: any, key: string) {
   if (key.includes(":")) {
     const [scope, mode] = key.split(":");
@@ -667,9 +667,9 @@ function onRowAction(row: any, key: string) {
       break;
     case "delete":
       window.$dialog?.warning({
-        title: "删除渠道",
-        content: "存在商品映射时不可删除，确定删除？",
-        positiveText: "删除",
+        title: "刪除渠道",
+        content: "存在商品映射時不可刪除，確定刪除？",
+        positiveText: "刪除",
         negativeText: "取消",
         onPositiveClick: () => handleDelete(row.id),
       });
@@ -690,8 +690,8 @@ function actionsCol(t: TableTier) {
             { default: () => h(NButton, { size: "tiny", secondary: true }, { default: () => "操作 ▾" }) },
           )
         : h("div", { class: "flex flex-wrap items-center gap-4px" }, [
-            h(NButton, { size: "tiny", loading: pinging[row.id], onClick: () => handlePing(row) }, { default: () => "测试" }),
-            canWrite() ? h(NButton, { size: "tiny", type: "primary", secondary: true, onClick: () => onRowAction(row, "import") }, { default: () => "导入商品" }) : null,
+            h(NButton, { size: "tiny", loading: pinging[row.id], onClick: () => handlePing(row) }, { default: () => "測試" }),
+            canWrite() ? h(NButton, { size: "tiny", type: "primary", secondary: true, onClick: () => onRowAction(row, "import") }, { default: () => "導入商品" }) : null,
             canWrite()
               ? h(
                   NDropdown,
@@ -699,7 +699,7 @@ function actionsCol(t: TableTier) {
                   { default: () => h(NButton, { size: "tiny", type: "primary", quaternary: true }, { default: () => "同步 ▾" }) },
                 )
               : null,
-            h(NButton, { size: "tiny", quaternary: true, onClick: () => openTasks(row.id) }, { default: () => "任务" }),
+            h(NButton, { size: "tiny", quaternary: true, onClick: () => openTasks(row.id) }, { default: () => "任務" }),
             h(
               NDropdown,
               { options: moreMenu(), trigger: "click", onSelect: (key: string) => onRowAction(row, key) },
@@ -726,7 +726,7 @@ const columns = computed<DataTableColumns<any>>(() => {
   }
   if (t === "full") {
     cols.push({
-      title: "余额", key: "balance_cache", width: 110,
+      title: "餘額", key: "balance_cache", width: 110,
       render: (row: any) => {
         // JSON omits a known zero balance; an unknown balance is explicitly -1.
         const balance = row.balance_cache ?? (row.last_ping_ok ? 0 : -1);
@@ -734,15 +734,15 @@ const columns = computed<DataTableColumns<any>>(() => {
         const historical = !row.last_ping_ok;
         return h("div", {
           title: historical
-            ? "上次成功获取的余额，当前未验证；最新余额以连接成功后的结果为准"
-            : `最近测试：${fmtTime(row.last_ping_at)}`,
+            ? "上次成功獲取的餘額，當前未驗證；最新餘額以連接成功後的結果為準"
+            : `最近測試：${fmtTime(row.last_ping_at)}`,
         }, [
           h("div", formatMoney(balance)),
-          historical ? h("small", { class: "text-amber-600" }, "历史余额") : null,
+          historical ? h("small", { class: "text-amber-600" }, "歷史餘額") : null,
         ]);
       },
     });
-    cols.push({ title: "最近采集", key: "last_collect_at", width: 146, render: (row: any) => fmtTime(row.last_collect_at || row.last_synced_at) });
+    cols.push({ title: "最近採集", key: "last_collect_at", width: 146, render: (row: any) => fmtTime(row.last_collect_at || row.last_synced_at) });
   }
   cols.push(rateCol(t));
   cols.push(actionsCol(t));
@@ -752,7 +752,7 @@ const columns = computed<DataTableColumns<any>>(() => {
 async function handleDelete(id: number) {
   const { error } = await deleteSupplyConnection(id);
   if (!error) {
-    window.$message?.success("已删除");
+    window.$message?.success("已刪除");
     load();
   }
 }
@@ -780,20 +780,20 @@ onMounted(load);
       <TablePager v-model:page="page" v-model:page-size="pageSize" :total="total" @change="load" />
     </div>
 
-    <!-- 新增/编辑 -->
-    <NModal v-model:show="showForm" :closable="!saving" :mask-closable="!saving" :close-on-esc="!saving" preset="card" :title="editingId ? '编辑渠道' : '新增渠道'" style="width: 560px; max-width: 96vw">
+    <!-- 新增/編輯 -->
+    <NModal v-model:show="showForm" :closable="!saving" :mask-closable="!saving" :close-on-esc="!saving" preset="card" :title="editingId ? '編輯渠道' : '新增渠道'" style="width: 560px; max-width: 96vw">
       <NForm label-placement="left" label-width="110">
-        <NFormItem label="名称" required>
-          <NInput v-model:value="form.name" placeholder="如：主站独角" />
+        <NFormItem label="名稱" required>
+          <NInput v-model:value="form.name" placeholder="如：主站獨角" />
         </NFormItem>
-        <NFormItem label="渠道类型" required>
+        <NFormItem label="渠道類型" required>
           <NSelect
             v-model:value="form.driver"
             :disabled="!!editingId"
             :options="[
-              { label: 'ZCard（自有协议）', value: 'zcard' },
-              { label: '独角数卡 dujiao-next', value: 'dujiao_next' },
-              { label: '异次元 acg-faka', value: 'acg_faka' },
+              { label: 'ZCard（自有協議）', value: 'zcard' },
+              { label: '獨角數卡 dujiao-next', value: 'dujiao_next' },
+              { label: '異次元 acg-faka', value: 'acg_faka' },
             ]"
           />
         </NFormItem>
@@ -803,10 +803,10 @@ onMounted(load);
         <NFormItem v-for="f in credFields" :key="f.key" :label="f.label" :required="editingId === 0">
           <NInput v-model:value="credDraft[f.key]" :placeholder="editingId ? '留空 = 不修改' : ''" />
         </NFormItem>
-        <NFormItem label="汇率">
+        <NFormItem label="匯率">
           <NInputNumber v-model:value="form.exchange_rate" :min="0.00000001" class="w-full" />
         </NFormItem>
-        <NFormItem label="加价规则">
+        <NFormItem label="加價規則">
           <div class="w-full">
             <div class="flex flex-wrap items-center gap-8px">
               <span class="w-64px shrink-0 text-13px">比例上浮</span>
@@ -814,25 +814,25 @@ onMounted(load);
                 <template #suffix>%</template>
               </NInputNumber>
               <span class="text-12px text-gray-400">＋</span>
-              <span class="w-64px shrink-0 text-13px">固定加价</span>
+              <span class="w-64px shrink-0 text-13px">固定加價</span>
               <NInputNumber v-model:value="form.markupAmountYuan" :min="0" :precision="2" size="small" class="w-120px" placeholder="0.00">
                 <template #suffix>{{ currencyUnit() }}</template>
               </NInputNumber>
             </div>
             <div class="mt-4px text-11px text-gray-400">
-              本店售价 = 上游价 × 汇率 ×（1 + 比例上浮%）＋ 固定加价；0 表示不加价。用于跟随渠道的导入及后续价格同步，保存设置不会立即重算已有商品。
+              本店售價 = 上游價 × 匯率 ×（1 + 比例上浮%）＋ 固定加價；0 表示不加價。用於跟隨渠道的導入及後續價格同步，保存設置不會立即重算已有商品。
             </div>
           </div>
         </NFormItem>
-        <NFormItem label="商品链接模板">
+        <NFormItem label="商品鏈接模板">
           <NInput v-model:value="form.productUrlTemplate" placeholder="如 {base}/product/{code}（商品列表跳上游）" />
         </NFormItem>
-        <NFormItem label="采购失败策略">
+        <NFormItem label="採購失敗策略">
           <NSelect
             v-model:value="form.failAction"
             :options="[
-              { label: '自动退款（默认）', value: 'auto_refund' },
-              { label: '转人工处理', value: 'manual' },
+              { label: '自動退款（默認）', value: 'auto_refund' },
+              { label: '轉人工處理', value: 'manual' },
             ]"
           />
         </NFormItem>
@@ -840,84 +840,84 @@ onMounted(load);
           <NSelect
             v-model:value="form.price_rounding_mode"
             :options="[
-              { label: '不取整（两位小数）', value: 'none' },
-              { label: `向上取整到整数 ${currencyUnit()}`, value: 'ceil_int' },
+              { label: '不取整（兩位小數）', value: 'none' },
+              { label: `向上取整到整數 ${currencyUnit()}`, value: 'ceil_int' },
               { label: `向上取整到 0.1 ${currencyUnit()}`, value: 'ceil_tenth' },
             ]"
           />
         </NFormItem>
-        <NFormItem label="同步自动改价">
+        <NFormItem label="同步自動改價">
           <div>
             <NSpace align="center">
               <NSwitch v-model:value="form.auto_sync_price" />
-              <span class="text-12px text-gray-400">关闭后保留本地价；开启后仍遵循固定覆盖价和手动改价保护</span>
+              <span class="text-12px text-gray-400">關閉後保留本地價；開啓後仍遵循固定覆蓋價和手動改價保護</span>
             </NSpace>
-            <div class="text-12px opacity-70">按商品已保存的定价规则同步。历史商品缺少规则时保留现价，可在导入商品中重新选择策略；手工商品价和规格价会受到保护。</div>
+            <div class="text-12px opacity-70">按商品已保存的定價規則同步。歷史商品缺少規則時保留現價，可在導入商品中重新選擇策略；手工商品價和規格價會受到保護。</div>
           </div>
         </NFormItem>
       </NForm>
       <template #footer>
         <NButton size="small" class="mr-8px" :disabled="saving" @click="showForm = false">取消</NButton>
         <NButton size="small" type="primary" :loading="saving" @click="submitForm">
-          {{ editingId ? "保存" : "创建" }}
+          {{ editingId ? "保存" : "創建" }}
         </NButton>
       </template>
     </NModal>
 
-    <!-- 定时计划 -->
-    <NModal v-model:show="showSchedule" preset="card" title="定时同步计划" style="width: 620px; max-width: 96vw" content-style="max-height: 70vh; overflow-y: auto">
-      <NAlert type="info" :bordered="false" class="mb-12px">商品列表中开启的自动上下架独立运行；关闭本页定时计划不会暂停它，请在商品列表暂停自动管理。</NAlert>
+    <!-- 定時計劃 -->
+    <NModal v-model:show="showSchedule" preset="card" title="定時同步計劃" style="width: 620px; max-width: 96vw" content-style="max-height: 70vh; overflow-y: auto">
+      <NAlert type="info" :bordered="false" class="mb-12px">商品列表中開啓的自動上下架獨立運行；關閉本頁定時計劃不會暫停它，請在商品列表暫停自動管理。</NAlert>
       <NAlert v-if="scheduleConn" :type="scheduleConn.rate_limit_until > Date.now() / 1000 ? 'warning' : 'info'" :show-icon="false" class="mb-12px">
-        <div>低库存检查：{{ scheduleConn.low_stock_scanned_at ? new Date(scheduleConn.low_stock_scanned_at * 1000).toLocaleString() : '尚未运行' }}</div>
-        <div>{{ scheduleConn.low_stock_message || '保存开启后在下一轮扫描开始检查，每分钟调度一次。' }}</div>
-        <div v-if="scheduleConn.status !== 'active'">此货源已停用，自动检查暂停。</div>
+        <div>低庫存檢查：{{ scheduleConn.low_stock_scanned_at ? new Date(scheduleConn.low_stock_scanned_at * 1000).toLocaleString() : '尚未運行' }}</div>
+        <div>{{ scheduleConn.low_stock_message || '保存開啓後在下一輪掃描開始檢查，每分鐘調度一次。' }}</div>
+        <div v-if="scheduleConn.status !== 'active'">此貨源已停用，自動檢查暫停。</div>
       </NAlert>
-      <!-- 执行状态（锚点来自连接行数据；下次 = 上次 + 间隔，窗口内生效） -->
+      <!-- 執行狀態（錨點來自連接行數據；下次 = 上次 + 間隔，窗口內生效） -->
       <div v-if="scheduleConn" class="mb-12px rounded-6px bg-gray-50 p-10px dark:bg-gray-800">
-        <div class="mb-6px text-13px font-500">自动任务执行状态</div>
+        <div class="mb-6px text-13px font-500">自動任務執行狀態</div>
         <div class="flex flex-col gap-3px text-12px text-gray-600 dark:text-gray-300">
           <div v-for="s in scheduleStatus" :key="s.label" class="flex flex-wrap items-center gap-8px">
             <span class="w-70px shrink-0">{{ s.label }}</span>
-            <NTag size="tiny" :type="s.on ? 'success' : 'default'" :bordered="false">{{ s.on ? "已启用" : "未启用" }}</NTag>
+            <NTag size="tiny" :type="s.on ? 'success' : 'default'" :bordered="false">{{ s.on ? "已啓用" : "未啓用" }}</NTag>
             <span>上次：{{ s.last }}</span>
             <span v-if="s.on" class="text-primary">下次：{{ s.next }}</span>
           </div>
         </div>
       </div>
       <NAlert type="info" :bordered="false" class="mb-12px">
-        采集过快可能被上游封锁 IP：遇 429/WAF 拦截会自动降速并熔断冷却（界面列表可见倒计时），
-        请求间隔为自适应下限。三类任务各自独立间隔，均在时间窗口内执行。保存后由系统每分钟检查到期自动派发。
+        採集過快可能被上游封鎖 IP：遇 429/WAF 攔截會自動降速並熔斷冷卻（界面列表可見倒計時），
+        請求間隔為自適應下限。三類任務各自獨立間隔，均在時間窗口內執行。保存後由系統每分鐘檢查到期自動派發。
       </NAlert>
       <NForm label-placement="left" label-width="130" :disabled="!canWrite() || scheduleSaving">
-        <NFormItem label="低库存加速检查">
-          <NSwitch v-model:value="schedule.low_stock.enabled" aria-label="低库存加速检查" />
+        <NFormItem label="低庫存加速檢查">
+          <NSwitch v-model:value="schedule.low_stock.enabled" aria-label="低庫存加速檢查" />
         </NFormItem>
-        <NFormItem label="库存不超过" :validation-status="lowStockError ? 'error' : undefined" :feedback="lowStockError">
-          <NInputNumber v-model:value="schedule.low_stock.threshold" :min="1" :max="1000000" :precision="0" :input-props="{ 'aria-label': '加速检查库存阈值' }" class="w-full" />
+        <NFormItem label="庫存不超過" :validation-status="lowStockError ? 'error' : undefined" :feedback="lowStockError">
+          <NInputNumber v-model:value="schedule.low_stock.threshold" :min="1" :max="1000000" :precision="0" :input-props="{ 'aria-label': '加速檢查庫存閾值' }" class="w-full" />
         </NFormItem>
-        <NFormItem label="检查间隔（分钟）">
-          <NInputNumber v-model:value="schedule.low_stock.interval" :min="5" :max="1440" :precision="0" :input-props="{ 'aria-label': '低库存检查间隔' }" class="w-full" />
+        <NFormItem label="檢查間隔（分鐘）">
+          <NInputNumber v-model:value="schedule.low_stock.interval" :min="5" :max="1440" :precision="0" :input-props="{ 'aria-label': '低庫存檢查間隔' }" class="w-full" />
         </NFormItem>
         <NAlert type="info" :show-icon="false" class="mb-16px">
-          对本货源已导入、仍由上游发货的规格全天检查，包含零库存；与下方采集、调价开关独立。查询失败会退避重试，上游限流会延后。新发现低库存后进入加速，不能代替下单时的实时校验。提醒阈值在「系统设置 → 货源」单独配置。
+          對本貨源已導入、仍由上游發貨的規格全天檢查，包含零庫存；與下方採集、調價開關獨立。查詢失敗會退避重試，上游限流會延後。新發現低庫存後進入加速，不能代替下單時的實時校驗。提醒閾值在「系統設置 → 貨源」單獨配置。
         </NAlert>
-        <NFormItem label="启用常规同步">
+        <NFormItem label="啓用常規同步">
           <NSwitch v-model:value="schedule.enabled" />
         </NFormItem>
-        <NFormItem label="分页请求间隔(秒)">
+        <NFormItem label="分頁請求間隔(秒)">
           <NInputNumber v-model:value="schedule.request_delay" :min="0" :max="60" class="w-full" />
         </NFormItem>
-        <NFormItem label="库存补查并发">
+        <NFormItem label="庫存補查併發">
           <NInputNumber v-model:value="schedule.stock_concurrency" :min="1" :max="10" class="w-full" />
         </NFormItem>
-        <NFormItem label="库存批次间隔(ms)">
+        <NFormItem label="庫存批次間隔(ms)">
           <NInputNumber v-model:value="schedule.stock_request_delay_ms" :min="0" :max="10000" class="w-full" />
         </NFormItem>
-        <NFormItem label="采集商品">
+        <NFormItem label="採集商品">
           <NSpace align="center" class="w-full">
             <NSwitch v-model:value="schedule.collect.enabled" size="small" />
             <NInputNumber v-model:value="schedule.collect.interval" :min="5" size="small" class="w-100px" />
-            <span class="text-12px">分钟</span>
+            <span class="text-12px">分鐘</span>
             <NSelect
               v-model:value="schedule.collect.mode"
               size="small"
@@ -929,38 +929,38 @@ onMounted(load);
             />
           </NSpace>
         </NFormItem>
-        <NFormItem label="同步价格">
+        <NFormItem label="同步價格">
           <NSpace align="center">
             <NSwitch v-model:value="schedule.price.enabled" size="small" />
             <NInputNumber v-model:value="schedule.price.interval" :min="5" size="small" class="w-100px" />
-            <span class="text-12px">分钟</span>
+            <span class="text-12px">分鐘</span>
           </NSpace>
         </NFormItem>
-        <NFormItem label="同步上下架/库存">
+        <NFormItem label="同步上下架/庫存">
           <NSpace align="center">
             <NSwitch v-model:value="schedule.status.enabled" size="small" />
             <NInputNumber v-model:value="schedule.status.interval" :min="5" size="small" class="w-100px" />
-            <span class="text-12px">分钟</span>
+            <span class="text-12px">分鐘</span>
           </NSpace>
         </NFormItem>
-        <NFormItem label="执行时间窗">
+        <NFormItem label="執行時間窗">
           <NInput v-model:value="schedule.collect.windows" placeholder="如 01:00-05:00, 22:00-06:00（空=全天）" />
         </NFormItem>
       </NForm>
       <template #footer>
         <NButton size="small" class="mr-8px" @click="showSchedule = false">取消</NButton>
-        <NButton size="small" type="primary" :loading="scheduleSaving" :disabled="!canWrite() || !!lowStockError" @click="submitSchedule">保存计划</NButton>
+        <NButton size="small" type="primary" :loading="scheduleSaving" :disabled="!canWrite() || !!lowStockError" @click="submitSchedule">保存計劃</NButton>
       </template>
     </NModal>
 
-    <!-- 交互式导入 -->
+    <!-- 交互式導入 -->
     <ImportModal v-if="showImport" v-model:show="showImport" :connection="importConn" @imported="load" @task-created="id => { openTasks(importConn.id); selectedImportTask = id; }" />
 
-    <!-- 同步任务抽屉：桌面端加宽到 960 让全列一屏可见；小屏回退 100%，窄屏内部横向滚动 -->
+    <!-- 同步任務抽屜：桌面端加寬到 960 讓全列一屏可見；小屏回退 100%，窄屏內部橫向滾動 -->
     <NDrawer v-model:show="showTasks" width="min(960px, 100%)">
-      <NDrawerContent :title="selectedImportTask ? '商品导入进度' : '同步任务'" closable>
+      <NDrawerContent :title="selectedImportTask ? '商品導入進度' : '同步任務'" closable>
         <template v-if="selectedImportTask">
-          <NButton class="mb-16px" size="small" @click="selectedImportTask = 0">返回任务列表</NButton>
+          <NButton class="mb-16px" size="small" @click="selectedImportTask = 0">返回任務列表</NButton>
           <ImportTaskProgress :task-id="selectedImportTask" @changed="loadTasks" @configure="() => { const conn = connections.find((r: any) => Number(r.id) === Number(tasksConn)); if (conn) { showTasks = false; openEdit(conn); } }" />
         </template>
         <NDataTable v-else

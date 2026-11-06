@@ -1,12 +1,12 @@
 package memberlevel
 
-// 会员等级仓储（ ：阈值即时评估全矩阵 + 积分产生 + 等级进度）。
+// 會員等級倉儲（ ：閾值即時評估全矩陣 + 積分產生 + 等級進度）。
 //
-// 口径（1.x 铁律平移）：
-// - 累计充值 = countAsRecharge：仅 type=recharge 真实充值入账（互转/调账/佣金不计——防小号互转刷级）
-// - 累计消费 = 已支付及之后状态订单总额，排除已全额退款订单
-// - 等级判定走阈值即时评估，不落 users 列（无双写不一致）
-// - 等级阶梯按 sort 升序：当前级 = 命中的最高 sort；下一级 = 其后首个未命中级
+// 口徑（1.x 鐵律平移）：
+// - 累計充值 = countAsRecharge：僅 type=recharge 真實充值入賬（互轉/調賬/佣金不計——防小號互轉刷級）
+// - 累計消費 = 已支付及之後狀態訂單總額，排除已全額退款訂單
+// - 等級判定走閾值即時評估，不落 users 列（無雙寫不一致）
+// - 等級階梯按 sort 升序：當前級 = 命中的最高 sort；下一級 = 其後首個未命中級
 
 import (
 	"context"
@@ -19,20 +19,20 @@ import (
 	walletport "github.com/NovaWorks/zcard-next/server/internal/mods/wallet/port"
 )
 
-// MemberLevelRepoImpl 等级仓储。
+// MemberLevelRepoImpl 等級倉儲。
 type MemberLevelRepoImpl struct {
 	data     *data.Data
-	recharge walletport.RechargeReader // countAsRecharge 口径（nil = 充值口径恒 0）
+	recharge walletport.RechargeReader // countAsRecharge 口徑（nil = 充值口徑恆 0）
 }
 
-// NewMemberLevelRepoImpl 构造。
+// NewMemberLevelRepoImpl 構造。
 func NewMemberLevelRepoImpl(d *data.Data, recharge walletport.RechargeReader) *MemberLevelRepoImpl {
 	return &MemberLevelRepoImpl{data: d, recharge: recharge}
 }
 
 var _ port.RateResolver = (*MemberLevelRepoImpl)(nil)
 
-// ListLevels 等级列表（按 sort 升序）。
+// ListLevels 等級列表（按 sort 升序）。
 func (r *MemberLevelRepoImpl) ListLevels(ctx context.Context) ([]*ent.MemberLevel, error) {
 	return data.Client(ctx, r.data).MemberLevel.Query().
 		Order(ent.Asc(memberlevel.FieldSort)).
@@ -48,7 +48,7 @@ func (r *MemberLevelRepoImpl) createLevel(ctx context.Context, name string, thre
 		return nil, err
 	}
 	if discount < 0 || discount > 10000 {
-		return nil, fmt.Errorf("折扣应为0至10000")
+		return nil, fmt.Errorf("折扣應為0至10000")
 	}
 	create := data.Client(ctx, r.data).MemberLevel.Create().
 		SetName(name).
@@ -70,7 +70,7 @@ func (r *MemberLevelRepoImpl) createLevel(ctx context.Context, name string, thre
 	return create.Save(ctx)
 }
 
-// CreateLevel 创建等级（points_rule JSON 透传：{"spend_cents":X,"points":Y}）。
+// CreateLevel 創建等級（points_rule JSON 透傳：{"spend_cents":X,"points":Y}）。
 func (r *MemberLevelRepoImpl) CreateLevel(ctx context.Context, name string, thresholdType string, thresholdRecharge, thresholdConsume int64, discount int32, sort int32, enabled bool, pointsRule map[string]any, settings ...LevelSettings) (out *ent.MemberLevel, err error) {
 	err = data.CurrencyTx(ctx, r.data, func(ctx context.Context) error {
 		var e error
@@ -80,7 +80,7 @@ func (r *MemberLevelRepoImpl) CreateLevel(ctx context.Context, name string, thre
 	return out, err
 }
 
-// UpdateLevel 更新等级。
+// UpdateLevel 更新等級。
 func (r *MemberLevelRepoImpl) UpdateLevel(ctx context.Context, id uint64, name string, discount int32, sort int32, enabled bool, pointsRule map[string]any, settings ...LevelSettings) (*ent.MemberLevel, error) {
 	v := LevelSettings{}
 	if len(settings) > 0 {
@@ -90,7 +90,7 @@ func (r *MemberLevelRepoImpl) UpdateLevel(ctx context.Context, id uint64, name s
 		return nil, err
 	}
 	if discount < 0 || discount > 10000 {
-		return nil, fmt.Errorf("折扣应为0至10000")
+		return nil, fmt.Errorf("折扣應為0至10000")
 	}
 	var result *ent.MemberLevel
 	err := data.CurrencyTx(ctx, r.data, func(ctx context.Context) error {
@@ -128,7 +128,7 @@ func (r *MemberLevelRepoImpl) UpdateLevel(ctx context.Context, id uint64, name s
 	return result, err
 }
 
-// DeleteLevel 删除等级。
+// DeleteLevel 刪除等級。
 func (r *MemberLevelRepoImpl) DeleteLevel(ctx context.Context, id uint64) error {
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		if err := r.lockLevel(ctx, id); err != nil {
@@ -141,7 +141,7 @@ func (r *MemberLevelRepoImpl) DeleteLevel(ctx context.Context, id uint64) error 
 	})
 }
 
-// effectiveLevel 阈值即时评估：命中的最高 sort 等级（全矩阵 recharge/consume/both_and/both_or）。
+// effectiveLevel 閾值即時評估：命中的最高 sort 等級（全矩陣 recharge/consume/both_and/both_or）。
 func (r *MemberLevelRepoImpl) effectiveLevel(ctx context.Context, userID uint64) (*ent.MemberLevel, error) {
 	if userID == 0 {
 		return nil, nil
@@ -161,7 +161,7 @@ func payableRate(lv *ent.MemberLevel) int32 {
 	return lv.Discount
 }
 
-// cumulative 双口径累计（充值 countAsRecharge + 消费 paid+）。
+// cumulative 雙口徑累計（充值 countAsRecharge + 消費 paid+）。
 func (r *MemberLevelRepoImpl) cumulative(ctx context.Context, client *ent.Client, userID uint64) (int64, int64, error) {
 	var recharged int64
 	if r.recharge != nil {
@@ -178,7 +178,7 @@ func (r *MemberLevelRepoImpl) cumulative(ctx context.Context, client *ent.Client
 	return recharged, totals[userID], nil
 }
 
-// matchLevel 阈值矩阵判定（AND|OR）。
+// matchLevel 閾值矩陣判定（AND|OR）。
 func matchLevel(lv *ent.MemberLevel, recharged, consumed int64) bool {
 	if lv.AcquireMode == "manual" {
 		return false
@@ -197,7 +197,7 @@ func matchLevel(lv *ent.MemberLevel, recharged, consumed int64) bool {
 	}
 }
 
-// EffectiveRate 管线步骤 2：当前等级折扣（万分比；未命中 0）。
+// EffectiveRate 管線步驟 2：當前等級折扣（萬分比；未命中 0）。
 func (r *MemberLevelRepoImpl) EffectiveRate(ctx context.Context, userID uint64) (int32, uint64, error) {
 	lv, err := r.effectiveLevel(ctx, userID)
 	if err != nil || lv == nil {
@@ -206,25 +206,25 @@ func (r *MemberLevelRepoImpl) EffectiveRate(ctx context.Context, userID uint64) 
 	return lv.Discount, lv.ID, nil
 }
 
-// EffectiveLevelOf 当前等级实体（事件侧取 points_rule 消费）。
+// EffectiveLevelOf 當前等級實體（事件側取 points_rule 消費）。
 func (r *MemberLevelRepoImpl) EffectiveLevelOf(ctx context.Context, userID uint64) (*ent.MemberLevel, error) {
 	return r.effectiveLevel(ctx, userID)
 }
 
-// Progress 等级进度视图（storefront GetMyLevel）。
+// Progress 等級進度視圖（storefront GetMyLevel）。
 type Progress struct {
 	Source         string
 	HasReferral    bool
 	RechargedCents int64
 	ConsumedCents  int64
-	Current        *ent.MemberLevel // nil = 未命中任何等级
-	Next           *ent.MemberLevel // nil = 已满级
-	RechargeGap    int64            // 距下一级充值差额（-1 = 下一级无充值条件）
-	ConsumeGap     int64            // 距下一级消费差额（-1 = 下一级无消费条件）
+	Current        *ent.MemberLevel // nil = 未命中任何等級
+	Next           *ent.MemberLevel // nil = 已滿級
+	RechargeGap    int64            // 距下一級充值差額（-1 = 下一級無充值條件）
+	ConsumeGap     int64            // 距下一級消費差額（-1 = 下一級無消費條件）
 	Percent        int32            // 0-100
 }
 
-// ResolveProgress 进度解析（当前级 + 下一级 + 双口径差额）。
+// ResolveProgress 進度解析（當前級 + 下一級 + 雙口徑差額）。
 func (r *MemberLevelRepoImpl) ResolveProgress(ctx context.Context, userID uint64) (*Progress, error) {
 	return r.resolveProgress(ctx, userID, true)
 }
@@ -268,7 +268,7 @@ func (r *MemberLevelRepoImpl) resolveProgress(ctx context.Context, userID uint64
 		return p, nil
 	}
 
-	// 当前级 = 命中的最高 sort；下一级 = 其后首个未命中级
+	// 當前級 = 命中的最高 sort；下一級 = 其後首個未命中級
 	lastMatched := -1
 	for i, lv := range levels {
 		if matchLevel(lv, recharged, consumed) {
@@ -285,13 +285,13 @@ func (r *MemberLevelRepoImpl) resolveProgress(ctx context.Context, userID uint64
 			return nil, err
 		}
 		if !granted.Enabled {
-			return nil, fmt.Errorf("推荐赠送等级已停用，请联系管理员")
+			return nil, fmt.Errorf("推薦贈送等級已停用，請聯繫管理員")
 		}
 		if p.Current == nil || payableRate(granted) < payableRate(p.Current) {
 			p.Current, p.Source = granted, "referral"
 		}
 	}
-	// 保留普通用户原有升级阶梯；获赠用户只展示确实能改善会员折扣的下一档。
+	// 保留普通用户原有升級階梯；獲贈用户只展示確實能改善會員折扣的下一檔。
 	for i := lastMatched + 1; i < len(levels); i++ {
 		if !p.HasReferral || payableRate(levels[i]) < payableRate(p.Current) {
 			p.Next = levels[i]
@@ -305,7 +305,7 @@ func (r *MemberLevelRepoImpl) resolveProgress(ctx context.Context, userID uint64
 	return p, nil
 }
 
-// nextGap 下一级差额与进度百分比（无该条件 -1；both_and 取短板）。
+// nextGap 下一級差額與進度百分比（無該條件 -1；both_and 取短板）。
 func nextGap(next *ent.MemberLevel, recharged, consumed int64) (int64, int64, int32) {
 	rg, cg := int64(-1), int64(-1)
 	if next.ThresholdRecharge > 0 {
@@ -348,12 +348,12 @@ func maxI64(a, b int64) int64 {
 	return b
 }
 
-// PointsRuleOf 积分产生规则解析（{"spend_cents":X,"points":Y}；未配置返回 0）。
+// PointsRuleOf 積分產生規則解析（{"spend_cents":X,"points":Y}；未配置返回 0）。
 func PointsRuleOf(lv *ent.MemberLevel) (spendCents, points int64) {
 	if lv == nil || len(lv.PointsRule) == 0 {
 		return 0, 0
 	}
-	// JSON 读回数值为 float64；ent 内存对象为 int64——两态兼容
+	// JSON 讀回數值為 float64；ent 內存對象為 int64——兩態兼容
 	toI64 := func(v any) int64 {
 		switch n := v.(type) {
 		case int64:

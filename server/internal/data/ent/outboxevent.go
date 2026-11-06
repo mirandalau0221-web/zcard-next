@@ -18,15 +18,15 @@ type OutboxEvent struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// 发布模块（order/payment/...）
+	// 發佈模塊（order/payment/...）
 	Module string `json:"module,omitempty"`
-	// 事件类型（order.paid 等，目录见附录 C）
+	// 事件類型（order.paid 等，目錄見附錄 C）
 	Type string `json:"type,omitempty"`
-	// 聚合根 ID（订单号/支付单号）
+	// 聚合根 ID（訂單號/支付單號）
 	AggregateID string `json:"aggregate_id,omitempty"`
-	// 事件载荷（proto schema，只加字段不改语义）
+	// 事件載荷（proto schema，只加字段不改語義）
 	Payload json.RawMessage `json:"payload,omitempty"`
-	// 防重复发布幂等键（order:123:paid）
+	// 防重複發佈冪等鍵（order:123:paid）
 	DedupeKey string `json:"dedupe_key,omitempty"`
 	// Status holds the value of the "status" field.
 	Status outboxevent.Status `json:"status,omitempty"`

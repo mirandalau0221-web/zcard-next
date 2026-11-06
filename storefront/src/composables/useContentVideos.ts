@@ -13,7 +13,7 @@ export function useContentVideos(container: Ref<HTMLElement | null>) {
         if (video.nextElementSibling?.classList.contains("video-playback-error")) return;
         const message = document.createElement("p");
         message.className = "video-playback-error";
-        message.textContent = $t("视频暂时无法播放，请检查网络或联系店主。");
+        message.textContent = $t("視頻暫時無法播放，請檢查網絡或聯繫店主。");
         message.setAttribute("role", "status");
         video.after(message);
         errors.push(message);

@@ -32,17 +32,17 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminProcurementService 采购管理：采购单列表/详情/手动重试/手动标记完成。
+// AdminProcurementService 採購管理：採購單列表/詳情/手動重試/手動標記完成。
 type AdminProcurementServiceClient interface {
 	ListSMS(ctx context.Context, in *ListProcurementsRequest, opts ...grpc.CallOption) (*SMSDiagnostics, error)
 	RetrySMS(ctx context.Context, in *RetrySMSRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListProcurements 采购单列表（按状态过滤）。
+	// ListProcurements 採購單列表（按狀態過濾）。
 	ListProcurements(ctx context.Context, in *ListProcurementsRequest, opts ...grpc.CallOption) (*ListProcurementsReply, error)
-	// GetProcurement 采购单详情（含采购项/密文行数）。
+	// GetProcurement 採購單詳情（含採購項/密文行數）。
 	GetProcurement(ctx context.Context, in *GetProcurementRequest, opts ...grpc.CallOption) (*ProcurementOrder, error)
-	// RetryProcurement 手动重试（pending/submitted/polling 均可重新提交或推进轮询）。
+	// RetryProcurement 手動重試（pending/submitted/polling 均可重新提交或推進輪詢）。
 	RetryProcurement(ctx context.Context, in *RetryProcurementRequest, opts ...grpc.CallOption) (*ProcurementOrder, error)
-	// MarkProcurementManual 手动标记完成/转人工（人工拿货后回填）。
+	// MarkProcurementManual 手動標記完成/轉人工（人工拿貨後回填）。
 	MarkProcurementManual(ctx context.Context, in *MarkProcurementManualRequest, opts ...grpc.CallOption) (*ProcurementOrder, error)
 }
 
@@ -118,17 +118,17 @@ func (c *adminProcurementServiceClient) MarkProcurementManual(ctx context.Contex
 // All implementations must embed UnimplementedAdminProcurementServiceServer
 // for forward compatibility.
 //
-// AdminProcurementService 采购管理：采购单列表/详情/手动重试/手动标记完成。
+// AdminProcurementService 採購管理：採購單列表/詳情/手動重試/手動標記完成。
 type AdminProcurementServiceServer interface {
 	ListSMS(context.Context, *ListProcurementsRequest) (*SMSDiagnostics, error)
 	RetrySMS(context.Context, *RetrySMSRequest) (*emptypb.Empty, error)
-	// ListProcurements 采购单列表（按状态过滤）。
+	// ListProcurements 採購單列表（按狀態過濾）。
 	ListProcurements(context.Context, *ListProcurementsRequest) (*ListProcurementsReply, error)
-	// GetProcurement 采购单详情（含采购项/密文行数）。
+	// GetProcurement 採購單詳情（含採購項/密文行數）。
 	GetProcurement(context.Context, *GetProcurementRequest) (*ProcurementOrder, error)
-	// RetryProcurement 手动重试（pending/submitted/polling 均可重新提交或推进轮询）。
+	// RetryProcurement 手動重試（pending/submitted/polling 均可重新提交或推進輪詢）。
 	RetryProcurement(context.Context, *RetryProcurementRequest) (*ProcurementOrder, error)
-	// MarkProcurementManual 手动标记完成/转人工（人工拿货后回填）。
+	// MarkProcurementManual 手動標記完成/轉人工（人工拿貨後回填）。
 	MarkProcurementManual(context.Context, *MarkProcurementManualRequest) (*ProcurementOrder, error)
 	mustEmbedUnimplementedAdminProcurementServiceServer()
 }

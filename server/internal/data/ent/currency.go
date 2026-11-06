@@ -21,15 +21,15 @@ type Currency struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// ISO 4217 三字码
+	// ISO 4217 三字碼
 	Code string `json:"code,omitempty"`
-	// 货币符号（¥/$）
+	// 貨幣符號（¥/$）
 	Symbol string `json:"symbol,omitempty"`
-	// 符号位置
+	// 符號位置
 	Position currency.Position `json:"position,omitempty"`
-	// 小数位
+	// 小數位
 	Precision int32 `json:"precision,omitempty"`
-	// 对基础货币汇率（手动 + 可选定时拉取，M3 插件）
+	// 對基礎貨幣匯率（手動 + 可選定時拉取，M3 插件）
 	Rate float64 `json:"rate,omitempty"`
 	// Enabled holds the value of the "enabled" field.
 	Enabled bool `json:"enabled,omitempty"`

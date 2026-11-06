@@ -87,26 +87,26 @@ func (s *AdminSupplyService) previewSnapshot(ctx context.Context, req *adminv1.P
 func (s *AdminSupplyService) snapshotRow(ctx context.Context, conn *ent.SupplyConnection, token string) (*ent.SupplyCatalogSnapshot, error) {
 	row, err := s.repo.entClient(ctx).SupplyCatalogSnapshot.Query().Where(snap.Token(token), snap.ConnectionID(conn.ID), snap.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, fmt.Errorf("商品目录已失效，请重新加载；已选内容会保留")
+		return nil, fmt.Errorf("商品目錄已失效，請重新加載；已選內容會保留")
 	}
 	if err != nil {
 		return nil, err
 	}
 	if row.Identity != catalogIdentity(conn) {
-		return nil, fmt.Errorf("货源账号已变化，请重新加载商品目录")
+		return nil, fmt.Errorf("貨源賬號已變化，請重新加載商品目錄")
 	}
 	if row.ExpiresAt <= time.Now().Unix() {
-		return nil, fmt.Errorf("商品目录已过期，请重新加载；已选内容会保留")
+		return nil, fmt.Errorf("商品目錄已過期，請重新加載；已選內容會保留")
 	}
 	return row, nil
 }
 func decodeCatalog(row *ent.SupplyCatalogSnapshot, conn *ent.SupplyConnection) (*previewEntry, error) {
 	if row.Status != "ready" {
-		return nil, fmt.Errorf("商品目录尚未加载完成，请稍后再试")
+		return nil, fmt.Errorf("商品目錄尚未加載完成，請稍後再試")
 	}
 	var payload catalogPayload
 	if err := json.Unmarshal(row.Payload, &payload); err != nil {
-		return nil, fmt.Errorf("商品目录快照不可用，请重新加载")
+		return nil, fmt.Errorf("商品目錄快照不可用，請重新加載")
 	}
 	return &previewEntry{at: row.CreatedAt, identity: previewIdentity(conn), categories: payload.Categories, byCode: payload.Products}, nil
 }
@@ -130,7 +130,7 @@ func (s *AdminSupplyService) ensureCatalogSnapshot(ctx context.Context, connecti
 			return err
 		}
 		if string(conn.Status) != "active" {
-			return fmt.Errorf("货源已停用，请启用后再加载目录")
+			return fmt.Errorf("貨源已停用，請啓用後再加載目錄")
 		}
 		tenant := tenancy.FromContext(ctx).SubsiteID
 		q := c.SupplyCatalogSnapshot.Query().Where(snap.ConnectionID(connectionID), snap.SubsiteID(tenant), snap.Identity(catalogIdentity(conn)), snap.ExpiresAtGT(time.Now().Unix()))
@@ -151,7 +151,7 @@ func (s *AdminSupplyService) ensureCatalogSnapshot(ctx context.Context, connecti
 			out = row
 			return nil
 		}
-		out, err = c.SupplyCatalogSnapshot.Create().SetConnectionID(connectionID).SetSubsiteID(tenant).SetToken(uuid.NewString()).SetIdentity(catalogIdentity(conn)).SetExpiresAt(time.Now().Add(catalogSnapshotLifetime).Unix()).SetMessage("正在等待加载上游目录，可以关闭窗口后再回来查看").Save(ctx)
+		out, err = c.SupplyCatalogSnapshot.Create().SetConnectionID(connectionID).SetSubsiteID(tenant).SetToken(uuid.NewString()).SetIdentity(catalogIdentity(conn)).SetExpiresAt(time.Now().Add(catalogSnapshotLifetime).Unix()).SetMessage("正在等待加載上游目錄，可以關閉窗口後再回來查看").Save(ctx)
 		return err
 	})
 	return
@@ -187,7 +187,7 @@ func (s *AdminSupplyService) runCatalogSnapshot(id uint64) {
 	defer cancel()
 	c := s.repo.entClient(ctx)
 	token := uuid.NewString()
-	n, err := c.SupplyCatalogSnapshot.Update().Where(snap.ID(id), snap.StatusIn("pending", "loading"), snap.LeaseUntilLTE(time.Now().Unix()), snap.ExpiresAtGT(time.Now().Unix())).SetStatus("loading").SetLeaseToken(token).SetLeaseUntil(time.Now().Add(catalogJobTimeout + 30*time.Second).Unix()).AddAttempts(1).SetMessage("正在请求上游目录；单次最多等待 120 秒，临时故障最多重试一次").Save(ctx)
+	n, err := c.SupplyCatalogSnapshot.Update().Where(snap.ID(id), snap.StatusIn("pending", "loading"), snap.LeaseUntilLTE(time.Now().Unix()), snap.ExpiresAtGT(time.Now().Unix())).SetStatus("loading").SetLeaseToken(token).SetLeaseUntil(time.Now().Add(catalogJobTimeout + 30*time.Second).Unix()).AddAttempts(1).SetMessage("正在請求上游目錄；單次最多等待 120 秒，臨時故障最多重試一次").Save(ctx)
 	if err != nil || n != 1 {
 		return
 	}
@@ -199,14 +199,14 @@ func (s *AdminSupplyService) runCatalogSnapshot(id uint64) {
 	var entry *previewEntry
 	conn, err := s.repo.GetConnection(ctx, row.ConnectionID)
 	if err == nil && (catalogIdentity(conn) != row.Identity || string(conn.Status) != "active") {
-		err = catalogLoadError("货源已变化或停用，请检查货源配置后重新加载目录")
+		err = catalogLoadError("貨源已變化或停用，請檢查貨源配置後重新加載目錄")
 	}
 	if row.Attempts > 3 {
-		err = catalogLoadError("目录加载多次中断，请重新加载")
+		err = catalogLoadError("目錄加載多次中斷，請重新加載")
 	}
 	if err == nil {
 		entry, err = s.fetchPreview(adapter.WithCatalogRead(ctx), row.ConnectionID, func(count int) {
-			_ = c.SupplyCatalogSnapshot.Update().Where(snap.ID(id), snap.LeaseToken(token), snap.Status("loading")).SetLoadedCount(count).SetMessage(fmt.Sprintf("已读取 %d 件商品，正在整理目录…", count)).Exec(ctx)
+			_ = c.SupplyCatalogSnapshot.Update().Where(snap.ID(id), snap.LeaseToken(token), snap.Status("loading")).SetLoadedCount(count).SetMessage(fmt.Sprintf("已讀取 %d 件商品，正在整理目錄…", count)).Exec(ctx)
 		})
 	}
 	if err == nil {
@@ -214,14 +214,14 @@ func (s *AdminSupplyService) runCatalogSnapshot(id uint64) {
 		if e != nil {
 			err = e
 		} else if catalogIdentity(current) != row.Identity || string(current.Status) != "active" {
-			err = catalogLoadError("货源已变化或停用，请检查货源配置后重新加载目录")
+			err = catalogLoadError("貨源已變化或停用，請檢查貨源配置後重新加載目錄")
 		}
 	}
 	var raw []byte
 	if err == nil {
 		raw, err = json.Marshal(catalogPayload{Categories: entry.categories, Products: entry.byCode})
 		if len(raw) > 32*1024*1024 {
-			err = catalogLoadError("商品目录超过存储上限，请缩小货源目录范围")
+			err = catalogLoadError("商品目錄超過存儲上限，請縮小貨源目錄範圍")
 		}
 	}
 	// A timeout cannot prevent persisting the failed state.
@@ -230,15 +230,15 @@ func (s *AdminSupplyService) runCatalogSnapshot(id uint64) {
 	update := c.SupplyCatalogSnapshot.Update().Where(snap.ID(id), snap.LeaseToken(token), snap.Status("loading")).SetLeaseUntil(0)
 	if err != nil {
 		failure := adapter.ClassifyImportError(err)
-		message := failure.Summary + "，请稍后重试目录加载；不会导入或修改商品"
+		message := failure.Summary + "，請稍後重試目錄加載；不會導入或修改商品"
 		if failure.Pause {
-			message = failure.Summary + "，保存后重新加载目录；不会导入或修改商品"
+			message = failure.Summary + "，保存後重新加載目錄；不會導入或修改商品"
 		}
 		if failure.Code == "TIMEOUT" {
-			message = "上游商品目录长时间未响应（单次最多 120 秒，任务总时限 5 分钟），请稍后重试或检查服务器到上游的网络"
+			message = "上游商品目錄長時間未響應（單次最多 120 秒，任務總時限 5 分鐘），請稍後重試或檢查服務器到上游的網絡"
 		}
 		if failure.Code == "RATE_LIMITED" {
-			message = "上游限流或网关拦截，已停止本次目录加载，请稍后重试"
+			message = "上游限流或網關攔截，已停止本次目錄加載，請稍後重試"
 		}
 		var validation catalogLoadError
 		if errors.As(err, &validation) {

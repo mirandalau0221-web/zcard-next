@@ -21,23 +21,23 @@ type FlashSale struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
-	// 0=商品级（哨兵）
+	// 0=商品級（哨兵）
 	SkuID uint64 `json:"sku_id,omitempty"`
-	// 秒杀价（分）
+	// 秒殺價（分）
 	FlashPrice int64 `json:"flash_price,omitempty"`
 	// StartAt holds the value of the "start_at" field.
 	StartAt time.Time `json:"start_at,omitempty"`
 	// EndAt holds the value of the "end_at" field.
 	EndAt time.Time `json:"end_at,omitempty"`
-	// 总量（与库存同锁扣减）
+	// 總量（與庫存同鎖釦減）
 	LimitQty int32 `json:"limit_qty,omitempty"`
-	// 支付成功后正式扣减
+	// 支付成功後正式扣減
 	SoldQty int32 `json:"sold_qty,omitempty"`
-	// 待付款预占，取消或超时释放
+	// 待付款預佔，取消或超時釋放
 	ReservedQty int32 `json:"reserved_qty,omitempty"`
 	// PerUserLimit holds the value of the "per_user_limit" field.
 	PerUserLimit int32 `json:"per_user_limit,omitempty"`

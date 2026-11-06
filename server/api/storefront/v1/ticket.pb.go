@@ -27,8 +27,8 @@ type CreateTicketRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Type               string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // presale | aftersale
 	Content            string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	GuestContact       string                 `protobuf:"bytes,3,opt,name=guest_contact,json=guestContact,proto3" json:"guest_contact,omitempty"` // 游客必填（联系方式）
-	OrderId            uint64                 `protobuf:"varint,4,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`               // 可选关联
+	GuestContact       string                 `protobuf:"bytes,3,opt,name=guest_contact,json=guestContact,proto3" json:"guest_contact,omitempty"` // 遊客必填（聯繫方式）
+	OrderId            uint64                 `protobuf:"varint,4,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`               // 可選關聯
 	ProductId          uint64                 `protobuf:"varint,5,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	AttachmentMediaIds []uint64               `protobuf:"varint,6,rep,packed,name=attachment_media_ids,json=attachmentMediaIds,proto3" json:"attachment_media_ids,omitempty"`
 	unknownFields      protoimpl.UnknownFields
@@ -398,7 +398,7 @@ func (x *GetTicketRequest) GetTicketNo() string {
 type TicketMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	SenderType    string                 `protobuf:"bytes,2,opt,name=sender_type,json=senderType,proto3" json:"sender_type,omitempty"` // user | admin | system（内部备注已过滤）
+	SenderType    string                 `protobuf:"bytes,2,opt,name=sender_type,json=senderType,proto3" json:"sender_type,omitempty"` // user | admin | system（內部備註已過濾）
 	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
 	Attachments   []uint64               `protobuf:"varint,4,rep,packed,name=attachments,proto3" json:"attachments,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -662,7 +662,7 @@ func (x *RateTicketRequest) GetRating() int32 {
 type PayUrgentRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	TicketNo         string                 `protobuf:"bytes,1,opt,name=ticket_no,json=ticketNo,proto3" json:"ticket_no,omitempty"`
-	ExpectedFeeCents *int64                 `protobuf:"varint,2,opt,name=expected_fee_cents,json=expectedFeeCents,proto3,oneof" json:"expected_fee_cents,omitempty"` // 用户已确认的报价；缺失或变价拒绝扣费
+	ExpectedFeeCents *int64                 `protobuf:"varint,2,opt,name=expected_fee_cents,json=expectedFeeCents,proto3,oneof" json:"expected_fee_cents,omitempty"` // 用户已確認的報價；缺失或變價拒絕扣費
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -714,8 +714,8 @@ func (x *PayUrgentRequest) GetExpectedFeeCents() int64 {
 type PayUrgentReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Paid          bool                   `protobuf:"varint,1,opt,name=paid,proto3" json:"paid,omitempty"`
-	FeeCents      int64                  `protobuf:"varint,2,opt,name=fee_cents,json=feeCents,proto3" json:"fee_cents,omitempty"` // 实扣（分）
-	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`                        // 余额不足等
+	FeeCents      int64                  `protobuf:"varint,2,opt,name=fee_cents,json=feeCents,proto3" json:"fee_cents,omitempty"` // 實扣（分）
+	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`                        // 餘額不足等
 	AlreadyUrgent bool                   `protobuf:"varint,4,opt,name=already_urgent,json=alreadyUrgent,proto3" json:"already_urgent,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

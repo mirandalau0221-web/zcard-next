@@ -66,7 +66,7 @@ type AdminCatalogServiceHTTPServer interface {
 	ApproveReview(context.Context, *ApproveReviewRequest) (*ReviewItem, error)
 	BatchUpdateProductCategory(context.Context, *BatchUpdateProductCategoryRequest) (*BatchUpdateProductCategoryReply, error)
 	BatchUpdateProductContent(context.Context, *BatchProductContentRequest) (*BatchProductContentResult, error)
-	// BatchUpdateProductStatus BatchUpdateProductStatus 批量上下架（列表多选操作；status 1=上架 0=下架 2=隐藏）。
+	// BatchUpdateProductStatus BatchUpdateProductStatus 批量上下架（列表多選操作；status 1=上架 0=下架 2=隱藏）。
 	BatchUpdateProductStatus(context.Context, *BatchUpdateProductStatusRequest) (*BatchUpdateProductStatusReply, error)
 	ClassifyProducts(context.Context, *ClassifyProductsRequest) (*ClassifyProductsReply, error)
 	CreateCategory(context.Context, *CreateCategoryRequest) (*Category, error)
@@ -86,26 +86,26 @@ type AdminCatalogServiceHTTPServer interface {
 	GetCategoryPlacements(context.Context, *GetCategoryPlacementsRequest) (*CategoryPlacementsReply, error)
 	GetDeliverySources(context.Context, *DeliverySourcesRequest) (*DeliverySourcesReply, error)
 	GetProduct(context.Context, *GetProductRequest) (*AdminProduct, error)
-	// ListCategories ── 分类 ──
+	// ListCategories ── 分類 ──
 	ListCategories(context.Context, *emptypb.Empty) (*CategoryList, error)
-	// ListControls ── 自定义控件 ──
+	// ListControls ── 自定義控件 ──
 	ListControls(context.Context, *ListControlsRequest) (*ControlList, error)
-	// ListMemberGroups ── 会员商品组 ──
+	// ListMemberGroups ── 會員商品組 ──
 	ListMemberGroups(context.Context, *emptypb.Empty) (*MemberGroupList, error)
 	// ListProducts ── 商品 ──
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsReply, error)
-	// ListReviews ── 评价（真实一单一评审核 + 虚拟评价）──
+	// ListReviews ── 評價（真實一單一評審核 + 虛擬評價）──
 	ListReviews(context.Context, *ListReviewsRequest) (*ListReviewsReply, error)
-	// ListSkus ── SKU 多规格 ──
+	// ListSkus ── SKU 多規格 ──
 	ListSkus(context.Context, *ListSkusRequest) (*SkuList, error)
-	// ListTags ── 标签 ──
+	// ListTags ── 標籤 ──
 	ListTags(context.Context, *emptypb.Empty) (*TagList, error)
 	ManageProductListing(context.Context, *ManageProductListingRequest) (*ManageProductListingReply, error)
 	MergeCategories(context.Context, *MergeCategoriesRequest) (*MergeCategoriesReply, error)
 	PreviewBatchUpdateProductContent(context.Context, *PreviewBatchProductContentRequest) (*BatchProductContentPreview, error)
 	PreviewDeleteProduct(context.Context, *GetProductRequest) (*DeleteProductPreview, error)
 	RejectReview(context.Context, *RejectReviewRequest) (*ReviewItem, error)
-	// ReorderCategories ReorderCategories 分类排序（拖拽重排：把某层级全部兄弟按 ids 顺序重排并归一化 sort）。
+	// ReorderCategories ReorderCategories 分類排序（拖拽重排：把某層級全部兄弟按 ids 順序重排並歸一化 sort）。
 	ReorderCategories(context.Context, *ReorderCategoriesRequest) (*emptypb.Empty, error)
 	SetCategoryPlacements(context.Context, *SetCategoryPlacementsRequest) (*CategoryPlacementsReply, error)
 	SetDeliverySource(context.Context, *SetDeliverySourceRequest) (*DeliverySourcesReply, error)
@@ -1060,7 +1060,7 @@ type AdminCatalogServiceHTTPClient interface {
 	ApproveReview(ctx context.Context, req *ApproveReviewRequest, opts ...http.CallOption) (rsp *ReviewItem, err error)
 	BatchUpdateProductCategory(ctx context.Context, req *BatchUpdateProductCategoryRequest, opts ...http.CallOption) (rsp *BatchUpdateProductCategoryReply, err error)
 	BatchUpdateProductContent(ctx context.Context, req *BatchProductContentRequest, opts ...http.CallOption) (rsp *BatchProductContentResult, err error)
-	// BatchUpdateProductStatus BatchUpdateProductStatus 批量上下架（列表多选操作；status 1=上架 0=下架 2=隐藏）。
+	// BatchUpdateProductStatus BatchUpdateProductStatus 批量上下架（列表多選操作；status 1=上架 0=下架 2=隱藏）。
 	BatchUpdateProductStatus(ctx context.Context, req *BatchUpdateProductStatusRequest, opts ...http.CallOption) (rsp *BatchUpdateProductStatusReply, err error)
 	ClassifyProducts(ctx context.Context, req *ClassifyProductsRequest, opts ...http.CallOption) (rsp *ClassifyProductsReply, err error)
 	CreateCategory(ctx context.Context, req *CreateCategoryRequest, opts ...http.CallOption) (rsp *Category, err error)
@@ -1080,26 +1080,26 @@ type AdminCatalogServiceHTTPClient interface {
 	GetCategoryPlacements(ctx context.Context, req *GetCategoryPlacementsRequest, opts ...http.CallOption) (rsp *CategoryPlacementsReply, err error)
 	GetDeliverySources(ctx context.Context, req *DeliverySourcesRequest, opts ...http.CallOption) (rsp *DeliverySourcesReply, err error)
 	GetProduct(ctx context.Context, req *GetProductRequest, opts ...http.CallOption) (rsp *AdminProduct, err error)
-	// ListCategories ── 分类 ──
+	// ListCategories ── 分類 ──
 	ListCategories(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CategoryList, err error)
-	// ListControls ── 自定义控件 ──
+	// ListControls ── 自定義控件 ──
 	ListControls(ctx context.Context, req *ListControlsRequest, opts ...http.CallOption) (rsp *ControlList, err error)
-	// ListMemberGroups ── 会员商品组 ──
+	// ListMemberGroups ── 會員商品組 ──
 	ListMemberGroups(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *MemberGroupList, err error)
 	// ListProducts ── 商品 ──
 	ListProducts(ctx context.Context, req *ListProductsRequest, opts ...http.CallOption) (rsp *ListProductsReply, err error)
-	// ListReviews ── 评价（真实一单一评审核 + 虚拟评价）──
+	// ListReviews ── 評價（真實一單一評審核 + 虛擬評價）──
 	ListReviews(ctx context.Context, req *ListReviewsRequest, opts ...http.CallOption) (rsp *ListReviewsReply, err error)
-	// ListSkus ── SKU 多规格 ──
+	// ListSkus ── SKU 多規格 ──
 	ListSkus(ctx context.Context, req *ListSkusRequest, opts ...http.CallOption) (rsp *SkuList, err error)
-	// ListTags ── 标签 ──
+	// ListTags ── 標籤 ──
 	ListTags(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *TagList, err error)
 	ManageProductListing(ctx context.Context, req *ManageProductListingRequest, opts ...http.CallOption) (rsp *ManageProductListingReply, err error)
 	MergeCategories(ctx context.Context, req *MergeCategoriesRequest, opts ...http.CallOption) (rsp *MergeCategoriesReply, err error)
 	PreviewBatchUpdateProductContent(ctx context.Context, req *PreviewBatchProductContentRequest, opts ...http.CallOption) (rsp *BatchProductContentPreview, err error)
 	PreviewDeleteProduct(ctx context.Context, req *GetProductRequest, opts ...http.CallOption) (rsp *DeleteProductPreview, err error)
 	RejectReview(ctx context.Context, req *RejectReviewRequest, opts ...http.CallOption) (rsp *ReviewItem, err error)
-	// ReorderCategories ReorderCategories 分类排序（拖拽重排：把某层级全部兄弟按 ids 顺序重排并归一化 sort）。
+	// ReorderCategories ReorderCategories 分類排序（拖拽重排：把某層級全部兄弟按 ids 順序重排並歸一化 sort）。
 	ReorderCategories(ctx context.Context, req *ReorderCategoriesRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	SetCategoryPlacements(ctx context.Context, req *SetCategoryPlacementsRequest, opts ...http.CallOption) (rsp *CategoryPlacementsReply, err error)
 	SetDeliverySource(ctx context.Context, req *SetDeliverySourceRequest, opts ...http.CallOption) (rsp *DeliverySourcesReply, err error)
@@ -1170,7 +1170,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) BatchUpdateProductContent(ctx contex
 	return &out, nil
 }
 
-// BatchUpdateProductStatus BatchUpdateProductStatus 批量上下架（列表多选操作；status 1=上架 0=下架 2=隐藏）。
+// BatchUpdateProductStatus BatchUpdateProductStatus 批量上下架（列表多選操作；status 1=上架 0=下架 2=隱藏）。
 func (c *AdminCatalogServiceHTTPClientImpl) BatchUpdateProductStatus(ctx context.Context, in *BatchUpdateProductStatusRequest, opts ...http.CallOption) (*BatchUpdateProductStatusReply, error) {
 	var out BatchUpdateProductStatusReply
 	pattern := "/api/v1/admin/products/batch-status"
@@ -1484,7 +1484,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) GetProduct(ctx context.Context, in *
 	return &out, nil
 }
 
-// ListCategories ── 分类 ──
+// ListCategories ── 分類 ──
 func (c *AdminCatalogServiceHTTPClientImpl) ListCategories(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CategoryList, error) {
 	var out CategoryList
 	pattern := "/api/v1/admin/categories"
@@ -1501,7 +1501,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) ListCategories(ctx context.Context, 
 	return &out, nil
 }
 
-// ListControls ── 自定义控件 ──
+// ListControls ── 自定義控件 ──
 func (c *AdminCatalogServiceHTTPClientImpl) ListControls(ctx context.Context, in *ListControlsRequest, opts ...http.CallOption) (*ControlList, error) {
 	var out ControlList
 	pattern := "/api/v1/admin/products/{product_id}/controls"
@@ -1518,7 +1518,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) ListControls(ctx context.Context, in
 	return &out, nil
 }
 
-// ListMemberGroups ── 会员商品组 ──
+// ListMemberGroups ── 會員商品組 ──
 func (c *AdminCatalogServiceHTTPClientImpl) ListMemberGroups(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*MemberGroupList, error) {
 	var out MemberGroupList
 	pattern := "/api/v1/admin/member-groups"
@@ -1552,7 +1552,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) ListProducts(ctx context.Context, in
 	return &out, nil
 }
 
-// ListReviews ── 评价（真实一单一评审核 + 虚拟评价）──
+// ListReviews ── 評價（真實一單一評審核 + 虛擬評價）──
 func (c *AdminCatalogServiceHTTPClientImpl) ListReviews(ctx context.Context, in *ListReviewsRequest, opts ...http.CallOption) (*ListReviewsReply, error) {
 	var out ListReviewsReply
 	pattern := "/api/v1/admin/reviews"
@@ -1569,7 +1569,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) ListReviews(ctx context.Context, in 
 	return &out, nil
 }
 
-// ListSkus ── SKU 多规格 ──
+// ListSkus ── SKU 多規格 ──
 func (c *AdminCatalogServiceHTTPClientImpl) ListSkus(ctx context.Context, in *ListSkusRequest, opts ...http.CallOption) (*SkuList, error) {
 	var out SkuList
 	pattern := "/api/v1/admin/products/{product_id}/skus"
@@ -1586,7 +1586,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) ListSkus(ctx context.Context, in *Li
 	return &out, nil
 }
 
-// ListTags ── 标签 ──
+// ListTags ── 標籤 ──
 func (c *AdminCatalogServiceHTTPClientImpl) ListTags(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*TagList, error) {
 	var out TagList
 	pattern := "/api/v1/admin/tags"
@@ -1687,7 +1687,7 @@ func (c *AdminCatalogServiceHTTPClientImpl) RejectReview(ctx context.Context, in
 	return &out, nil
 }
 
-// ReorderCategories ReorderCategories 分类排序（拖拽重排：把某层级全部兄弟按 ids 顺序重排并归一化 sort）。
+// ReorderCategories ReorderCategories 分類排序（拖拽重排：把某層級全部兄弟按 ids 順序重排並歸一化 sort）。
 func (c *AdminCatalogServiceHTTPClientImpl) ReorderCategories(ctx context.Context, in *ReorderCategoriesRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/categories/reorder"

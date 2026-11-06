@@ -32,23 +32,23 @@ const OperationAdminCouponServiceUpsertPromotion = "/zcard.api.admin.v1.AdminCou
 
 type AdminCouponServiceHTTPServer interface {
 	CreateCouponBatch(context.Context, *CreateCouponBatchRequest) (*CreateCouponBatchReply, error)
-	// CreateFlashSale CreateFlashSale 创建秒杀。
+	// CreateFlashSale CreateFlashSale 創建秒殺。
 	CreateFlashSale(context.Context, *CreateFlashSaleRequest) (*FlashSaleItem, error)
-	// DeleteCoupons DeleteCoupons 批量删除券（仅未使用；可按 id 列表或整批未使用）。
+	// DeleteCoupons DeleteCoupons 批量刪除券（僅未使用；可按 id 列表或整批未使用）。
 	DeleteCoupons(context.Context, *DeleteCouponsRequest) (*DeleteCouponsReply, error)
-	// DeleteFlashSale DeleteFlashSale 删除秒杀。
+	// DeleteFlashSale DeleteFlashSale 刪除秒殺。
 	DeleteFlashSale(context.Context, *DeleteFlashSaleRequest) (*emptypb.Empty, error)
 	DisableCoupon(context.Context, *DisableCouponRequest) (*emptypb.Empty, error)
-	// ExportCoupons ExportCoupons 导出券码 CSV（按状态/批次，含表头）。
+	// ExportCoupons ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
 	ExportCoupons(context.Context, *ExportCouponsRequest) (*ExportCouponsReply, error)
-	// GrantCoupon GrantCoupon 批次赠送指定用户。
+	// GrantCoupon GrantCoupon 批次贈送指定用户。
 	GrantCoupon(context.Context, *GrantCouponRequest) (*GrantCouponReply, error)
 	ListCoupons(context.Context, *ListCouponsRequest) (*CouponList, error)
-	// ListFlashSales ListFlashSales 秒杀列表。
+	// ListFlashSales ListFlashSales 秒殺列表。
 	ListFlashSales(context.Context, *ListFlashSalesRequest) (*ListFlashSalesReply, error)
-	// ListPromotions ListPromotions 促销列表。
+	// ListPromotions ListPromotions 促銷列表。
 	ListPromotions(context.Context, *ListPromotionsRequest) (*ListPromotionsReply, error)
-	// UpsertPromotion UpsertPromotion 创建/更新促销。
+	// UpsertPromotion UpsertPromotion 創建/更新促銷。
 	UpsertPromotion(context.Context, *UpsertPromotionRequest) (*PromotionItem, error)
 }
 
@@ -281,23 +281,23 @@ func _AdminCouponService_ExportCoupons0_HTTP_Handler(srv AdminCouponServiceHTTPS
 
 type AdminCouponServiceHTTPClient interface {
 	CreateCouponBatch(ctx context.Context, req *CreateCouponBatchRequest, opts ...http.CallOption) (rsp *CreateCouponBatchReply, err error)
-	// CreateFlashSale CreateFlashSale 创建秒杀。
+	// CreateFlashSale CreateFlashSale 創建秒殺。
 	CreateFlashSale(ctx context.Context, req *CreateFlashSaleRequest, opts ...http.CallOption) (rsp *FlashSaleItem, err error)
-	// DeleteCoupons DeleteCoupons 批量删除券（仅未使用；可按 id 列表或整批未使用）。
+	// DeleteCoupons DeleteCoupons 批量刪除券（僅未使用；可按 id 列表或整批未使用）。
 	DeleteCoupons(ctx context.Context, req *DeleteCouponsRequest, opts ...http.CallOption) (rsp *DeleteCouponsReply, err error)
-	// DeleteFlashSale DeleteFlashSale 删除秒杀。
+	// DeleteFlashSale DeleteFlashSale 刪除秒殺。
 	DeleteFlashSale(ctx context.Context, req *DeleteFlashSaleRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DisableCoupon(ctx context.Context, req *DisableCouponRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ExportCoupons ExportCoupons 导出券码 CSV（按状态/批次，含表头）。
+	// ExportCoupons ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
 	ExportCoupons(ctx context.Context, req *ExportCouponsRequest, opts ...http.CallOption) (rsp *ExportCouponsReply, err error)
-	// GrantCoupon GrantCoupon 批次赠送指定用户。
+	// GrantCoupon GrantCoupon 批次贈送指定用户。
 	GrantCoupon(ctx context.Context, req *GrantCouponRequest, opts ...http.CallOption) (rsp *GrantCouponReply, err error)
 	ListCoupons(ctx context.Context, req *ListCouponsRequest, opts ...http.CallOption) (rsp *CouponList, err error)
-	// ListFlashSales ListFlashSales 秒杀列表。
+	// ListFlashSales ListFlashSales 秒殺列表。
 	ListFlashSales(ctx context.Context, req *ListFlashSalesRequest, opts ...http.CallOption) (rsp *ListFlashSalesReply, err error)
-	// ListPromotions ListPromotions 促销列表。
+	// ListPromotions ListPromotions 促銷列表。
 	ListPromotions(ctx context.Context, req *ListPromotionsRequest, opts ...http.CallOption) (rsp *ListPromotionsReply, err error)
-	// UpsertPromotion UpsertPromotion 创建/更新促销。
+	// UpsertPromotion UpsertPromotion 創建/更新促銷。
 	UpsertPromotion(ctx context.Context, req *UpsertPromotionRequest, opts ...http.CallOption) (rsp *PromotionItem, err error)
 }
 
@@ -326,7 +326,7 @@ func (c *AdminCouponServiceHTTPClientImpl) CreateCouponBatch(ctx context.Context
 	return &out, nil
 }
 
-// CreateFlashSale CreateFlashSale 创建秒杀。
+// CreateFlashSale CreateFlashSale 創建秒殺。
 func (c *AdminCouponServiceHTTPClientImpl) CreateFlashSale(ctx context.Context, in *CreateFlashSaleRequest, opts ...http.CallOption) (*FlashSaleItem, error) {
 	var out FlashSaleItem
 	pattern := "/api/v1/admin/flash-sales"
@@ -344,7 +344,7 @@ func (c *AdminCouponServiceHTTPClientImpl) CreateFlashSale(ctx context.Context, 
 	return &out, nil
 }
 
-// DeleteCoupons DeleteCoupons 批量删除券（仅未使用；可按 id 列表或整批未使用）。
+// DeleteCoupons DeleteCoupons 批量刪除券（僅未使用；可按 id 列表或整批未使用）。
 func (c *AdminCouponServiceHTTPClientImpl) DeleteCoupons(ctx context.Context, in *DeleteCouponsRequest, opts ...http.CallOption) (*DeleteCouponsReply, error) {
 	var out DeleteCouponsReply
 	pattern := "/api/v1/admin/coupons/delete"
@@ -362,7 +362,7 @@ func (c *AdminCouponServiceHTTPClientImpl) DeleteCoupons(ctx context.Context, in
 	return &out, nil
 }
 
-// DeleteFlashSale DeleteFlashSale 删除秒杀。
+// DeleteFlashSale DeleteFlashSale 刪除秒殺。
 func (c *AdminCouponServiceHTTPClientImpl) DeleteFlashSale(ctx context.Context, in *DeleteFlashSaleRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/flash-sales/{id}"
@@ -396,7 +396,7 @@ func (c *AdminCouponServiceHTTPClientImpl) DisableCoupon(ctx context.Context, in
 	return &out, nil
 }
 
-// ExportCoupons ExportCoupons 导出券码 CSV（按状态/批次，含表头）。
+// ExportCoupons ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
 func (c *AdminCouponServiceHTTPClientImpl) ExportCoupons(ctx context.Context, in *ExportCouponsRequest, opts ...http.CallOption) (*ExportCouponsReply, error) {
 	var out ExportCouponsReply
 	pattern := "/api/v1/admin/coupons/export"
@@ -413,7 +413,7 @@ func (c *AdminCouponServiceHTTPClientImpl) ExportCoupons(ctx context.Context, in
 	return &out, nil
 }
 
-// GrantCoupon GrantCoupon 批次赠送指定用户。
+// GrantCoupon GrantCoupon 批次贈送指定用户。
 func (c *AdminCouponServiceHTTPClientImpl) GrantCoupon(ctx context.Context, in *GrantCouponRequest, opts ...http.CallOption) (*GrantCouponReply, error) {
 	var out GrantCouponReply
 	pattern := "/api/v1/admin/coupons/grant"
@@ -447,7 +447,7 @@ func (c *AdminCouponServiceHTTPClientImpl) ListCoupons(ctx context.Context, in *
 	return &out, nil
 }
 
-// ListFlashSales ListFlashSales 秒杀列表。
+// ListFlashSales ListFlashSales 秒殺列表。
 func (c *AdminCouponServiceHTTPClientImpl) ListFlashSales(ctx context.Context, in *ListFlashSalesRequest, opts ...http.CallOption) (*ListFlashSalesReply, error) {
 	var out ListFlashSalesReply
 	pattern := "/api/v1/admin/flash-sales"
@@ -464,7 +464,7 @@ func (c *AdminCouponServiceHTTPClientImpl) ListFlashSales(ctx context.Context, i
 	return &out, nil
 }
 
-// ListPromotions ListPromotions 促销列表。
+// ListPromotions ListPromotions 促銷列表。
 func (c *AdminCouponServiceHTTPClientImpl) ListPromotions(ctx context.Context, in *ListPromotionsRequest, opts ...http.CallOption) (*ListPromotionsReply, error) {
 	var out ListPromotionsReply
 	pattern := "/api/v1/admin/promotions"
@@ -481,7 +481,7 @@ func (c *AdminCouponServiceHTTPClientImpl) ListPromotions(ctx context.Context, i
 	return &out, nil
 }
 
-// UpsertPromotion UpsertPromotion 创建/更新促销。
+// UpsertPromotion UpsertPromotion 創建/更新促銷。
 func (c *AdminCouponServiceHTTPClientImpl) UpsertPromotion(ctx context.Context, in *UpsertPromotionRequest, opts ...http.CallOption) (*PromotionItem, error) {
 	var out PromotionItem
 	pattern := "/api/v1/admin/promotions"

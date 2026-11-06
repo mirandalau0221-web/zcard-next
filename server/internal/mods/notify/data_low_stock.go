@@ -49,7 +49,7 @@ func (d *Dispatcher) scanLowStock(ctx context.Context) error {
 		}
 	}
 	if threshold < 1 || threshold > 1000000 {
-		return fmt.Errorf("低库存提醒阈值无效")
+		return fmt.Errorf("低庫存提醒閾值無效")
 	}
 	raw, err = channel.settings.GetJSON(ctx, "supply", "low_stock_alert_enabled")
 	if err != nil {
@@ -79,7 +79,7 @@ func (d *Dispatcher) scanLowStock(ctx context.Context) error {
 	}
 	link := ""
 	if u, e := url.Parse(base); e == nil && (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" && u.User == nil {
-		link = "\n<a href=\"" + html.EscapeString(strings.TrimRight(base, "/")+path+"/product?low_stock=1") + "\">查看后台库存预警（需要登录）</a>"
+		link = "\n<a href=\"" + html.EscapeString(strings.TrimRight(base, "/")+path+"/product?low_stock=1") + "\">查看後台庫存預警（需要登錄）</a>"
 	}
 	var last uint64
 	for {
@@ -146,11 +146,11 @@ func (d *Dispatcher) scanLowStock(ctx context.Context) error {
 								label += " / " + slot.Name
 							}
 							label = limitStockText(label, 70)
-							kind := "低库存"
+							kind := "低庫存"
 							if state == 2 {
 								kind = "已售罄"
 							}
-							lines = append(lines, fmt.Sprintf("• %s【%s】\n库存：%d；阈值：低于 %d\n检查时间：%s", html.EscapeString(label), kind, slot.Quantity, threshold, slot.CheckedAt.UTC().Format(time.RFC3339)))
+							lines = append(lines, fmt.Sprintf("• %s【%s】\n庫存：%d；閾值：低於 %d\n檢查時間：%s", html.EscapeString(label), kind, slot.Quantity, threshold, slot.CheckedAt.UTC().Format(time.RFC3339)))
 						}
 					}
 					if e = upd.Exec(tx); e != nil {
@@ -162,7 +162,7 @@ func (d *Dispatcher) scanLowStock(ctx context.Context) error {
 				return nil
 			}
 			if changed > len(lines) {
-				lines = append(lines, fmt.Sprintf("另有 %d 个低库存规格，请在后台查看。", changed-len(lines)))
+				lines = append(lines, fmt.Sprintf("另有 %d 個低庫存規格，請在後台查看。", changed-len(lines)))
 			}
 			key := "stock:" + uuid.NewString()
 			for _, target := range telegramTargets(cfg) {
@@ -170,7 +170,7 @@ func (d *Dispatcher) scanLowStock(ctx context.Context) error {
 				if target.TopicID > 0 {
 					vars["telegram_topic_id"] = fmt.Sprint(target.TopicID)
 				}
-				err = c.NotificationLog.Create().SetVariables(vars).SetDeliveryKey(fmt.Sprintf("%s:%s:%d", key, target.ChatID, target.TopicID)).SetEventType("stock.low").SetBizType("stock").SetChannel(notificationlog.ChannelTelegram).SetRecipient(target.ChatID).SetSubject("库存预警").SetBody(strings.Join(lines, "\n\n") + link).SetNextAttemptAt(time.Now().UTC()).Exec(tx)
+				err = c.NotificationLog.Create().SetVariables(vars).SetDeliveryKey(fmt.Sprintf("%s:%s:%d", key, target.ChatID, target.TopicID)).SetEventType("stock.low").SetBizType("stock").SetChannel(notificationlog.ChannelTelegram).SetRecipient(target.ChatID).SetSubject("庫存預警").SetBody(strings.Join(lines, "\n\n") + link).SetNextAttemptAt(time.Now().UTC()).Exec(tx)
 				if err != nil {
 					return err
 				}

@@ -65,11 +65,11 @@ async function pollTest(ids: string[], deadline: number) {
     matches.every((row) => row.status !== "pending")
   ) {
     testNotice.value = matches.every((row) => row.status === "sent")
-      ? "测试消息已发送，请到对应接收位置查看。"
-      : "测试未全部送达，请查看发送记录中的具体原因。";
+      ? "測試消息已發送，請到對應接收位置查看。"
+      : "測試未全部送達，請查看發送記錄中的具體原因。";
     testing.value = false;
   } else if (Date.now() >= deadline) {
-    testNotice.value = "测试仍在后台处理，可刷新发送记录查看结果。";
+    testNotice.value = "測試仍在後台處理，可刷新發送記錄查看結果。";
     testing.value = false;
   } else timer = setTimeout(() => void pollTest(ids, deadline), 3000);
 }
@@ -86,7 +86,7 @@ async function test(target: { chat_id: string; topic_id: number }) {
       testing.value = false;
       return;
     }
-    testNotice.value = `测试已排队：${target.chat_id}${target.topic_id ? ` / Topic ${target.topic_id}` : " / 默认位置"}。排队成功不代表已经送达。`;
+    testNotice.value = `測試已排隊：${target.chat_id}${target.topic_id ? ` / Topic ${target.topic_id}` : " / 默認位置"}。排隊成功不代表已經送達。`;
     if (checkAuth("notify:read") && data?.log_ids?.length) {
       page.value = 1;
       await pollTest(data.log_ids.map(String), Date.now() + 60000);
@@ -104,7 +104,7 @@ async function retry(id: number) {
       data: {},
     });
     if (!error) {
-      window.$message?.success("已按原接收位置加入重试队列");
+      window.$message?.success("已按原接收位置加入重試隊列");
       await load();
     }
   } finally {
@@ -112,9 +112,9 @@ async function retry(id: number) {
   }
 }
 const labels: Record<string, string> = {
-  pending: "待发送 / 重试中",
-  sent: "已发送",
-  failed: "发送失败",
+  pending: "待發送 / 重試中",
+  sent: "已發送",
+  failed: "發送失敗",
   skipped: "已停止",
 };
 onMounted(() => {
@@ -126,10 +126,10 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <section class="mt-24px telegram-delivery" aria-label="TG 测试与发送记录">
-    <h3 class="font-600">测试与发送记录</h3>
+  <section class="mt-24px telegram-delivery" aria-label="TG 測試與發送記錄">
+    <h3 class="font-600">測試與發送記錄</h3>
     <NAlert class="mt-12px" type="info" :show-icon="false"
-      >只测试已保存的接收位置；消息不包含卡密或查询密码。网络结果不明确时重试可能重复，请先检查目标话题。</NAlert
+      >只測試已保存的接收位置；消息不包含卡密或查詢密碼。網絡結果不明確時重試可能重複，請先檢查目標話題。</NAlert
     >
     <NSpace class="mt-12px">
       <template v-if="checkAuth('notify:write')">
@@ -140,26 +140,26 @@ onBeforeUnmount(() => {
           :disabled="unsaved || !enabled || testing"
           @click="test(target)"
         >
-          测试 {{ target.chat_id }} ·
-          {{ target.topic_id ? `Topic ${target.topic_id}` : "默认位置" }}
+          測試 {{ target.chat_id }} ·
+          {{ target.topic_id ? `Topic ${target.topic_id}` : "默認位置" }}
         </NButton>
       </template>
       <NButton v-if="checkAuth('notify:read')" :loading="loading" @click="load"
-        >刷新发送记录</NButton
+        >刷新發送記錄</NButton
       >
     </NSpace>
-    <p v-if="unsaved" class="mt-8px">请先保存 TG 配置，再测试或重试。</p>
+    <p v-if="unsaved" class="mt-8px">請先保存 TG 配置，再測試或重試。</p>
     <p v-else-if="!enabled" class="mt-8px">
-      请先配置 Token 并开启通道及订单或低库存通知。
+      請先配置 Token 並開啓通道及訂單或低庫存通知。
     </p>
     <p v-if="testNotice" class="mt-12px" role="status">{{ testNotice }}</p>
     <NAlert v-if="loadFailed" class="mt-12px" type="error"
-      >发送记录加载失败，请点击刷新重试。</NAlert
+      >發送記錄加載失敗，請點擊刷新重試。</NAlert
     >
     <NEmpty
       v-else-if="loaded && !logs.length"
       class="mt-16px"
-      description="暂无 Telegram 发送记录"
+      description="暫無 Telegram 發送記錄"
     />
     <article v-for="log in logs" :key="log.id" class="telegram-log">
       <NSpace align="center"
@@ -181,16 +181,16 @@ onBeforeUnmount(() => {
         {{
           Number(log.topic_id)
             ? `Topic ID：${log.topic_id}`
-            : "默认位置（未指定话题）"
+            : "默認位置（未指定話題）"
         }}
       </div>
       <div>
-        尝试 {{ log.attempts || 0 }} 次<span v-if="log.message_id">
+        嘗試 {{ log.attempts || 0 }} 次<span v-if="log.message_id">
           · 消息 ID {{ log.message_id }}</span
         >
       </div>
       <div v-if="log.next_attempt_at">
-        下次尝试：{{
+        下次嘗試：{{
           new Date(Number(log.next_attempt_at) * 1000).toLocaleString()
         }}
       </div>
@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
         :loading="retrying === log.id"
         :disabled="retrying !== null || unsaved || !enabled"
         @click="retry(log.id)"
-        >重试原接收位置</NButton
+        >重試原接收位置</NButton
       >
     </article>
     <NPagination

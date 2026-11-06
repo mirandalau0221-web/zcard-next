@@ -1,8 +1,8 @@
-// 运营支撑 API：审计日志（audit:read）+ 货币管理（settings:currency_*）。
+// 運營支撐 API：審計日誌（audit:read）+ 貨幣管理（settings:currency_*）。
 
 import { request } from "../request";
 
-// ── 审计日志 ──
+// ── 審計日誌 ──
 
 export function fetchOpLogs(params?: { operator_id?: number; page?: number; page_size?: number }) {
   return request({ url: "/api/v1/admin/audit/op-logs", params });
@@ -12,7 +12,7 @@ export function fetchSecurityLogs(params?: { action?: string; page?: number; pag
   return request({ url: "/api/v1/admin/audit/security-logs", params });
 }
 
-// ── 货币 ──
+// ── 貨幣 ──
 
 export function listCurrencies() {
   return request({ url: "/api/v1/admin/currencies" });

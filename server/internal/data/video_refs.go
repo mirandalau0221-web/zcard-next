@@ -64,7 +64,7 @@ func SyncVideoRefs(ctx context.Context, d *Data, oldContent, newContent string) 
 				return err
 			}
 			if n == 0 {
-				return fmt.Errorf("视频或封面已删除，请重新选择素材")
+				return fmt.Errorf("視頻或封面已刪除，請重新選擇素材")
 			}
 		} else {
 			if _, err := q.Where(media.RefCountGT(0)).AddRefCount(-1).Save(ctx); err != nil {

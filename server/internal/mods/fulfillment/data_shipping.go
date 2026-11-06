@@ -30,14 +30,14 @@ func trackingValid(carrier, no string) bool {
 func (s *AdminFulfillmentService) shippingOrder(ctx context.Context, no string) (*ent.Order, uint64, error) {
 	cl := identity.ClaimsFromContext(ctx)
 	if cl == nil {
-		return nil, 0, fmt.Errorf("请登录")
+		return nil, 0, fmt.Errorf("請登錄")
 	}
 	o, e := data.Client(ctx, s.data).Order.Query().Where(order.OrderNo(no), order.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).Only(ctx)
 	return o, cl.Subject, e
 }
 func (s *AdminFulfillmentService) ShipOrder(ctx context.Context, req *adminv1.ShipOrderRequest) (*emptypb.Empty, error) {
 	if !trackingValid(req.Carrier, req.TrackingNo) || len(req.ItemIds) == 0 || len(req.ItemIds) > 100 || len(req.RequestKey) < 8 || len(req.RequestKey) > 100 {
-		return nil, kerrors.BadRequest("shipping.INVALID", "请选择商品并填写快递公司、单号")
+		return nil, kerrors.BadRequest("shipping.INVALID", "請選擇商品並填寫快遞公司、單號")
 	}
 	e := data.Tx(ctx, s.data, func(ctx context.Context) error {
 		o, aid, e := s.shippingOrder(ctx, req.OrderNo)
@@ -49,11 +49,11 @@ func (s *AdminFulfillmentService) ShipOrder(ctx context.Context, req *adminv1.Sh
 		old, e := c.Shipment.Query().Where(shipment.RequestKey(key)).Only(ctx)
 		if e == nil {
 			if old.Carrier != req.Carrier || old.TrackingNo != req.TrackingNo || len(old.Items) != len(req.ItemIds) {
-				return fmt.Errorf("发货请求内容已变化")
+				return fmt.Errorf("發貨請求內容已變化")
 			}
 			for _, id := range req.ItemIds {
 				if old.Items[strconv.FormatUint(id, 10)] == 0 {
-					return fmt.Errorf("发货商品已变化")
+					return fmt.Errorf("發貨商品已變化")
 				}
 			}
 			return nil
@@ -68,7 +68,7 @@ func (s *AdminFulfillmentService) ShipOrder(ctx context.Context, req *adminv1.Sh
 		for _, id := range req.ItemIds {
 			k := strconv.FormatUint(id, 10)
 			if _, ok := items[k]; ok {
-				return fmt.Errorf("商品不能重复选择")
+				return fmt.Errorf("商品不能重複選擇")
 			}
 			it, e := c.OrderItem.Query().Where(orderitem.ID(id), orderitem.OrderID(o.ID), orderitem.GoodsType("physical")).Only(ctx)
 			if e != nil {
@@ -76,7 +76,7 @@ func (s *AdminFulfillmentService) ShipOrder(ctx context.Context, req *adminv1.Sh
 			}
 			qty := it.Quantity - it.CanceledQuantity - it.ShippedQuantity
 			if qty <= 0 {
-				return fmt.Errorf("商品已发货或已取消")
+				return fmt.Errorf("商品已發貨或已取消")
 			}
 			if e = c.OrderItem.UpdateOneID(it.ID).AddShippedQuantity(qty).SetFulfillmentStatus("shipped").Exec(ctx); e != nil {
 				return e
@@ -107,7 +107,7 @@ func (s *AdminFulfillmentService) UpdateShipping(ctx context.Context, req *admin
 			return e
 		}
 		if strings.TrimSpace(req.Reason) == "" || len([]rune(req.Reason)) > 120 {
-			return fmt.Errorf("请填写120字以内的更正原因")
+			return fmt.Errorf("請填寫120字以內的更正原因")
 		}
 		if req.Received {
 			return data.ReceivePhysicalShipment(ctx, s.data, req.OrderNo, req.ShipmentId, "admin", aid)
@@ -120,7 +120,7 @@ func (s *AdminFulfillmentService) UpdateShipping(ctx context.Context, req *admin
 		c := data.Client(ctx, s.data)
 		if req.ShipmentId > 0 {
 			if !trackingValid(req.Carrier, req.TrackingNo) {
-				return fmt.Errorf("快递信息无效")
+				return fmt.Errorf("快遞信息無效")
 			}
 			p, e := c.Shipment.Query().Where(shipment.ID(req.ShipmentId), shipment.OrderID(o.ID), shipment.Status("shipped")).Only(ctx)
 			if e != nil {
@@ -129,21 +129,21 @@ func (s *AdminFulfillmentService) UpdateShipping(ctx context.Context, req *admin
 			if e = c.Shipment.UpdateOneID(p.ID).SetCarrier(req.Carrier).SetTrackingNo(req.TrackingNo).Exec(ctx); e != nil {
 				return e
 			}
-			return data.PhysicalOrderEvent(ctx, s.data, o, "shipment_corrected", "admin", aid, fmt.Sprintf("包裹%d 原单号:%s；%s", p.ID, p.TrackingNo, req.Reason))
+			return data.PhysicalOrderEvent(ctx, s.data, o, "shipment_corrected", "admin", aid, fmt.Sprintf("包裹%d 原單號:%s；%s", p.ID, p.TrackingNo, req.Reason))
 		}
 		sent, e := c.Shipment.Query().Where(shipment.OrderID(o.ID)).Exist(ctx)
 		if e != nil {
 			return e
 		}
 		if sent {
-			return fmt.Errorf("已有包裹寄出，不能修改订单地址")
+			return fmt.Errorf("已有包裹寄出，不能修改訂單地址")
 		}
 		a, e := shipping.Validate(req.Address)
 		if e != nil {
 			return e
 		}
 		if a["country"] != o.ShippingAddress["country"] {
-			return fmt.Errorf("付款后不能更改配送国家")
+			return fmt.Errorf("付款後不能更改配送國家")
 		}
 		if o.Extra == nil {
 			o.Extra = map[string]any{}
@@ -152,7 +152,7 @@ func (s *AdminFulfillmentService) UpdateShipping(ctx context.Context, req *admin
 		b, _ := json.Marshal(o.Extra["shipping_address_history"])
 		_ = json.Unmarshal(b, &history)
 		if len(history) >= 100 {
-			return fmt.Errorf("地址更正次数超过上限")
+			return fmt.Errorf("地址更正次數超過上限")
 		}
 		history = append(history, map[string]any{"before": o.ShippingAddress, "after": a, "admin_id": aid, "at": time.Now().Unix(), "reason": req.Reason})
 		o.Extra["shipping_address_history"] = history
@@ -173,7 +173,7 @@ func (s *AdminFulfillmentService) RestockReturn(ctx context.Context, req *adminv
 			return e
 		}
 		if o.CommerceVersion != 1 || req.Quantity <= 0 || len(req.RequestKey) < 8 || len(req.RequestKey) > 100 || len([]rune(req.Reason)) > 120 || strings.TrimSpace(req.Reason) == "" {
-			return fmt.Errorf("请填写退货数量和验收原因")
+			return fmt.Errorf("請填寫退貨數量和驗收原因")
 		}
 		c := data.Client(ctx, s.data)
 		key := fmt.Sprintf("return:%x", sha256.Sum256([]byte(fmt.Sprintf("%d:%s", o.ID, req.RequestKey))))
@@ -185,7 +185,7 @@ func (s *AdminFulfillmentService) RestockReturn(ctx context.Context, req *adminv
 		}
 		if receipt != nil {
 			if receipt.RequestHash != requestHash {
-				return fmt.Errorf("同一退货请求不能改变商品、数量或原因")
+				return fmt.Errorf("同一退貨請求不能改變商品、數量或原因")
 			}
 			return nil
 		}
@@ -201,7 +201,7 @@ func (s *AdminFulfillmentService) RestockReturn(ctx context.Context, req *adminv
 				return e
 			}
 			if it.OrderID != o.ID || it.ProductID != oldMovement.ProductID || it.SkuID != oldMovement.SkuID || int64(req.Quantity) != oldMovement.Delta {
-				return fmt.Errorf("同一入库请求不能改变商品或数量")
+				return fmt.Errorf("同一入庫請求不能改變商品或數量")
 			}
 			return nil
 		}
@@ -210,20 +210,20 @@ func (s *AdminFulfillmentService) RestockReturn(ctx context.Context, req *adminv
 			return e
 		}
 		if n != 1 {
-			return fmt.Errorf("订单已变化")
+			return fmt.Errorf("訂單已變化")
 		}
 		it, e := c.OrderItem.Query().Where(orderitem.ID(req.ItemId), orderitem.OrderID(o.ID), orderitem.GoodsType("physical")).Only(ctx)
 		if e != nil {
 			return e
 		}
 		if req.Quantity > it.ShippedQuantity-it.ReturnedQuantity {
-			return fmt.Errorf("退货入库不能超过已发货且未入库数量")
+			return fmt.Errorf("退貨入庫不能超過已發貨且未入庫數量")
 		}
 		if e = c.PhysicalReturnReceipt.Create().SetSubsiteID(o.SubsiteID).SetOrderID(o.ID).SetItemID(it.ID).SetQuantity(req.Quantity).SetRequestKey(key).SetRequestHash(requestHash).SetReason(strings.TrimSpace(req.Reason)).SetInventoryTracked(it.InventoryTracked).Exec(ctx); e != nil {
 			return e
 		}
 		if it.InventoryTracked {
-			if e = data.MovePhysicalStock(ctx, s.data, o.SubsiteID, it.ProductID, it.SkuID, o.ID, int64(req.Quantity), key, "退货验收入库"); e != nil {
+			if e = data.MovePhysicalStock(ctx, s.data, o.SubsiteID, it.ProductID, it.SkuID, o.ID, int64(req.Quantity), key, "退貨驗收入庫"); e != nil {
 				return e
 			}
 		}
@@ -237,11 +237,11 @@ func (s *AdminFulfillmentService) RestockReturn(ctx context.Context, req *adminv
 		if it.SkuName != "" {
 			name += "（" + it.SkuName + "）"
 		}
-		event, action := "return_registered", "登记退货"
+		event, action := "return_registered", "登記退貨"
 		if it.InventoryTracked {
-			event, action = "return_restocked", "入库"
+			event, action = "return_restocked", "入庫"
 		}
-		return data.PhysicalOrderEvent(ctx, s.data, o, event, "admin", aid, fmt.Sprintf("商品项 #%d · %s %d 件：%s · %s", it.ID, action, req.Quantity, req.Reason, name))
+		return data.PhysicalOrderEvent(ctx, s.data, o, event, "admin", aid, fmt.Sprintf("商品項 #%d · %s %d 件：%s · %s", it.ID, action, req.Quantity, req.Reason, name))
 	})
 	if e != nil {
 		return nil, kerrors.BadRequest("shipping.RESTOCK", e.Error())

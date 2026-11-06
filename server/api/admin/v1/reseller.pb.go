@@ -152,7 +152,7 @@ type ReviewApplyRequest struct {
 	Id                   uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Approve              bool                   `protobuf:"varint,2,opt,name=approve,proto3" json:"approve,omitempty"`
 	Reason               string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
-	DefaultMarkupPercent float64                `protobuf:"fixed64,4,opt,name=default_markup_percent,json=defaultMarkupPercent,proto3" json:"default_markup_percent,omitempty"` // 审核通过时设定
+	DefaultMarkupPercent float64                `protobuf:"fixed64,4,opt,name=default_markup_percent,json=defaultMarkupPercent,proto3" json:"default_markup_percent,omitempty"` // 審核通過時設定
 	MaxMarkupPercent     float64                `protobuf:"fixed64,5,opt,name=max_markup_percent,json=maxMarkupPercent,proto3" json:"max_markup_percent,omitempty"`
 	ConfirmDays          int32                  `protobuf:"varint,6,opt,name=confirm_days,json=confirmDays,proto3" json:"confirm_days,omitempty"`
 	unknownFields        protoimpl.UnknownFields
@@ -365,7 +365,7 @@ type UpsertPricingRequest struct {
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	SkuId         uint64                 `protobuf:"varint,3,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
 	Mode          string                 `protobuf:"bytes,4,opt,name=mode,proto3" json:"mode,omitempty"`    // inherit | markup_percent | fixed_markup | fixed_price
-	Value         int64                  `protobuf:"varint,5,opt,name=value,proto3" json:"value,omitempty"` // markup=万分比；fixed=分
+	Value         int64                  `protobuf:"varint,5,opt,name=value,proto3" json:"value,omitempty"` // markup=萬分比；fixed=分
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -717,10 +717,10 @@ func (x *BalanceRequest) GetSubsiteId() uint64 {
 
 type BalanceReply struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
-	Available           int64                  `protobuf:"varint,1,opt,name=available,proto3" json:"available,omitempty"` // 缓存（含冻结正数）
+	Available           int64                  `protobuf:"varint,1,opt,name=available,proto3" json:"available,omitempty"` // 緩存（含凍結正數）
 	Locked              int64                  `protobuf:"varint,2,opt,name=locked,proto3" json:"locked,omitempty"`
 	Negative            int64                  `protobuf:"varint,3,opt,name=negative,proto3" json:"negative,omitempty"`
-	RecomputedAvailable int64                  `protobuf:"varint,4,opt,name=recomputed_available,json=recomputedAvailable,proto3" json:"recomputed_available,omitempty"` // 流水重算（对账口径）
+	RecomputedAvailable int64                  `protobuf:"varint,4,opt,name=recomputed_available,json=recomputedAvailable,proto3" json:"recomputed_available,omitempty"` // 流水重算（對賬口徑）
 	RecomputedLocked    int64                  `protobuf:"varint,5,opt,name=recomputed_locked,json=recomputedLocked,proto3" json:"recomputed_locked,omitempty"`
 	RecomputedNegative  int64                  `protobuf:"varint,6,opt,name=recomputed_negative,json=recomputedNegative,proto3" json:"recomputed_negative,omitempty"`
 	unknownFields       protoimpl.UnknownFields
@@ -842,7 +842,7 @@ type ResellerSiteItem struct {
 	ProfileId          uint64                 `protobuf:"varint,2,opt,name=profile_id,json=profileId,proto3" json:"profile_id,omitempty"`
 	Domain             string                 `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
 	VerificationStatus string                 `protobuf:"bytes,4,opt,name=verification_status,json=verificationStatus,proto3" json:"verification_status,omitempty"` // pending | verified | failed
-	VerificationToken  string                 `protobuf:"bytes,5,opt,name=verification_token,json=verificationToken,proto3" json:"verification_token,omitempty"`    // 用于 DNS TXT/HTTP 文件内容
+	VerificationToken  string                 `protobuf:"bytes,5,opt,name=verification_token,json=verificationToken,proto3" json:"verification_token,omitempty"`    // 用於 DNS TXT/HTTP 文件內容
 	IsPrimary          bool                   `protobuf:"varint,6,opt,name=is_primary,json=isPrimary,proto3" json:"is_primary,omitempty"`
 	SiteName           string                 `protobuf:"bytes,7,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`
 	Logo               string                 `protobuf:"bytes,8,opt,name=logo,proto3" json:"logo,omitempty"`
@@ -1204,7 +1204,7 @@ func (x *SetWhitelabelRequest) GetFavicon() string {
 	return ""
 }
 
-// CreateResellerProductRequest 分站自营商品上架入参（名称必填；价格/成本分）。
+// CreateResellerProductRequest 分站自營商品上架入參（名稱必填；價格/成本分）。
 type CreateResellerProductRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Name              string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -1215,7 +1215,7 @@ type CreateResellerProductRequest struct {
 	CategoryId        uint64                 `protobuf:"varint,6,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	StockType         string                 `protobuf:"bytes,7,opt,name=stock_type,json=stockType,proto3" json:"stock_type,omitempty"`          // card | url | code
 	DeliveryMode      string                 `protobuf:"bytes,8,opt,name=delivery_mode,json=deliveryMode,proto3" json:"delivery_mode,omitempty"` // status | delete
-	Status            int32                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`                                // 1=上架 0=下架 2=隐藏
+	Status            int32                  `protobuf:"varint,9,opt,name=status,proto3" json:"status,omitempty"`                                // 1=上架 0=下架 2=隱藏
 	Sort              int32                  `protobuf:"varint,10,opt,name=sort,proto3" json:"sort,omitempty"`
 	StockVisible      bool                   `protobuf:"varint,11,opt,name=stock_visible,json=stockVisible,proto3" json:"stock_visible,omitempty"`
 	unknownFields     protoimpl.UnknownFields
@@ -1329,7 +1329,7 @@ func (x *CreateResellerProductRequest) GetStockVisible() bool {
 	return false
 }
 
-// ResellerProduct 分站自营商品（上架结果回执）。
+// ResellerProduct 分站自營商品（上架結果回執）。
 type ResellerProduct struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`

@@ -28,7 +28,7 @@ type MyCoupon struct {
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`    // fixed | percent
-	Value         int64                  `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"` // fixed=分；percent=万分比
+	Value         int64                  `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"` // fixed=分；percent=萬分比
 	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty"`
 	ScopeJson     string                 `protobuf:"bytes,6,opt,name=scope_json,json=scopeJson,proto3" json:"scope_json,omitempty"`
 	ExpireAt      int64                  `protobuf:"varint,7,opt,name=expire_at,json=expireAt,proto3" json:"expire_at,omitempty"`
@@ -205,7 +205,7 @@ func (x *RedeemCouponRequest) GetCode() string {
 
 type ListFlashSalesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Upcoming      bool                   `protobuf:"varint,1,opt,name=upcoming,proto3" json:"upcoming,omitempty"` // true = 即将开始；false = 进行中
+	Upcoming      bool                   `protobuf:"varint,1,opt,name=upcoming,proto3" json:"upcoming,omitempty"` // true = 即將開始；false = 進行中
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -254,7 +254,7 @@ type StoreFlashSale struct {
 	FlashPrice    int64                  `protobuf:"varint,3,opt,name=flash_price,json=flashPrice,proto3" json:"flash_price,omitempty"` // 分
 	StartAt       int64                  `protobuf:"varint,4,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
 	EndAt         int64                  `protobuf:"varint,5,opt,name=end_at,json=endAt,proto3" json:"end_at,omitempty"`
-	Remaining     int32                  `protobuf:"varint,6,opt,name=remaining,proto3" json:"remaining,omitempty"` // 剩余量（limit - sold；-1 未提供）
+	Remaining     int32                  `protobuf:"varint,6,opt,name=remaining,proto3" json:"remaining,omitempty"` // 剩餘量（limit - sold；-1 未提供）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

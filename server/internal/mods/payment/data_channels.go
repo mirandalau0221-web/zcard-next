@@ -1,9 +1,9 @@
 package payment
 
-// 渠道管理 + 回调管线 + 退款 v1（ 核心交易支付）。
+// 渠道管理 + 回調管線 + 退款 v1（ 核心交易支付）。
 //
-// 渠道凭据 AES-256-GCM 加密存储（ZCARD_DATA_KEY），解密失败降级为空——列表绝不 500。
-// 回调管线：四重校验（渠道/单号/金额/币种）→ 幂等三层 → markPaid → 事务后事件。
+// 渠道憑據 AES-256-GCM 加密存儲（ZCARD_DATA_KEY），解密失敗降級為空——列表絕不 500。
+// 回調管線：四重校驗（渠道/單號/金額/幣種）→ 冪等三層 → markPaid → 事務後事件。
 
 import (
 	"context"
@@ -36,22 +36,22 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// PaymentRepoImpl 支付仓储。
+// PaymentRepoImpl 支付倉儲。
 type PaymentRepoImpl struct {
 	data   *data.Data
 	Cipher *crypto.Box // ZCARD_DATA_KEY
-	reg    *Registry   // 渠道 adapter 注册表
-	// 回调管线依赖（wire 注入， 破环点）：
-	lifecycle orderport.OrderLifecycle    // 订单型回调 → 状态机推进 + order.paid 事件（同事务）
-	wallet    walletport.Wallet           // 余额支付扣款 / 充值到账入账（通道 B 同事务）
-	points    walletport.Points           // 充值赠送积分（积分账本；nil = 未装配跳过）
+	reg    *Registry   // 渠道 adapter 註冊表
+	// 回調管線依賴（wire 注入， 破環點）：
+	lifecycle orderport.OrderLifecycle    // 訂單型回調 → 狀態機推進 + order.paid 事件（同事務）
+	wallet    walletport.Wallet           // 餘額支付扣款 / 充值到賬入賬（通道 B 同事務）
+	points    walletport.Points           // 充值贈送積分（積分賬本；nil = 未裝配跳過）
 	outbox    events.Writer               // recharge.succeeded 等事件
-	currency  settingsport.CurrencyReader // 币种快照换算（；nil = 同币直收）
-	settings  settingsport.Provider       // site/url 等（ 回调地址拼接；nil = 相对路径）
-	supplier  port.SupplierRecharger      // target=supply 充值入账（供货账户余额；nil = 未装配跳过）
+	currency  settingsport.CurrencyReader // 幣種快照換算（；nil = 同幣直收）
+	settings  settingsport.Provider       // site/url 等（ 回調地址拼接；nil = 相對路徑）
+	supplier  port.SupplierRecharger      // target=supply 充值入賬（供貨賬户餘額；nil = 未裝配跳過）
 }
 
-// NewPaymentRepoImpl 构造。
+// NewPaymentRepoImpl 構造。
 func NewPaymentRepoImpl(d *data.Data, box *crypto.Box, reg *Registry, lifecycle orderport.OrderLifecycle, wallet walletport.Wallet, points walletport.Points, outbox events.Writer, currency settingsport.CurrencyReader, settings settingsport.Provider, supplier port.SupplierRecharger) *PaymentRepoImpl {
 	return &PaymentRepoImpl{data: d, Cipher: box, reg: reg, lifecycle: lifecycle, wallet: wallet, points: points, outbox: outbox, currency: currency, settings: settings, supplier: supplier}
 }
@@ -72,7 +72,7 @@ func chargeUnits(amount money.Cents, rate decimal.Decimal, unit currencyunit.Cha
 	d := decimal.NewFromInt(int64(amount)).Shift(-2).Mul(rate).Shift(unit.Precision).
 		Div(decimal.NewFromInt(unit.Step)).Round(0).Mul(decimal.NewFromInt(unit.Step))
 	if !d.IsPositive() || d.GreaterThan(decimal.NewFromInt(1<<63-1)) {
-		return 0, fmt.Errorf("payment.INVALID_CHARGE_AMOUNT: 换算金额过小或超出范围")
+		return 0, fmt.Errorf("payment.INVALID_CHARGE_AMOUNT: 換算金額過小或超出範圍")
 	}
 	return d.IntPart(), nil
 }
@@ -97,11 +97,11 @@ func (r *PaymentRepoImpl) computeCharge(ctx context.Context, driver string, cfg 
 	rate := decimal.NewFromInt(1)
 	if target != base {
 		if r.currency == nil {
-			return ChargeSnapshot{}, fmt.Errorf("payment.CURRENCY_MISSING: 未配置币种 %s", target)
+			return ChargeSnapshot{}, fmt.Errorf("payment.CURRENCY_MISSING: 未配置幣種 %s", target)
 		}
 		rateStr, _, e := r.currency.CurrencyByCode(ctx, target)
 		if e != nil {
-			return ChargeSnapshot{}, fmt.Errorf("payment.CURRENCY_MISSING: 未配置币种 %s", target)
+			return ChargeSnapshot{}, fmt.Errorf("payment.CURRENCY_MISSING: 未配置幣種 %s", target)
 		}
 		rate, err = decimal.NewFromString(rateStr)
 		if err != nil || !rate.IsPositive() {
@@ -148,7 +148,7 @@ func chargeCurrency(driver string, cfg json.RawMessage, base string) (string, er
 			fiat = "CNY"
 		}
 		if target != "" && target != fiat {
-			return "", fmt.Errorf("payment.CHANNEL_CONFIG_INVALID: GMPay 请使用 currency 配置法币")
+			return "", fmt.Errorf("payment.CHANNEL_CONFIG_INVALID: GMPay 請使用 currency 配置法幣")
 		}
 		target = fiat
 		if _, err := currencyunit.CurrencyChargeUnit(driver, target); err != nil {
@@ -156,7 +156,7 @@ func chargeCurrency(driver string, cfg json.RawMessage, base string) (string, er
 		}
 	default:
 		if base != "CNY" || (target != "" && target != "CNY") {
-			return "", fmt.Errorf("payment.CURRENCY_UNSUPPORTED: %s 不支持基础货币 %s", driver, base)
+			return "", fmt.Errorf("payment.CURRENCY_UNSUPPORTED: %s 不支持基礎貨幣 %s", driver, base)
 		}
 		target = "CNY"
 	}
@@ -213,7 +213,7 @@ func (r *PaymentRepoImpl) snapshotDriver(ctx context.Context, p *ent.Payment) st
 
 // ── 渠道管理（）────────────────────────────────────────────
 
-// ListChannels 渠道列表（凭据脱敏）。
+// ListChannels 渠道列表（憑據脱敏）。
 func (r *PaymentRepoImpl) ListChannels(ctx context.Context) ([]*ent.PaymentChannel, error) {
 	return data.Client(ctx, r.data).PaymentChannel.Query().
 		Where(paymentchannel.DeletedAtIsNil()).
@@ -221,7 +221,7 @@ func (r *PaymentRepoImpl) ListChannels(ctx context.Context) ([]*ent.PaymentChann
 		All(ctx)
 }
 
-// ChannelMethod 支付方式（收银台顾客看到的选项；params 承载网关路由参数）。
+// ChannelMethod 支付方式（收銀台顧客看到的選項；params 承載網關路由參數）。
 type ChannelMethod struct {
 	ChannelUsage
 	Code                 string            `json:"code"`
@@ -234,7 +234,7 @@ type ChannelMethod struct {
 	RecommendDescription string            `json:"recommend_description,omitempty"`
 }
 
-// parseMethods 渠道方式列表解析（methods JSON 空 → nil = 单方式渠道旧语义）。
+// parseMethods 渠道方式列表解析（methods JSON 空 → nil = 單方式渠道舊語義）。
 func parseMethods(ch *ent.PaymentChannel) []ChannelMethod {
 	if len(ch.Methods) == 0 {
 		return nil
@@ -250,7 +250,7 @@ func parseMethods(ch *ent.PaymentChannel) []ChannelMethod {
 	return out
 }
 
-// methodsJSON 校验并归一化方式列表 JSON（空串 → nil）。
+// methodsJSON 校驗並歸一化方式列表 JSON（空串 → nil）。
 func methodsJSON(raw string) ([]map[string]any, error) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
@@ -258,7 +258,7 @@ func methodsJSON(raw string) ([]map[string]any, error) {
 	}
 	var ms []ChannelMethod
 	if err := json.Unmarshal([]byte(raw), &ms); err != nil {
-		return nil, fmt.Errorf("payment.METHODS_INVALID: 支付方式列表格式错误: %w", err)
+		return nil, fmt.Errorf("payment.METHODS_INVALID: 支付方式列表格式錯誤: %w", err)
 	}
 	seen := map[string]bool{}
 	for _, m := range ms {
@@ -266,7 +266,7 @@ func methodsJSON(raw string) ([]map[string]any, error) {
 			return nil, err
 		}
 		if seen[m.Code] {
-			return nil, fmt.Errorf("payment.METHODS_INVALID: 支付方式标识不能重复")
+			return nil, fmt.Errorf("payment.METHODS_INVALID: 支付方式標識不能重複")
 		}
 		seen[m.Code] = true
 		if m.Code == "" || m.Name == "" {
@@ -281,7 +281,7 @@ func methodsJSON(raw string) ([]map[string]any, error) {
 
 func (r *PaymentRepoImpl) createChannel(ctx context.Context, name, code, driver, configJSON string, fee int64, feeType string, enabled bool, sort int32, icon string, methods []map[string]any, usage ...ChannelUsage) (*ent.PaymentChannel, error) {
 	if isNativeCryptoDriver(driver) && len(methods) > 0 {
-		return nil, fmt.Errorf("payment.METHODS_INVALID: 此渠道不支持本地支付方式列表，请在渠道参数中配置币种与网络")
+		return nil, fmt.Errorf("payment.METHODS_INVALID: 此渠道不支持本地支付方式列表，請在渠道參數中配置幣種與網絡")
 	}
 	// A deleted channel keeps its code for historical callbacks. A replacement
 	// requested from the visible list must receive a fresh code and encryption AAD.
@@ -308,7 +308,7 @@ func (r *PaymentRepoImpl) createChannel(ctx context.Context, name, code, driver,
 	}
 	enc, err := r.Cipher.Seal([]byte(configJSON), []byte("payment_channel:"+code))
 	if err != nil {
-		return nil, fmt.Errorf("payment: 凭据加密失败: %w", err)
+		return nil, fmt.Errorf("payment: 憑據加密失敗: %w", err)
 	}
 	q := data.Client(ctx, r.data).PaymentChannel.Create().
 		SetName(name).
@@ -329,7 +329,7 @@ func (r *PaymentRepoImpl) createChannel(ctx context.Context, name, code, driver,
 	return q.Save(ctx)
 }
 
-// CreateChannel 创建渠道（凭据加密入库；methodsJSON=支付方式列表）。
+// CreateChannel 創建渠道（憑據加密入庫；methodsJSON=支付方式列表）。
 func (r *PaymentRepoImpl) CreateChannel(ctx context.Context, name, code, driver, configJSON string, fee int64, feeType string, enabled bool, sort int32, icon string, methods []map[string]any, usage ...ChannelUsage) (out *ent.PaymentChannel, err error) {
 	err = data.CurrencyTx(ctx, r.data, func(ctx context.Context) error {
 		var e error
@@ -339,8 +339,8 @@ func (r *PaymentRepoImpl) CreateChannel(ctx context.Context, name, code, driver,
 	return out, err
 }
 
-// UpdateChannel 更新渠道（config_json=**** 跳过凭据修改；feeType 空=不修改；
-// setIcon/setMethods=false 保持原值——proto optional 语义）。
+// UpdateChannel 更新渠道（config_json=**** 跳過憑據修改；feeType 空=不修改；
+// setIcon/setMethods=false 保持原值——proto optional 語義）。
 func (r *PaymentRepoImpl) UpdateChannel(ctx context.Context, id uint64, name, configJSON string, fee int64, feeType string, enabled bool, sort int32, setIcon bool, icon string, setMethods bool, methods []map[string]any, usage ...ChannelUsage) (*ent.PaymentChannel, error) {
 	var result *ent.PaymentChannel
 	err := data.CurrencyTx(ctx, r.data, func(txCtx context.Context) error {
@@ -349,7 +349,7 @@ func (r *PaymentRepoImpl) UpdateChannel(ctx context.Context, id uint64, name, co
 			return err
 		}
 		if !ch.DeletedAt.IsZero() {
-			return fmt.Errorf("payment.CHANNEL_DELETED: 渠道已删除，请新建渠道")
+			return fmt.Errorf("payment.CHANNEL_DELETED: 渠道已刪除，請新建渠道")
 		}
 		result, err = r.updateChannel(txCtx, id, name, configJSON, fee, feeType, enabled, sort, setIcon, icon, setMethods, methods, usage...)
 		return err
@@ -364,7 +364,7 @@ func (r *PaymentRepoImpl) updateChannel(ctx context.Context, id uint64, name, co
 			return nil, err
 		}
 		if isNativeCryptoDriver(ch.Driver) {
-			return nil, fmt.Errorf("payment.METHODS_INVALID: 此渠道不支持本地支付方式列表，请在渠道参数中配置币种与网络")
+			return nil, fmt.Errorf("payment.METHODS_INVALID: 此渠道不支持本地支付方式列表，請在渠道參數中配置幣種與網絡")
 		}
 	}
 	q := data.Client(ctx, r.data).PaymentChannel.UpdateOneID(id)
@@ -411,7 +411,7 @@ func (r *PaymentRepoImpl) updateChannel(ctx context.Context, id uint64, name, co
 	return q.Save(ctx)
 }
 
-// DeleteChannel 删除渠道。
+// DeleteChannel 刪除渠道。
 func (r *PaymentRepoImpl) DeleteChannel(ctx context.Context, id uint64) error {
 	return data.Tx(ctx, r.data, func(txCtx context.Context) error {
 		c := data.Client(txCtx, r.data)
@@ -424,7 +424,7 @@ func (r *PaymentRepoImpl) DeleteChannel(ctx context.Context, id uint64) error {
 				return nil
 			}
 			if ch.Enabled {
-				return fmt.Errorf("payment.CHANNEL_ENABLED: 请先停用渠道再删除")
+				return fmt.Errorf("payment.CHANNEL_ENABLED: 請先停用渠道再刪除")
 			}
 			// Keep the original identity and encrypted credentials for late callbacks.
 			_, err = c.PaymentChannel.UpdateOneID(id).SetDeletedAt(time.Now().UTC()).Save(txCtx)
@@ -434,7 +434,7 @@ func (r *PaymentRepoImpl) DeleteChannel(ctx context.Context, id uint64) error {
 	})
 }
 
-// DecryptConfig 解密凭据（失败降级为空，铁律 5）。
+// DecryptConfig 解密憑據（失敗降級為空，鐵律 5）。
 func (r *PaymentRepoImpl) DecryptConfig(ch *ent.PaymentChannel) json.RawMessage {
 	if r.Cipher == nil {
 		return json.RawMessage("{}")
@@ -446,8 +446,8 @@ func (r *PaymentRepoImpl) DecryptConfig(ch *ent.PaymentChannel) json.RawMessage 
 	return json.RawMessage(plain)
 }
 
-// CallbackURL 渠道回调地址（站点 URL 拼接；site/url 未配置回落相对路径——
-// ：admin 配置面板展示复制，填到支付平台 webhook/notify 配置）。
+// CallbackURL 渠道回調地址（站點 URL 拼接；site/url 未配置回落相對路徑——
+// ：admin 配置面板展示覆制，填到支付平台 webhook/notify 配置）。
 func (r *PaymentRepoImpl) CallbackURL(ctx context.Context, code string) string {
 	base := ""
 	if r.settings != nil {
@@ -455,8 +455,8 @@ func (r *PaymentRepoImpl) CallbackURL(ctx context.Context, code string) string {
 			var v string
 			if json.Unmarshal(raw, &v) == nil {
 				base = strings.TrimRight(strings.TrimSpace(v), "/")
-				// 站点设置允许裸域名；先补协议，避免 absolutePayURL 将域名
-				// 当作相对路径再次拼接到请求 Host 后。
+				// 站點設置允許裸域名；先補協議，避免 absolutePayURL 將域名
+				// 當作相對路徑再次拼接到請求 Host 後。
 				if strings.HasPrefix(base, "//") {
 					base = "https:" + base
 				} else if base != "" && !strings.Contains(base, "://") {
@@ -468,8 +468,8 @@ func (r *PaymentRepoImpl) CallbackURL(ctx context.Context, code string) string {
 	return base + "/payments/callback/" + code
 }
 
-// ConfiguredFields 已配置字段名列表（解密后统计非空值——仅名不显值，脱敏；
-// admin 前端「已配置」状态判定 + 敏感字段编辑时留空不覆盖）。
+// ConfiguredFields 已配置字段名列表（解密後統計非空值——僅名不顯值，脱敏；
+// admin 前端「已配置」狀態判定 + 敏感字段編輯時留空不覆蓋）。
 func (r *PaymentRepoImpl) ConfiguredFields(ch *ent.PaymentChannel) []string {
 	cfg := r.DecryptConfig(ch)
 	if len(cfg) == 0 || string(cfg) == "{}" {
@@ -488,7 +488,7 @@ func (r *PaymentRepoImpl) ConfiguredFields(ch *ent.PaymentChannel) []string {
 			}
 			continue
 		}
-		// 数组值（多选字段 token/network）：非空数组算已配置
+		// 數組值（多選字段 token/network）：非空數組算已配置
 		var arr []json.RawMessage
 		if json.Unmarshal(v, &arr) == nil && len(arr) > 0 {
 			out = append(out, k)
@@ -498,9 +498,9 @@ func (r *PaymentRepoImpl) ConfiguredFields(ch *ent.PaymentChannel) []string {
 	return out
 }
 
-// ── 支付单（）────────────────────────────────────────────
+// ── 支付單（）────────────────────────────────────────────
 
-// CreatePayment 创建支付单。
+// CreatePayment 創建支付單。
 func (r *PaymentRepoImpl) CreatePayment(ctx context.Context, orderID uint64, channel string, amount int64, idemKey string, methods ...string) (*ent.Payment, error) {
 	if preflight, ok := r.lifecycle.(interface {
 		ValidateSMSPayment(context.Context, uint64) error
@@ -528,7 +528,7 @@ func (r *PaymentRepoImpl) CreatePayment(ctx context.Context, orderID uint64, cha
 		}
 		now := time.Now().UTC()
 		if o.Status != order.StatusPendingPayment || o.ExpiredAt.IsZero() || !now.Before(o.ExpiredAt) || o.ExpiryReview {
-			return fmt.Errorf("payment.ORDER_EXPIRED: 订单已过期或待核对，请重新下单")
+			return fmt.Errorf("payment.ORDER_EXPIRED: 訂單已過期或待核對，請重新下單")
 		}
 		ch, err := resolveChannel(ctx, r.data, o.SubsiteID, channel)
 		if err != nil {
@@ -542,14 +542,14 @@ func (r *PaymentRepoImpl) CreatePayment(ctx context.Context, orderID uint64, cha
 			return e
 		}
 		if hasSMS && (ch.Driver != "wallet" || !data.SMSSalesEnabled() || o.UserID == 0 || o.BaseCurrency != "CNY" || ch.Fee != 0) {
-			return fmt.Errorf("payment.SMS_WALLET_ONLY: 接码仅支持会员余额付款，请确认销售已启用")
+			return fmt.Errorf("payment.SMS_WALLET_ONLY: 接碼僅支持會員餘額付款，請確認銷售已啓用")
 		}
 		hasSocial, socialErr := data.HasSocialOrder(ctx, client, o.ID)
 		if socialErr != nil {
 			return socialErr
 		}
 		if hasSocial && (ch.Driver != "wallet" || o.UserID == 0 || o.BaseCurrency != "CNY" || ch.Fee != 0) {
-			return fmt.Errorf("payment.SOCIAL_WALLET_ONLY: 服务仅支持会员余额付款")
+			return fmt.Errorf("payment.SOCIAL_WALLET_ONLY: 服務僅支持會員餘額付款")
 		}
 		if !ch.Enabled {
 			return fmt.Errorf("payment.CHANNEL_DISABLED")
@@ -596,8 +596,8 @@ func (r *PaymentRepoImpl) CreatePayment(ctx context.Context, orderID uint64, cha
 	return result, err
 }
 
-// CreateRechargePayment 充值支付单（RechargePayer 端口实现）：
-// 建单（关联 recharge_order_id）→ 渠道发起（金额=服务端落库值）→ 返回跳转信息。
+// CreateRechargePayment 充值支付單（RechargePayer 端口實現）：
+// 建單（關聯 recharge_order_id）→ 渠道發起（金額=服務端落庫值）→ 返回跳轉信息。
 func (r *PaymentRepoImpl) CreateRechargePayment(ctx context.Context, rechargeOrderID uint64, channel, method string, amount money.Cents) (*port.RechargePaymentInfo, error) {
 	client := data.Client(ctx, r.data)
 	ro, err := client.RechargeOrder.Get(ctx, rechargeOrderID)
@@ -615,7 +615,7 @@ func (r *PaymentRepoImpl) CreateRechargePayment(ctx context.Context, rechargeOrd
 		return nil, fmt.Errorf("payment.CHANNEL_DISABLED")
 	}
 	if ch.Driver == "wallet" {
-		return nil, fmt.Errorf("payment.RECHARGE_CHANNEL_INVALID: 充值不支持余额渠道")
+		return nil, fmt.Errorf("payment.RECHARGE_CHANNEL_INVALID: 充值不支持餘額渠道")
 	}
 	scene := sceneMemberRecharge
 	if ro.Target == rechargeorder.TargetSupply {
@@ -624,7 +624,7 @@ func (r *PaymentRepoImpl) CreateRechargePayment(ctx context.Context, rechargeOrd
 	if err := r.checkPaymentUsage(ch, method, scene); err != nil {
 		return nil, err
 	}
-	// 方式级路由（与订单支付同口径）：多方式渠道 method 必填且须在启用列表内
+	// 方式級路由（與訂單支付同口徑）：多方式渠道 method 必填且須在啓用列表內
 	var methodCode string
 	var methodParams map[string]string
 	if ms := parseMethods(ch); len(ms) > 0 {
@@ -635,7 +635,7 @@ func (r *PaymentRepoImpl) CreateRechargePayment(ctx context.Context, rechargeOrd
 			}
 		}
 		if methodCode == "" {
-			return nil, fmt.Errorf("payment.METHOD_INVALID: 请选择该渠道支持的支付方式")
+			return nil, fmt.Errorf("payment.METHOD_INVALID: 請選擇該渠道支持的支付方式")
 		}
 	}
 	if isNativeCryptoDriver(ch.Driver) {
@@ -672,13 +672,13 @@ func (r *PaymentRepoImpl) CreateRechargePayment(ctx context.Context, rechargeOrd
 		return nil, fmt.Errorf("payment.CHANNEL_CONFIG_INVALID: %w", err)
 	}
 	snap := price.Charge
-	// 回跳/回调绝对化（同订单支付口径）：return 回充值 tab——曾不传，
-	// 网关回跳空地址即 404；notify 走 site/url 或请求 Host
+	// 回跳/回調絕對化（同訂單支付口徑）：return 回充值 tab——曾不傳，
+	// 網關回跳空地址即 404；notify 走 site/url 或請求 Host
 	info, err := r.dispatchPayment(ctx, p, provider, port.CreatePaymentRequest{
 		OrderNo: p.GatewayOrderRef, GatewayOrderRef: p.GatewayOrderRef,
 		Channel:      channel,
 		Amount:       money.Cents(p.Amount),
-		Subject:      "余额充值",
+		Subject:      "餘額充值",
 		ChargedUnits: snap.Units, ChargedCurrency: snap.Currency,
 		ReturnURL:     absolutePayURL(ctx, "/member?tab=recharge"),
 		NotifyBaseURL: absolutePayURL(ctx, r.callbackURLFor(ctx, ch)),
@@ -693,12 +693,12 @@ func (r *PaymentRepoImpl) CreateRechargePayment(ctx context.Context, rechargeOrd
 	}, nil
 }
 
-// GetPayment 按 ID 查支付单。
+// GetPayment 按 ID 查支付單。
 func (r *PaymentRepoImpl) GetPayment(ctx context.Context, id uint64) (*ent.Payment, error) {
 	return data.Client(ctx, r.data).Payment.Get(ctx, id)
 }
 
-// ListPayments 支付单列表。
+// ListPayments 支付單列表。
 func (r *PaymentRepoImpl) ListPayments(ctx context.Context, status, orderNo string, cursor uint64, limit int32, reviewOnly ...bool) ([]*ent.Payment, error) {
 	q := data.Client(ctx, r.data).Payment.Query().
 		Where(payment.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).
@@ -726,18 +726,18 @@ func (r *PaymentRepoImpl) ListPayments(ctx context.Context, status, orderNo stri
 	return q.All(ctx)
 }
 
-// HandleCallback 回调处理管线（ 核心——四重校验+幂等+业务推进）。
-// 事务内：行锁 payment → 幂等三层 → 按支付单类型分流：
+// HandleCallback 回調處理管線（ 核心——四重校驗+冪等+業務推進）。
+// 事務內：行鎖 payment → 冪等三層 → 按支付單類型分流：
 //
-//	订单型（order_id>0）：余额渠道先扣款（wallet.DebitInTx，同事务）→
+//	訂單型（order_id>0）：餘額渠道先扣款（wallet.DebitInTx，同事務）→
 //
-// OrderLifecycle.MarkPaid（状态机 CAS + 状态事件 + outbox order.paid， 破环点）
+// OrderLifecycle.MarkPaid（狀態機 CAS + 狀態事件 + outbox order.paid， 破環點）
 //
-//	充值型（recharge_order_id>0）：充值单 pending→success → 余额入账
+//	充值型（recharge_order_id>0）：充值單 pending→success → 餘額入賬
 //
-// （amount+gift，reference=recharge:<paymentID> 幂等）→ outbox recharge.succeeded
+// （amount+gift，reference=recharge:<paymentID> 冪等）→ outbox recharge.succeeded
 //
-// 支付确认前零入账（铁律 16）；事件与入账同事务，回滚不残留。
+// 支付確認前零入賬（鐵律 16）；事件與入賬同事務，回滾不殘留。
 func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, fact CallbackFact) error {
 	if !fact.Success {
 		return fmt.Errorf("payment.NOT_SUCCESSFUL")
@@ -745,7 +745,7 @@ func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, 
 	return data.Tx(ctx, r.data, func(txCtx context.Context) error {
 		client := data.Client(txCtx, r.data)
 
-		// 1) 行锁支付单
+		// 1) 行鎖支付單
 		p, err := client.Payment.Query().Where(payment.ID(paymentID)).Only(txCtx)
 		if ent.IsNotFound(err) {
 			return fmt.Errorf("payment.NOT_FOUND")
@@ -768,15 +768,15 @@ func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, 
 			}
 		}
 
-		// 2) 幂等第一层：已 success 直接 ACK
+		// 2) 冪等第一層：已 success 直接 ACK
 		if p.Status == payment.StatusSuccess {
 			return nil
 		}
 
-		// 3) 四重校验（渠道/单号/金额/币种——金额永远对服务端权威值）
-		// 跨币路径（ 快照）：回调金额=渠道币种最小单位，对 charged_units
-		// 精确核对（网关回显下单金额，零二次换算）；实收换算回基础货币分落 charged_amount。
-		// 同币路径（charged_units=0）：旧口径 fact.Amount==amount + CNY。
+		// 3) 四重校驗（渠道/單號/金額/幣種——金額永遠對服務端權威值）
+		// 跨幣路徑（ 快照）：回調金額=渠道幣種最小單位，對 charged_units
+		// 精確核對（網關回顯下單金額，零二次換算）；實收換算回基礎貨幣分落 charged_amount。
+		// 同幣路徑（charged_units=0）：舊口徑 fact.Amount==amount + CNY。
 		if fact.Channel != p.Channel {
 			return fmt.Errorf("payment.CHANNEL_MISMATCH")
 		}
@@ -803,7 +803,7 @@ func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, 
 			rate := decimal.NewFromFloat(p.ExchangeRate)
 			if !trustworthy || !rate.IsPositive() {
 				// Record receipt without crediting wallet or fulfilling an ambiguous payment.
-				reviewReason = "历史跨币支付金额单位无法确认，请核对网关实收后补单或退款"
+				reviewReason = "歷史跨幣支付金額單位無法確認，請核對網關實收後補單或退款"
 				chargedBase = 0
 			} else {
 				base, _ := money.FromDisplay(fact.Amount, rate, precision)
@@ -832,7 +832,7 @@ func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, 
 			}
 			fact.OrderNo = o.OrderNo
 		}
-		// 4) 幂等第二层 + 分流推进（支付单 CAS pending→success）
+		// 4) 冪等第二層 + 分流推進（支付單 CAS pending→success）
 		now := time.Now().UTC()
 		affected, err := client.Payment.Update().
 			Where(payment.ID(p.ID), payment.StatusNEQ(payment.StatusSuccess)).
@@ -867,7 +867,7 @@ func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, 
 				if ch.Driver == "wallet" {
 					return fmt.Errorf("payment.ORDER_NOT_PENDING")
 				}
-				reason := "订单已关闭或已有付款，到账待核对，请处理补单或退款"
+				reason := "訂單已關閉或已有付款，到賬待核對，請處理補單或退款"
 				if _, err = client.Payment.UpdateOneID(p.ID).SetReviewReason(reason).Save(txCtx); err != nil {
 					return err
 				}
@@ -879,7 +879,7 @@ func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, 
 			return r.settleRecharge(txCtx, p, fact)
 		}
 		if p.OrderID > 0 {
-			// 钱包直付等内部路径 fact 不带单号——按支付单回填（MarkPaid 判据）
+			// 錢包直付等內部路徑 fact 不帶單號——按支付單回填（MarkPaid 判據）
 			if o, err := client.Order.Get(txCtx, p.OrderID); err == nil {
 				fact.OrderNo = o.OrderNo
 			}
@@ -888,9 +888,9 @@ func (r *PaymentRepoImpl) HandleCallback(ctx context.Context, paymentID uint64, 
 	})
 }
 
-// settleOrder 订单型推进：余额渠道扣款 → OrderLifecycle.MarkPaid（同事务）。
+// settleOrder 訂單型推進：餘額渠道扣款 → OrderLifecycle.MarkPaid（同事務）。
 func (r *PaymentRepoImpl) settleOrder(ctx context.Context, p *ent.Payment, fact CallbackFact) error {
-	// 余额支付：先扣款（幂等键 order_pay:<orderID>；余额不足整事务回滚）
+	// 餘額支付：先扣款（冪等鍵 order_pay:<orderID>；餘額不足整事務回滾）
 	ch, err := r.channelForPayment(ctx, p)
 	if err != nil {
 		return err
@@ -909,7 +909,7 @@ func (r *PaymentRepoImpl) settleOrder(ctx context.Context, p *ent.Payment, fact 
 			return fmt.Errorf("payment.WALLET_DEBIT_FAILED: %w", err)
 		}
 	}
-	// 订单置 paid（状态机 CAS + 事件 + outbox order.paid；幂等：已 paid 直接成功）
+	// 訂單置 paid（狀態機 CAS + 事件 + outbox order.paid；冪等：已 paid 直接成功）
 	if r.lifecycle == nil || p.OrderID == 0 {
 		return fmt.Errorf("payment.ORDER_LIFECYCLE_UNBOUND")
 	}
@@ -922,8 +922,8 @@ func (r *PaymentRepoImpl) settleOrder(ctx context.Context, p *ent.Payment, fact 
 	})
 }
 
-// settleRecharge 充值型推进：充值单 success → 余额入账（幂等键 recharge:<paymentID>）
-// → outbox recharge.succeeded。金额与赠送全部取服务端落库值（铁律 16）。
+// settleRecharge 充值型推進：充值單 success → 餘額入賬（冪等鍵 recharge:<paymentID>）
+// → outbox recharge.succeeded。金額與贈送全部取服務端落庫值（鐵律 16）。
 func (r *PaymentRepoImpl) settleRecharge(ctx context.Context, p *ent.Payment, fact CallbackFact) error {
 	base, err := data.BaseCurrency(ctx, r.data)
 	if err != nil {
@@ -934,7 +934,7 @@ func (r *PaymentRepoImpl) settleRecharge(ctx context.Context, p *ent.Payment, fa
 		return err
 	}
 	if paymentCurrency != base {
-		return fmt.Errorf("payment.CURRENCY_MISMATCH: 充值单币种与基础货币不一致，需要迁移")
+		return fmt.Errorf("payment.CURRENCY_MISMATCH: 充值單幣種與基礎貨幣不一致，需要遷移")
 	}
 	client := data.Client(ctx, r.data)
 	var ro *ent.RechargeOrder
@@ -952,7 +952,7 @@ func (r *PaymentRepoImpl) settleRecharge(ctx context.Context, p *ent.Payment, fa
 	}
 	reviewOrReject := func() error {
 		if isNativeCryptoDriver(p.DriverSnapshot) {
-			_, err := client.Payment.UpdateOneID(p.ID).SetReviewReason("充值单已处理，本次到账待核对，请处理退款").Save(ctx)
+			_, err := client.Payment.UpdateOneID(p.ID).SetReviewReason("充值單已處理，本次到賬待核對，請處理退款").Save(ctx)
 			return err
 		}
 		return fmt.Errorf("payment.RECHARGE_NOT_PENDING")
@@ -972,15 +972,15 @@ func (r *PaymentRepoImpl) settleRecharge(ctx context.Context, p *ent.Payment, fa
 	if affected != 1 {
 		return reviewOrReject()
 	}
-	// 入账分支（target 由建单时定；金额全部取服务端落库值，铁律 16）：
-	// balance → 用户钱包余额（本金+赠送）+ 赠送积分；
-	// supply → 对接账户供货余额（本金；供货预存无赠送）。
+	// 入賬分支（target 由建單時定；金額全部取服務端落庫值，鐵律 16）：
+	// balance → 用户錢包餘額（本金+贈送）+ 贈送積分；
+	// supply → 對接賬户供貨餘額（本金；供貨預存無贈送）。
 	total := ro.Amount + ro.GiftAmount
 	if ro.Target == rechargeorder.TargetSupply {
 		if ro.SupplierAccountID > 0 && r.supplier != nil {
 			if err := r.supplier.Recharge(ctx, ro.SupplierAccountID, total,
 				fmt.Sprintf("recharge:%d", p.ID),
-				fmt.Sprintf("对接账户自助充值到账（用户 #%d，本金 %d 分 + 赠送 %d 分）", ro.UserID, ro.Amount, ro.GiftAmount)); err != nil {
+				fmt.Sprintf("對接賬户自助充值到賬（用户 #%d，本金 %d 分 + 贈送 %d 分）", ro.UserID, ro.Amount, ro.GiftAmount)); err != nil {
 				return fmt.Errorf("payment.SUPPLY_RECHARGE_FAILED: %w", err)
 			}
 		}
@@ -990,22 +990,22 @@ func (r *PaymentRepoImpl) settleRecharge(ctx context.Context, p *ent.Payment, fa
 			Type: "recharge", Amount: money.Cents(total),
 			Reference: fmt.Sprintf("recharge:%d", p.ID),
 			OrderID:   0,
-			Remark:    fmt.Sprintf("充值到账（本金 %d 分 + 赠送 %d 分）", ro.Amount, ro.GiftAmount),
+			Remark:    fmt.Sprintf("充值到賬（本金 %d 分 + 贈送 %d 分）", ro.Amount, ro.GiftAmount),
 		}); err != nil {
 			return fmt.Errorf("payment.RECHARGE_CREDIT_FAILED: %w", err)
 		}
 	}
-	// 赠送积分（幂等键 points:recharge:<paymentID>；积分账本 ）
+	// 贈送積分（冪等鍵 points:recharge:<paymentID>；積分賬本 ）
 	if ro.GiftPoints > 0 && r.points != nil {
 		if err := r.points.PointCreditInTx(ctx, walletport.PointEntry{
 			UserID: ro.UserID, Direction: "in", Type: "earn_recharge",
 			Amount: int64(ro.GiftPoints), Reference: fmt.Sprintf("points:recharge:%d", p.ID),
-			Remark: fmt.Sprintf("充值赠送积分 %d", ro.GiftPoints),
+			Remark: fmt.Sprintf("充值贈送積分 %d", ro.GiftPoints),
 		}); err != nil {
 			return fmt.Errorf("payment.RECHARGE_POINTS_FAILED: %w", err)
 		}
 	}
-	// 充值成功事件（notify 消费）
+	// 充值成功事件（notify 消費）
 	if r.outbox != nil {
 		payload, _ := json.Marshal(map[string]any{
 			"recharge_id": ro.ID, "payment_id": p.ID, "user_id": ro.UserID,
@@ -1017,20 +1017,20 @@ func (r *PaymentRepoImpl) settleRecharge(ctx context.Context, p *ent.Payment, fa
 	return nil
 }
 
-// isWalletChannel 渠道驱动是否为余额支付（wallet driver）。
+// isWalletChannel 渠道驅動是否為餘額支付（wallet driver）。
 func (r *PaymentRepoImpl) isWalletChannel(ctx context.Context, code string) bool {
 	ch, err := data.Client(ctx, r.data).PaymentChannel.Query().
 		Where(paymentchannel.Code(code)).Only(ctx)
 	return err == nil && ch.Driver == "wallet"
 }
 
-// CallbackFact 回调事实（适配器产出）。
+// CallbackFact 回調事實（適配器產出）。
 type CallbackFact struct {
 	GatewayOrderRef string
 	Channel         string
 	ChannelOrderNo  string
 	OrderNo         string
-	Amount          int64 // 分（基础货币）
+	Amount          int64 // 分（基礎貨幣）
 	Currency        string
 	Success         bool
 	Raw             json.RawMessage
@@ -1038,7 +1038,7 @@ type CallbackFact struct {
 
 // ── 退款（）───────────────────────────────────────────────
 
-// CreateRefund 创建退款单。
+// CreateRefund 創建退款單。
 func (r *PaymentRepoImpl) CreateRefund(ctx context.Context, orderID uint64, amount int64, channel, reason string) (*ent.RefundOrder, error) {
 	return data.Client(ctx, r.data).RefundOrder.Create().
 		SetOrderID(orderID).
@@ -1049,7 +1049,7 @@ func (r *PaymentRepoImpl) CreateRefund(ctx context.Context, orderID uint64, amou
 		Save(ctx)
 }
 
-// ListRefunds 退款单列表。
+// ListRefunds 退款單列表。
 func (r *PaymentRepoImpl) ListRefunds(ctx context.Context, status string, filters ...*adminv1.ListRefundsRequest) ([]*ent.RefundOrder, error) {
 	orderFilter := []predicate.Order{order.SubsiteID(tenancy.FromContext(ctx).SubsiteID)}
 	var before uint64
@@ -1069,13 +1069,13 @@ func (r *PaymentRepoImpl) ListRefunds(ctx context.Context, status string, filter
 	return q.All(ctx)
 }
 
-// ── DTO 转换 ────────────────────────────────────────────────
+// ── DTO 轉換 ────────────────────────────────────────────────
 
-// ToChannelPB 转 admin 协议（凭据脱敏；icon/methods_json 原样下发）。
+// ToChannelPB 轉 admin 協議（憑據脱敏；icon/methods_json 原樣下發）。
 func ToChannelPB(ch *ent.PaymentChannel) *adminv1.Channel {
 	pb := &adminv1.Channel{
 		Id: ch.ID, Name: paymentChannelName(ch), Code: ch.Code, Driver: ch.Driver,
-		ConfigJson: `"****"`, // 凭据永不明文下发
+		ConfigJson: `"****"`, // 憑據永不明文下發
 		Fee:        ch.Fee, FeeType: string(ch.FeeType), FeeBearer: string(ch.FeeBearer), Recommended: ch.Recommended, RecommendLabel: ch.RecommendLabel, RecommendDescription: ch.RecommendDescription,
 		Enabled: ch.Enabled, Sort: ch.Sort,
 		Icon:          ch.Icon,
@@ -1089,7 +1089,7 @@ func ToChannelPB(ch *ent.PaymentChannel) *adminv1.Channel {
 	return pb
 }
 
-// ToPaymentPB 转支付单协议。
+// ToPaymentPB 轉支付單協議。
 func ToPaymentPB(p *ent.Payment, orderNo string) *adminv1.Payment {
 	out := &adminv1.Payment{
 		Id: p.ID, OrderId: p.OrderID, OrderNo: orderNo,
@@ -1111,7 +1111,7 @@ func ToPaymentPB(p *ent.Payment, orderNo string) *adminv1.Payment {
 	return out
 }
 
-// ToRefundPB 转退款单协议。
+// ToRefundPB 轉退款單協議。
 func ToRefundPB(rf *ent.RefundOrder, orderNo string) *adminv1.RefundOrder {
 	allocations, _ := json.Marshal(rf.ItemAllocations)
 	return &adminv1.RefundOrder{
@@ -1126,7 +1126,7 @@ func ToRefundPB(rf *ent.RefundOrder, orderNo string) *adminv1.RefundOrder {
 // Return an error so procurement transfers the order to manual review instead of
 // creating a receipt that can never settle (especially for guest and mixed orders).
 func (r *PaymentRepoImpl) RefundOrder(ctx context.Context, orderID uint64, amount money.Cents, reason string) error {
-	return fmt.Errorf("payment: 自动退款尚未执行，请在订单详情核实后退款或补发")
+	return fmt.Errorf("payment: 自動退款尚未執行，請在訂單詳情核實後退款或補發")
 }
 
 // Normalize only generated legacy names; preserve operator names and all identities.
@@ -1134,7 +1134,7 @@ func paymentChannelName(ch *ent.PaymentChannel) string {
 	if ch.Driver != "epusdt" {
 		return ch.Name
 	}
-	const old = "EPUSDT / GM Pay（多链多币种）"
+	const old = "EPUSDT / GM Pay（多鏈多幣種）"
 	if ch.Name == old {
 		return "GM Pay"
 	}

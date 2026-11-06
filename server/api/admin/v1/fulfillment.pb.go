@@ -78,7 +78,7 @@ func (x *ListPendingRequest) GetPageSize() int32 {
 type ListPendingReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Orders        []*PendingOrder        `protobuf:"bytes,1,rep,name=orders,proto3" json:"orders,omitempty"`
-	HasMore       bool                   `protobuf:"varint,2,opt,name=has_more,json=hasMore,proto3" json:"has_more,omitempty"` // 按订单分页，单页可包含多个商品项
+	HasMore       bool                   `protobuf:"varint,2,opt,name=has_more,json=hasMore,proto3" json:"has_more,omitempty"` // 按訂單分頁，單頁可包含多個商品項
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -263,10 +263,10 @@ type ManualDeliverRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	ServiceContent string                 `protobuf:"bytes,6,opt,name=service_content,json=serviceContent,proto3" json:"service_content,omitempty"`
 	OrderNo        string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
-	Content        string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`                            // 卡密内容（多行，每行一条）
-	LogisticsNo    string                 `protobuf:"bytes,3,opt,name=logistics_no,json=logisticsNo,proto3" json:"logistics_no,omitempty"` // 物流单号（与 content 二选一）
+	Content        string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`                            // 卡密內容（多行，每行一條）
+	LogisticsNo    string                 `protobuf:"bytes,3,opt,name=logistics_no,json=logisticsNo,proto3" json:"logistics_no,omitempty"` // 物流單號（與 content 二選一）
 	Remark         string                 `protobuf:"bytes,4,opt,name=remark,proto3" json:"remark,omitempty"`
-	OrderItemId    uint64                 `protobuf:"varint,5,opt,name=order_item_id,json=orderItemId,proto3" json:"order_item_id,omitempty"` // 多商品订单必须指定补发商品项
+	OrderItemId    uint64                 `protobuf:"varint,5,opt,name=order_item_id,json=orderItemId,proto3" json:"order_item_id,omitempty"` // 多商品訂單必須指定補發商品項
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -463,8 +463,8 @@ func (x *ListDeliveriesReply) GetTotal() int64 {
 	return 0
 }
 
-// DeliveryRecord 交付记录（content=完整卡密，服务端现场解密；路由受
-// order:view_delivery 权限门控 + 查看审计留痕）。
+// DeliveryRecord 交付記錄（content=完整卡密，服務端現場解密；路由受
+// order:view_delivery 權限門控 + 查看審計留痕）。
 type DeliveryRecord struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	OrderItemId   uint64                 `protobuf:"varint,11,opt,name=order_item_id,json=orderItemId,proto3" json:"order_item_id,omitempty"`

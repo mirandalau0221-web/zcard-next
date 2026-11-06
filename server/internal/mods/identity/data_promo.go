@@ -1,7 +1,7 @@
 package identity
 
-// 推广码（promo_code）：8 位随机字符串邀请标识，替代裸 user_id（防枚举）。
-// 存量用户懒生成（登录/查询时补）；注册自动生成。
+// 推廣碼（promo_code）：8 位隨機字符串邀請標識，替代裸 user_id（防枚舉）。
+// 存量用户懶生成（登錄/查詢時補）；註冊自動生成。
 
 import (
 	"context"
@@ -14,15 +14,15 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/user"
 )
 
-// promoAlphabet 推广码字母表（剔除 I/O/0/1 防手抄混淆——dujiao 同款纪律）。
+// promoAlphabet 推廣碼字母表（剔除 I/O/0/1 防手抄混淆——dujiao 同款紀律）。
 const promoAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 const promoCodeLen = 8
 
-// genPromoCode 生成 8 位随机推广码（crypto/rand）。
+// genPromoCode 生成 8 位隨機推廣碼（crypto/rand）。
 func genPromoCode() string {
 	buf := make([]byte, promoCodeLen)
 	if _, err := rand.Read(buf); err != nil {
-		// crypto/rand 失败极罕见：回退时间戳低位（仍满足唯一性重试语义）
+		// crypto/rand 失敗極罕見：回退時間戳低位（仍滿足唯一性重試語義）
 		return "FALLBACK"
 	}
 	for i, b := range buf {
@@ -31,8 +31,8 @@ func genPromoCode() string {
 	return string(buf)
 }
 
-// EnsurePromoCode 用户推广码懒生成（空则补；唯一冲突重试 8 次）。
-// 返回有效推广码（已有直接返回）。Me/Login/推广中心等入口调用。
+// EnsurePromoCode 用户推廣碼懶生成（空則補；唯一衝突重試 8 次）。
+// 返回有效推廣碼（已有直接返回）。Me/Login/推廣中心等入口調用。
 func (r *UserRepo) EnsurePromoCode(ctx context.Context, userID uint64) string {
 	client := data.Client(ctx, r.data)
 	u, err := client.User.Get(ctx, userID)
@@ -48,21 +48,21 @@ func (r *UserRepo) EnsurePromoCode(ctx context.Context, userID uint64) string {
 		if err == nil {
 			return code
 		}
-		// 唯一冲突（概率 ~8 字符空间碰撞极低）或更新失败：重试新码
+		// 唯一衝突（概率 ~8 字符空間碰撞極低）或更新失敗：重試新碼
 	}
 	return ""
 }
 
-// ResolvePromoCode 推广标识 → 邀请人（双格式兼容）：
-// 1) 8 位随机码 → 按 promo_code 精确匹配；
-// 2) 纯数字 → 旧 user_id（存量链接兼容）。
-// 大小写不敏感（手抄场景）；解析失败返回 nil。
+// ResolvePromoCode 推廣標識 → 邀請人（雙格式兼容）：
+// 1) 8 位隨機碼 → 按 promo_code 精確匹配；
+// 2) 純數字 → 舊 user_id（存量鏈接兼容）。
+// 大小寫不敏感（手抄場景）；解析失敗返回 nil。
 func (r *UserRepo) ResolvePromoCode(ctx context.Context, code string) *ent.User {
 	u, _ := r.ResolvePromoCodeChecked(ctx, code)
 	return u
 }
 
-// ResolvePromoCodeChecked 保留数据库错误，避免注册时将故障误认为无权益。
+// ResolvePromoCodeChecked 保留數據庫錯誤，避免註冊時將故障誤認為無權益。
 func (r *UserRepo) ResolvePromoCodeChecked(ctx context.Context, code string) (*ent.User, error) {
 	code = strings.TrimSpace(code)
 	if code == "" || len(code) > 20 {

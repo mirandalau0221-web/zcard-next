@@ -8,17 +8,17 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// StoreNotificationService 站内信铃铛：未读数/列表/已读。
+// StoreNotificationService 站內信鈴鐺：未讀數/列表/已讀。
 service StoreNotificationService {
-  // UnreadCount 未读数。
+  // UnreadCount 未讀數。
   rpc UnreadCount(google.protobuf.Empty) returns (UnreadCountReply) {
     option (google.api.http) = { get: "/api/v1/storefront/notifications/unread-count" };
   }
-  // ListNotifications 站内信列表。
+  // ListNotifications 站內信列表。
   rpc ListNotifications(ListNotificationsRequest) returns (ListNotificationsReply) {
     option (google.api.http) = { get: "/api/v1/storefront/notifications" };
   }
-  // MarkRead 标记已读（id=0 全部）。
+  // MarkRead 標記已讀（id=0 全部）。
   rpc MarkRead(MarkReadRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/storefront/notifications/read"

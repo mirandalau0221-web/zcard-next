@@ -1,6 +1,6 @@
 import { request } from "../request";
 
-// ── 钱包管理 ──
+// ── 錢包管理 ──
 
 export interface WalletBalance {
   user_id: number;
@@ -22,14 +22,14 @@ export interface WalletTransaction {
   created_at: number;
 }
 
-/** 查询指定用户余额 */
+/** 查詢指定用户餘額 */
 export function fetchWalletBalance(userId: number) {
   return request({
     url: `/api/v1/admin/wallet/${userId}`,
   });
 }
 
-/** 手动调账（正=入账 负=扣减） */
+/** 手動調賬（正=入賬 負=扣減） */
 export function adjustWalletBalance(
   userId: number,
   data: { amount_cents: number; reason: string },
@@ -41,7 +41,7 @@ export function adjustWalletBalance(
   });
 }
 
-/** 积分调整（正=增加 负=扣减），返回调整后积分余额 */
+/** 積分調整（正=增加 負=扣減），返回調整後積分餘額 */
 export function adjustWalletPoints(userId: number, points: number, reason: string) {
   return request({
     url: `/api/v1/admin/wallet/${userId}/adjust-points`,
@@ -50,7 +50,7 @@ export function adjustWalletPoints(userId: number, points: number, reason: strin
   });
 }
 
-/** 查询指定用户流水（分页） */
+/** 查詢指定用户流水（分頁） */
 export function fetchWalletTransactions(
   userId: number,
   params?: { page?: number; page_size?: number },
@@ -62,7 +62,7 @@ export function fetchWalletTransactions(
   });
 }
 
-// ── 提现单（wallet:withdraw / withdraw_review）──
+// ── 提現單（wallet:withdraw / withdraw_review）──
 
 export function fetchWithdrawals(params?: { status?: string; page?: number; page_size?: number }) {
   return request({ url: "/api/v1/admin/wallet/withdrawals", params });
@@ -76,7 +76,7 @@ export function payWithdrawal(id: number, receipt?: string) {
   return request({ url: `/api/v1/admin/wallet/withdrawals/${id}/pay`, method: "post", data: { receipt } });
 }
 
-// ── 礼品卡（giftcard:read / write）──
+// ── 禮品卡（giftcard:read / write）──
 
 export function fetchGiftcardBatches(page = 1, pageSize = 20) {
   return request({ url: "/api/v1/admin/wallet/giftcard-batches", params: { page, page_size: pageSize } });

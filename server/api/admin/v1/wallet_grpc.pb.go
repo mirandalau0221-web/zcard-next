@@ -36,30 +36,30 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminWalletService 钱包管理：调账/充值单/流水查询。
+// AdminWalletService 錢包管理：調賬/充值單/流水查詢。
 //
-// 路由注册顺序注意：protoc-gen-go-http 按方法声明顺序注册路由，而
-// gorilla/mux 按注册顺序匹配（先注册先命中），因此所有静态路径方法必须
-// 声明在含 {user_id} 通配段的方法之前，否则 /wallet/withdrawals 等会被
-// /wallet/{user_id} 吞掉并误解析为 CODEC 400。
+// 路由註冊順序注意：protoc-gen-go-http 按方法聲明順序註冊路由，而
+// gorilla/mux 按註冊順序匹配（先註冊先命中），因此所有靜態路徑方法必須
+// 聲明在含 {user_id} 通配段的方法之前，否則 /wallet/withdrawals 等會被
+// /wallet/{user_id} 吞掉並誤解析為 CODEC 400。
 type AdminWalletServiceClient interface {
-	// ListWithdrawals 提现单列表（状态筛选）。
+	// ListWithdrawals 提現單列表（狀態篩選）。
 	ListWithdrawals(ctx context.Context, in *ListWithdrawalsRequest, opts ...grpc.CallOption) (*ListWithdrawalsReply, error)
-	// ReviewWithdrawal 审核（通过→approved 保持锁定；驳回→rejected 解锁回余额）。
+	// ReviewWithdrawal 審核（通過→approved 保持鎖定；駁回→rejected 解鎖回餘額）。
 	ReviewWithdrawal(ctx context.Context, in *ReviewWithdrawalRequest, opts ...grpc.CallOption) (*WithdrawalItem, error)
-	// PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣减 + 流水）。
+	// PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣減 + 流水）。
 	PayWithdrawal(ctx context.Context, in *PayWithdrawalRequest, opts ...grpc.CallOption) (*WithdrawalItem, error)
-	// CreateGiftcardBatch 礼品卡批次创建（批量生成密文 code；giftcard:write）。
+	// CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
 	CreateGiftcardBatch(ctx context.Context, in *CreateGiftcardBatchRequest, opts ...grpc.CallOption) (*CreateGiftcardBatchReply, error)
 	// ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(ctx context.Context, in *ListGiftcardBatchesRequest, opts ...grpc.CallOption) (*ListGiftcardBatchesReply, error)
-	// DeleteGiftcardBatch 删除批次并作废未兑换卡，保留已兑换记录。
+	// DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
 	DeleteGiftcardBatch(ctx context.Context, in *DeleteGiftcardBatchRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// GetBalance 指定用户余额。
+	// GetBalance 指定用户餘額。
 	GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...grpc.CallOption) (*Balance, error)
-	// Adjust 手动调账（需 wallet:adjust 权限 + 原因必填 + 审计）。
+	// Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
 	Adjust(ctx context.Context, in *AdjustRequest, opts ...grpc.CallOption) (*Balance, error)
-	// AdjustPoints 积分调整（正=增加 负=扣减；复用积分账本与审计）。
+	// AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
 	AdjustPoints(ctx context.Context, in *AdjustPointsRequest, opts ...grpc.CallOption) (*PointsBalance, error)
 	// ListTransactions 指定用户流水。
 	ListTransactions(ctx context.Context, in *ListWalletTxRequest, opts ...grpc.CallOption) (*ListWalletTxReply, error)
@@ -177,30 +177,30 @@ func (c *adminWalletServiceClient) ListTransactions(ctx context.Context, in *Lis
 // All implementations must embed UnimplementedAdminWalletServiceServer
 // for forward compatibility.
 //
-// AdminWalletService 钱包管理：调账/充值单/流水查询。
+// AdminWalletService 錢包管理：調賬/充值單/流水查詢。
 //
-// 路由注册顺序注意：protoc-gen-go-http 按方法声明顺序注册路由，而
-// gorilla/mux 按注册顺序匹配（先注册先命中），因此所有静态路径方法必须
-// 声明在含 {user_id} 通配段的方法之前，否则 /wallet/withdrawals 等会被
-// /wallet/{user_id} 吞掉并误解析为 CODEC 400。
+// 路由註冊順序注意：protoc-gen-go-http 按方法聲明順序註冊路由，而
+// gorilla/mux 按註冊順序匹配（先註冊先命中），因此所有靜態路徑方法必須
+// 聲明在含 {user_id} 通配段的方法之前，否則 /wallet/withdrawals 等會被
+// /wallet/{user_id} 吞掉並誤解析為 CODEC 400。
 type AdminWalletServiceServer interface {
-	// ListWithdrawals 提现单列表（状态筛选）。
+	// ListWithdrawals 提現單列表（狀態篩選）。
 	ListWithdrawals(context.Context, *ListWithdrawalsRequest) (*ListWithdrawalsReply, error)
-	// ReviewWithdrawal 审核（通过→approved 保持锁定；驳回→rejected 解锁回余额）。
+	// ReviewWithdrawal 審核（通過→approved 保持鎖定；駁回→rejected 解鎖回餘額）。
 	ReviewWithdrawal(context.Context, *ReviewWithdrawalRequest) (*WithdrawalItem, error)
-	// PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣减 + 流水）。
+	// PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣減 + 流水）。
 	PayWithdrawal(context.Context, *PayWithdrawalRequest) (*WithdrawalItem, error)
-	// CreateGiftcardBatch 礼品卡批次创建（批量生成密文 code；giftcard:write）。
+	// CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
 	CreateGiftcardBatch(context.Context, *CreateGiftcardBatchRequest) (*CreateGiftcardBatchReply, error)
 	// ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(context.Context, *ListGiftcardBatchesRequest) (*ListGiftcardBatchesReply, error)
-	// DeleteGiftcardBatch 删除批次并作废未兑换卡，保留已兑换记录。
+	// DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
 	DeleteGiftcardBatch(context.Context, *DeleteGiftcardBatchRequest) (*emptypb.Empty, error)
-	// GetBalance 指定用户余额。
+	// GetBalance 指定用户餘額。
 	GetBalance(context.Context, *GetBalanceRequest) (*Balance, error)
-	// Adjust 手动调账（需 wallet:adjust 权限 + 原因必填 + 审计）。
+	// Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
 	Adjust(context.Context, *AdjustRequest) (*Balance, error)
-	// AdjustPoints 积分调整（正=增加 负=扣减；复用积分账本与审计）。
+	// AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
 	AdjustPoints(context.Context, *AdjustPointsRequest) (*PointsBalance, error)
 	// ListTransactions 指定用户流水。
 	ListTransactions(context.Context, *ListWalletTxRequest) (*ListWalletTxReply, error)

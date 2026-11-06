@@ -1,6 +1,6 @@
 package migratev1
 
-// 源库（1.x MySQL，只读）连接与巡查询。
+// 源庫（1.x MySQL，只讀）連接與巡查詢。
 
 import (
 	"context"
@@ -11,28 +11,28 @@ import (
 	_ "github.com/go-sql-driver/mysql" // 源方言固定 MySQL
 )
 
-// Source 1.x 源库句柄。约定只读：迁移全程仅 SELECT，建议配只读账号。
+// Source 1.x 源庫句柄。約定只讀：遷移全程僅 SELECT，建議配只讀賬號。
 type Source struct {
 	DB *sql.DB
 }
 
-// OpenSource 打开源库（dsn 为 go-sql-driver 格式；由 --dsn-old 或 --old-env 构造）。
+// OpenSource 打開源庫（dsn 為 go-sql-driver 格式；由 --dsn-old 或 --old-env 構造）。
 func OpenSource(dsn string) (*Source, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("打开 1.x 源库失败: %w", err)
+		return nil, fmt.Errorf("打開 1.x 源庫失敗: %w", err)
 	}
-	// 巡检/分页读无需高并发；限制连接数降低对生产源库的冲击
+	// 巡檢/分頁讀無需高併發；限制連接數降低對生產源庫的衝擊
 	db.SetMaxOpenConns(4)
 	db.SetMaxIdleConns(2)
 	db.SetConnMaxIdleTime(5 * time.Minute)
 	return &Source{DB: db}, nil
 }
 
-// Close 关闭源库。
+// Close 關閉源庫。
 func (s *Source) Close() error { return s.DB.Close() }
 
-// ServerVersion 源库版本（巡检报告展示）。
+// ServerVersion 源庫版本（巡檢報告展示）。
 func (s *Source) ServerVersion(ctx context.Context) (string, error) {
 	var v string
 	if err := s.DB.QueryRowContext(ctx, "SELECT VERSION()").Scan(&v); err != nil {
@@ -52,19 +52,19 @@ func (s *Source) TableExists(ctx context.Context, table string) (bool, error) {
 	return n > 0, nil
 }
 
-// ColumnDataType 列的 DATA_TYPE（information_schema；表/列不存在返回错误）。
+// ColumnDataType 列的 DATA_TYPE（information_schema；表/列不存在返回錯誤）。
 func (s *Source) ColumnDataType(ctx context.Context, table, column string) (string, error) {
 	var dt string
 	err := s.DB.QueryRowContext(ctx,
 		"SELECT DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
 		table, column).Scan(&dt)
 	if err != nil {
-		return "", fmt.Errorf("探测列 %s.%s 失败: %w", table, column, err)
+		return "", fmt.Errorf("探測列 %s.%s 失敗: %w", table, column, err)
 	}
 	return dt, nil
 }
 
-// CountRows 表行数（巡检规模概览；大表 COUNT 可能偏慢，仅在 preflight 使用）。
+// CountRows 錶行數（巡檢規模概覽；大表 COUNT 可能偏慢，僅在 preflight 使用）。
 func (s *Source) CountRows(ctx context.Context, table string) (int64, error) {
 	var n sql.NullInt64
 	if err := s.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM `"+table+"`").Scan(&n); err != nil {
@@ -73,7 +73,7 @@ func (s *Source) CountRows(ctx context.Context, table string) (int64, error) {
 	return n.Int64, nil
 }
 
-// SampleStrings 取单列前 limit 行（密钥抽样自检用；NULL 跳过）。
+// SampleStrings 取單列前 limit 行（密鑰抽樣自檢用；NULL 跳過）。
 func (s *Source) SampleStrings(ctx context.Context, table, column string, limit int) ([]string, error) {
 	rows, err := s.DB.QueryContext(ctx,
 		fmt.Sprintf("SELECT `%s` FROM `%s` WHERE `%s` IS NOT NULL ORDER BY id LIMIT %d", column, table, column, limit))
@@ -92,7 +92,7 @@ func (s *Source) SampleStrings(ctx context.Context, table, column string, limit 
 	return out, rows.Err()
 }
 
-// SettingValue 读 settings 表单个 key 的 value（JSON 编码字符串；不存在返回空串与 false）。
+// SettingValue 讀 settings 表單個 key 的 value（JSON 編碼字符串；不存在返回空串與 false）。
 func (s *Source) SettingValue(ctx context.Context, key string) (string, bool, error) {
 	var v string
 	err := s.DB.QueryRowContext(ctx, "SELECT value FROM settings WHERE `key` = ?", key).Scan(&v)

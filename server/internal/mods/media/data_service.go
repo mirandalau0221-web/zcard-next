@@ -1,6 +1,6 @@
 package media
 
-// 管理面 API（）+ Uploader/Referencer port 实现。
+// 管理面 API（）+ Uploader/Referencer port 實現。
 
 import (
 	"context"
@@ -23,18 +23,18 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminMediaService 管理面素材服务。
+// AdminMediaService 管理面素材服務。
 type AdminMediaService struct {
 	adminv1.UnimplementedAdminMediaServiceServer
 	repo *MediaRepo
 }
 
-// NewAdminMediaService 构造。
+// NewAdminMediaService 構造。
 func NewAdminMediaService(repo *MediaRepo) *AdminMediaService {
 	return &AdminMediaService{repo: repo}
 }
 
-// Upload 实现 port.Uploader（业务模块与 admin API 共用同一安全路径）。
+// Upload 實現 port.Uploader（業務模塊與 admin API 共用同一安全路徑）。
 func (r *MediaRepo) Upload(ctx context.Context, in mediaport.UploadInput) (*mediaport.UploadResult, error) {
 	clean, mime, w, h, err := ValidateAndReencode(in.Name, in.ContentType, in.Data)
 	if err != nil {
@@ -47,17 +47,17 @@ func (r *MediaRepo) Upload(ctx context.Context, in mediaport.UploadInput) (*medi
 	}
 	m, err := r.CreateMedia(ctx, in, rel, mime, int64(len(clean)), int32(w), int32(h), HashFile(clean))
 	if err != nil {
-		_ = DeleteLocal(rel) // 回滚物理文件
+		_ = DeleteLocal(rel) // 回滾物理文件
 		return nil, err
 	}
 	return &mediaport.UploadResult{ID: m.ID, Path: "/uploads/" + rel, Width: int32(w), Height: int32(h)}, nil
 }
 
-// Upload admin 上传。
+// Upload admin 上傳。
 func (s *AdminMediaService) Upload(ctx context.Context, req *adminv1.UploadMediaRequest) (*adminv1.MediaItem, error) {
 	data, err := base64.StdEncoding.DecodeString(req.GetDataBase64())
 	if err != nil {
-		return nil, errors.BadRequest("media.BASE64_INVALID", "data_base64 解码失败")
+		return nil, errors.BadRequest("media.BASE64_INVALID", "data_base64 解碼失敗")
 	}
 	res, err := s.repo.Upload(ctx, mediaport.UploadInput{
 		Name: req.GetName(), ContentType: req.GetContentType(), Data: data,
@@ -70,10 +70,10 @@ func (s *AdminMediaService) Upload(ctx context.Context, req *adminv1.UploadMedia
 	return toMediaPB(m), nil
 }
 
-// ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+// ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
 func (s *AdminMediaService) ImportFromURL(ctx context.Context, req *adminv1.ImportMediaRequest) (*adminv1.MediaItem, error) {
 	if err := httpx.ValidateURL(req.GetUrl()); err != nil {
-		return nil, errors.BadRequest("media.URL_BLOCKED", "外链地址被 SSRF 防护拦截")
+		return nil, errors.BadRequest("media.URL_BLOCKED", "外鏈地址被 SSRF 防護攔截")
 	}
 	client := httpx.NewSafeClient(15 * time.Second) // 15s
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, req.GetUrl(), nil)
@@ -87,9 +87,9 @@ func (s *AdminMediaService) ImportFromURL(ctx context.Context, req *adminv1.Impo
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, errors.BadRequest("media.FETCH_FAILED", fmt.Sprintf("外链返回 %d", resp.StatusCode))
+		return nil, errors.BadRequest("media.FETCH_FAILED", fmt.Sprintf("外鏈返回 %d", resp.StatusCode))
 	}
-	// 限长读取（超 10MB 即拒，防拉爆内存）
+	// 限長讀取（超 10MB 即拒，防拉爆內存）
 	limited := io.LimitReader(resp.Body, MaxSizeBytes+1)
 	data, err := io.ReadAll(limited)
 	if err != nil {
@@ -98,12 +98,12 @@ func (s *AdminMediaService) ImportFromURL(ctx context.Context, req *adminv1.Impo
 	if len(data) > MaxSizeBytes {
 		return nil, mapMediaError(ErrTooLarge)
 	}
-	// 内容嗅探：CDN 直链常见「URL 扩展名/响应头 ≠ 实际编码」（.png 实为 JPEG/WebP、
-	// 无扩展名短链、binary/octet-stream 等），校验按文件名白名单三分会误杀。
-	// 以魔数实测为准重写扩展名与 Content-Type，再走统一校验（校验本身不放宽）。
+	// 內容嗅探：CDN 直鏈常見「URL 擴展名/響應頭 ≠ 實際編碼」（.png 實為 JPEG/WebP、
+	// 無擴展名短鏈、binary/octet-stream 等），校驗按文件名白名單三分會誤殺。
+	// 以魔數實測為準重寫擴展名與 Content-Type，再走統一校驗（校驗本身不放寬）。
 	name := path.Base(strings.Split(req.GetUrl(), "?")[0])
 	if name == "" || name == "/" || !strings.Contains(name, ".") {
-		name = "import.png" // 无扩展名兜底（魔数校验仍把关）
+		name = "import.png" // 無擴展名兜底（魔數校驗仍把關）
 	}
 	contentType := resp.Header.Get("Content-Type")
 	if ext, sniffedMime, ok := SniffImage(data); ok {
@@ -114,7 +114,7 @@ func (s *AdminMediaService) ImportFromURL(ctx context.Context, req *adminv1.Impo
 		name = stem + ext
 		contentType = sniffedMime
 	} else {
-		return nil, errors.BadRequest("media.NOT_IMAGE", "外链内容不是可识别的图片，支持 "+SupportedImages)
+		return nil, errors.BadRequest("media.NOT_IMAGE", "外鏈內容不是可識別的圖片，支持 "+SupportedImages)
 	}
 	res, err := s.repo.Upload(ctx, mediaport.UploadInput{
 		Name: name, ContentType: contentType, Data: data,
@@ -127,7 +127,7 @@ func (s *AdminMediaService) ImportFromURL(ctx context.Context, req *adminv1.Impo
 	return toMediaPB(m), nil
 }
 
-// ── 分类 ──────────────────────────────────────────────────
+// ── 分類 ──────────────────────────────────────────────────
 
 func (s *AdminMediaService) CreateCategory(ctx context.Context, req *adminv1.CreateMediaCategoryRequest) (*adminv1.MediaCategory, error) {
 	c, err := s.repo.CreateCategory(ctx, req.GetName(), req.GetParentId(), req.GetSort())
@@ -210,7 +210,7 @@ func (s *AdminMediaService) MoveMedia(ctx context.Context, req *adminv1.MoveMedi
 	return &emptypb.Empty{}, nil
 }
 
-// DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+// DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
 func (s *AdminMediaService) DeleteMedia(ctx context.Context, req *adminv1.DeleteMediaRequest) (*adminv1.DeleteMediaReply, error) {
 	deleted, refs, err := s.repo.DeleteMedia(ctx, req.GetIds(), req.GetConfirm())
 	if err != nil {
@@ -219,14 +219,14 @@ func (s *AdminMediaService) DeleteMedia(ctx context.Context, req *adminv1.Delete
 			for _, m := range refs {
 				reply.Referenced = append(reply.Referenced, toMediaPB(m))
 			}
-			return reply, nil // 200 + need_confirm（前端二次确认交互）
+			return reply, nil // 200 + need_confirm（前端二次確認交互）
 		}
 		return nil, mapMediaError(err)
 	}
 	return &adminv1.DeleteMediaReply{Deleted: int32(deleted)}, nil
 }
 
-// ── 转换与工具 ────────────────────────────────────────────
+// ── 轉換與工具 ────────────────────────────────────────────
 
 func toMediaPB(m *ent.Media) *adminv1.MediaItem {
 	if m == nil {
@@ -247,19 +247,19 @@ func toCategoryPB(c *ent.MediaCategory) *adminv1.MediaCategory {
 func mapMediaError(err error) error {
 	switch {
 	case err == ErrCategoryName:
-		return errors.BadRequest("media.CATEGORY_NAME_INVALID", "分类名 1-30 字符")
+		return errors.BadRequest("media.CATEGORY_NAME_INVALID", "分類名 1-30 字符")
 	case err == ErrHasChildren:
-		return errors.BadRequest("media.CATEGORY_NOT_EMPTY", "分类存在子分类或素材")
+		return errors.BadRequest("media.CATEGORY_NOT_EMPTY", "分類存在子分類或素材")
 	case err == ErrNotFound:
-		return errors.NotFound("media.NOT_FOUND", "记录不存在")
+		return errors.NotFound("media.NOT_FOUND", "記錄不存在")
 	case err == ErrInvalidType:
-		return errors.BadRequest("media.INVALID_TYPE", "支持 "+SupportedImages+" 图片")
+		return errors.BadRequest("media.INVALID_TYPE", "支持 "+SupportedImages+" 圖片")
 	case err == ErrTooLarge:
-		return errors.BadRequest("media.TOO_LARGE", "图片超过 10MB 上限，请压缩后重试")
+		return errors.BadRequest("media.TOO_LARGE", "圖片超過 10MB 上限，請壓縮後重試")
 	case err == ErrImageDimensions:
-		return errors.BadRequest("media.DIMENSIONS", "图片尺寸或动画总像素过大，请缩小尺寸后重试")
+		return errors.BadRequest("media.DIMENSIONS", "圖片尺寸或動畫總像素過大，請縮小尺寸後重試")
 	case err == ErrNotImage:
-		return errors.BadRequest("media.NOT_IMAGE", "文件内容不是合法图片")
+		return errors.BadRequest("media.NOT_IMAGE", "文件內容不是合法圖片")
 	}
 	return errors.InternalServer("media.ERROR", err.Error())
 }
@@ -286,31 +286,31 @@ func pageParams(page, pageSize int32) (int, int) {
 	return p, ps
 }
 
-// ── Store 前台媒体（收款码上传；登录态 + 复用三件套；≤2MB）──
+// ── Store 前台媒體（收款碼上傳；登錄態 + 複用三件套；≤2MB）──
 
-// StoreMediaService 前台媒体服务。
+// StoreMediaService 前台媒體服務。
 type StoreMediaService struct {
 	storefrontv1.UnimplementedStoreMediaServiceServer
 	repo *MediaRepo
 }
 
-// NewStoreMediaService 构造。
+// NewStoreMediaService 構造。
 func NewStoreMediaService(repo *MediaRepo) *StoreMediaService {
 	return &StoreMediaService{repo: repo}
 }
 
-// Upload base64 上传（用户登录态；收款码场景限 2MB——小于 admin 10MB）。
+// Upload base64 上傳（用户登錄態；收款碼場景限 2MB——小於 admin 10MB）。
 func (s *StoreMediaService) Upload(ctx context.Context, req *storefrontv1.StoreUploadRequest) (*storefrontv1.StoreUploadReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	data, err := base64.StdEncoding.DecodeString(req.GetDataBase64())
 	if err != nil {
-		return nil, errors.BadRequest("media.BASE64_INVALID", "data_base64 解码失败")
+		return nil, errors.BadRequest("media.BASE64_INVALID", "data_base64 解碼失敗")
 	}
 	if len(data) > 2*1024*1024 {
-		return nil, errors.BadRequest("media.TOO_LARGE", "图片超过 2MB 上限")
+		return nil, errors.BadRequest("media.TOO_LARGE", "圖片超過 2MB 上限")
 	}
 	res, err := s.repo.Upload(ctx, mediaport.UploadInput{
 		Name: "qrcode", ContentType: "", Data: data, UploaderID: claims.Subject,

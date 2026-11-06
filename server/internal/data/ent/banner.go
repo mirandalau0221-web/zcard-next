@@ -22,17 +22,17 @@ type Banner struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Position holds the value of the "position" field.
 	Position banner.Position `json:"position,omitempty"`
-	// 多语言标题
+	// 多語言標題
 	TitleJSON map[string]string `json:"title_json,omitempty"`
 	// Image holds the value of the "image" field.
 	Image string `json:"image,omitempty"`
-	// 缺省回落 PC 图
+	// 缺省回落 PC 圖
 	MobileImage string `json:"mobile_image,omitempty"`
 	// LinkType holds the value of the "link_type" field.
 	LinkType banner.LinkType `json:"link_type,omitempty"`

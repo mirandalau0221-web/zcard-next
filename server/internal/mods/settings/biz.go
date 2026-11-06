@@ -1,8 +1,8 @@
-// Package settings 设置中心（）：settings 表 = 运行时业务开关真理源。
+// Package settings 設置中心（）：settings 表 = 運行時業務開關真理源。
 //
-// 分组目录（规划 ）：site（基础）/template（模板）/trade（交易）/security（安全）/
-// ops（运维）/notify（邮件短信）/recharge（充值提现）/points（积分）/affiliate（分销）/
-// supply（货源）/i18n（语言货币）。安装向导 /install 交付。
+// 分組目錄（規劃 ）：site（基礎）/template（模板）/trade（交易）/security（安全）/
+// ops（運維）/notify（郵件短信）/recharge（充值提現）/points（積分）/affiliate（分銷）/
+// supply（貨源）/i18n（語言貨幣）。安裝嚮導 /install 交付。
 package settings
 
 import (
@@ -15,41 +15,41 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/settings/port"
 )
 
-// ErrSettingNotFound 设置项不存在。
+// ErrSettingNotFound 設置項不存在。
 var ErrSettingNotFound = errors.New("settings.NOT_FOUND")
 
-// Repo 设置仓储（模块内端口，实现于 data.go）。
+// Repo 設置倉儲（模塊內端口，實現於 data.go）。
 type Repo interface {
 	Get(ctx context.Context, group, key string) (json.RawMessage, error)
 	List(ctx context.Context, group string) ([]port.Item, error)
 	Put(ctx context.Context, group, key string, value json.RawMessage) error
-	// Currencies 启用货币视图（前台列表）。
+	// Currencies 啓用貨幣視圖（前台列表）。
 	Currencies(ctx context.Context) ([]CurrencyView, error)
-	// CurrencyExists 货币是否存在（i18n.base_currency 写入校验）。
+	// CurrencyExists 貨幣是否存在（i18n.base_currency 寫入校驗）。
 	CurrencyExists(ctx context.Context, code string) (bool, error)
-	// PutMany 批量写入（事务原子）。
+	// PutMany 批量寫入（事務原子）。
 	PutMany(ctx context.Context, items []port.Item) error
 }
 
-// SettingsUsecase 设置用例。
+// SettingsUsecase 設置用例。
 type SettingsUsecase struct {
 	repo Repo
 }
 
-// NewSettingsUsecase 构造。
+// NewSettingsUsecase 構造。
 func NewSettingsUsecase(repo Repo) *SettingsUsecase { return &SettingsUsecase{repo: repo} }
 
-// CurrencyExists 转发（service 层 base_currency 写入校验）。
+// CurrencyExists 轉發（service 層 base_currency 寫入校驗）。
 func (uc *SettingsUsecase) CurrencyExists(ctx context.Context, code string) (bool, error) {
 	return uc.repo.CurrencyExists(ctx, code)
 }
 
-// Get 读取单项。
+// Get 讀取單項。
 func (uc *SettingsUsecase) Get(ctx context.Context, group, key string) (json.RawMessage, error) {
 	return uc.repo.Get(ctx, group, key)
 }
 
-// GetDefault 读取单项，不存在返回默认值。
+// GetDefault 讀取單項，不存在返回默認值。
 func (uc *SettingsUsecase) GetDefault(ctx context.Context, group, key string, def json.RawMessage) (json.RawMessage, error) {
 	v, err := uc.repo.Get(ctx, group, key)
 	if errors.Is(err, ErrSettingNotFound) {
@@ -58,12 +58,12 @@ func (uc *SettingsUsecase) GetDefault(ctx context.Context, group, key string, de
 	return v, err
 }
 
-// List 按分组列出（group 为空列出全部）。
+// List 按分組列出（group 為空列出全部）。
 func (uc *SettingsUsecase) List(ctx context.Context, group string) ([]port.Item, error) {
 	return uc.repo.List(ctx, group)
 }
 
-// Put 更新单项（键经目录校验 + JSON 合法性；SECRET 键回写 **** 视为未修改跳过）。
+// Put 更新單項（鍵經目錄校驗 + JSON 合法性；SECRET 鍵回寫 **** 視為未修改跳過）。
 func (uc *SettingsUsecase) Put(ctx context.Context, group, key string, value json.RawMessage) error {
 	if err := ValidateKey(group, key); err != nil {
 		return err
@@ -72,13 +72,13 @@ func (uc *SettingsUsecase) Put(ctx context.Context, group, key string, value jso
 		return errors.New("settings.INVALID_VALUE")
 	}
 	if IsSecret(group, key) && (string(value) == `"****"` || (group == "notify" && key == "telegram_bot_token" && string(value) == `""`)) {
-		return nil // 脱敏回写 = 未修改
+		return nil // 脱敏回寫 = 未修改
 	}
 	return uc.PutMany(ctx, []port.Item{{Group: group, Key: key, Value: value}})
 }
 
-// PutMany 批量更新（表单级保存；单事务原子写入——任一项失败整体回滚）。
-// 校验语义与 Put 一致；SECRET 键 **** 回写跳过。
+// PutMany 批量更新（表單級保存；單事務原子寫入——任一項失敗整體回滾）。
+// 校驗語義與 Put 一致；SECRET 鍵 **** 回寫跳過。
 func (uc *SettingsUsecase) PutMany(ctx context.Context, items []port.Item) error {
 	if len(items) == 0 {
 		return nil
@@ -122,7 +122,7 @@ func (uc *SettingsUsecase) PutMany(ctx context.Context, items []port.Item) error
 	return uc.repo.PutMany(ctx, valid)
 }
 
-// GetStruct 泛型读取（）：JSON 绑定到调用方结构体，DB 缺省回落目录默认值。
+// GetStruct 泛型讀取（）：JSON 綁定到調用方結構體，DB 缺省回落目錄默認值。
 // 用法：var cfg TradeConfig; uc.GetStruct(ctx, "trade", "guest_checkout", &cfg)
 func GetStruct[T any](ctx context.Context, uc *SettingsUsecase, group, key string, out *T) error {
 	raw, err := uc.GetDefault(ctx, group, key, nil)
@@ -130,21 +130,21 @@ func GetStruct[T any](ctx context.Context, uc *SettingsUsecase, group, key strin
 		return err
 	}
 	if raw == nil {
-		// DB 无值 → 用目录默认值
+		// DB 無值 → 用目錄默認值
 		g, ok := Group(group)
 		if !ok {
-			return fmt.Errorf("settings: 未知分组 %q", group)
+			return fmt.Errorf("settings: 未知分組 %q", group)
 		}
 		def, has := g.DefaultJSON(key)
 		if !has {
-			return fmt.Errorf("settings: 分组 %q 内未知键 %q", group, key)
+			return fmt.Errorf("settings: 分組 %q 內未知鍵 %q", group, key)
 		}
 		raw = json.RawMessage(def)
 	}
 	return json.Unmarshal(raw, out)
 }
 
-// SanitizeGroup 脱敏分组（列表/详情接口用）：SECRET 键值替换 ****。
+// SanitizeGroup 脱敏分組（列表/詳情接口用）：SECRET 鍵值替換 ****。
 func SanitizeGroup(items []port.Item) []port.Item {
 	out := make([]port.Item, 0, len(items))
 	for _, it := range items {
@@ -157,9 +157,9 @@ func SanitizeGroup(items []port.Item) []port.Item {
 	return out
 }
 
-// withDefaults 目录默认值补齐（admin 列表用）：DB 已写入的键优先，
-// 未写入的键以目录默认 JSON 展示——保证每个分组全量可见
-// （与前台 GetPublicConfig 的回落逻辑同源；保存后即落 DB 行）。
+// withDefaults 目錄默認值補齊（admin 列表用）：DB 已寫入的鍵優先，
+// 未寫入的鍵以目錄默認 JSON 展示——保證每個分組全量可見
+// （與前台 GetPublicConfig 的回落邏輯同源；保存後即落 DB 行）。
 func withDefaults(groupFilter string, items []port.Item) []port.Item {
 	have := make(map[string]bool, len(items))
 	for _, it := range items {

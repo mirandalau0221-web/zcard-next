@@ -1,11 +1,11 @@
 package migratev1
 
-// P6 尾域迁移：分站 reseller（merchants→profiles 后重跑 P2-P4 补迁分站数据——
-// subsiteFor 已参数化，主站先行时跳过的数据此刻自动补上）+ 供货 supplier 域。
-// 映射规格《数据迁移工具开发计划》§5.7/§5.8。
+// P6 尾域遷移：分站 reseller（merchants→profiles 後重跑 P2-P4 補遷分站數據——
+// subsiteFor 已參數化，主站先行時跳過的數據此刻自動補上）+ 供貨 supplier 域。
+// 映射規格《數據遷移工具開發計劃》§5.7/§5.8。
 //
-// 关键映射：2.0 的 subsite_id 即 reseller_profiles 主键（reseller 模块注释原话），
-// idmap("merchants", oldMerchantID) → profileID 即该分站数据的 subsite_id。
+// 關鍵映射：2.0 的 subsite_id 即 reseller_profiles 主鍵（reseller 模塊註釋原話），
+// idmap("merchants", oldMerchantID) → profileID 即該分站數據的 subsite_id。
 
 import (
 	"context"
@@ -27,11 +27,11 @@ import (
 // MigrateReseller P6 分站域。
 func (m *Migrator) MigrateReseller(ctx context.Context) error {
 	steps := []func(context.Context) error{
-		m.migrateMerchantProfiles, // 先建 profiles（subsite_id 来源）
+		m.migrateMerchantProfiles, // 先建 profiles（subsite_id 來源）
 		m.migrateSubsiteDomains,
 		m.migrateSubsiteLedger,
-		m.backfillSubsiteData,    // 重跑 P2-P4：分站商品/卡密/订单补迁（主站数据幂等跳过）
-		m.migrateSubsitePricings, // 依赖分站商品已补迁
+		m.backfillSubsiteData,    // 重跑 P2-P4：分站商品/卡密/訂單補遷（主站數據冪等跳過）
+		m.migrateSubsitePricings, // 依賴分站商品已補遷
 	}
 	for _, step := range steps {
 		if err := step(ctx); err != nil {
@@ -42,7 +42,7 @@ func (m *Migrator) MigrateReseller(ctx context.Context) error {
 }
 
 // migrateMerchantProfiles 1.x merchants(id>1) → reseller_profiles。
-// owner：merchant_members(role=owner) 优先，subsite_order_snapshots.reseller_user_id 兜底。
+// owner：merchant_members(role=owner) 優先，subsite_order_snapshots.reseller_user_id 兜底。
 func (m *Migrator) migrateMerchantProfiles(ctx context.Context) error {
 	var (
 		id, status, userID int64
@@ -53,7 +53,7 @@ func (m *Migrator) migrateMerchantProfiles(ctx context.Context) error {
 		func() []any { return []any{&id, &userID, &name, &slug, &status} },
 		func(int64) error {
 			if id == 1 {
-				m.st.Record("merchants", "skip") // 主站商户不迁（产物落 subsite 0）
+				m.st.Record("merchants", "skip") // 主站商户不遷（產物落 subsite 0）
 				return nil
 			}
 			if _, ok := m.IDs.Get(ctx, "merchants", uint64(id)); ok {
@@ -62,11 +62,11 @@ func (m *Migrator) migrateMerchantProfiles(ctx context.Context) error {
 			}
 			owner := m.merchantOwner(ctx, id)
 			if owner == 0 {
-				return fmt.Errorf("分站 %d 无法确定 owner（merchant_members 与快照均无）", id)
+				return fmt.Errorf("分站 %d 無法確定 owner（merchant_members 與快照均無）", id)
 			}
 			newOwner, ok := m.IDs.Get(ctx, "users", owner)
 			if !ok {
-				return fmt.Errorf("分站 %d owner 用户 %d 未迁移", id, owner)
+				return fmt.Errorf("分站 %d owner 用户 %d 未遷移", id, owner)
 			}
 			st := resellerprofile.StatusApproved
 			if status == 0 {
@@ -97,7 +97,7 @@ func (m *Migrator) merchantOwner(ctx context.Context, merchantID int64) uint64 {
 	if owner.Valid && owner.Int64 > 0 {
 		return uint64(owner.Int64)
 	}
-	// 兜底：订单快照的 reseller_user_id（1.x merchant_members.user_id 列名可能是 user_id 而非 model_id）
+	// 兜底：訂單快照的 reseller_user_id（1.x merchant_members.user_id 列名可能是 user_id 而非 model_id）
 	_ = m.Src.DB.QueryRowContext(ctx,
 		"SELECT user_id FROM merchant_members WHERE merchant_id = ? AND role = 'owner' LIMIT 1",
 		merchantID).Scan(&owner)
@@ -143,7 +143,7 @@ func (m *Migrator) migrateSubsiteDomains(ctx context.Context) error {
 			}
 			siteType := "custom"
 			if typ == "subdomain" {
-				siteType = "main" // 1.x subdomain=平台子域（主域形态）；custom=自有域名
+				siteType = "main" // 1.x subdomain=平台子域（主域形態）；custom=自有域名
 			}
 			siteStatus := "active"
 			if status == "disabled" {
@@ -157,7 +157,7 @@ func (m *Migrator) migrateSubsiteDomains(ctx context.Context) error {
 				SetVerificationStatus(resellersite.VerificationStatus(verificationStatus)).
 				SetIsPrimary(isPrimary).
 				SetStatus(resellersite.Status(siteStatus))
-			_ = verifiedAt // 2.0 site 无 verified_at 列（verification_status 已表达）
+			_ = verifiedAt // 2.0 site 無 verified_at 列（verification_status 已表達）
 			if t, ok, _ := mustTime(nullStr(createdAt), m.TZ); ok {
 				b.SetCreatedAt(t)
 			}
@@ -204,26 +204,26 @@ func (m *Migrator) migrateSubsitePricings(ctx context.Context) error {
 			}
 			newPID, ok := m.IDs.Get(ctx, "products", uint64(productID))
 			if !ok {
-				m.st.Record("subsite_pricings", "skip") // 商品尚未补迁（顺序异常或已删）
+				m.st.Record("subsite_pricings", "skip") // 商品尚未補遷（順序異常或已刪）
 				return nil
 			}
 			var value int64
 			switch pricingMode {
 			case "markup_percent":
-				value = int64(nullFloat(markupPercent) * 100) // 百分比 → 万分比
+				value = int64(nullFloat(markupPercent) * 100) // 百分比 → 萬分比
 			case "fixed_markup":
 				value = nullInt(fixedMarkup)
 			case "fixed_price":
 				value = nullInt(fixedPrice)
 			}
 			if !isListed {
-				m.RW.AddError("subsite_pricings", uint64(id), "1.x 下架商品的分站定价未迁（2.0 以商品可见性表达）")
+				m.RW.AddError("subsite_pricings", uint64(id), "1.x 下架商品的分站定價未遷（2.0 以商品可見性表達）")
 				return nil
 			}
 			pr, err := m.Client.ResellerPricing.Create().
 				SetSubsiteID(siteID).
 				SetProductID(newPID).
-				SetSkuID(0). // 1.x SKU 级定价极少且无稳定映射键，商品级先行
+				SetSkuID(0). // 1.x SKU 級定價極少且無穩定映射鍵，商品級先行
 				SetMode(resellerpricing.Mode(pricingMode)).
 				SetValue(value).
 				Save(ctx)
@@ -240,7 +240,7 @@ func (m *Migrator) migrateSubsitePricings(ctx context.Context) error {
 }
 
 // migrateSubsiteLedger 1.x subsite_ledger_entries → reseller_ledger_entries
-// + reseller_balance_accounts 快照（可用合计；与流水末态差异进清单——同 P5 对账语义）。
+// + reseller_balance_accounts 快照（可用合計；與流水末態差異進清單——同 P5 對賬語義）。
 func (m *Migrator) migrateSubsiteLedger(ctx context.Context) error {
 	var (
 		id, merchantID  int64
@@ -272,7 +272,7 @@ func (m *Migrator) migrateSubsiteLedger(ctx context.Context) error {
 				return nil
 			}
 			if status == "canceled" {
-				m.st.Record("subsite_ledger_entries", "skip") // 2.0 无 canceled 态
+				m.st.Record("subsite_ledger_entries", "skip") // 2.0 無 canceled 態
 				return nil
 			}
 			key := orString(nullStr(idempotencyKey), fmt.Sprintf("v1_import:sle:%d", id))
@@ -309,7 +309,7 @@ func (m *Migrator) migrateSubsiteLedger(ctx context.Context) error {
 	); err != nil {
 		return err
 	}
-	// 账户快照：available = SUM(status=available 的正负行)；与 2.0 账户差异在 P5 对账报告同视图暴露
+	// 賬户快照：available = SUM(status=available 的正負行)；與 2.0 賬户差異在 P5 對賬報告同視圖暴露
 	if m.dry {
 		return nil
 	}
@@ -320,7 +320,7 @@ func (m *Migrator) migrateSubsiteLedger(ctx context.Context) error {
 	t := m.st.table("reseller_balance_accounts")
 	for _, p := range profiles {
 		exists, err := m.Client.ResellerBalanceAccount.Query().
-			Where().Exist(ctx) // 占位：下方按 subsite 唯一键判断
+			Where().Exist(ctx) // 佔位：下方按 subsite 唯一鍵判斷
 		if err != nil {
 			return err
 		}
@@ -343,16 +343,16 @@ func (m *Migrator) migrateSubsiteLedger(ctx context.Context) error {
 	return nil
 }
 
-// backfillSubsiteData 分站数据补迁：重跑 P2-P4（subsiteFor 此刻可解析 merchant>1；
-// 主站数据全部幂等跳过，只有分站行迁入）。
+// backfillSubsiteData 分站數據補遷：重跑 P2-P4（subsiteFor 此刻可解析 merchant>1；
+// 主站數據全部冪等跳過，只有分站行遷入）。
 func (m *Migrator) backfillSubsiteData(ctx context.Context) error {
 	if m.dry {
 		return nil
 	}
 	steps := []func(context.Context) error{
-		m.MigrateCatalog,   // 分站分类/商品/SKU/评论
+		m.MigrateCatalog,   // 分站分類/商品/SKU/評論
 		m.MigrateInventory, // 分站卡密 + 交付回填
-		m.MigrateTrade,     // 分站订单五表 + 支付 + cards.order_id 回填
+		m.MigrateTrade,     // 分站訂單五表 + 支付 + cards.order_id 回填
 	}
 	for _, step := range steps {
 		if err := step(ctx); err != nil {
@@ -362,7 +362,7 @@ func (m *Migrator) backfillSubsiteData(ctx context.Context) error {
 	return nil
 }
 
-// MigrateSuppliers P6 供货域。
+// MigrateSuppliers P6 供貨域。
 func (m *Migrator) MigrateSuppliers(ctx context.Context) error {
 	steps := []func(context.Context) error{
 		m.migrateSupplierAccounts,
@@ -406,14 +406,14 @@ func (m *Migrator) migrateSupplierAccounts(ctx context.Context) error {
 			secret := apiSecret
 			if laracrypt.LooksEncrypted(apiSecret) {
 				if m.AppKey == nil {
-					return fmt.Errorf("api_secret 为密文但 APP_KEY 不可用")
+					return fmt.Errorf("api_secret 為密文但 APP_KEY 不可用")
 				}
 				c, err := laracrypt.New(m.AppKey)
 				if err != nil {
 					return err
 				}
 				if secret, err = c.OpenString(apiSecret); err != nil {
-					return fmt.Errorf("api_secret 解密失败: %w", err)
+					return fmt.Errorf("api_secret 解密失敗: %w", err)
 				}
 			}
 			box, err := crypto.NewBox(m.DataKey)
@@ -457,7 +457,7 @@ func (m *Migrator) migrateSupplierAccounts(ctx context.Context) error {
 func (m *Migrator) migrateSupplierPrices(ctx context.Context) error {
 	var (
 		id, accountID, productID, price int64
-		skuID                           sql.NullInt64 // 1.x nullable（NULL=商品级）
+		skuID                           sql.NullInt64 // 1.x nullable（NULL=商品級）
 	)
 	return m.scanTable(ctx, "supplier_product_prices",
 		[]string{"id", "supplier_account_id", "product_id", "sku_id", "price"},
@@ -480,7 +480,7 @@ func (m *Migrator) migrateSupplierPrices(ctx context.Context) error {
 			pr, err := m.Client.SupplierProductPrice.Create().
 				SetSupplierAccountID(newA).
 				SetProductID(newP).
-				SetSkuID(0). // 1.x SKU 级供货价无稳定映射键（同 pricings 决策）
+				SetSkuID(0). // 1.x SKU 級供貨價無穩定映射鍵（同 pricings 決策）
 				SetPrice(price).
 				Save(ctx)
 			if err != nil {
@@ -526,7 +526,7 @@ func (m *Migrator) migrateSupplyOrders(ctx context.Context) error {
 				SetAccountID(newA).
 				SetDownstreamOrderNo(downstreamNo).
 				SetItems([]map[string]any{}).
-				SetAmount(0). // 1.x 供货单金额在订单侧（extra 保真），此处 0 + 报告
+				SetAmount(0). // 1.x 供貨單金額在訂單側（extra 保真），此處 0 + 報告
 				SetStatus(supplyorder.StatusFulfilled)
 			if newO, ok := m.IDs.Get(ctx, "orders", uint64(orderID)); ok {
 				b.SetLocalOrderID(newO)
@@ -535,7 +535,7 @@ func (m *Migrator) migrateSupplyOrders(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			m.RW.AddError("supply_orders", uint64(id), "供货单金额与商品行在 1.x 无独立列（订单侧 extra 保真）")
+			m.RW.AddError("supply_orders", uint64(id), "供貨單金額與商品行在 1.x 無獨立列（訂單側 extra 保真）")
 			if cu := nullStr(callbackURL); cu != "" {
 				if _, err := m.Client.DownstreamCallback.Create().
 					SetSupplyOrderID(so.ID).

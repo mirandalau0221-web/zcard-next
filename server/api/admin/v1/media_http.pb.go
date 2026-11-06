@@ -31,27 +31,27 @@ const OperationAdminMediaServiceRenameMedia = "/zcard.api.admin.v1.AdminMediaSer
 const OperationAdminMediaServiceUpload = "/zcard.api.admin.v1.AdminMediaService/Upload"
 
 type AdminMediaServiceHTTPServer interface {
-	// CreateCategory CreateCategory 创建分类。
+	// CreateCategory CreateCategory 創建分類。
 	CreateCategory(context.Context, *CreateMediaCategoryRequest) (*MediaCategory, error)
-	// DeleteCategory DeleteCategory 删除分类（有内容拒绝）。
+	// DeleteCategory DeleteCategory 刪除分類（有內容拒絕）。
 	DeleteCategory(context.Context, *DeleteMediaCategoryRequest) (*emptypb.Empty, error)
-	// DeleteMedia DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+	// DeleteMedia DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
 	DeleteMedia(context.Context, *DeleteMediaRequest) (*DeleteMediaReply, error)
-	// ImportFromURL ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+	// ImportFromURL ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
 	ImportFromURL(context.Context, *ImportMediaRequest) (*MediaItem, error)
-	// ListCategories ListCategories 分类列表。
+	// ListCategories ListCategories 分類列表。
 	ListCategories(context.Context, *emptypb.Empty) (*ListMediaCategoriesReply, error)
 	// ListMedia ListMedia 素材列表。
 	ListMedia(context.Context, *ListMediaRequest) (*ListMediaReply, error)
-	// MoveCategory MoveCategory 分类移动。
+	// MoveCategory MoveCategory 分類移動。
 	MoveCategory(context.Context, *MoveMediaCategoryRequest) (*emptypb.Empty, error)
-	// MoveMedia MoveMedia 素材批量移动。
+	// MoveMedia MoveMedia 素材批量移動。
 	MoveMedia(context.Context, *MoveMediaRequest) (*emptypb.Empty, error)
-	// RenameCategory RenameCategory 分类改名。
+	// RenameCategory RenameCategory 分類改名。
 	RenameCategory(context.Context, *RenameMediaCategoryRequest) (*MediaCategory, error)
 	// RenameMedia RenameMedia 素材改名。
 	RenameMedia(context.Context, *RenameMediaRequest) (*MediaItem, error)
-	// Upload Upload 上传（安全三件套：三重校验+重编码+10MB）。
+	// Upload Upload 上傳（安全三件套：三重校驗+重編碼+10MB）。
 	Upload(context.Context, *UploadMediaRequest) (*MediaItem, error)
 }
 
@@ -292,27 +292,27 @@ func _AdminMediaService_DeleteMedia0_HTTP_Handler(srv AdminMediaServiceHTTPServe
 }
 
 type AdminMediaServiceHTTPClient interface {
-	// CreateCategory CreateCategory 创建分类。
+	// CreateCategory CreateCategory 創建分類。
 	CreateCategory(ctx context.Context, req *CreateMediaCategoryRequest, opts ...http.CallOption) (rsp *MediaCategory, err error)
-	// DeleteCategory DeleteCategory 删除分类（有内容拒绝）。
+	// DeleteCategory DeleteCategory 刪除分類（有內容拒絕）。
 	DeleteCategory(ctx context.Context, req *DeleteMediaCategoryRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// DeleteMedia DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+	// DeleteMedia DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
 	DeleteMedia(ctx context.Context, req *DeleteMediaRequest, opts ...http.CallOption) (rsp *DeleteMediaReply, err error)
-	// ImportFromURL ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+	// ImportFromURL ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
 	ImportFromURL(ctx context.Context, req *ImportMediaRequest, opts ...http.CallOption) (rsp *MediaItem, err error)
-	// ListCategories ListCategories 分类列表。
+	// ListCategories ListCategories 分類列表。
 	ListCategories(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListMediaCategoriesReply, err error)
 	// ListMedia ListMedia 素材列表。
 	ListMedia(ctx context.Context, req *ListMediaRequest, opts ...http.CallOption) (rsp *ListMediaReply, err error)
-	// MoveCategory MoveCategory 分类移动。
+	// MoveCategory MoveCategory 分類移動。
 	MoveCategory(ctx context.Context, req *MoveMediaCategoryRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// MoveMedia MoveMedia 素材批量移动。
+	// MoveMedia MoveMedia 素材批量移動。
 	MoveMedia(ctx context.Context, req *MoveMediaRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// RenameCategory RenameCategory 分类改名。
+	// RenameCategory RenameCategory 分類改名。
 	RenameCategory(ctx context.Context, req *RenameMediaCategoryRequest, opts ...http.CallOption) (rsp *MediaCategory, err error)
 	// RenameMedia RenameMedia 素材改名。
 	RenameMedia(ctx context.Context, req *RenameMediaRequest, opts ...http.CallOption) (rsp *MediaItem, err error)
-	// Upload Upload 上传（安全三件套：三重校验+重编码+10MB）。
+	// Upload Upload 上傳（安全三件套：三重校驗+重編碼+10MB）。
 	Upload(ctx context.Context, req *UploadMediaRequest, opts ...http.CallOption) (rsp *MediaItem, err error)
 }
 
@@ -324,7 +324,7 @@ func NewAdminMediaServiceHTTPClient(client *http.Client) AdminMediaServiceHTTPCl
 	return &AdminMediaServiceHTTPClientImpl{client}
 }
 
-// CreateCategory CreateCategory 创建分类。
+// CreateCategory CreateCategory 創建分類。
 func (c *AdminMediaServiceHTTPClientImpl) CreateCategory(ctx context.Context, in *CreateMediaCategoryRequest, opts ...http.CallOption) (*MediaCategory, error) {
 	var out MediaCategory
 	pattern := "/api/v1/admin/media/categories"
@@ -342,7 +342,7 @@ func (c *AdminMediaServiceHTTPClientImpl) CreateCategory(ctx context.Context, in
 	return &out, nil
 }
 
-// DeleteCategory DeleteCategory 删除分类（有内容拒绝）。
+// DeleteCategory DeleteCategory 刪除分類（有內容拒絕）。
 func (c *AdminMediaServiceHTTPClientImpl) DeleteCategory(ctx context.Context, in *DeleteMediaCategoryRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/media/categories/{id}"
@@ -359,7 +359,7 @@ func (c *AdminMediaServiceHTTPClientImpl) DeleteCategory(ctx context.Context, in
 	return &out, nil
 }
 
-// DeleteMedia DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+// DeleteMedia DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
 func (c *AdminMediaServiceHTTPClientImpl) DeleteMedia(ctx context.Context, in *DeleteMediaRequest, opts ...http.CallOption) (*DeleteMediaReply, error) {
 	var out DeleteMediaReply
 	pattern := "/api/v1/admin/media/delete"
@@ -377,7 +377,7 @@ func (c *AdminMediaServiceHTTPClientImpl) DeleteMedia(ctx context.Context, in *D
 	return &out, nil
 }
 
-// ImportFromURL ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+// ImportFromURL ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
 func (c *AdminMediaServiceHTTPClientImpl) ImportFromURL(ctx context.Context, in *ImportMediaRequest, opts ...http.CallOption) (*MediaItem, error) {
 	var out MediaItem
 	pattern := "/api/v1/admin/media/import"
@@ -395,7 +395,7 @@ func (c *AdminMediaServiceHTTPClientImpl) ImportFromURL(ctx context.Context, in 
 	return &out, nil
 }
 
-// ListCategories ListCategories 分类列表。
+// ListCategories ListCategories 分類列表。
 func (c *AdminMediaServiceHTTPClientImpl) ListCategories(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListMediaCategoriesReply, error) {
 	var out ListMediaCategoriesReply
 	pattern := "/api/v1/admin/media/categories"
@@ -429,7 +429,7 @@ func (c *AdminMediaServiceHTTPClientImpl) ListMedia(ctx context.Context, in *Lis
 	return &out, nil
 }
 
-// MoveCategory MoveCategory 分类移动。
+// MoveCategory MoveCategory 分類移動。
 func (c *AdminMediaServiceHTTPClientImpl) MoveCategory(ctx context.Context, in *MoveMediaCategoryRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/media/categories/{id}/move"
@@ -447,7 +447,7 @@ func (c *AdminMediaServiceHTTPClientImpl) MoveCategory(ctx context.Context, in *
 	return &out, nil
 }
 
-// MoveMedia MoveMedia 素材批量移动。
+// MoveMedia MoveMedia 素材批量移動。
 func (c *AdminMediaServiceHTTPClientImpl) MoveMedia(ctx context.Context, in *MoveMediaRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/media/move"
@@ -465,7 +465,7 @@ func (c *AdminMediaServiceHTTPClientImpl) MoveMedia(ctx context.Context, in *Mov
 	return &out, nil
 }
 
-// RenameCategory RenameCategory 分类改名。
+// RenameCategory RenameCategory 分類改名。
 func (c *AdminMediaServiceHTTPClientImpl) RenameCategory(ctx context.Context, in *RenameMediaCategoryRequest, opts ...http.CallOption) (*MediaCategory, error) {
 	var out MediaCategory
 	pattern := "/api/v1/admin/media/categories/{id}/rename"
@@ -501,7 +501,7 @@ func (c *AdminMediaServiceHTTPClientImpl) RenameMedia(ctx context.Context, in *R
 	return &out, nil
 }
 
-// Upload Upload 上传（安全三件套：三重校验+重编码+10MB）。
+// Upload Upload 上傳（安全三件套：三重校驗+重編碼+10MB）。
 func (c *AdminMediaServiceHTTPClientImpl) Upload(ctx context.Context, in *UploadMediaRequest, opts ...http.CallOption) (*MediaItem, error) {
 	var out MediaItem
 	pattern := "/api/v1/admin/media/upload"

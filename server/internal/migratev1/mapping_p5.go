@@ -1,12 +1,12 @@
 package migratev1
 
-// P5 资金域迁移：bills → wallet_transactions（重放 + 余额三方对账差异清单）、
+// P5 資金域遷移：bills → wallet_transactions（重放 + 餘額三方對賬差異清單）、
 // withdrawals、commissions → affiliate_commissions。
-// 映射规格《数据迁移工具开发计划》§5.6。
+// 映射規格《數據遷移工具開發計劃》§5.6。
 //
-// 对账不变量（差异暴露而非修复）：每用户末条流水 balance_after ==
-// wallet_accounts.available（P1 的 1.x users.balance 快照）；不等即进
-// 「资金差异清单」——1.x 账实不符是历史问题，迁移工具的职责是暴露它。
+// 對賬不變量（差異暴露而非修復）：每用户末條流水 balance_after ==
+// wallet_accounts.available（P1 的 1.x users.balance 快照）；不等即進
+// 「資金差異清單」——1.x 賬實不符是歷史問題，遷移工具的職責是暴露它。
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/withdrawal"
 )
 
-// MigrateMoney P5 阶段。
+// MigrateMoney P5 階段。
 func (m *Migrator) MigrateMoney(ctx context.Context) error {
 	if err := m.migrateBills(ctx); err != nil {
 		return err
@@ -31,13 +31,13 @@ func (m *Migrator) MigrateMoney(ctx context.Context) error {
 	if err := m.migrateCommissions(ctx); err != nil {
 		return err
 	}
-	// bills 全量迁完后做余额三方对账（差异进清单不修复）
+	// bills 全量遷完後做餘額三方對賬（差異進清單不修復）
 	return m.ReconcileWallets(ctx)
 }
 
 // migrateBills 1.x bills → wallet_transactions（重放）。
 // direction：type 1=收入→in、0=支出→out；balance_before 由 balance_after 反推；
-// reference = v1_import:bills:<old_id>（幂等键，重放语义）。type 用 v1_bill 标记来源。
+// reference = v1_import:bills:<old_id>（冪等鍵，重放語義）。type 用 v1_bill 標記來源。
 func (m *Migrator) migrateBills(ctx context.Context) error {
 	var (
 		id, userID   int64
@@ -111,9 +111,9 @@ func (m *Migrator) migrateBills(ctx context.Context) error {
 	)
 }
 
-// ReconcileWallets 余额三方对账：每用户「末条流水 balance_after vs 钱包快照 available
-// （=1.x users.balance）」。差异进清单（errors.jsonl + 报告），不修复——切换前人工核销。
-// 必须在 bills 全量迁完后调用。
+// ReconcileWallets 餘額三方對賬：每用户「末條流水 balance_after vs 錢包快照 available
+// （=1.x users.balance）」。差異進清單（errors.jsonl + 報告），不修復——切換前人工核銷。
+// 必須在 bills 全量遷完後調用。
 func (m *Migrator) ReconcileWallets(ctx context.Context) error {
 	if m.dry {
 		return nil
@@ -130,7 +130,7 @@ func (m *Migrator) ReconcileWallets(ctx context.Context) error {
 			Order(ent.Desc(wallettransaction.FieldCreatedAt), ent.Desc(wallettransaction.FieldID)).
 			First(ctx)
 		if ent.IsNotFound(err) {
-			continue // 无流水（空账户）：快照即真相
+			continue // 無流水（空賬户）：快照即真相
 		}
 		if err != nil {
 			return err
@@ -138,7 +138,7 @@ func (m *Migrator) ReconcileWallets(ctx context.Context) error {
 		if last.BalanceAfter != acc.Available {
 			diff++
 			m.RW.AddError("wallet_reconcile", acc.UserID,
-				fmt.Sprintf("账实不符：末条流水 balance_after=%d ≠ 钱包快照 available=%d（差 %d 分）",
+				fmt.Sprintf("賬實不符：末條流水 balance_after=%d ≠ 錢包快照 available=%d（差 %d 分）",
 					last.BalanceAfter, acc.Available, last.BalanceAfter-acc.Available))
 		}
 	}
@@ -220,7 +220,7 @@ func (m *Migrator) migrateWithdrawals(ctx context.Context) error {
 			}
 			if aa := nullInt(actualAmount); aa != 0 && aa != amount-fee {
 				m.RW.AddError("withdrawals", uint64(id),
-					fmt.Sprintf("actual_amount=%d 与 amount-fee=%d 不一致（2.0 无独立到账列，差异记录在案）", aa, amount-fee))
+					fmt.Sprintf("actual_amount=%d 與 amount-fee=%d 不一致（2.0 無獨立到賬列，差異記錄在案）", aa, amount-fee))
 			}
 			if _, err := m.IDs.Put(ctx, m.Client, "withdrawals", uint64(id), w.ID); err != nil {
 				return err
@@ -232,7 +232,7 @@ func (m *Migrator) migrateWithdrawals(ctx context.Context) error {
 }
 
 // migrateCommissions 1.x commissions → affiliate_commissions。
-// pending（1.x 冻结中）→ pending_confirm；paid（已随提现支付）→ withdrawn。
+// pending（1.x 凍結中）→ pending_confirm；paid（已隨提現支付）→ withdrawn。
 func (m *Migrator) migrateCommissions(ctx context.Context) error {
 	var (
 		id, buyerID, referrerID int64
@@ -263,12 +263,12 @@ func (m *Migrator) migrateCommissions(ctx context.Context) error {
 			st := "available"
 			switch status {
 			case "pending":
-				st = "pending_confirm" // 历史冻结佣金折算冻结态（§8.2 口径）
+				st = "pending_confirm" // 歷史凍結佣金折算凍結態（§8.2 口徑）
 			case "paid":
 				st = "withdrawn"
 			}
 			b := m.Client.AffiliateCommission.Create().
-				SetOrderID(0). // 1.x 订单未映射时置 0（下方尝试）
+				SetOrderID(0). // 1.x 訂單未映射時置 0（下方嘗試）
 				SetReferrerID(newR).
 				SetTier(int8(tier)).
 				SetBaseAmount(baseAmount).
@@ -290,7 +290,7 @@ func (m *Migrator) migrateCommissions(ctx context.Context) error {
 			if t, ok, _ := mustTime(nullStr(createdAt), m.TZ); ok {
 				b.SetCreatedAt(t)
 				if st == "available" {
-					b.SetAvailableAt(t) // available_at 空 → 迁移时刻（即时可用语义）
+					b.SetAvailableAt(t) // available_at 空 → 遷移時刻（即時可用語義）
 				}
 			} else if st == "available" {
 				b.SetAvailableAt(time.Now().UTC())

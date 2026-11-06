@@ -1,6 +1,6 @@
 package settings
 
-// 设置仓储 Ent 实现（UNIQUE(group, key) 命中读写）。
+// 設置倉儲 Ent 實現（UNIQUE(group, key) 命中讀寫）。
 
 import (
 	"context"
@@ -18,16 +18,16 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// RepoImpl 设置仓储实现。
+// RepoImpl 設置倉儲實現。
 type RepoImpl struct {
 	data   *data.Data
 	cipher *crypto.Box
 }
 
-// NewRepoImpl 构造。
+// NewRepoImpl 構造。
 func NewRepoImpl(d *data.Data) *RepoImpl { return &RepoImpl{data: d} }
 
-// Get 读取单项。
+// Get 讀取單項。
 func (r *RepoImpl) Get(ctx context.Context, group, key string) (json.RawMessage, error) {
 	row, err := data.Client(ctx, r.data).Setting.Query().
 		Where(setting.Group(group), setting.Key(key)).
@@ -52,7 +52,7 @@ func (r *RepoImpl) Get(ctx context.Context, group, key string) (json.RawMessage,
 			}
 			plain, err := r.cipher.Open(sealed, []byte("settings:notify:telegram_bot_token"))
 			if err != nil {
-				return nil, fmt.Errorf("Telegram Token 无法解密，请重新配置")
+				return nil, fmt.Errorf("Telegram Token 無法解密，請重新配置")
 			}
 			return json.RawMessage(plain), nil
 		}
@@ -60,7 +60,7 @@ func (r *RepoImpl) Get(ctx context.Context, group, key string) (json.RawMessage,
 	return json.RawMessage(row.Value), nil
 }
 
-// List 按分组列出（空分组 = 全部）。
+// List 按分組列出（空分組 = 全部）。
 func (r *RepoImpl) List(ctx context.Context, group string) ([]port.Item, error) {
 	q := data.Client(ctx, r.data).Setting.Query().Order(ent.Asc(setting.FieldGroup, setting.FieldKey))
 	if group != "" {
@@ -77,7 +77,7 @@ func (r *RepoImpl) List(ctx context.Context, group string) ([]port.Item, error) 
 	return items, nil
 }
 
-// Put upsert 单项（Ent Upsert 跨方言适配，ADR-D18；冲突目标显式化——PG 必需）。
+// Put upsert 單項（Ent Upsert 跨方言適配，ADR-D18；衝突目標顯式化——PG 必需）。
 func (r *RepoImpl) Put(ctx context.Context, group, key string, value json.RawMessage) error {
 	if group == "notify" && key == "telegram_bot_token" {
 		if r.cipher == nil {
@@ -99,14 +99,14 @@ func (r *RepoImpl) Put(ctx context.Context, group, key string, value json.RawMes
 		Exec(ctx)
 }
 
-// CurrencyExists 货币是否存在（i18n.base_currency 写入校验）。
+// CurrencyExists 貨幣是否存在（i18n.base_currency 寫入校驗）。
 func (r *RepoImpl) CurrencyExists(ctx context.Context, code string) (bool, error) {
 	return data.Client(ctx, r.data).Currency.Query().
 		Where(currency.Code(code), currency.Enabled(true)).
 		Exist(ctx)
 }
 
-// PutMany 批量写入（单事务原子；跨方言 upsert 复用 Put）。
+// PutMany 批量寫入（單事務原子；跨方言 upsert 複用 Put）。
 func (r *RepoImpl) PutMany(ctx context.Context, items []port.Item) error {
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		if hasCurrencyConfigurationWrites(items) {
@@ -128,9 +128,9 @@ func (r *RepoImpl) PutMany(ctx context.Context, items []port.Item) error {
 	})
 }
 
-// ── port.Provider 实现（跨模块读取入口，）─────────────────────
+// ── port.Provider 實現（跨模塊讀取入口，）─────────────────────
 
-// GetDefault 读取单项，不存在返回 def。
+// GetDefault 讀取單項，不存在返回 def。
 func (r *RepoImpl) GetDefault(ctx context.Context, group, key string, def json.RawMessage) (json.RawMessage, error) {
 	v, err := r.Get(ctx, group, key)
 	if errors.Is(err, ErrSettingNotFound) {
@@ -139,7 +139,7 @@ func (r *RepoImpl) GetDefault(ctx context.Context, group, key string, def json.R
 	return v, err
 }
 
-// Get 直查（包内工具，install/前台复用）。
+// Get 直查（包內工具，install/前台複用）。
 func Get(ctx context.Context, d *data.Data, group, key string) (json.RawMessage, error) {
 	row, err := data.Client(ctx, d).Setting.Query().
 		Where(setting.Group(group), setting.Key(key)).

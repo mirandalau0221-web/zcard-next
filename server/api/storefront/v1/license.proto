@@ -8,51 +8,51 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// StoreLicenseService 专业套餐在线购买(：发行侧部署配置签发私钥后开放；
-// 支付 = 钱包余额扣款（充值管线入账的钱），签发与扣款同事务；购买人下载许可证
-// 文件后在目标实例后台安装激活）。
+// StoreLicenseService 專業套餐在線購買(：發行側部署配置簽發私鑰後開放；
+// 支付 = 錢包餘額扣款（充值管線入賬的錢），簽發與扣款同事務；購買人下載許可證
+// 文件後在目標實例後台安裝激活）。
 service StoreLicenseService {
-  // GetLicenseOffer 套餐报价（价格服务端裁决；instance_id 供目标实例绑定预览）。
+  // GetLicenseOffer 套餐報價（價格服務端裁決；instance_id 供目標實例綁定預覽）。
   rpc GetLicenseOffer(google.protobuf.Empty) returns (LicenseOfferReply) {
     option (google.api.http) = { get: "/api/v1/storefront/license/offer" };
   }
-  // PurchaseLicense 购买（钱包扣款 → ed25519 签发 → 返回许可证文件）。
+  // PurchaseLicense 購買（錢包扣款 → ed25519 簽發 → 返回許可證文件）。
   rpc PurchaseLicense(PurchaseLicenseRequest) returns (PurchaseLicenseReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/license/purchase"
       body: "*"
     };
   }
-  // ListLicenseOrders 购买记录（含许可证文件可重新下载）。
+  // ListLicenseOrders 購買記錄（含許可證文件可重新下載）。
   rpc ListLicenseOrders(ListLicenseOrdersRequest) returns (ListLicenseOrdersReply) {
     option (google.api.http) = { get: "/api/v1/storefront/license/orders" };
   }
 }
 
-// LicenseOfferReply 套餐报价与购买前置状态。
+// LicenseOfferReply 套餐報價與購買前置狀態。
 message LicenseOfferReply {
-  // 月付价（分；默认 300 = 3U）
+  // 月付價（分；默認 300 = 3U）
   int64 monthly_cents = 1;
-  // 年付价（分；默认 3000 = 30U）
+  // 年付價（分；默認 3000 = 30U）
   int64 yearly_cents = 2;
-  // 发行侧是否配置签发私钥（false = 本部署不开通在线购买）
+  // 發行側是否配置簽發私鑰（false = 本部署不開通在線購買）
   bool purchasable = 3;
-  // 本部署实例 ID（自购场景绑定预览；购买其他实例时填对方实例 ID）
+  // 本部署實例 ID（自購場景綁定預覽；購買其他實例時填對方實例 ID）
   string instance_id = 4;
 }
 
 message PurchaseLicenseRequest {
   // monthly | yearly
   string plan = 1 [(google.api.field_behavior) = REQUIRED];
-  // 目标实例 ID（空 = 绑定本部署实例——发行侧自测/内部发行场景）
+  // 目標實例 ID（空 = 綁定本部署實例——發行側自測/內部發行場景）
   string instance_id = 2;
-  // 目标域名（可选；空 = 不限域名）
+  // 目標域名（可選；空 = 不限域名）
   string domain = 3;
 }
 
 message PurchaseLicenseReply {
   uint64 order_id = 1;
-  // 许可证文件内容（JSON：license + signature；目标实例后台安装激活）
+  // 許可證文件內容（JSON：license + signature；目標實例後台安裝激活）
   string license_file = 2;
   string expires_at = 3; // RFC3339
   int64 paid_cents = 4;

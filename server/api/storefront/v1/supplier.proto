@@ -9,47 +9,47 @@ import "storefront/v1/payment.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// StoreSupplierService 前台对接申请（个人中心）：申请成为供货商户 →
-// 后台审核 → 凭据管理（app_id + api_secret）。
-// 通过后凭据可直接填入 acg-faka/dujiao-next/zcard 三面板（协议由申请时选定）。
+// StoreSupplierService 前台對接申請（個人中心）：申請成為供貨商户 →
+// 後台審核 → 憑據管理（app_id + api_secret）。
+// 通過後憑據可直接填入 acg-faka/dujiao-next/zcard 三面板（協議由申請時選定）。
 service StoreSupplierService {
-  // SubmitSupplierApplication 提交对接申请（服务端生成 api_key/api_secret；
-  // api_secret 不在本响应返回——审核通过后在凭据接口查看）。
+  // SubmitSupplierApplication 提交對接申請（服務端生成 api_key/api_secret；
+  // api_secret 不在本響應返回——審核通過後在憑據接口查看）。
   rpc SubmitSupplierApplication(SubmitSupplierApplicationRequest) returns (SupplierAccountReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/supplier/applications"
       body: "*"
     };
   }
-  // ListMySupplierAccounts 我的对接账户（申请中/已通过/已驳回/已禁用全量）。
+  // ListMySupplierAccounts 我的對接賬户（申請中/已通過/已駁回/已禁用全量）。
   rpc ListMySupplierAccounts(google.protobuf.Empty) returns (ListSupplierAccountsReply) {
     option (google.api.http) = { get: "/api/v1/storefront/supplier/accounts" };
   }
-  // GetSupplierCredentials 查看凭据（仅 approved 且归属本人；返回明文 api_secret）。
+  // GetSupplierCredentials 查看憑據（僅 approved 且歸屬本人；返回明文 api_secret）。
   rpc GetSupplierCredentials(GetSupplierCredentialsRequest) returns (SupplierCredentialsReply) {
     option (google.api.http) = { get: "/api/v1/storefront/supplier/accounts/{id}/credentials" };
   }
-  // RegenerateSupplierSecret 重置密钥（旧 secret 立即失效；新明文仅此一次返回）。
+  // RegenerateSupplierSecret 重置密鑰（舊 secret 立即失效；新明文僅此一次返回）。
   rpc RegenerateSupplierSecret(RegenerateSupplierSecretRequest) returns (SupplierCredentialsReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/supplier/accounts/{id}/regenerate-secret"
     };
   }
-  // CancelSupplierApplication 撤销申请（仅 applying 状态可撤销）。
+  // CancelSupplierApplication 撤銷申請（僅 applying 狀態可撤銷）。
   rpc CancelSupplierApplication(CancelSupplierApplicationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/storefront/supplier/accounts/{id}/cancel"
     };
   }
-  // CreateSupplierRecharge 对接账户自助充值（金额服务端档位裁决；
-  // 支付确认前不入账——回调成功后入账到供货余额，reference 幂等）。
+  // CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；
+  // 支付確認前不入賬——回調成功後入賬到供貨餘額，reference 冪等）。
   rpc CreateSupplierRecharge(CreateSupplierRechargeRequest) returns (CreateSupplierRechargeReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/supplier/accounts/{id}/recharge"
       body: "*"
     };
   }
-  // SetSupplierIPWhitelist 设置 IP 白名单（仅 approved 且归属本人；空 = 所有 IP 放行）。
+  // SetSupplierIPWhitelist 設置 IP 白名單（僅 approved 且歸屬本人；空 = 所有 IP 放行）。
   rpc SetSupplierIPWhitelist(SetSupplierIPWhitelistRequest) returns (SupplierAccountReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/supplier/accounts/{id}/ip-whitelist"
@@ -59,12 +59,12 @@ service StoreSupplierService {
 }
 
 message SubmitSupplierApplicationRequest {
-  // 下游面板协议：zcard | dujiao_next | acg_faka
+  // 下游面板協議：zcard | dujiao_next | acg_faka
   string protocol = 1 [(google.api.field_behavior) = REQUIRED];
-  string display_name = 2 [(google.api.field_behavior) = REQUIRED]; // 站点/店铺名（≤100）
-  string contact = 3; // 联系方式（QQ/邮箱/手机）
-  string apply_reason = 4; // 申请理由（≤500）
-  string notify_url = 5; // 交付回调地址（可选；HTTPS 强制）
+  string display_name = 2 [(google.api.field_behavior) = REQUIRED]; // 站點/店鋪名（≤100）
+  string contact = 3; // 聯繫方式（QQ/郵箱/手機）
+  string apply_reason = 4; // 申請理由（≤500）
+  string notify_url = 5; // 交付回調地址（可選；HTTPS 強制）
 }
 
 message SupplierAccountReply {
@@ -74,12 +74,12 @@ message SupplierAccountReply {
   string display_name = 4;
   string contact = 5;
   string apply_reason = 6;
-  string review_note = 7; // 审核意见/驳回理由
-  string api_key = 8; // app_id（明文常驻）
+  string review_note = 7; // 審核意見/駁回理由
+  string api_key = 8; // app_id（明文常駐）
   int64 reviewed_at = 9;
   int64 created_at = 10;
-  int64 balance_cache = 11; // 供货余额（分）
-  repeated string ip_whitelist = 12; // IP 白名单（空=所有 IP 放行；精确 IP 或 CIDR）
+  int64 balance_cache = 11; // 供貨餘額（分）
+  repeated string ip_whitelist = 12; // IP 白名單（空=所有 IP 放行；精確 IP 或 CIDR）
 }
 
 message ListSupplierAccountsReply {
@@ -99,24 +99,24 @@ message CancelSupplierApplicationRequest {
 }
 
 message CreateSupplierRechargeRequest {
-  uint64 id = 1 [(google.api.field_behavior) = REQUIRED]; // 对接账户（须 approved 且归属本人）
-  int64 amount_cents = 2 [(google.api.field_behavior) = REQUIRED]; // 意向金额（分；服务端按档位裁决）
+  uint64 id = 1 [(google.api.field_behavior) = REQUIRED]; // 對接賬户（須 approved 且歸屬本人）
+  int64 amount_cents = 2 [(google.api.field_behavior) = REQUIRED]; // 意向金額（分；服務端按檔位裁決）
   string channel = 3 [(google.api.field_behavior) = REQUIRED]; // 支付渠道 code
-  // 方式标识（多方式渠道必填：易支付 alipay/wxpay、USDT 选链；单方式渠道留空）
+  // 方式標識（多方式渠道必填：易支付 alipay/wxpay、USDT 選鏈；單方式渠道留空）
   optional string method = 4;
   string quote_key = 5;
 }
 
 message SetSupplierIPWhitelistRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
-  repeated string ips = 2; // 精确 IP 或 CIDR 网段（如 1.2.3.4、10.0.0.0/24）；空 = 不限
+  repeated string ips = 2; // 精確 IP 或 CIDR 網段（如 1.2.3.4、10.0.0.0/24）；空 = 不限
 }
 
 message CreateSupplierRechargeReply {
   uint64 recharge_id = 1;
   uint64 payment_id = 2;
-  string type = 3; // redirect | qrcode | params（与 CreateRechargeReply 同构）
-  string payload = 4; // 支付跳转 URL / 二维码内容 / 参数 JSON
+  string type = 3; // redirect | qrcode | params（與 CreateRechargeReply 同構）
+  string payload = 4; // 支付跳轉 URL / 二維碼內容 / 參數 JSON
   PaymentQuote quote = 5;
 }
 
@@ -125,5 +125,5 @@ message SupplierCredentialsReply {
   string protocol = 2;
   string status = 3;
   string api_key = 4; // app_id（明文）
-  string api_secret = 5; // app_key（明文；重置后旧值立即失效）
+  string api_secret = 5; // app_key（明文；重置後舊值立即失效）
 }

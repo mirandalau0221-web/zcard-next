@@ -1,7 +1,7 @@
-// Package authz 自建 RBAC（）：admin_roles + role_permissions，权限目录自动生成。
+// Package authz 自建 RBAC（）：admin_roles + role_permissions，權限目錄自動生成。
 //
-// 发卡系统权限模型简单，自建 RBAC 比 Casbin 更轻可控（规划 ）；
-// 「域内角色」（分站主只见自己分站）由 subsite_id 租户隔离实现，不做双套权限源。
+// 髮卡系統權限模型簡單，自建 RBAC 比 Casbin 更輕可控（規劃 ）；
+// 「域內角色」（分站主只見自己分站）由 subsite_id 租户隔離實現，不做雙套權限源。
 package authz
 
 import (
@@ -10,14 +10,14 @@ import (
 	"time"
 )
 
-// RoleRepo 角色仓储（模块内端口，实现于 data.go；管理方法仅供 service 层消费）。
+// RoleRepo 角色倉儲（模塊內端口，實現於 data.go；管理方法僅供 service 層消費）。
 type RoleRepo interface {
-	// PermissionCodes 返回角色的全部权限点编码。
+	// PermissionCodes 返回角色的全部權限點編碼。
 	PermissionCodes(ctx context.Context, roleID uint64) ([]string, error)
 	// Role 角色名（不存在返回空串）。
 	Role(ctx context.Context, roleID uint64) (name string, err error)
 
-	// ── 管理面（RoleService 消费）──
+	// ── 管理面（RoleService 消費）──
 	Roles(ctx context.Context) ([]*RoleDetail, error)
 	RoleByID(ctx context.Context, id uint64) (*RoleDetail, error)
 	CreateRole(ctx context.Context, name, code, desc string, perms []string) (*RoleDetail, error)
@@ -26,8 +26,8 @@ type RoleRepo interface {
 	SetPermissions(ctx context.Context, id uint64, perms []string) (*RoleDetail, error)
 }
 
-// RbacUsecase 鉴权用例：权限点进程内缓存（30s TTL，角色变更后自然过期；
-// 多员工实时吊销走 sessions/版本号）。
+// RbacUsecase 鑑權用例：權限點進程內緩存（30s TTL，角色變更後自然過期；
+// 多員工實時吊銷走 sessions/版本號）。
 type RbacUsecase struct {
 	repo RoleRepo
 
@@ -43,12 +43,12 @@ type cacheEntry struct {
 
 const cacheTTL = 30 * time.Second
 
-// NewRbacUsecase 构造。
+// NewRbacUsecase 構造。
 func NewRbacUsecase(repo RoleRepo) *RbacUsecase {
 	return &RbacUsecase{repo: repo, cache: map[uint64]cacheEntry{}}
 }
 
-// Allowed 判定权限；* 通配（super_admin 种子）。
+// Allowed 判定權限；* 通配（super_admin 種子）。
 func (uc *RbacUsecase) Allowed(ctx context.Context, roleID uint64, permission string) bool {
 	codes := uc.codes(ctx, roleID)
 	for _, c := range codes {
@@ -59,12 +59,12 @@ func (uc *RbacUsecase) Allowed(ctx context.Context, roleID uint64, permission st
 	return false
 }
 
-// PermissionsOf 权限点清单（含缓存）。
+// PermissionsOf 權限點清單（含緩存）。
 func (uc *RbacUsecase) PermissionsOf(ctx context.Context, roleID uint64) ([]string, error) {
 	return uc.codes(ctx, roleID), nil
 }
 
-// RoleName 角色名（含缓存）。
+// RoleName 角色名（含緩存）。
 func (uc *RbacUsecase) RoleName(ctx context.Context, roleID uint64) string {
 	uc.mu.RLock()
 	e, ok := uc.cache[roleID]
@@ -97,7 +97,7 @@ func (uc *RbacUsecase) codes(ctx context.Context, roleID uint64) []string {
 	return codes
 }
 
-// Invalidate 失效角色缓存（权限变更后实时生效，）。
+// Invalidate 失效角色緩存（權限變更後實時生效，）。
 func (uc *RbacUsecase) Invalidate(roleID uint64) {
 	uc.mu.Lock()
 	defer uc.mu.Unlock()

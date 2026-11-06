@@ -15,7 +15,7 @@ func (g *Gateway) PrepareSMS(ctx context.Context, id uint64, code string) (suppl
 		return quote, err
 	}
 	if conn.Driver != "zcard" || string(conn.Status) != "active" || conn.ExchangeRate != 1 {
-		return quote, fmt.Errorf("接码货源必须为启用的人民币 ZCard 连接")
+		return quote, fmt.Errorf("接碼貨源必須為啓用的人民幣 ZCard 連接")
 	}
 	a, err := g.adapterFor(ctx, id)
 	if err != nil {
@@ -26,34 +26,34 @@ func (g *Gateway) PrepareSMS(ctx context.Context, id uint64, code string) (suppl
 		return quote, err
 	}
 	if !slices.Contains(p.Capabilities, supplyport.SMSCapability) || !slices.Contains(p.Capabilities, supplyport.SMSPolling) || p.Currency != "CNY" || p.Balance < 0 {
-		return quote, fmt.Errorf("货源接码能力或签名账户尚未就绪")
+		return quote, fmt.Errorf("貨源接碼能力或簽名賬户尚未就緒")
 	}
 	reader, ok := a.(interface {
 		GetSMSProduct(context.Context, string) (int64, error)
 	})
 	if !ok {
-		return quote, fmt.Errorf("货源不支持接码")
+		return quote, fmt.Errorf("貨源不支持接碼")
 	}
 	cost, err := reader.GetSMSProduct(ctx, code)
 	if err != nil {
 		return quote, err
 	}
 	if cost <= 0 || p.Balance < cost {
-		return quote, fmt.Errorf("接码报价无效或供货余额不足")
+		return quote, fmt.Errorf("接碼報價無效或供貨餘額不足")
 	}
 	stock, err := a.GetStock(ctx, code, "")
 	if err != nil {
 		return quote, err
 	}
 	if stock != -1 && stock < 1 {
-		return quote, fmt.Errorf("接码库存不足或尚未确认")
+		return quote, fmt.Errorf("接碼庫存不足或尚未確認")
 	}
 	current, err := g.repo.GetConnection(ctx, id)
 	if err != nil {
 		return quote, err
 	}
 	if data.SMSConnectionIdentity(current) != data.SMSConnectionIdentity(conn) {
-		return quote, fmt.Errorf("货源账号已变化")
+		return quote, fmt.Errorf("貨源賬號已變化")
 	}
 	return supplyport.SMSQuote{ProductID: code, ConnectionID: id, Identity: data.SMSConnectionIdentity(conn), Amount: cost}, nil
 }

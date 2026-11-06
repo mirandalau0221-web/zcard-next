@@ -1,6 +1,6 @@
 package queue
 
-// asynq 适配器（有 Redis 时启用；三队列 weighted 6:3:1 隔离，ADR-D6）。
+// asynq 適配器（有 Redis 時啓用；三隊列 weighted 6:3:1 隔離，ADR-D6）。
 
 import (
 	"context"
@@ -10,15 +10,15 @@ import (
 	"github.com/hibiken/asynq"
 )
 
-// AsynqQueue asynq 实现（Enqueuer）。Enabled 恒 true——构造即代表 Redis 已配置。
+// AsynqQueue asynq 實現（Enqueuer）。Enabled 恆 true——構造即代表 Redis 已配置。
 type AsynqQueue struct {
 	client *asynq.Client
 }
 
-// NewAsynqQueue 构造（client 生命周期由调用方管理）。
+// NewAsynqQueue 構造（client 生命週期由調用方管理）。
 func NewAsynqQueue(client *asynq.Client) *AsynqQueue { return &AsynqQueue{client: client} }
 
-// TaskOf 构造 asynq 任务（导出供 worker 侧注册同一口径的处理器名）。
+// TaskOf 構造 asynq 任務（導出供 worker 側註冊同一口徑的處理器名）。
 func TaskOf(t Task) *asynq.Task {
 	typ := t.Type
 	if typ == "" {
@@ -27,7 +27,7 @@ func TaskOf(t Task) *asynq.Task {
 	return asynq.NewTask(typ, t.Payload)
 }
 
-// Enqueue 入队：队列名归一（空→default）+ DedupeKey → asynq TaskID（唯一约束即幂等）。
+// Enqueue 入隊：隊列名歸一（空→default）+ DedupeKey → asynq TaskID（唯一約束即冪等）。
 func (q *AsynqQueue) Enqueue(ctx context.Context, t Task) error {
 	name := t.Queue
 	if name == "" {
@@ -39,20 +39,20 @@ func (q *AsynqQueue) Enqueue(ctx context.Context, t Task) error {
 	}
 	info, err := q.client.EnqueueContext(ctx, TaskOf(t), opts...)
 	if err != nil {
-		// 同 TaskID 已存在视为成功（幂等重入）
+		// 同 TaskID 已存在視為成功（冪等重入）
 		if errors.Is(err, asynq.ErrTaskIDConflict) {
 			return nil
 		}
-		return fmt.Errorf("queue: enqueue %q 到 %q 失败: %w", t.Type, name, err)
+		return fmt.Errorf("queue: enqueue %q 到 %q 失敗: %w", t.Type, name, err)
 	}
 	_ = info
 	return nil
 }
 
-// Enabled 恒 true。
+// Enabled 恆 true。
 func (*AsynqQueue) Enabled() bool { return true }
 
-// NewRedisClient 按 conf 构造 asynq 底层 Redis 连接。
+// NewRedisClient 按 conf 構造 asynq 底層 Redis 連接。
 func NewRedisClient(opt asynq.RedisConnOpt) *asynq.Client {
 	return asynq.NewClient(opt)
 }

@@ -26,14 +26,14 @@ const OperationAdminProcurementServiceRetryProcurement = "/zcard.api.admin.v1.Ad
 const OperationAdminProcurementServiceRetrySMS = "/zcard.api.admin.v1.AdminProcurementService/RetrySMS"
 
 type AdminProcurementServiceHTTPServer interface {
-	// GetProcurement GetProcurement 采购单详情（含采购项/密文行数）。
+	// GetProcurement GetProcurement 採購單詳情（含採購項/密文行數）。
 	GetProcurement(context.Context, *GetProcurementRequest) (*ProcurementOrder, error)
-	// ListProcurements ListProcurements 采购单列表（按状态过滤）。
+	// ListProcurements ListProcurements 採購單列表（按狀態過濾）。
 	ListProcurements(context.Context, *ListProcurementsRequest) (*ListProcurementsReply, error)
 	ListSMS(context.Context, *ListProcurementsRequest) (*SMSDiagnostics, error)
-	// MarkProcurementManual MarkProcurementManual 手动标记完成/转人工（人工拿货后回填）。
+	// MarkProcurementManual MarkProcurementManual 手動標記完成/轉人工（人工拿貨後回填）。
 	MarkProcurementManual(context.Context, *MarkProcurementManualRequest) (*ProcurementOrder, error)
-	// RetryProcurement RetryProcurement 手动重试（pending/submitted/polling 均可重新提交或推进轮询）。
+	// RetryProcurement RetryProcurement 手動重試（pending/submitted/polling 均可重新提交或推進輪詢）。
 	RetryProcurement(context.Context, *RetryProcurementRequest) (*ProcurementOrder, error)
 	RetrySMS(context.Context, *RetrySMSRequest) (*emptypb.Empty, error)
 }
@@ -175,14 +175,14 @@ func _AdminProcurementService_MarkProcurementManual0_HTTP_Handler(srv AdminProcu
 }
 
 type AdminProcurementServiceHTTPClient interface {
-	// GetProcurement GetProcurement 采购单详情（含采购项/密文行数）。
+	// GetProcurement GetProcurement 採購單詳情（含採購項/密文行數）。
 	GetProcurement(ctx context.Context, req *GetProcurementRequest, opts ...http.CallOption) (rsp *ProcurementOrder, err error)
-	// ListProcurements ListProcurements 采购单列表（按状态过滤）。
+	// ListProcurements ListProcurements 採購單列表（按狀態過濾）。
 	ListProcurements(ctx context.Context, req *ListProcurementsRequest, opts ...http.CallOption) (rsp *ListProcurementsReply, err error)
 	ListSMS(ctx context.Context, req *ListProcurementsRequest, opts ...http.CallOption) (rsp *SMSDiagnostics, err error)
-	// MarkProcurementManual MarkProcurementManual 手动标记完成/转人工（人工拿货后回填）。
+	// MarkProcurementManual MarkProcurementManual 手動標記完成/轉人工（人工拿貨後回填）。
 	MarkProcurementManual(ctx context.Context, req *MarkProcurementManualRequest, opts ...http.CallOption) (rsp *ProcurementOrder, err error)
-	// RetryProcurement RetryProcurement 手动重试（pending/submitted/polling 均可重新提交或推进轮询）。
+	// RetryProcurement RetryProcurement 手動重試（pending/submitted/polling 均可重新提交或推進輪詢）。
 	RetryProcurement(ctx context.Context, req *RetryProcurementRequest, opts ...http.CallOption) (rsp *ProcurementOrder, err error)
 	RetrySMS(ctx context.Context, req *RetrySMSRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
@@ -195,7 +195,7 @@ func NewAdminProcurementServiceHTTPClient(client *http.Client) AdminProcurementS
 	return &AdminProcurementServiceHTTPClientImpl{client}
 }
 
-// GetProcurement GetProcurement 采购单详情（含采购项/密文行数）。
+// GetProcurement GetProcurement 採購單詳情（含採購項/密文行數）。
 func (c *AdminProcurementServiceHTTPClientImpl) GetProcurement(ctx context.Context, in *GetProcurementRequest, opts ...http.CallOption) (*ProcurementOrder, error) {
 	var out ProcurementOrder
 	pattern := "/api/v1/admin/procurements/{id}"
@@ -212,7 +212,7 @@ func (c *AdminProcurementServiceHTTPClientImpl) GetProcurement(ctx context.Conte
 	return &out, nil
 }
 
-// ListProcurements ListProcurements 采购单列表（按状态过滤）。
+// ListProcurements ListProcurements 採購單列表（按狀態過濾）。
 func (c *AdminProcurementServiceHTTPClientImpl) ListProcurements(ctx context.Context, in *ListProcurementsRequest, opts ...http.CallOption) (*ListProcurementsReply, error) {
 	var out ListProcurementsReply
 	pattern := "/api/v1/admin/procurements"
@@ -245,7 +245,7 @@ func (c *AdminProcurementServiceHTTPClientImpl) ListSMS(ctx context.Context, in 
 	return &out, nil
 }
 
-// MarkProcurementManual MarkProcurementManual 手动标记完成/转人工（人工拿货后回填）。
+// MarkProcurementManual MarkProcurementManual 手動標記完成/轉人工（人工拿貨後回填）。
 func (c *AdminProcurementServiceHTTPClientImpl) MarkProcurementManual(ctx context.Context, in *MarkProcurementManualRequest, opts ...http.CallOption) (*ProcurementOrder, error) {
 	var out ProcurementOrder
 	pattern := "/api/v1/admin/procurements/{id}/manual"
@@ -263,7 +263,7 @@ func (c *AdminProcurementServiceHTTPClientImpl) MarkProcurementManual(ctx contex
 	return &out, nil
 }
 
-// RetryProcurement RetryProcurement 手动重试（pending/submitted/polling 均可重新提交或推进轮询）。
+// RetryProcurement RetryProcurement 手動重試（pending/submitted/polling 均可重新提交或推進輪詢）。
 func (c *AdminProcurementServiceHTTPClientImpl) RetryProcurement(ctx context.Context, in *RetryProcurementRequest, opts ...http.CallOption) (*ProcurementOrder, error) {
 	var out ProcurementOrder
 	pattern := "/api/v1/admin/procurements/{id}/retry"

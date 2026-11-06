@@ -6,13 +6,13 @@
         <div class="tag">{{ typeLabel(post.type) }}</div>
         <h1 class="post-title">{{ post.title }}</h1>
         <div class="muted">
-          <template v-if="categoryName(post.category_id)">{{ $t('栏目：') }}{{ categoryName(post.category_id) }} · </template>{{ formatDate(post.published_at) }}
+          <template v-if="categoryName(post.category_id)">{{ $t('欄目：') }}{{ categoryName(post.category_id) }} · </template>{{ formatDate(post.published_at) }}
         </div>
       </div>
       <div ref="postBody" class="card post-body" @click="openPostImage" @keydown="postImageKeydown" v-html="content"></div>
       <ImageViewer v-if="previewImages.length" :images="previewImages" :initial-index="previewIndex" @close="previewImages = []" />
     </template>
-    <div v-else class="muted" style="text-align: center; margin-top: 24px;">{{ $t('加载中…') }}</div>
+    <div v-else class="muted" style="text-align: center; margin-top: 24px;">{{ $t('加載中…') }}</div>
     <div style="margin-top: 16px;">
       <router-link class="btn secondary" to="/posts">{{ $t('← 返回列表') }}</router-link>
     </div>
@@ -47,7 +47,7 @@ function openPostImage(event: Event) {
   event.preventDefault();
   event.target.focus({ preventScroll: true });
   previewIndex.value = index;
-  previewImages.value = images.map(img => ({ src: img.currentSrc || img.src, alt: img.alt || post.value?.title || $t("文章图片") }));
+  previewImages.value = images.map(img => ({ src: img.currentSrc || img.src, alt: img.alt || post.value?.title || $t("文章圖片") }));
 }
 function postImageKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' || event.key === ' ') openPostImage(event);
@@ -56,7 +56,7 @@ watch([postBody, content, locale], () => {
   postBody.value?.querySelectorAll('img').forEach(img => {
     img.tabIndex = 0;
     img.setAttribute('role', 'button');
-    img.setAttribute('aria-label', $t("放大查看{0}", [img.alt || $t('文章图片')]));
+    img.setAttribute('aria-label', $t("放大查看{0}", [img.alt || $t('文章圖片')]));
   });
 }, { flush: 'post' });
 watch(() => route.params.slug, () => { previewImages.value = []; });
@@ -81,7 +81,7 @@ async function loadPost() {
   const currentRequest = ++postRequest;
   const { data: detail, error: postErr } = await getPost(route.params.slug as string);
   if (currentRequest !== postRequest) return;
-  error.value = postErr ? $t("文章不存在或未发布") : '';
+  error.value = postErr ? $t("文章不存在或未發佈") : '';
   post.value = detail?.post || null;
   content.value = detail?.content || '';
   if (!postErr) await applyPostSeo(detail);
@@ -91,7 +91,7 @@ const { data: catData } = await listPostCategories();
 categories.value = catData?.categories || [];
 await loadPost();
 
-/** 文章页 SEO：title/description/canonical + Article/Breadcrumb JSON-LD */
+/** 文章頁 SEO：title/description/canonical + Article/Breadcrumb JSON-LD */
 async function applyPostSeo(detail: { post: StorePost; content: string } | null) {
   const site = await fetchSiteSeo();
   const base = site.url || (typeof window !== "undefined" ? window.location.origin : "");

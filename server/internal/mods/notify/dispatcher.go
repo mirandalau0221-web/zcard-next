@@ -1,12 +1,12 @@
 package notify
 
-// 事件订阅分发器（）：
-// outbox 事件 → 路由表（事件 → 通道集合）→ 模板渲染（白名单变量 + HTML escape）
-// → 逐通道投递（独立 enabled；skipped 降级不报错）→ 每条落 notification_logs。
+// 事件訂閲分發器（）：
+// outbox 事件 → 路由表（事件 → 通道集合）→ 模板渲染（白名單變量 + HTML escape）
+// → 逐通道投遞（獨立 enabled；skipped 降級不報錯）→ 每條落 notification_logs。
 //
-// 幂等：processed_events(event_id, consumer) 由 Dispatcher 统一兜底。
-// 白名单变量：模板只允许引用 Variables 里登记的键；未知 {{.xxx}} 渲染为空（防注入：
-// 变量值 HTML escape；模板本身后台可编辑——只开放占位符子集，禁用 tpl 全功能）。
+// 冪等：processed_events(event_id, consumer) 由 Dispatcher 統一兜底。
+// 白名單變量：模板只允許引用 Variables 裏登記的鍵；未知 {{.xxx}} 渲染為空（防注入：
+// 變量值 HTML escape；模板本身後台可編輯——只開放佔位符子集，禁用 tpl 全功能）。
 
 import (
 	"bytes"
@@ -23,15 +23,15 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/i18n"
 )
 
-// Dispatcher 事件分发器。
+// Dispatcher 事件分發器。
 type Dispatcher struct {
 	adminPath func(context.Context) (string, error)
 	repo      *NotifyRepo
 	channels  map[string]Channel       // name → channel
-	brand     notifyport.BrandResolver // 白标（nil = 未装配，跳过品牌注入）
+	brand     notifyport.BrandResolver // 白標（nil = 未裝配，跳過品牌注入）
 }
 
-// NewDispatcher 构造（注册通道）。
+// NewDispatcher 構造（註冊通道）。
 func NewDispatcher(repo *NotifyRepo, channels ...Channel) *Dispatcher {
 	m := make(map[string]Channel, len(channels))
 	for _, c := range channels {
@@ -40,13 +40,13 @@ func NewDispatcher(repo *NotifyRepo, channels ...Channel) *Dispatcher {
 	return &Dispatcher{repo: repo, channels: m}
 }
 
-// WithBrandResolver 装配白标解析（wire 经 bootstrap 注入；分站订单邮件品牌隔离）。
+// WithBrandResolver 裝配白標解析（wire 經 bootstrap 注入；分站訂單郵件品牌隔離）。
 func (d *Dispatcher) WithBrandResolver(r notifyport.BrandResolver) *Dispatcher {
 	d.brand = r
 	return d
 }
 
-// 事件 → 默认通道矩阵（模板可覆盖；通道 enabled 逐个独立判定）。
+// 事件 → 默認通道矩陣（模板可覆蓋；通道 enabled 逐個獨立判定）。
 var defaultChannels = map[string][]string{
 	events.AdminMFAChanged: {"telegram"},
 	"order.paid":           {"email", "inbox"},
@@ -58,12 +58,12 @@ var defaultChannels = map[string][]string{
 	"payment.failed":       {"inbox"},
 	"recharge.succeeded":   {"email", "inbox"},
 	"user.registered":      {"email", "inbox"},
-	// ：工单通知（用户侧新回复；客服侧新工单经 telegram 管理员通道）
+	// ：工單通知（用户側新回覆；客服側新工單經 telegram 管理員通道）
 	"ticket.created": {"inbox"},
 	"ticket.replied": {"email", "inbox"},
 }
 
-// HandleEvent outbox 消费入口（Dispatcher Register）。
+// HandleEvent outbox 消費入口（Dispatcher Register）。
 func (d *Dispatcher) HandleEvent(ctx context.Context, env events.Envelope) error {
 	if env.Type == events.AdminMFAChanged {
 		var payload struct {
@@ -75,31 +75,31 @@ func (d *Dispatcher) HandleEvent(ctx context.Context, env events.Envelope) error
 		if err := json.Unmarshal(env.Payload, &payload); err != nil {
 			return err
 		}
-		return d.Send(ctx, notifyport.Message{EventType: env.Type, Channel: "telegram", Locale: "zh_CN", Subject: "ZCard 后台两步验证变更", Body: fmt.Sprintf("管理员 ID：%d\n操作：%s\n操作者 ID：%d（0 为服务器命令行）\n时间：%s\n若非预期操作，请立即检查服务器与管理员账号。", payload.AdminID, payload.Action, payload.OperatorID, payload.At), BizType: "admin_security", BizID: payload.AdminID})
+		return d.Send(ctx, notifyport.Message{EventType: env.Type, Channel: "telegram", Locale: "zh_CN", Subject: "ZCard 後台兩步驗證變更", Body: fmt.Sprintf("管理員 ID：%d\n操作：%s\n操作者 ID：%d（0 為服務器命令行）\n時間：%s\n若非預期操作，請立即檢查服務器與管理員賬號。", payload.AdminID, payload.Action, payload.OperatorID, payload.At), BizType: "admin_security", BizID: payload.AdminID})
 	}
 	channels := defaultChannels[env.Type]
 	if len(channels) == 0 {
-		return nil // 无订阅事件（管理员告警类由业务模块显式 Send）
+		return nil // 無訂閲事件（管理員告警類由業務模塊顯式 Send）
 	}
 	var payload map[string]any
 	decoder := json.NewDecoder(bytes.NewReader(env.Payload))
 	decoder.UseNumber()
 	if err := decoder.Decode(&payload); err != nil {
-		return fmt.Errorf("notify: 解析 %s 载荷失败: %w", env.Type, err)
+		return fmt.Errorf("notify: 解析 %s 載荷失敗: %w", env.Type, err)
 	}
 	// SMS results remain in the authenticated order view, never card delivery mail.
 	if env.Type == "order.delivered" && payload["delivery_kind"] == "sms_activation" {
 		return nil
 	}
-	// 白名单变量（事件载荷扁平化；值统一字符串化 + HTML escape 在渲染期）
+	// 白名單變量（事件載荷扁平化；值統一字符串化 + HTML escape 在渲染期）
 	vars := FlattenVars(payload)
 	if env.Type == "order.paid" || env.Type == "order.delivered" {
 		if err := d.repo.orderEmailVars(ctx, env, vars); err != nil {
 			return err
 		}
 	}
-	// 品牌隔离 fail-closed：分站上下文邮件注入分站白标；
-	// 无白标 → 品牌变量留空（绝不回退主站品牌）
+	// 品牌隔離 fail-closed：分站上下文郵件注入分站白標；
+	// 無白標 → 品牌變量留空（絕不回退主站品牌）
 	if env.SubsiteID > 0 && d.brand != nil {
 		if brand, ok := d.brand.ResolveBrand(ctx, env.SubsiteID); ok {
 			vars["site_name"] = brand.SiteName
@@ -120,9 +120,9 @@ func (d *Dispatcher) HandleEvent(ctx context.Context, env events.Envelope) error
 	for _, ch := range channels {
 		channel, ok := d.channels[ch]
 		if !ok {
-			continue // 通道未注册（SMS/Telegram ）
+			continue // 通道未註冊（SMS/Telegram ）
 		}
-		// 模板（事件 × 通道 × 语言；无模板 → 该通道跳过——不算错误）
+		// 模板（事件 × 通道 × 語言；無模板 → 該通道跳過——不算錯誤）
 		tpl, err := d.repo.Template(ctx, templateEvent, ch, locale)
 		if err != nil {
 			if errors.Is(err, ErrNotFound) {
@@ -138,34 +138,34 @@ func (d *Dispatcher) HandleEvent(ctx context.Context, env events.Envelope) error
 			Body:      RenderTemplate(tpl.BodyTpl, vars),
 			Variables: vars,
 		}
-		// 收件人解析（email → 载荷 email 字段；inbox → user_id）
+		// 收件人解析（email → 載荷 email 字段；inbox → user_id）
 		msg.Recipient = vars["email"]
 		msg.UserID = parseUint(vars["user_id"])
 		msg.BizType = "order"
 		msg.BizID = parseUint64(vars["order_id"])
 		if ch == "email" && msg.Recipient == "" {
-			_ = d.repo.WriteLog(ctx, logOf(msg, "skipped", "订单未留有效邮箱，未发送邮件"))
+			_ = d.repo.WriteLog(ctx, logOf(msg, "skipped", "訂單未留有效郵箱，未發送郵件"))
 			continue
 		}
 		if ch == "email" && tpl.ID == 0 && vars["fetch_url"] == "" && (env.Type == "order.paid" || env.Type == "order.delivered") {
-			_ = d.repo.WriteLog(ctx, logOf(msg, "failed", "店铺网址未配置或无效，无法生成订单查询链接"))
+			_ = d.repo.WriteLog(ctx, logOf(msg, "failed", "店鋪網址未配置或無效，無法生成訂單查詢鏈接"))
 			continue
 		}
 
 		if err := channel.Deliver(ctx, msg); err != nil {
 			if err == ErrSkipped {
 				_ = d.repo.WriteLog(ctx, logOf(msg, "skipped", "通道未配置"))
-				continue // 降级：不算失败不重试
+				continue // 降級：不算失敗不重試
 			}
 			_ = d.repo.WriteLog(ctx, logOf(msg, "failed", err.Error()))
-			continue // 单通道失败不阻断其余（重试由管理员日志重发）
+			continue // 單通道失敗不阻斷其餘（重試由管理員日誌重發）
 		}
 		_ = d.repo.WriteLog(ctx, logOf(msg, "sent", ""))
 	}
 	return nil
 }
 
-// FlattenVars 载荷扁平化为白名单变量（嵌套 key 以 . 连接；值字符串化）。
+// FlattenVars 載荷扁平化為白名單變量（嵌套 key 以 . 連接；值字符串化）。
 func FlattenVars(payload map[string]any) map[string]string {
 	out := make(map[string]string)
 	var walk func(prefix string, v any)
@@ -180,7 +180,7 @@ func FlattenVars(payload map[string]any) map[string]string {
 				walk(key, vv)
 			}
 		case []any:
-			// 数组不展开（变量粒度到对象字段；数组场景业务侧显式拼接进字符串字段）
+			// 數組不展開（變量粒度到對象字段；數組場景業務側顯式拼接進字符串字段）
 		case string:
 			out[prefix] = x
 		case float64:
@@ -199,11 +199,11 @@ func FlattenVars(payload map[string]any) map[string]string {
 	return out
 }
 
-// placeholderRe 占位符子集：{{.key}}（仅字母数字下划线点；无函数/管道——防注入）。
+// placeholderRe 佔位符子集：{{.key}}（僅字母數字下劃線點；無函數/管道——防注入）。
 var placeholderRe = regexp.MustCompile(`{{\s*\.([A-Za-z0-9_.]+)\s*}}`)
 
-// RenderTemplate 渲染模板：白名单变量替换 + 值 HTML escape（防注入双保险）。
-// 未知变量渲染为空字符串。
+// RenderTemplate 渲染模板：白名單變量替換 + 值 HTML escape（防注入雙保險）。
+// 未知變量渲染為空字符串。
 func RenderTemplate(tpl string, vars map[string]string) string {
 	return placeholderRe.ReplaceAllStringFunc(tpl, func(m string) string {
 		key := placeholderRe.FindStringSubmatch(m)[1]
@@ -214,7 +214,7 @@ func RenderTemplate(tpl string, vars map[string]string) string {
 	})
 }
 
-// ValidateTemplate 后台模板编辑校验：占位符必须在白名单内（预览前拦截）。
+// ValidateTemplate 後台模板編輯校驗：佔位符必須在白名單內（預覽前攔截）。
 func ValidateTemplate(tpl string, allowed []string) error {
 	allowedSet := make(map[string]bool, len(allowed))
 	for _, a := range allowed {
@@ -222,18 +222,18 @@ func ValidateTemplate(tpl string, allowed []string) error {
 	}
 	for _, m := range placeholderRe.FindAllStringSubmatch(tpl, -1) {
 		if !allowedSet[m[1]] {
-			return fmt.Errorf("notify.TPL_VAR_NOT_ALLOWED: %q 不在白名单变量内", m[1])
+			return fmt.Errorf("notify.TPL_VAR_NOT_ALLOWED: %q 不在白名單變量內", m[1])
 		}
 	}
 	return nil
 }
 
 func logOf(msg notifyport.Message, status, errMsg string) LogInput {
-	// 敏感类型（验证码邮件）：正文/变量不落日志——库内无明文纪律
-	// （邮件照发，仅审计留档脱敏；BizType 契约见调用方）
+	// 敏感類型（驗證碼郵件）：正文/變量不落日誌——庫內無明文紀律
+	// （郵件照發，僅審計留檔脱敏；BizType 契約見調用方）
 	body, vars := msg.Body, msg.Variables
 	if msg.BizType == "password_reset" || msg.BizType == "order_access_recovery" || msg.BizType == "register_code" {
-		body = "[验证码邮件：内容不落日志]"
+		body = "[驗證碼郵件：內容不落日誌]"
 		vars = map[string]string{"masked": "true"}
 	}
 	return LogInput{
@@ -259,10 +259,10 @@ func trimFloat(f float64) string {
 	return fmt.Sprintf("%v", f)
 }
 
-// Send 显式发送（管理员告警等业务直调；实现 notifyport.Sender）。
-// ChannelReady 通道是否就绪（配置齐全）。验证码等「必须送达」的场景应在发送前
-// 调用并 fail-fast——Send 对未配置通道按降级语义返回成功（营销通知不阻断业务），
-// 验证码静默 skipped = 用户点了发送却永远收不到（实测踩坑）。
+// Send 顯式發送（管理員告警等業務直調；實現 notifyport.Sender）。
+// ChannelReady 通道是否就緒（配置齊全）。驗證碼等「必須送達」的場景應在發送前
+// 調用並 fail-fast——Send 對未配置通道按降級語義返回成功（營銷通知不阻斷業務），
+// 驗證碼靜默 skipped = 用户點了發送卻永遠收不到（實測踩坑）。
 func (d *Dispatcher) ChannelReady(ctx context.Context, channel string) bool {
 	c, ok := d.channels[channel]
 	if !ok {
@@ -291,7 +291,7 @@ func (d *Dispatcher) Send(ctx context.Context, msg notifyport.Message) error {
 	return nil
 }
 
-// SubscribedEvents 订阅事件清单（main.go 注册用；与 defaultChannels 键一致）。
+// SubscribedEvents 訂閲事件清單（main.go 註冊用；與 defaultChannels 鍵一致）。
 func SubscribedEvents() []string {
 	out := make([]string, 0, len(defaultChannels))
 	for k := range defaultChannels {

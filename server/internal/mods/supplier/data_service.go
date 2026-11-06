@@ -1,7 +1,7 @@
 package supplier
 
-// 管理面 API：下游账户（申请/审核/启停/重置密钥）、定价、账本、回调管理。
-// secret 纪律：仅创建/重置时回显一次，其余响应零泄漏。
+// 管理面 API：下游賬户（申請/審核/啓停/重置密鑰）、定價、賬本、回調管理。
+// secret 紀律：僅創建/重置時回顯一次，其餘響應零泄漏。
 
 import (
 	"context"
@@ -21,19 +21,19 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminSupplierService 管理面供货服务。
+// AdminSupplierService 管理面供貨服務。
 type AdminSupplierService struct {
 	adminv1.UnimplementedAdminSupplierServiceServer
 	repo *SupplierRepoImpl
 	api  *SupplyAPIService
 }
 
-// NewAdminSupplierService 构造。
+// NewAdminSupplierService 構造。
 func NewAdminSupplierService(repo *SupplierRepoImpl, api *SupplyAPIService) *AdminSupplierService {
 	return &AdminSupplierService{repo: repo, api: api}
 }
 
-// CreateAccount 申请（secret 明文返回一次）。
+// CreateAccount 申請（secret 明文返回一次）。
 func (s *AdminSupplierService) CreateAccount(ctx context.Context, req *adminv1.CreateSupplierAccountRequest) (*adminv1.SupplierAccountReply, error) {
 	if req.GetApiKey() == "" || req.GetApiSecret() == "" {
 		return nil, errors.New("supplier.KEY_REQUIRED: api_key/api_secret 必填")
@@ -43,7 +43,7 @@ func (s *AdminSupplierService) CreateAccount(ctx context.Context, req *adminv1.C
 		protocol = "zcard"
 	}
 	if protocol != "zcard" && protocol != "dujiao_next" && protocol != "acg_faka" {
-		return nil, errors.New("supplier.INVALID_PROTOCOL: protocol 必须为 zcard|dujiao_next|acg_faka")
+		return nil, errors.New("supplier.INVALID_PROTOCOL: protocol 必須為 zcard|dujiao_next|acg_faka")
 	}
 	acc, err := s.repo.CreateAccount(ctx, req.GetName(), req.GetApiKey(), req.GetApiSecret(), req.GetContact(), protocol, req.GetDisplayName())
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *AdminSupplierService) CreateAccount(ctx context.Context, req *adminv1.C
 	return toAccountPB(acc, req.GetApiSecret()), nil
 }
 
-// ListAccounts 列表（secret 零回显）。
+// ListAccounts 列表（secret 零回顯）。
 func (s *AdminSupplierService) ListAccounts(ctx context.Context, req *adminv1.ListSupplierAccountsRequest) (*adminv1.ListSupplierAccountsReply, error) {
 	page, size := pageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListAccounts(ctx, page, size)
@@ -66,10 +66,10 @@ func (s *AdminSupplierService) ListAccounts(ctx context.Context, req *adminv1.Li
 	return reply, nil
 }
 
-// ReviewAccount 审核（通过/驳回；驳回置 rejected 状态并记录意见）。
+// ReviewAccount 審核（通過/駁回；駁回置 rejected 狀態並記錄意見）。
 func (s *AdminSupplierService) ReviewAccount(ctx context.Context, req *adminv1.ReviewSupplierAccountRequest) (*adminv1.SupplierAccountReply, error) {
 	if !req.GetApprove() && strings.TrimSpace(req.GetReviewNote()) == "" {
-		return nil, errors.New("supplier.REVIEW_NOTE_REQUIRED: 驳回时请填写审核意见")
+		return nil, errors.New("supplier.REVIEW_NOTE_REQUIRED: 駁回時請填寫審核意見")
 	}
 	acc, err := s.repo.ReviewAccount(ctx, req.GetId(), req.GetApprove(), strings.TrimSpace(req.GetReviewNote()))
 	if err != nil {
@@ -78,7 +78,7 @@ func (s *AdminSupplierService) ReviewAccount(ctx context.Context, req *adminv1.R
 	return toAccountPB(acc, ""), nil
 }
 
-// ToggleAccount 启停。
+// ToggleAccount 啓停。
 func (s *AdminSupplierService) ToggleAccount(ctx context.Context, req *adminv1.ToggleSupplierAccountRequest) (*adminv1.SupplierAccountReply, error) {
 	acc, err := s.repo.ToggleAccount(ctx, req.GetId(), req.GetEnabled())
 	if err != nil {
@@ -87,7 +87,7 @@ func (s *AdminSupplierService) ToggleAccount(ctx context.Context, req *adminv1.T
 	return toAccountPB(acc, ""), nil
 }
 
-// ResetSecret 重置密钥（明文返回一次）。
+// ResetSecret 重置密鑰（明文返回一次）。
 func (s *AdminSupplierService) ResetSecret(ctx context.Context, req *adminv1.ResetSupplierSecretRequest) (*adminv1.ResetSupplierSecretReply, error) {
 	if err := s.repo.ResetSecret(ctx, req.GetId(), req.GetNewSecret()); err != nil {
 		return nil, err
@@ -95,12 +95,12 @@ func (s *AdminSupplierService) ResetSecret(ctx context.Context, req *adminv1.Res
 	return &adminv1.ResetSupplierSecretReply{ApiSecret: req.GetNewSecret()}, nil
 }
 
-// SetNotifyURL 配置回调地址（http/https 均支持）。
+// SetNotifyURL 配置回調地址（http/https 均支持）。
 func (s *AdminSupplierService) SetNotifyURL(ctx context.Context, req *adminv1.SetSupplierNotifyURLRequest) (*adminv1.SupplierAccountReply, error) {
 	notifyURL := strings.TrimSpace(req.GetNotifyUrl())
 	u, err := url.Parse(notifyURL)
 	if err != nil || (u.Scheme != "https" && u.Scheme != "http") || u.Host == "" {
-		return nil, errors.New("supplier.NOTIFY_URL_INVALID: 回调地址格式不正确（http/https）")
+		return nil, errors.New("supplier.NOTIFY_URL_INVALID: 回調地址格式不正確（http/https）")
 	}
 	if err := s.repo.SetNotifyURL(ctx, req.GetId(), notifyURL); err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (s *AdminSupplierService) SetNotifyURL(ctx context.Context, req *adminv1.Se
 	return toAccountPB(acc, ""), nil
 }
 
-// SetIPWhitelist 设置 IP 白名单（空 = 所有 IP 放行；接口鉴权层强制）。
+// SetIPWhitelist 設置 IP 白名單（空 = 所有 IP 放行；接口鑑權層強制）。
 func (s *AdminSupplierService) SetIPWhitelist(ctx context.Context, req *adminv1.SetSupplierIPWhitelistRequest) (*adminv1.SupplierAccountReply, error) {
 	ips, err := normalizeWhitelist(req.GetIps())
 	if err != nil {
@@ -122,20 +122,20 @@ func (s *AdminSupplierService) SetIPWhitelist(ctx context.Context, req *adminv1.
 	return toAccountPB(acc, ""), nil
 }
 
-// Recharge 充值（账本入账；reference 幂等由调用方保证）。
+// Recharge 充值（賬本入賬；reference 冪等由調用方保證）。
 func (s *AdminSupplierService) Recharge(ctx context.Context, req *adminv1.RechargeSupplierRequest) (*emptypb.Empty, error) {
 	if req.GetAmountCents() <= 0 || !money.ValidCents(req.GetAmountCents()) {
-		return nil, kerrors.BadRequest("supplier.INVALID_AMOUNT", "充值金额须大于零且不能超过单笔金额上限")
+		return nil, kerrors.BadRequest("supplier.INVALID_AMOUNT", "充值金額須大於零且不能超過單筆金額上限")
 	}
 	key := strings.TrimSpace(req.GetReference())
 	if len(key) > 80 {
-		return nil, kerrors.BadRequest("supplier.INVALID_REFERENCE", "充值幂等键不能超过 80 字节")
+		return nil, kerrors.BadRequest("supplier.INVALID_REFERENCE", "充值冪等鍵不能超過 80 字節")
 	}
-	if key == "" { // 兼容尚未发送幂等键的客户端；金额不能充当充值标识。
+	if key == "" { // 兼容尚未發送冪等鍵的客户端；金額不能充當充值標識。
 		key = uuid.NewString()
 	}
 	ref := fmt.Sprintf("recharge:manual:%d:%s", req.GetId(), key)
-	if err := s.repo.Recharge(ctx, req.GetId(), req.GetAmountCents(), ref, orEmpty(req.GetRemark(), "管理员充值")); err != nil {
+	if err := s.repo.Recharge(ctx, req.GetId(), req.GetAmountCents(), ref, orEmpty(req.GetRemark(), "管理員充值")); err != nil {
 		if errors.Is(err, ErrDuplicateLedger) {
 			entry, e := data.Client(ctx, s.repo.data).SupplierLedgerEntry.Query().Where(supplierledgerentry.Reference(ref)).Only(ctx)
 			if e != nil {
@@ -144,14 +144,14 @@ func (s *AdminSupplierService) Recharge(ctx context.Context, req *adminv1.Rechar
 			if entry.AccountID == req.GetId() && entry.Type == "recharge" && entry.Amount == req.GetAmountCents() {
 				return &emptypb.Empty{}, nil
 			}
-			return nil, kerrors.Conflict("supplier.RECHARGE_REFERENCE_CONFLICT", "此充值已提交，请使用原金额重试；新充值请重新打开充值窗口")
+			return nil, kerrors.Conflict("supplier.RECHARGE_REFERENCE_CONFLICT", "此充值已提交，請使用原金額重試；新充值請重新打開充值窗口")
 		}
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// ListLedger 账本流水。
+// ListLedger 賬本流水。
 func (s *AdminSupplierService) ListLedger(ctx context.Context, req *adminv1.ListSupplierLedgerRequest) (*adminv1.ListSupplierLedgerReply, error) {
 	page, size := pageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListLedger(ctx, req.GetAccountId(), page, size)
@@ -169,7 +169,7 @@ func (s *AdminSupplierService) ListLedger(ctx context.Context, req *adminv1.List
 	return reply, nil
 }
 
-// UpsertPrice 供货定价。
+// UpsertPrice 供貨定價。
 func (s *AdminSupplierService) UpsertPrice(ctx context.Context, req *adminv1.UpsertSupplierPriceRequest) (*emptypb.Empty, error) {
 	if err := s.repo.UpsertPriceRule(ctx, req.GetAccountId(), req.GetProductId(), req.GetSkuId(), req.GetCategoryId(), req.GetScope(), req.GetPrice(), req.GetDiscountBps()); err != nil {
 		return nil, err
@@ -177,7 +177,7 @@ func (s *AdminSupplierService) UpsertPrice(ctx context.Context, req *adminv1.Ups
 	return &emptypb.Empty{}, nil
 }
 
-// ListPrices 账号的专属价列表（：浏览覆盖价）。
+// ListPrices 賬號的專屬價列表（：瀏覽覆蓋價）。
 func (s *AdminSupplierService) ListPrices(ctx context.Context, req *adminv1.ListSupplierPricesRequest) (*adminv1.ListSupplierPricesReply, error) {
 	rows, err := s.repo.ListPrices(ctx, req.GetAccountId())
 	if err != nil {
@@ -198,7 +198,7 @@ func (s *AdminSupplierService) ListPrices(ctx context.Context, req *adminv1.List
 	return reply, nil
 }
 
-// DeletePrice 删除专属价（恢复基础供货价）。
+// DeletePrice 刪除專屬價（恢復基礎供貨價）。
 func (s *AdminSupplierService) DeletePrice(ctx context.Context, req *adminv1.DeleteSupplierPriceRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeletePrice(ctx, req.GetId()); err != nil {
 		return nil, err
@@ -206,7 +206,7 @@ func (s *AdminSupplierService) DeletePrice(ctx context.Context, req *adminv1.Del
 	return &emptypb.Empty{}, nil
 }
 
-// ListCallbacks 回调记录。
+// ListCallbacks 回調記錄。
 func (s *AdminSupplierService) ListCallbacks(ctx context.Context, req *adminv1.ListSupplierCallbacksRequest) (*adminv1.ListSupplierCallbacksReply, error) {
 	page, size := pageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListCallbacks(ctx, req.GetStatus(), page, size)
@@ -228,7 +228,7 @@ func (s *AdminSupplierService) ListCallbacks(ctx context.Context, req *adminv1.L
 	return reply, nil
 }
 
-// ResendCallback 手动重发（死信恢复）。
+// ResendCallback 手動重發（死信恢復）。
 func (s *AdminSupplierService) ResendCallback(ctx context.Context, req *adminv1.ResendSupplierCallbackRequest) (*emptypb.Empty, error) {
 	cb, err := s.repo.ResetCallback(ctx, req.GetId())
 	if err != nil {

@@ -1,7 +1,7 @@
 package catalog
 
-// SKU 多规格数据层（M1b）：admin CRUD + 前台列表 + 订单取价（SKU 价 > 商品价）。
-// ent import 收口：data 前缀文件（架构测试规则 3b）。
+// SKU 多規格數據層（M1b）：admin CRUD + 前台列表 + 訂單取價（SKU 價 > 商品價）。
+// ent import 收口：data 前綴文件（架構測試規則 3b）。
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 	"github.com/go-kratos/kratos/v3/errors"
 )
 
-// SkuInput SKU 创建/更新输入（price_cents=0 表示继承商品价）。
+// SkuInput SKU 創建/更新輸入（price_cents=0 表示繼承商品價）。
 type SkuInput struct {
 	PhysicalStock                     *int64
 	ExpectedPhysicalStock             *int64
@@ -46,14 +46,14 @@ func (r *ProductRepoImpl) ListProductSkus(ctx context.Context, productID uint64)
 		All(ctx)
 }
 
-// CreateSku 创建 SKU。
+// CreateSku 創建 SKU。
 func (r *ProductRepoImpl) createSku(ctx context.Context, in SkuInput) (*ent.ProductSku, error) {
 	parent, e := data.Client(ctx, r.data).Product.Get(ctx, in.ProductID)
 	if e != nil {
 		return nil, e
 	}
 	if parent.ProductKind == "sms_channel" || parent.DeliveryKind == "social_service" {
-		return nil, fmt.Errorf("渠道接码不生成 SKU，请在商品页面选择选项")
+		return nil, fmt.Errorf("渠道接碼不生成 SKU，請在商品頁面選擇選項")
 	}
 	if parent.GoodsType == "physical" {
 		in.StockOffset = 0
@@ -72,26 +72,26 @@ func (r *ProductRepoImpl) createSku(ctx context.Context, in SkuInput) (*ent.Prod
 				return nil, err
 			}
 			if used {
-				return nil, errors.Conflict("catalog.SKU_BASE_ORDERS", "该实体商品已有无规格订单，请复制为新商品后添加规格")
+				return nil, errors.Conflict("catalog.SKU_BASE_ORDERS", "該實體商品已有無規格訂單，請複製為新商品後添加規格")
 			}
 			if parent.PhysicalStock != 0 {
 				if !parent.TrackInventory {
-					return nil, errors.Conflict("catalog.SKU_BASE_STOCK", "请先开启库存管理，将商品级可售库存设为 0，再添加规格")
+					return nil, errors.Conflict("catalog.SKU_BASE_STOCK", "請先開啓庫存管理，將商品級可售庫存設為 0，再添加規格")
 				}
-				return nil, errors.Conflict("catalog.SKU_BASE_STOCK", "请先将商品级可售库存设为 0，再添加规格并分配库存")
+				return nil, errors.Conflict("catalog.SKU_BASE_STOCK", "請先將商品級可售庫存設為 0，再添加規格並分配庫存")
 			}
 		}
 
 		in.FulfillmentMode = "follow"
 		if in.PhysicalStock != nil && (*in.PhysicalStock < 0 || *in.PhysicalStock > 100000000) {
-			return nil, errors.BadRequest("catalog.SKU_INVALID", "规格库存须在 0 至 100000000 之间")
+			return nil, errors.BadRequest("catalog.SKU_INVALID", "規格庫存須在 0 至 100000000 之間")
 		}
 	}
 	if parent.FulfillmentMode == "reuse" || parent.FulfillmentMode == "local" {
-		return nil, errors.Conflict("catalog.SKU_DELIVERY_CONFLICT", "默认规格已配置本地发货，请先切换发货来源，再新增规格")
+		return nil, errors.Conflict("catalog.SKU_DELIVERY_CONFLICT", "默認規格已配置本地發貨，請先切換髮貨來源，再新增規格")
 	}
 	if in.FulfillmentMode == "local" || in.FulfillmentMode == "reuse" {
-		return nil, errors.BadRequest("catalog.SKU_INVALID", "请先保存规格，再在发货设置中配置内容来源")
+		return nil, errors.BadRequest("catalog.SKU_INVALID", "請先保存規格，再在發貨設置中配置內容來源")
 	}
 	if err := validateServiceConfig(in.FulfillmentMode, nil, true); err != nil {
 		return nil, errors.BadRequest("catalog.SKU_INVALID", err.Error())
@@ -102,7 +102,7 @@ func (r *ProductRepoImpl) createSku(ctx context.Context, in SkuInput) (*ent.Prod
 			return nil, err
 		}
 		if p.UpstreamSourceID > 0 {
-			return nil, errors.BadRequest("catalog.SKU_INVALID", "上游规格不能改为本地人工交付")
+			return nil, errors.BadRequest("catalog.SKU_INVALID", "上游規格不能改為本地人工交付")
 		}
 	}
 	tc := tenancy.FromContext(ctx)
@@ -130,7 +130,7 @@ func (r *ProductRepoImpl) createSku(ctx context.Context, in SkuInput) (*ent.Prod
 	}
 	row, err := create.Save(ctx)
 	if sqlgraph.IsUniqueConstraintError(err) {
-		return nil, errors.Conflict("catalog.SKU_NAME_DUPLICATE", "该商品已有同名规格，请修改规格名")
+		return nil, errors.Conflict("catalog.SKU_NAME_DUPLICATE", "該商品已有同名規格，請修改規格名")
 	}
 	return row, err
 }
@@ -154,15 +154,15 @@ func (r *ProductRepoImpl) updateSku(ctx context.Context, id uint64, in SkuInput)
 			in.ExpectedPhysicalStock = nil
 		}
 		if in.FulfillmentMode != "" && in.FulfillmentMode != "follow" && in.FulfillmentMode != "auto" {
-			return nil, fmt.Errorf("实体规格仅支持快递配送")
+			return nil, fmt.Errorf("實體規格僅支持快遞配送")
 		}
 		in.FulfillmentMode = "follow"
 	}
 	if in.FulfillmentMode != "" && in.FulfillmentMode != current.FulfillmentMode && (in.FulfillmentMode == "local" || in.FulfillmentMode == "reuse" || current.FulfillmentMode == "local" || current.FulfillmentMode == "reuse") {
-		return nil, fmt.Errorf("请在发货设置中更改规格的内容来源")
+		return nil, fmt.Errorf("請在發貨設置中更改規格的內容來源")
 	}
 	if in.UpstreamSkuID != "" && in.UpstreamSkuID != current.UpstreamSkuID && (current.FulfillmentMode == "local" || current.FulfillmentMode == "reuse") {
-		return nil, fmt.Errorf("本地发货规格不能更换上游绑定")
+		return nil, fmt.Errorf("本地發貨規格不能更換上游綁定")
 	}
 	if err := validateServiceConfig(in.FulfillmentMode, nil, true); err != nil {
 		return nil, err
@@ -177,7 +177,7 @@ func (r *ProductRepoImpl) updateSku(ctx context.Context, id uint64, in SkuInput)
 			return nil, err
 		}
 		if p.UpstreamSourceID > 0 {
-			return nil, fmt.Errorf("上游规格不能改为本地人工交付")
+			return nil, fmt.Errorf("上游規格不能改為本地人工交付")
 		}
 	}
 	q := data.Client(ctx, r.data).ProductSku.UpdateOneID(id)
@@ -192,14 +192,14 @@ func (r *ProductRepoImpl) updateSku(ctx context.Context, id uint64, in SkuInput)
 	}
 	if in.PhysicalStock != nil {
 		if in.ExpectedPhysicalStock == nil || *in.ExpectedPhysicalStock != current.PhysicalStock {
-			return nil, fmt.Errorf("规格库存已变化，请刷新后调整")
+			return nil, fmt.Errorf("規格庫存已變化，請刷新後調整")
 		}
 		p, e := data.Client(ctx, r.data).Product.Get(ctx, current.ProductID)
 		if e != nil {
 			return nil, e
 		}
 		if p.GoodsType != "physical" {
-			return nil, fmt.Errorf("非实体商品不支持实物库存")
+			return nil, fmt.Errorf("非實體商品不支持實物庫存")
 		}
 		if e = data.AdjustPhysicalStock(ctx, r.data, p, id, *in.PhysicalStock); e != nil {
 			return nil, e
@@ -222,14 +222,14 @@ func (r *ProductRepoImpl) updateSku(ctx context.Context, id uint64, in SkuInput)
 	}
 	if err := q.Exec(ctx); err != nil {
 		if sqlgraph.IsUniqueConstraintError(err) {
-			return nil, errors.Conflict("catalog.SKU_NAME_DUPLICATE", "该商品已有同名规格，请修改规格名")
+			return nil, errors.Conflict("catalog.SKU_NAME_DUPLICATE", "該商品已有同名規格，請修改規格名")
 		}
 		return nil, err
 	}
 	return data.Client(ctx, r.data).ProductSku.Get(ctx, id)
 }
 
-// DeleteSku 删除 SKU。
+// DeleteSku 刪除 SKU。
 func (r *ProductRepoImpl) deleteSku(ctx context.Context, id uint64) error {
 	c := data.Client(ctx, r.data)
 	query := c.ProductSku.Query().Where(productsku.ID(id))
@@ -245,7 +245,7 @@ func (r *ProductRepoImpl) deleteSku(ctx context.Context, id uint64) error {
 		return e
 	}
 	if p.GoodsType == "physical" && sk.PhysicalStock != 0 {
-		return fmt.Errorf("规格仍有可售库存，请先调整库存为零再删除")
+		return fmt.Errorf("規格仍有可售庫存，請先調整庫存為零再刪除")
 	}
 	// Use current locking reads after the product lock. A plain Exists can see a
 	// snapshot from before waiting for a concurrent importer under MySQL RR.
@@ -259,22 +259,22 @@ func (r *ProductRepoImpl) deleteSku(ctx context.Context, id uint64) error {
 	if rows, err := cards.All(ctx); err != nil {
 		return err
 	} else if len(rows) > 0 {
-		return fmt.Errorf("规格仍有未售或预占卡密，不能删除")
+		return fmt.Errorf("規格仍有未售或預佔卡密，不能刪除")
 	}
 	if rows, err := orders.All(ctx); err != nil {
 		return err
 	} else if len(rows) > 0 {
-		return fmt.Errorf("规格已有订单引用，不能删除")
+		return fmt.Errorf("規格已有訂單引用，不能刪除")
 	}
 	if rows, err := prizes.All(ctx); err != nil {
 		return err
 	} else if len(rows) > 0 {
-		return fmt.Errorf("该规格用于抽奖奖品，请先更换或移除奖品来源")
+		return fmt.Errorf("該規格用於抽獎獎品，請先更換或移除獎品來源")
 	}
 	if rows, err := sources.All(ctx); err != nil {
 		return err
 	} else if len(rows) > 0 {
-		return fmt.Errorf("规格仍有发货来源记录，不能删除")
+		return fmt.Errorf("規格仍有發貨來源記錄，不能刪除")
 	}
 
 	n, err := data.Client(ctx, r.data).ProductSku.Delete().Where(productsku.ID(id)).Exec(ctx)
@@ -287,9 +287,9 @@ func (r *ProductRepoImpl) deleteSku(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// ── 前台/订单取价 ────────────────────────────────────────────
+// ── 前台/訂單取價 ────────────────────────────────────────────
 
-// ListSkus 前台 SKU 列表（只下发 id/名称/价格）。
+// ListSkus 前台 SKU 列表（只下發 id/名稱/價格）。
 func (r *ProductRepoImpl) ListSkus(ctx context.Context, productID uint64) ([]port.Sku, error) {
 	rows, err := data.Client(ctx, r.data).ProductSku.Query().
 		Where(productsku.ProductID(productID)).
@@ -341,7 +341,7 @@ func (r *ProductRepoImpl) ResolvePrice(ctx context.Context, productID, skuID uin
 	if skuID > 0 {
 		sku, err := client.ProductSku.Query().Where(productsku.ID(skuID), productsku.ProductID(productID)).Only(ctx)
 		if err != nil {
-			return 0, fmt.Errorf("catalog.SKU_NOT_FOUND: 规格不存在或不属于该商品: %w", err)
+			return 0, fmt.Errorf("catalog.SKU_NOT_FOUND: 規格不存在或不屬於該商品: %w", err)
 		}
 		if sku.Price > 0 {
 			return money.Cents(sku.Price), nil
@@ -352,7 +352,7 @@ func (r *ProductRepoImpl) ResolvePrice(ctx context.Context, productID, skuID uin
 			return 0, err
 		}
 		if exists {
-			return 0, fmt.Errorf("catalog.SKU_REQUIRED: 请选择商品规格")
+			return 0, fmt.Errorf("catalog.SKU_REQUIRED: 請選擇商品規格")
 		}
 	}
 	p, err := client.Product.Get(ctx, productID)
@@ -366,10 +366,10 @@ var _ port.PricingResolver = (*ProductRepoImpl)(nil)
 
 func validateServiceConfig(mode string, stock *int64, sku bool) error {
 	if mode != "" && mode != "auto" && mode != "manual" && mode != "local" && mode != "reuse" && !(sku && mode == "follow") {
-		return fmt.Errorf("交付方式无效")
+		return fmt.Errorf("交付方式無效")
 	}
 	if stock != nil && *stock < -1 {
-		return fmt.Errorf("人工可售总量须为-1或非负整数")
+		return fmt.Errorf("人工可售總量須為-1或非負整數")
 	}
 	return nil
 }

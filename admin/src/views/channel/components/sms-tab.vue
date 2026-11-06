@@ -21,28 +21,28 @@ const rows = ref<any[]>([]),
   status = ref(""),
   orderNo = ref("");
 const phases: Record<string, string> = {
-  purchase: "采购确认中",
-  query: "同步会话",
+  purchase: "採購確認中",
+  query: "同步會話",
   refund: "零售退款中",
-  review: "待人工核对",
-  done: "已结束",
+  review: "待人工核對",
+  done: "已結束",
 };
 const options = Object.entries(phases).map(([value, label]) => ({
   value,
   label,
 }));
 const columns: DataTableColumns<any> = [
-  { title: "订单号", key: "order_no" },
-  { title: "货源", key: "connection_id" },
+  { title: "訂單號", key: "order_no" },
+  { title: "貨源", key: "connection_id" },
   {
-    title: "任务状态",
+    title: "任務狀態",
     key: "phase",
     render: (r) => phases[r.phase] || r.phase,
   },
-  { title: "会话状态", key: "state" },
-  { title: "买家退款", key: "refund_status" },
-  { title: "诊断", key: "last_error" },
-  { title: "尝试次数", key: "attempts" },
+  { title: "會話狀態", key: "state" },
+  { title: "買家退款", key: "refund_status" },
+  { title: "診斷", key: "last_error" },
+  { title: "嘗試次數", key: "attempts" },
   {
     title: "操作",
     key: "actions",
@@ -55,7 +55,7 @@ const columns: DataTableColumns<any> = [
               disabled: loading.value,
               onClick: () => retry(r.id),
             },
-            () => "恢复原任务",
+            () => "恢復原任務",
           )
         : null,
   },
@@ -72,7 +72,7 @@ async function load() {
     },
   });
   loading.value = false;
-  error.value = r.error ? "接码诊断加载失败，请重试" : "";
+  error.value = r.error ? "接碼診斷加載失敗，請重試" : "";
   if (r.data) {
     rows.value = r.data.items || [];
     total.value = Number(r.data.total || 0);
@@ -81,7 +81,7 @@ async function load() {
 }
 async function retry(id: string) {
   if (reason.value.trim().length < 3) {
-    error.value = "请先填写核对和重试原因（至少 3 字）";
+    error.value = "請先填寫核對和重試原因（至少 3 字）";
     return;
   }
   const r = await request({
@@ -96,14 +96,14 @@ onMounted(load);
 <template>
   <div class="flex flex-col gap-4">
     <NAlert :type="sales ? 'info' : 'warning'"
-      >接码新购{{
-        sales ? "已启用" : "已关闭"
-      }}。关闭新购不影响已有任务恢复。恢复原任务只重放已保存的购买或操作意图。</NAlert
+      >接碼新購{{
+        sales ? "已啓用" : "已關閉"
+      }}。關閉新購不影響已有任務恢復。恢復原任務只重放已保存的購買或操作意圖。</NAlert
     ><NAlert v-if="error" type="error">{{ error }}</NAlert>
     <div class="flex flex-wrap gap-2">
       <NInput
         v-model:value="orderNo"
-        placeholder="零售订单号"
+        placeholder="零售訂單號"
         class="max-w-64"
       /><NSelect
         v-model:value="status"
@@ -115,13 +115,13 @@ onMounted(load);
           page = 1;
           load();
         "
-        >查询</NButton
+        >查詢</NButton
       >
     </div>
     <NInput
       v-if="checkAuth('procurement:write')"
       v-model:value="reason"
-      placeholder="恢复任务前的核对说明（3–180 字）"
+      placeholder="恢復任務前的核對説明（3–180 字）"
       :maxlength="180"
     /><NDataTable
       :columns="columns"

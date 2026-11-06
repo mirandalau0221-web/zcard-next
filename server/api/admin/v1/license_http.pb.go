@@ -23,11 +23,11 @@ const OperationAdminLicenseServiceGetLicenseStatus = "/zcard.api.admin.v1.AdminL
 const OperationAdminLicenseServiceInstallLicense = "/zcard.api.admin.v1.AdminLicenseService/InstallLicense"
 
 type AdminLicenseServiceHTTPServer interface {
-	// ClearLicense ClearLicense 清除许可证（回到社区版）。
+	// ClearLicense ClearLicense 清除許可證（回到社區版）。
 	ClearLicense(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
-	// GetLicenseStatus GetLicenseStatus 许可证状态（安装/有效性/特性清单/到期）。
+	// GetLicenseStatus GetLicenseStatus 許可證狀態（安裝/有效性/特性清單/到期）。
 	GetLicenseStatus(context.Context, *emptypb.Empty) (*LicenseStatus, error)
-	// InstallLicense InstallLicense 安装许可证（校验通过才落库；绑定当前实例）。
+	// InstallLicense InstallLicense 安裝許可證（校驗通過才落庫；綁定當前實例）。
 	InstallLicense(context.Context, *InstallLicenseRequest) (*LicenseStatus, error)
 }
 
@@ -96,11 +96,11 @@ func _AdminLicenseService_ClearLicense0_HTTP_Handler(srv AdminLicenseServiceHTTP
 }
 
 type AdminLicenseServiceHTTPClient interface {
-	// ClearLicense ClearLicense 清除许可证（回到社区版）。
+	// ClearLicense ClearLicense 清除許可證（回到社區版）。
 	ClearLicense(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// GetLicenseStatus GetLicenseStatus 许可证状态（安装/有效性/特性清单/到期）。
+	// GetLicenseStatus GetLicenseStatus 許可證狀態（安裝/有效性/特性清單/到期）。
 	GetLicenseStatus(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *LicenseStatus, err error)
-	// InstallLicense InstallLicense 安装许可证（校验通过才落库；绑定当前实例）。
+	// InstallLicense InstallLicense 安裝許可證（校驗通過才落庫；綁定當前實例）。
 	InstallLicense(ctx context.Context, req *InstallLicenseRequest, opts ...http.CallOption) (rsp *LicenseStatus, err error)
 }
 
@@ -112,7 +112,7 @@ func NewAdminLicenseServiceHTTPClient(client *http.Client) AdminLicenseServiceHT
 	return &AdminLicenseServiceHTTPClientImpl{client}
 }
 
-// ClearLicense ClearLicense 清除许可证（回到社区版）。
+// ClearLicense ClearLicense 清除許可證（回到社區版）。
 func (c *AdminLicenseServiceHTTPClientImpl) ClearLicense(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/license"
@@ -129,7 +129,7 @@ func (c *AdminLicenseServiceHTTPClientImpl) ClearLicense(ctx context.Context, in
 	return &out, nil
 }
 
-// GetLicenseStatus GetLicenseStatus 许可证状态（安装/有效性/特性清单/到期）。
+// GetLicenseStatus GetLicenseStatus 許可證狀態（安裝/有效性/特性清單/到期）。
 func (c *AdminLicenseServiceHTTPClientImpl) GetLicenseStatus(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*LicenseStatus, error) {
 	var out LicenseStatus
 	pattern := "/api/v1/admin/license"
@@ -146,7 +146,7 @@ func (c *AdminLicenseServiceHTTPClientImpl) GetLicenseStatus(ctx context.Context
 	return &out, nil
 }
 
-// InstallLicense InstallLicense 安装许可证（校验通过才落库；绑定当前实例）。
+// InstallLicense InstallLicense 安裝許可證（校驗通過才落庫；綁定當前實例）。
 func (c *AdminLicenseServiceHTTPClientImpl) InstallLicense(ctx context.Context, in *InstallLicenseRequest, opts ...http.CallOption) (*LicenseStatus, error) {
 	var out LicenseStatus
 	pattern := "/api/v1/admin/license"

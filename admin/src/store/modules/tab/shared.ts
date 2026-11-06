@@ -173,8 +173,8 @@ export function filterTabsByIds(tabIds: string[], tabs: App.Global.Tab[]) {
 export function extractTabsByAllRoutes(router: Router, tabs: App.Global.Tab[]) {
   const routes = router.getRoutes();
 
-  // 非业务路由（login/403/404/500 等 constant+空白布局页）永不入标签栏——
-  // 历史会话误存（如登录页曾被记录）在此统一清除
+  // 非業務路由（login/403/404/500 等 constant+空白布局頁）永不入標籤欄——
+  // 歷史會話誤存（如登錄頁曾被記錄）在此統一清除
   const tabableNames = routes.filter((route) => !route.meta?.constant).map((route) => route.name);
 
   return tabs.filter((tab) => tabableNames.includes(tab.routeKey));

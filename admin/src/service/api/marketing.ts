@@ -1,8 +1,8 @@
-// 营销域 API：会员等级 + 优惠券/秒杀/促销 + 内容管理（横幅/文章）。
+// 營銷域 API：會員等級 + 優惠券/秒殺/促銷 + 內容管理（橫幅/文章）。
 
 import { request } from "../request";
 
-// ── 会员等级（memberlevel:read / write / delete）──
+// ── 會員等級（memberlevel:read / write / delete）──
 
 export function fetchMemberLevels() {
   return request({ url: "/api/v1/admin/member-levels" });
@@ -29,7 +29,7 @@ export function deleteMemberLevel(id: number) {
   return request({ url: `/api/v1/admin/member-levels/${id}`, method: "delete" });
 }
 
-// ── 优惠券（coupon:read / write）──
+// ── 優惠券（coupon:read / write）──
 
 export function fetchCoupons(status?: string, batchId?: string, page = 1, pageSize = 20) {
   const params: Record<string, unknown> = { page, page_size: pageSize };
@@ -50,14 +50,14 @@ export function grantCoupon(batchId: string, userId: number, count: number) {
   return request({ url: "/api/v1/admin/coupons/grant", method: "post", data: { batch_id: batchId, user_id: userId, count } });
 }
 
-/** 批量删除券（ids 或整批未使用；服务端仅删未使用，已使用/已作废跳过） */
+/** 批量刪除券（ids 或整批未使用；服務端僅刪未使用，已使用/已作廢跳過） */
 export function deleteCoupons(ids: number[], batchId?: string) {
   const data: Record<string, unknown> = { ids };
   if (batchId) data.batch_id = batchId;
   return request({ url: "/api/v1/admin/coupons/delete", method: "post", data });
 }
 
-/** 导出券码 CSV（按当前筛选：状态 + 批次），返回 { filename, csv } */
+/** 導出券碼 CSV（按當前篩選：狀態 + 批次），返回 { filename, csv } */
 export function exportCoupons(status?: string, batchId?: string) {
   const params: Record<string, unknown> = {};
   if (status) params.status = status;
@@ -65,7 +65,7 @@ export function exportCoupons(status?: string, batchId?: string) {
   return request({ url: "/api/v1/admin/coupons/export", params });
 }
 
-// ── 秒杀 / 促销 ──
+// ── 秒殺 / 促銷 ──
 
 export function fetchFlashSales(page = 1, pageSize = 20) {
   return request({ url: "/api/v1/admin/flash-sales", params: { page, page_size: pageSize } });
@@ -87,7 +87,7 @@ export function upsertPromotion(data: { id?: number; name: string; scope_json?: 
   return request({ url: "/api/v1/admin/promotions", method: "post", data });
 }
 
-// ── 内容管理（content:read / write）：横幅 + 文章 + 文章栏目 ──
+// ── 內容管理（content:read / write）：橫幅 + 文章 + 文章欄目 ──
 
 export function fetchBanners(params?: { position?: string; page?: number; page_size?: number }) {
   return request({ url: "/api/v1/admin/content/banners", params });
@@ -125,7 +125,7 @@ export function deletePost(id: number) {
   return request({ url: `/api/v1/admin/content/posts/${id}`, method: "delete" });
 }
 
-// ── 文章栏目（content:read / write）──
+// ── 文章欄目（content:read / write）──
 
 export function fetchPostCategories() {
   return request({ url: "/api/v1/admin/content/categories" });

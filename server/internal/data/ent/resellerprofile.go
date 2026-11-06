@@ -29,13 +29,13 @@ type ResellerProfile struct {
 	ApplyReason string `json:"apply_reason,omitempty"`
 	// RejectReason holds the value of the "reject_reason" field.
 	RejectReason string `json:"reject_reason,omitempty"`
-	// 分站等级（域名/供货/自助上架权限位）
+	// 分站等級（域名/供貨/自助上架權限位）
 	Level int8 `json:"level,omitempty"`
-	// 默认加价率
+	// 默認加價率
 	DefaultMarkupPercent float64 `json:"default_markup_percent,omitempty"`
-	// 加价率上限（管控）
+	// 加價率上限（管控）
 	MaxMarkupPercent float64 `json:"max_markup_percent,omitempty"`
-	// 利润冻结天数（库文档 settlement_status 的落地语义）
+	// 利潤凍結天數（庫文檔 settlement_status 的落地語義）
 	ConfirmDays int32 `json:"confirm_days,omitempty"`
 	// ReviewedBy holds the value of the "reviewed_by" field.
 	ReviewedBy uint64 `json:"reviewed_by,omitempty"`

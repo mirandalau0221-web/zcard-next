@@ -28,13 +28,13 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StorefrontConfigService 前台公开配置。
-// 输出经 PUBLIC_KEYS 白名单过滤（SECRET 键绝不外泄——快照测试守护）；
-// storefront 前端模板参数、交易开关、启用语言/货币由此驱动。
+// StorefrontConfigService 前台公開配置。
+// 輸出經 PUBLIC_KEYS 白名單過濾（SECRET 鍵絕不外泄——快照測試守護）；
+// storefront 前端模板參數、交易開關、啓用語言/貨幣由此驅動。
 type StorefrontConfigServiceClient interface {
-	// GetPublicConfig 前台公开配置（全部分组白名单键合并下发，稳定排序）。
+	// GetPublicConfig 前台公開配置（全部分組白名單鍵合併下發，穩定排序）。
 	GetPublicConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PublicConfig, error)
-	// ListCurrencies 启用货币列表（展示换算用）。
+	// ListCurrencies 啓用貨幣列表（展示換算用）。
 	ListCurrencies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Currencies, error)
 }
 
@@ -70,13 +70,13 @@ func (c *storefrontConfigServiceClient) ListCurrencies(ctx context.Context, in *
 // All implementations must embed UnimplementedStorefrontConfigServiceServer
 // for forward compatibility.
 //
-// StorefrontConfigService 前台公开配置。
-// 输出经 PUBLIC_KEYS 白名单过滤（SECRET 键绝不外泄——快照测试守护）；
-// storefront 前端模板参数、交易开关、启用语言/货币由此驱动。
+// StorefrontConfigService 前台公開配置。
+// 輸出經 PUBLIC_KEYS 白名單過濾（SECRET 鍵絕不外泄——快照測試守護）；
+// storefront 前端模板參數、交易開關、啓用語言/貨幣由此驅動。
 type StorefrontConfigServiceServer interface {
-	// GetPublicConfig 前台公开配置（全部分组白名单键合并下发，稳定排序）。
+	// GetPublicConfig 前台公開配置（全部分組白名單鍵合併下發，穩定排序）。
 	GetPublicConfig(context.Context, *emptypb.Empty) (*PublicConfig, error)
-	// ListCurrencies 启用货币列表（展示换算用）。
+	// ListCurrencies 啓用貨幣列表（展示換算用）。
 	ListCurrencies(context.Context, *emptypb.Empty) (*Currencies, error)
 	mustEmbedUnimplementedStorefrontConfigServiceServer()
 }

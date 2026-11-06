@@ -25,9 +25,9 @@ type ResellerBalanceAccount struct {
 	Available int64 `json:"available,omitempty"`
 	// Locked holds the value of the "locked" field.
 	Locked int64 `json:"locked,omitempty"`
-	// 负债（退款逆向不足扣）
+	// 負債（退款逆向不足扣）
 	Negative int64 `json:"negative,omitempty"`
-	// 账本水位（增量重算）
+	// 賬本水位（增量重算）
 	LastEntryID uint64 `json:"last_entry_id,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt    time.Time `json:"updated_at,omitempty"`

@@ -87,20 +87,20 @@ func (s *ProcureService) deliverReceipt(ctx context.Context, id uint64, amount i
 			return nil
 		}
 		if count > 0 && count < int(oi.Quantity) {
-			return fmt.Errorf("采购商品已部分交付，请核实后转人工补发剩余数量")
+			return fmt.Errorf("採購商品已部分交付，請核實後轉人工補發剩餘數量")
 		}
 		sealed, err := s.repo.ReceivedContent(ctx, id)
 		if err != nil {
 			return err
 		}
 		if len(sealed) != int(oi.Quantity) || len(sealed) == 0 {
-			return fmt.Errorf("上游卡密数量与购买数量不符，请核实后转人工补发")
+			return fmt.Errorf("上游卡密數量與購買數量不符，請核實後轉人工補發")
 		}
 		items := make([]fulfillmentport.UpstreamDeliveryItem, 0, len(sealed))
 		for _, ct := range sealed {
 			plain, err := s.cipher.Open(ct, oi.ProductID, oi.SubsiteID)
 			if err != nil {
-				return fmt.Errorf("采购卡密解密失败，请核实后转人工")
+				return fmt.Errorf("採購卡密解密失敗，請核實後轉人工")
 			}
 			items = append(items, fulfillmentport.UpstreamDeliveryItem{SealedContent: ct, ContentHash: s.cipher.ContentHash(plain)})
 		}
@@ -160,7 +160,7 @@ func (r *ProcureRepo) lockManualRecovery(ctx context.Context, po *ent.Procuremen
 	switch o.Status {
 	case order.StatusPaid, order.StatusFulfilling, order.StatusPartiallyDelivered:
 	default:
-		return fmt.Errorf("当前订单状态不允许转人工发货")
+		return fmt.Errorf("當前訂單狀態不允許轉人工發貨")
 	}
 	n, err := c.Order.Update().Where(order.ID(o.ID), order.Version(o.Version), order.StatusEQ(o.Status)).AddVersion(1).Save(ctx)
 	if err != nil {
@@ -174,14 +174,14 @@ func (r *ProcureRepo) lockManualRecovery(ctx context.Context, po *ent.Procuremen
 		return err
 	}
 	if processing {
-		return fmt.Errorf("退款处理中，请先核实退款结果")
+		return fmt.Errorf("退款處理中，請先核實退款結果")
 	}
 	count, err := r.deliveredCount(ctx, it.ID, it.Quantity)
 	if err != nil {
 		return err
 	}
 	if count >= int(it.Quantity) {
-		return fmt.Errorf("该商品已完成交付，无需转人工")
+		return fmt.Errorf("該商品已完成交付，無需轉人工")
 	}
 	return nil
 }
@@ -230,7 +230,7 @@ func (r *ProcureRepo) recordMissing(ctx context.Context, itemID uint64) error {
 		if err != nil {
 			return err
 		}
-		return r.MarkManual(ctx, po.ID, "未能生成有效采购任务，请核实上游扣款和出货结果后人工补发；系统不会重复采购")
+		return r.MarkManual(ctx, po.ID, "未能生成有效採購任務，請核實上游扣款和出貨結果後人工補發；系統不會重複採購")
 	})
 }
 
@@ -255,5 +255,5 @@ func (r *ProcureRepo) reconcileMissing(ctx context.Context) error {
 }
 
 func (r *ProcureRepo) recordDeliveryFailure(ctx context.Context, id uint64) error {
-	return data.Client(ctx, r.data).ProcurementOrder.Update().Where(procurementorder.ID(id), procurementorder.StatusEQ(procurementorder.StatusPolling)).AddRetryCount(1).SetNextRetryAt(time.Now().UTC().Add(time.Minute)).SetLastError("上游已返回结果，本地交付失败，请重试交付或核实后转人工").Exec(ctx)
+	return data.Client(ctx, r.data).ProcurementOrder.Update().Where(procurementorder.ID(id), procurementorder.StatusEQ(procurementorder.StatusPolling)).AddRetryCount(1).SetNextRetryAt(time.Now().UTC().Add(time.Minute)).SetLastError("上游已返回結果，本地交付失敗，請重試交付或核實後轉人工").Exec(ctx)
 }

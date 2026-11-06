@@ -1,8 +1,8 @@
-// Package payment 支付模块（M1a）：渠道/支付单/回调管线/补单/退款编排。
+// Package payment 支付模塊（M1a）：渠道/支付單/回調管線/補單/退款編排。
 //
-// 落地注册表骨架；M1a 交付 alipay/wechat/epay/钱包四渠道 + 回调管线
-// （事务内：行锁 payment+order → 四重校验 → 幂等 → markPaid）+ golden vector 契约测试
-// （固定 key + 固定 body → 期望签名/验签结果，1.x 最大测试缺口的门禁化）。
+// 落地註冊表骨架；M1a 交付 alipay/wechat/epay/錢包四渠道 + 回調管線
+// （事務內：行鎖 payment+order → 四重校驗 → 冪等 → markPaid）+ golden vector 契約測試
+// （固定 key + 固定 body → 期望簽名/驗簽結果，1.x 最大測試缺口的門禁化）。
 package payment
 
 import (
@@ -14,20 +14,20 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/payment/port"
 )
 
-// ErrProviderUnknown 渠道未注册（新增渠道 = 新增 adapter 文件 + 注册）。
+// ErrProviderUnknown 渠道未註冊（新增渠道 = 新增 adapter 文件 + 註冊）。
 type ErrProviderUnknown struct{ Provider string }
 
 func (e *ErrProviderUnknown) Error() string {
-	return fmt.Sprintf("payment: 渠道 %q 未注册", e.Provider)
+	return fmt.Sprintf("payment: 渠道 %q 未註冊", e.Provider)
 }
 
-// Registry 渠道注册表（启动装配：各 adapter 自注册）。
+// Registry 渠道註冊表（啓動裝配：各 adapter 自注冊）。
 type Registry struct {
 	mu        sync.RWMutex
 	providers map[string]port.Provider
 }
 
-// Register 注册渠道 adapter（init/装配期调用）。
+// Register 註冊渠道 adapter（init/裝配期調用）。
 func (r *Registry) Register(p port.Provider) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -45,7 +45,7 @@ func (r *Registry) Provider(provider string) (port.Provider, error) {
 	return p, nil
 }
 
-// All 全部已注册 adapter（：admin 配置面驱动元数据遍历）。
+// All 全部已註冊 adapter（：admin 配置面驅動元數據遍歷）。
 func (r *Registry) All() []port.Provider {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -57,10 +57,10 @@ func (r *Registry) All() []port.Provider {
 	return out
 }
 
-// NewRegistry 构造注册表并注册内置渠道 adapter（alipay/wechat/epay）。
+// NewRegistry 構造註冊表並註冊內置渠道 adapter（alipay/wechat/epay）。
 func NewRegistry() *Registry {
 	r := &Registry{providers: map[string]port.Provider{}}
-	// 内置渠道注册失败仅可能因实现缺陷（如重复 Type），这里直接 panic 暴露问题。
+	// 內置渠道註冊失敗僅可能因實現缺陷（如重複 Type），這裏直接 panic 暴露問題。
 	if err := adapter.RegisterAll(r); err != nil {
 		panic(err)
 	}
@@ -69,12 +69,12 @@ func NewRegistry() *Registry {
 
 var _ port.Registry = (*Registry)(nil)
 
-// PaymentUsecase 支付用例骨架（M1a 交付 CreatePayment/HandleCallback/退款编排）。
+// PaymentUsecase 支付用例骨架（M1a 交付 CreatePayment/HandleCallback/退款編排）。
 type PaymentUsecase struct {
 	registry *Registry
 }
 
-// NewPaymentUsecase 构造。
+// NewPaymentUsecase 構造。
 func NewPaymentUsecase(reg *Registry) *PaymentUsecase {
 	return &PaymentUsecase{registry: reg}
 }

@@ -45,7 +45,7 @@ func validateLowStockPlan(settings map[string]any) error {
 	var p lowStockPlan
 	b, _ := json.Marshal(raw)
 	if string(b) == "null" || json.Unmarshal(b, &p) != nil || p.Threshold < 1 || p.Threshold > 1000000 || p.Interval < 5 || p.Interval > 1440 {
-		return fmt.Errorf("低库存加速设置无效：数量须为 1–1000000，间隔须为 5–1440 分钟的整数")
+		return fmt.Errorf("低庫存加速設置無效：數量須為 1–1000000，間隔須為 5–1440 分鐘的整數")
 	}
 	return nil
 }
@@ -73,7 +73,7 @@ func (s *SyncService) ScanLowStock(ctx context.Context) {
 			continue
 		}
 		if !conn.RateLimitUntil.IsZero() && time.Now().Before(conn.RateLimitUntil) {
-			s.monitorProgress(ctx, conn.ID, "上游限流冷却中，预计 "+conn.RateLimitUntil.Local().Format(time.RFC3339)+" 后重试")
+			s.monitorProgress(ctx, conn.ID, "上游限流冷卻中，預計 "+conn.RateLimitUntil.Local().Format(time.RFC3339)+" 後重試")
 			continue
 		}
 		// A per-connection bounded round lets the following connection make progress.
@@ -83,7 +83,7 @@ func (s *SyncService) ScanLowStock(ctx context.Context) {
 			err = s.probeLowStock(call, conn, plan)
 		}
 		if err != nil {
-			s.monitorProgress(ctx, conn.ID, "本轮未完成，将继续检查："+adapter.StockErrorSummary(err))
+			s.monitorProgress(ctx, conn.ID, "本輪未完成，將繼續檢查："+adapter.StockErrorSummary(err))
 		}
 		stop()
 		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
@@ -196,7 +196,7 @@ func (s *SyncService) probeLowStock(ctx context.Context, conn *ent.SupplyConnect
 	checked, failed := 0, 0
 	defer func() {
 		if ctx.Err() == nil {
-			message := fmt.Sprintf("本轮检查 %d 个规格，%d 个待确认；按各规格成功时间到期检查，失败自动退避", checked, failed)
+			message := fmt.Sprintf("本輪檢查 %d 個規格，%d 個待確認；按各規格成功時間到期檢查，失敗自動退避", checked, failed)
 			s.monitorProgress(ctx, conn.ID, message)
 		}
 	}()
@@ -315,7 +315,7 @@ func (s *SyncService) probeLowStock(ctx context.Context, conn *ent.SupplyConnect
 		}
 		if errors.Is(queryErr, adapter.ErrRateLimited) {
 			if s.pacer != nil {
-				s.pacer.OnRateLimited(context.WithoutCancel(ctx), conn, "低库存检查限流")
+				s.pacer.OnRateLimited(context.WithoutCancel(ctx), conn, "低庫存檢查限流")
 			}
 			return nil
 		}

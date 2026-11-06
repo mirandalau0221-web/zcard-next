@@ -8,39 +8,39 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// StoreTicketService 用户工单：创建/列表/详情/回复/评价/付费加急。
-// 游客可创建（guest_contact 必填）；内部备注用户侧自动过滤。
+// StoreTicketService 用户工單：創建/列表/詳情/回覆/評價/付費加急。
+// 遊客可創建（guest_contact 必填）；內部備註用户側自動過濾。
 service StoreTicketService {
-  // CreateTicket 创建工单（登录用户或游客）。
+  // CreateTicket 創建工單（登錄用户或遊客）。
   rpc CreateTicket(CreateTicketRequest) returns (Ticket) {
     option (google.api.http) = {
       post: "/api/v1/storefront/tickets"
       body: "*"
     };
   }
-  // ListMyTickets 我的工单列表。
+  // ListMyTickets 我的工單列表。
   rpc ListMyTickets(ListMyTicketsRequest) returns (ListMyTicketsReply) {
     option (google.api.http) = { get: "/api/v1/storefront/tickets" };
   }
-  // GetTicket 工单详情（消息流；内部备注过滤）。
+  // GetTicket 工單詳情（消息流；內部備註過濾）。
   rpc GetTicket(GetTicketRequest) returns (GetTicketReply) {
     option (google.api.http) = { get: "/api/v1/storefront/tickets/{ticket_no}" };
   }
-  // ReplyTicket 追加回复。
+  // ReplyTicket 追加回復。
   rpc ReplyTicket(ReplyTicketRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/storefront/tickets/{ticket_no}/reply"
       body: "*"
     };
   }
-  // RateTicket 评价（resolved 后 1-5）。
+  // RateTicket 評價（resolved 後 1-5）。
   rpc RateTicket(RateTicketRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/storefront/tickets/{ticket_no}/rate"
       body: "*"
     };
   }
-  // PayUrgent 付费加急（余额支付 urgent_fee；成功即 priority=urgent_paid）。
+  // PayUrgent 付費加急（餘額支付 urgent_fee；成功即 priority=urgent_paid）。
   rpc PayUrgent(PayUrgentRequest) returns (PayUrgentReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/tickets/{ticket_no}/urgent"
@@ -52,8 +52,8 @@ service StoreTicketService {
 message CreateTicketRequest {
   string type = 1 [(google.api.field_behavior) = REQUIRED]; // presale | aftersale
   string content = 2 [(google.api.field_behavior) = REQUIRED];
-  string guest_contact = 3; // 游客必填（联系方式）
-  uint64 order_id = 4; // 可选关联
+  string guest_contact = 3; // 遊客必填（聯繫方式）
+  uint64 order_id = 4; // 可選關聯
   uint64 product_id = 5;
   repeated uint64 attachment_media_ids = 6;
 }
@@ -90,7 +90,7 @@ message GetTicketRequest {
 
 message TicketMessage {
   uint64 id = 1;
-  string sender_type = 2; // user | admin | system（内部备注已过滤）
+  string sender_type = 2; // user | admin | system（內部備註已過濾）
   string content = 3;
   repeated uint64 attachments = 4;
   int64 created_at = 5;
@@ -117,12 +117,12 @@ message RateTicketRequest {
 
 message PayUrgentRequest {
   string ticket_no = 1 [(google.api.field_behavior) = REQUIRED];
-  optional int64 expected_fee_cents = 2; // 用户已确认的报价；缺失或变价拒绝扣费
+  optional int64 expected_fee_cents = 2; // 用户已確認的報價；缺失或變價拒絕扣費
 }
 
 message PayUrgentReply {
   bool paid = 1;
-  int64 fee_cents = 2; // 实扣（分）
-  string error = 3; // 余额不足等
+  int64 fee_cents = 2; // 實扣（分）
+  string error = 3; // 餘額不足等
   bool already_urgent = 4;
 }

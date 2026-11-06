@@ -18,30 +18,30 @@ import (
 
 func LockPhysicalOrder(ctx context.Context, d *Data, o *ent.Order, allowRefunded ...bool) error {
 	if o.CommerceVersion != 1 {
-		return fmt.Errorf("该订单不支持实体履约")
+		return fmt.Errorf("該訂單不支持實體履約")
 	}
 	switch o.Status {
 	case order.StatusRefunded:
 		if len(allowRefunded) == 0 || !allowRefunded[0] {
-			return fmt.Errorf("订单已退清")
+			return fmt.Errorf("訂單已退清")
 		}
 	case order.StatusPaid, order.StatusFulfilling, order.StatusPartiallyDelivered, order.StatusDelivered, order.StatusCompleted:
 	default:
-		return fmt.Errorf("订单尚未付款或已关闭")
+		return fmt.Errorf("訂單尚未付款或已關閉")
 	}
 	busy, e := Client(ctx, d).RefundOrder.Query().Where(refundorder.OrderID(o.ID), refundorder.StatusIn("created", "processing")).Exist(ctx)
 	if e != nil {
 		return e
 	}
 	if busy {
-		return fmt.Errorf("退款待核对，暂不能操作物流")
+		return fmt.Errorf("退款待核對，暫不能操作物流")
 	}
 	n, e := Client(ctx, d).Order.Update().Where(order.ID(o.ID), order.Version(o.Version), order.StatusEQ(o.Status)).AddVersion(1).Save(ctx)
 	if e != nil {
 		return e
 	}
 	if n != 1 {
-		return fmt.Errorf("订单已变化，请刷新后重试")
+		return fmt.Errorf("訂單已變化，請刷新後重試")
 	}
 	return nil
 }
@@ -166,7 +166,7 @@ func ReceivePhysicalShipment(ctx context.Context, d *Data, no string, sid uint64
 			return e
 		}
 		if n != 1 {
-			return fmt.Errorf("包裹状态已变化")
+			return fmt.Errorf("包裹狀態已變化")
 		}
 		for key, qty := range s.Items {
 			id, e := strconv.ParseUint(key, 10, 64)
@@ -181,7 +181,7 @@ func ReceivePhysicalShipment(ctx context.Context, d *Data, no string, sid uint64
 				return fmt.Errorf("包裹商品不存在")
 			}
 		}
-		if e = PhysicalOrderEvent(ctx, d, o, "shipment_received", actor, aid, fmt.Sprintf("确认收到包裹 %d", s.ID)); e != nil {
+		if e = PhysicalOrderEvent(ctx, d, o, "shipment_received", actor, aid, fmt.Sprintf("確認收到包裹 %d", s.ID)); e != nil {
 			return e
 		}
 		return RefreshPhysicalProgress(ctx, d, o)

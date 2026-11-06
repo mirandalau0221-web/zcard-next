@@ -25,7 +25,7 @@ type CartItem struct {
 	UserID uint64 `json:"user_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
-	// 0=商品级（哨兵，参与唯一索引）
+	// 0=商品級（哨兵，參與唯一索引）
 	SkuID uint64 `json:"sku_id,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int32 `json:"quantity,omitempty"`

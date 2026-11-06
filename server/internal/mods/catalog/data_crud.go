@@ -1,7 +1,7 @@
 package catalog
 
-// 商品/分类/标签管理 CRUD 数据层（；ent import 收口：data 前缀文件）。
-// sanitize 在 service 层调用后传入；slug 唯一校验在 biz。
+// 商品/分類/標籤管理 CRUD 數據層（；ent import 收口：data 前綴文件）。
+// sanitize 在 service 層調用後傳入；slug 唯一校驗在 biz。
 
 import (
 	"context"
@@ -29,7 +29,7 @@ import (
 
 // ── 商品 ─────────────────────────────────────────────────────
 
-// ListAdmin 管理面商品列表（含下架/隐藏；成本价下发）。
+// ListAdmin 管理面商品列表（含下架/隱藏；成本價下發）。
 func (r *ProductRepoImpl) ListAdmin(ctx context.Context, f port.AdminFilter) ([]*ent.Product, int64, error) {
 	tc := tenancy.FromContext(ctx)
 	q := data.Client(ctx, r.data).Product.Query().
@@ -45,7 +45,7 @@ func (r *ProductRepoImpl) ListAdmin(ctx context.Context, f port.AdminFilter) ([]
 		q = q.Where(product.IsLocked(*f.IsLocked))
 	}
 	if f.CategoryID > 0 {
-		// 选择父分类时递归包含全部子分类商品
+		// 選擇父分類時遞歸包含全部子分類商品
 		desc, err := descendantCategoryIDs(ctx, data.Client(ctx, r.data), f.CategoryID)
 		if err != nil {
 			return nil, 0, err
@@ -58,12 +58,12 @@ func (r *ProductRepoImpl) ListAdmin(ctx context.Context, f port.AdminFilter) ([]
 	}
 	if f.StockType != "" {
 		if f.StockType != "card" && f.StockType != "url" && f.StockType != "code" {
-			return nil, 0, fmt.Errorf("商品库存类型无效")
+			return nil, 0, fmt.Errorf("商品庫存類型無效")
 		}
 		q = q.Where(product.StockTypeEQ(product.StockType(f.StockType)))
 	}
 	if f.Keyword != "" {
-		q = q.Where(product.NameContains(f.Keyword)) // 与前台一致：包含匹配（搜名称中段词可命中）
+		q = q.Where(product.NameContains(f.Keyword)) // 與前台一致：包含匹配（搜名稱中段詞可命中）
 	}
 	if f.ConnectionID > 0 {
 		q = q.Where(product.UpstreamSourceID(f.ConnectionID))
@@ -71,7 +71,7 @@ func (r *ProductRepoImpl) ListAdmin(ctx context.Context, f port.AdminFilter) ([]
 	if f.LocalOnly {
 		q = q.Where(product.Or(product.UpstreamSourceIDIsNil(), product.UpstreamSourceID(0)))
 	}
-	if f.Status != 0 { // 0=全部（proto3 默认值）；1=上架 2=隐藏 -1=仅下架（DB status=0）
+	if f.Status != 0 { // 0=全部（proto3 默認值）；1=上架 2=隱藏 -1=僅下架（DB status=0）
 		st := f.Status
 		if st == -1 {
 			st = 0
@@ -81,7 +81,7 @@ func (r *ProductRepoImpl) ListAdmin(ctx context.Context, f port.AdminFilter) ([]
 	if f.Inventory != "" || f.RestockedOnly {
 		return r.listInventory(ctx, q, f)
 	}
-	// 先按货源计算库存，再筛选和分页；未知/不限库存不计入缺货。
+	// 先按貨源計算庫存，再篩選和分頁；未知/不限庫存不計入缺貨。
 	if f.LowStockThreshold > 0 || f.OutOfStockOnly {
 		candidates, err := q.Clone().Where(product.Status(1)).All(ctx)
 		if err != nil {
@@ -173,20 +173,20 @@ func (r *ProductRepoImpl) stockSnapshotBatch(ctx context.Context, productIDs []u
 	return out, nil
 }
 
-// GetAdmin 管理面商品详情。
+// GetAdmin 管理面商品詳情。
 func (r *ProductRepoImpl) GetAdmin(ctx context.Context, subsiteID, id uint64) (*ent.Product, error) {
 	return data.Client(ctx, r.data).Product.Query().
 		Where(product.ID(id), product.SubsiteID(subsiteID), product.StatusGTE(0)).
 		Only(ctx)
 }
 
-// CreateProduct 创建商品（description 已 sanitize）。
+// CreateProduct 創建商品（description 已 sanitize）。
 func (r *ProductRepoImpl) createProduct(ctx context.Context, in port.ProductInput) (*ent.Product, error) {
 	if err := r.validatePhysicalProduct(ctx, nil, &in); err != nil {
 		return nil, err
 	}
 	if in.FulfillmentMode == "local" || in.FulfillmentMode == "reuse" {
-		return nil, fmt.Errorf("请先创建商品，再配置发货来源")
+		return nil, fmt.Errorf("請先創建商品，再配置發貨來源")
 	}
 	if err := validateServiceConfig(in.FulfillmentMode, in.ManualStock, false); err != nil {
 		return nil, err
@@ -233,21 +233,21 @@ func (r *ProductRepoImpl) createProduct(ctx context.Context, in port.ProductInpu
 	return create.Save(ctx)
 }
 
-// SetDirectContent 回填直发内容密文（创建后由 service 按真实 productID 加密调用）。
+// SetDirectContent 回填直髮內容密文（創建後由 service 按真實 productID 加密調用）。
 func (r *ProductRepoImpl) SetDirectContent(ctx context.Context, id uint64, ciphered []byte) error {
 	p, e := data.Client(ctx, r.data).Product.Get(ctx, id)
 	if e != nil {
 		return e
 	}
 	if p.DeliveryKind == "social_service" {
-		return fmt.Errorf("社交服务使用绑定货源交付，不能设置直发内容")
+		return fmt.Errorf("社交服務使用綁定貨源交付，不能設置直髮內容")
 	}
 	return data.Client(ctx, r.data).Product.UpdateOneID(id).
 		Where(product.GoodsTypeNEQ("physical")).
 		SetDirectContent(ciphered).Exec(ctx)
 }
 
-// UpdateProduct 更新（nil/零值字段不动）。
+// UpdateProduct 更新（nil/零值字段不動）。
 func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.ProductInput) (*ent.Product, error) {
 	current, err := data.Client(ctx, r.data).Product.Get(ctx, id)
 	if err != nil {
@@ -258,7 +258,7 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 	}
 	if current.ProductKind == "sms_channel" {
 		if in.GoodsType != nil && *in.GoodsType != "virtual" || in.StockType != "" && in.StockType != "card" || in.FulfillmentMode != "" && in.FulfillmentMode != "auto" || in.Price > 0 || in.FactoryPrice > 0 || in.PointsRequired > 0 || len(in.DirectContent) > 0 {
-			return nil, fmt.Errorf("渠道接码商品请在货源导入/映射中设置加价，不能改为普通商品或本地发货")
+			return nil, fmt.Errorf("渠道接碼商品請在貨源導入/映射中設置加價，不能改為普通商品或本地發貨")
 		}
 	}
 	if err := r.validatePhysicalProduct(ctx, current, &in); err != nil {
@@ -270,15 +270,15 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 			return nil, e
 		}
 		if owned {
-			return nil, fmt.Errorf("商品已有本地发货设置，不能直接更改库存类型")
+			return nil, fmt.Errorf("商品已有本地發貨設置，不能直接更改庫存類型")
 		}
 	}
 	if current.FulfillmentMode == "reuse" || current.FulfillmentMode == "local" {
 		if in.FulfillmentMode != current.FulfillmentMode && in.FulfillmentMode != "" {
-			return nil, fmt.Errorf("请在发货设置中更改本地发货来源")
+			return nil, fmt.Errorf("請在發貨設置中更改本地發貨來源")
 		}
 	} else if in.FulfillmentMode == "reuse" || in.FulfillmentMode == "local" {
-		return nil, fmt.Errorf("请在发货设置中配置内容来源")
+		return nil, fmt.Errorf("請在發貨設置中配置內容來源")
 	}
 
 	if in.FulfillmentMode == "manual" {
@@ -287,7 +287,7 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 			return nil, err
 		}
 		if p.UpstreamSourceID > 0 {
-			return nil, fmt.Errorf("上游商品不能改为本地人工交付，请新建本地服务商品")
+			return nil, fmt.Errorf("上游商品不能改為本地人工交付，請新建本地服務商品")
 		}
 	}
 	q := data.Client(ctx, r.data).Product.UpdateOneID(id).Where(product.StatusGTE(0), product.SubsiteID(tenancy.FromContext(ctx).SubsiteID))
@@ -304,7 +304,7 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 	}
 	if in.PhysicalStock != nil && current.GoodsType == "physical" {
 		if in.ExpectedPhysicalStock == nil || *in.ExpectedPhysicalStock != current.PhysicalStock {
-			return nil, fmt.Errorf("库存已变化，请刷新后重新调整")
+			return nil, fmt.Errorf("庫存已變化，請刷新後重新調整")
 		}
 		if err := data.AdjustPhysicalStock(ctx, r.data, current, 0, *in.PhysicalStock); err != nil {
 			return nil, err
@@ -344,7 +344,7 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 	}
 	if in.StockType != "" {
 		q.SetStockType(product.StockType(in.StockType))
-		// 保留旧直发密文供历史订单取货；新订单按 stock_type 走卡池。
+		// 保留舊直髮密文供歷史訂單取貨；新訂單按 stock_type 走卡池。
 	}
 	if err := validateServiceConfig(in.FulfillmentMode, in.ManualStock, false); err != nil {
 		return nil, err
@@ -378,7 +378,7 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 		}
 	}
 	if in.PointsRequiredSet {
-		q.SetPointsRequired(in.PointsRequired) // 含 0=移出积分商城（PUT 全量语义）
+		q.SetPointsRequired(in.PointsRequired) // 含 0=移出積分商城（PUT 全量語義）
 	}
 	if current.DeliveryKind == "social_service" {
 		q.SetPrice(0).SetFactoryPrice(0).SetPointsRequired(0).AddLockVersion(1)
@@ -389,7 +389,7 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 	return r.GetAdmin(ctx, tenancy.FromContext(ctx).SubsiteID, id)
 }
 
-// BatchUpdateStatus 批量上下架（ 列表多选；status 1/0/2）。
+// BatchUpdateStatus 批量上下架（ 列表多選；status 1/0/2）。
 func (r *ProductRepoImpl) BatchUpdateStatus(ctx context.Context, ids []uint64, status int8) (int, error) {
 	existing, err := data.Client(ctx, r.data).Product.Query().Where(product.IDIn(ids...), product.SubsiteID(tenancy.FromContext(ctx).SubsiteID), product.StatusGTE(0)).IDs(ctx)
 	if err != nil {
@@ -402,9 +402,9 @@ func (r *ProductRepoImpl) BatchUpdateStatus(ctx context.Context, ids []uint64, s
 	return n, err
 }
 
-// DeleteProduct 删除（软外键约束：有卡密时拒删）。
+// DeleteProduct 刪除（軟外鍵約束：有卡密時拒刪）。
 func (r *ProductRepoImpl) deleteProduct(ctx context.Context, id uint64) error {
-	// 删除前清理本地采集封面（失败不阻断删除）
+	// 刪除前清理本地採集封面（失敗不阻斷刪除）
 	if p, err := data.Client(ctx, r.data).Product.Get(ctx, id); err == nil {
 		deleteProductCover(p.Cover)
 	}
@@ -460,9 +460,9 @@ func entutilID() uint64 {
 	return idCounter
 }
 
-// ── 分类 ─────────────────────────────────────────────────────
+// ── 分類 ─────────────────────────────────────────────────────
 
-// ListCategories 分类列表（含商品计数）。
+// ListCategories 分類列表（含商品計數）。
 func (r *ProductRepoImpl) ListCategories(ctx context.Context) ([]*ent.Category, error) {
 	tc := tenancy.FromContext(ctx)
 	return data.Client(ctx, r.data).Category.Query().
@@ -471,14 +471,14 @@ func (r *ProductRepoImpl) ListCategories(ctx context.Context) ([]*ent.Category, 
 		All(ctx)
 }
 
-// CreateCategory 创建分类。
+// CreateCategory 創建分類。
 func (r *ProductRepoImpl) CreateCategory(ctx context.Context, name string, parentID uint64, icon string, sort int32) (*ent.Category, error) {
 	if err := data.ValidateCategoryName(name); err != nil {
 		return nil, err
 	}
 	name = strings.TrimSpace(name)
 	tc := tenancy.FromContext(ctx)
-	// 环状校验
+	// 環狀校驗
 	if parentID > 0 {
 		if err := r.checkCategoryTree(ctx, parentID, 0); err != nil {
 			return nil, err
@@ -493,10 +493,10 @@ func (r *ProductRepoImpl) CreateCategory(ctx context.Context, name string, paren
 		Save(ctx)
 }
 
-// UpdateCategory 更新分类。
-// 指针语义（缺省不变）：icon nil=不变（空串=清除）；hide nil=不变；
-// sort nil=不变；parentId nil=不变（0=置顶级；>0=指定父，防环：
-// 不能把分类设为自身或自身的后代，否则树成环）。
+// UpdateCategory 更新分類。
+// 指針語義（缺省不變）：icon nil=不變（空串=清除）；hide nil=不變；
+// sort nil=不變；parentId nil=不變（0=置頂級；>0=指定父，防環：
+// 不能把分類設為自身或自身的後代，否則樹成環）。
 func (r *ProductRepoImpl) updateCategory(ctx context.Context, id uint64, name string, icon *string, hide *bool, sort *int32, parentID *int64) (*ent.Category, error) {
 	if name != "" {
 		if err := data.ValidateCategoryName(name); err != nil {
@@ -526,7 +526,7 @@ func (r *ProductRepoImpl) updateCategory(ctx context.Context, id uint64, name st
 			if uint64(*parentID) == id {
 				return nil, fmt.Errorf("catalog.CATEGORY_CANNOT_PARENT_SELF")
 			}
-			// 防环：新父不能是自身后代
+			// 防環：新父不能是自身後代
 			desc, err := descendantCategoryIDs(ctx, client, id)
 			if err != nil {
 				return nil, err
@@ -536,13 +536,13 @@ func (r *ProductRepoImpl) updateCategory(ctx context.Context, id uint64, name st
 			}
 			q.SetParentID(uint64(*parentID))
 		} else {
-			q.ClearParentID() // 置顶级
+			q.ClearParentID() // 置頂級
 		}
 	}
 	return q.Save(ctx)
 }
 
-// descendantCategoryIDs 收集分类的全部子孙 id（含自身）——防环判据。
+// descendantCategoryIDs 收集分類的全部子孫 id（含自身）——防環判據。
 func descendantCategoryIDs(ctx context.Context, client *ent.Client, id uint64) (map[uint64]bool, error) {
 	out := map[uint64]bool{id: true}
 	frontier := []uint64{id}
@@ -645,8 +645,8 @@ func (r *ProductRepoImpl) deleteCategory(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// ReorderCategories 分类排序（拖拽重排）：把 parent_id 层级下全部兄弟按 ids 顺序
-// 重排，sort 归一化为 0..n-1；跨层级移动时一并改父级。事务原子提交。
+// ReorderCategories 分類排序（拖拽重排）：把 parent_id 層級下全部兄弟按 ids 順序
+// 重排，sort 歸一化為 0..n-1；跨層級移動時一併改父級。事務原子提交。
 func (r *ProductRepoImpl) ReorderCategories(ctx context.Context, parentID uint64, ids []uint64) error {
 	if len(ids) == 0 {
 		return nil
@@ -706,14 +706,14 @@ func (r *ProductRepoImpl) checkCategoryTree(ctx context.Context, id, parentID ui
 	return r.checkCategoryTree(ctx, id, row.ParentID)
 }
 
-// ── 标签 ─────────────────────────────────────────────────────
+// ── 標籤 ─────────────────────────────────────────────────────
 
-// ListTags 标签列表。
+// ListTags 標籤列表。
 func (r *ProductRepoImpl) ListTags(ctx context.Context) ([]*ent.Tag, error) {
 	return data.Client(ctx, r.data).Tag.Query().Order(ent.Asc(tag.FieldID)).All(ctx)
 }
 
-// CreateTag 创建标签。
+// CreateTag 創建標籤。
 func (r *ProductRepoImpl) CreateTag(ctx context.Context, name, slug, icon, color, position string) (*ent.Tag, error) {
 	return data.Client(ctx, r.data).Tag.Create().
 		SetName(name).
@@ -724,7 +724,7 @@ func (r *ProductRepoImpl) CreateTag(ctx context.Context, name, slug, icon, color
 		Save(ctx)
 }
 
-// DeleteTag 删除标签。
+// DeleteTag 刪除標籤。
 func (r *ProductRepoImpl) DeleteTag(ctx context.Context, id uint64) error {
 	n, err := data.Client(ctx, r.data).Tag.Delete().Where(tag.ID(id)).Exec(ctx)
 	if err != nil {
@@ -736,9 +736,9 @@ func (r *ProductRepoImpl) DeleteTag(ctx context.Context, id uint64) error {
 	return nil
 }
 
-// ── 管理面 DTO 转换 ──────────────────────────────────────────
+// ── 管理面 DTO 轉換 ──────────────────────────────────────────
 
-// ToAdminPB 转 admin 协议对象。
+// ToAdminPB 轉 admin 協議對象。
 func ToAdminPB(p *ent.Product) *adminv1.AdminProduct {
 	out := &adminv1.AdminProduct{
 		ProductProperty: p.ProductProperty, SalesVisible: &p.SalesVisible, TrackInventory: &p.TrackInventory,
@@ -774,9 +774,9 @@ func nilOrZero(v uint64) *uint64 {
 	return &v
 }
 
-// UpsertUpstreamProduct 货源同步商品 upsert（，supply 模块经 port 消费）。
-// 判据：subsite_id + upstream_source_id + upstream_product_code 幂等。
-// Price=-1 保持现有价（价格保护由 supply 侧决策后传入）。
+// UpsertUpstreamProduct 貨源同步商品 upsert（，supply 模塊經 port 消費）。
+// 判據：subsite_id + upstream_source_id + upstream_product_code 冪等。
+// Price=-1 保持現有價（價格保護由 supply 側決策後傳入）。
 func (r *ProductRepoImpl) UpsertUpstreamProduct(ctx context.Context, in port.UpstreamProductInput) (id uint64, created bool, err error) {
 	err = data.CurrencyTx(ctx, r.data, func(ctx context.Context) error {
 		var e error
@@ -797,26 +797,26 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 		in.ProductKind = "standard"
 	}
 	if in.ProductKind != "standard" && in.ProductKind != "sms_channel" && in.ProductKind != "social_service" {
-		return 0, false, fmt.Errorf("商品类型无效")
+		return 0, false, fmt.Errorf("商品類型無效")
 	}
 	if in.ProductKind == "sms_channel" && (in.DeliveryKind != "sms_activation" || len(in.SKUs) > 0) {
-		return 0, false, fmt.Errorf("渠道商品类型无效")
+		return 0, false, fmt.Errorf("渠道商品類型無效")
 	}
 	if in.DeliveryKind == "" {
 		in.DeliveryKind = "card"
 	}
 	if in.DeliveryKind != "card" && in.DeliveryKind != "sms_activation" && in.DeliveryKind != "social_service" {
-		return 0, false, fmt.Errorf("不支持的上游交付类型")
+		return 0, false, fmt.Errorf("不支持的上游交付類型")
 	}
 	if in.DeliveryKind == "sms_activation" && len(in.SKUs) > 0 {
-		return 0, false, fmt.Errorf("接码商品不支持规格")
+		return 0, false, fmt.Errorf("接碼商品不支持規格")
 	}
 	if in.ProductKind == "social_service" && in.DeliveryKind != "social_service" {
-		return 0, false, fmt.Errorf("社交服务交付类型不匹配")
+		return 0, false, fmt.Errorf("社交服務交付類型不匹配")
 	}
 	if in.DeliveryKind == "social_service" {
 		if in.ProductKind != "social_service" || len(in.SocialSchema) == 0 || len(in.SKUs) != 0 {
-			return 0, false, fmt.Errorf("社交服务购买规则缺失或商品类型不匹配")
+			return 0, false, fmt.Errorf("社交服務購買規則缺失或商品類型不匹配")
 		}
 		in.Price, in.FactoryPrice = 0, 0
 	}
@@ -849,9 +849,9 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 	}
 	in.Description = sanitize.RichHTML(in.Description)
 	if ent.IsNotFound(err) {
-		// 新建：slug 用上游标识（稳定、幂等）；状态按 auto_onshelf 开关。
-		// 候选 slug（base、base-2 … base-21）一次 IN 查询判重——替代逐个
-		// Exist 最多 100 次点查（大数量同步的热点）
+		// 新建：slug 用上游標識（穩定、冪等）；狀態按 auto_onshelf 開關。
+		// 候選 slug（base、base-2 … base-21）一次 IN 查詢判重——替代逐個
+		// Exist 最多 100 次點查（大數量同步的熱點）
 		slug := slugify(in.UpstreamProductCode)
 		if slug == "" {
 			slug = fmt.Sprintf("up-%d-%s", in.ConnectionID, in.UpstreamProductCode)
@@ -881,7 +881,7 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 			}
 		}
 		if slug == "" {
-			// 前 21 个候选全撞（极端）：从 22 起逐个 Exist 兜底
+			// 前 21 個候選全撞（極端）：從 22 起逐個 Exist 兜底
 			slug = fmt.Sprintf("%s-%d", baseSlug, 22)
 			for i := 22; i < 100; i++ {
 				exists, err3 := data.Client(ctx, r.data).Product.Query().
@@ -895,15 +895,15 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 				slug = fmt.Sprintf("%s-%d", baseSlug, i+1)
 			}
 		}
-		// 上游不可售（手动发货/预选/停售，in.Status=0）恒下架；
-		// 在售且允许自动上架才 1（待定价导入 AutoOnshelf=false → 0）
+		// 上游不可售（手動發貨/預選/停售，in.Status=0）恆下架；
+		// 在售且允許自動上架才 1（待定價導入 AutoOnshelf=false → 0）
 		status := in.Status
 		if in.Status == 1 && !in.AutoOnshelf {
 			status = 0
 		}
 		price := in.Price
 		if price < 0 {
-			price = 0 // 待定价的新商品没有旧价，不能将“不改价”哨兵存为售价。
+			price = 0 // 待定價的新商品沒有舊價，不能將“不改價”哨兵存為售價。
 		}
 		create := data.Client(ctx, r.data).Product.Create().
 			SetSubsiteID(tc.SubsiteID).
@@ -941,10 +941,10 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 
 	if existing.Status < 0 {
 		if !in.ReimportDeleted {
-			return 0, false, fmt.Errorf("商品已在本地删除，自动同步不会恢复；如需重新导入，请在导入上游商品中勾选该商品")
+			return 0, false, fmt.Errorf("商品已在本地刪除，自動同步不會恢復；如需重新導入，請在導入上游商品中勾選該商品")
 		}
-		// 只释放上游唯一标识；旧商品及其订单、卡密、SKU 继续保留归档。
-		// 释放与新建必须同一事务，失败时仍由归档记录阻止自动同步复活。
+		// 只釋放上游唯一標識；舊商品及其訂單、卡密、SKU 繼續保留歸檔。
+		// 釋放與新建必須同一事務，失敗時仍由歸檔記錄阻止自動同步復活。
 		var id uint64
 		var created bool
 		err := data.Tx(ctx, r.data, func(ctx context.Context) error {
@@ -961,7 +961,7 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 		return id, created, err
 	}
 
-	// 更新：名称/描述/封面/分类/状态/成本价；价格按保护语义（-1 不动）
+	// 更新：名稱/描述/封面/分類/狀態/成本價；價格按保護語義（-1 不動）
 	if err := data.GuardUpstreamDelivery(ctx, data.Client(ctx, r.data), existing); err != nil {
 		return 0, false, err
 	}
@@ -969,10 +969,10 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 		SetName(in.Name).
 		SetUpstreamSyncedAt(in.UpstreamSyncedAt)
 	if existing.ProductKind != in.ProductKind {
-		return 0, false, fmt.Errorf("商品类型不能变化")
+		return 0, false, fmt.Errorf("商品類型不能變化")
 	}
 	if existing.DeliveryKind != in.DeliveryKind {
-		return 0, false, fmt.Errorf("上游交付类型变化，请新建商品映射")
+		return 0, false, fmt.Errorf("上游交付類型變化，請新建商品映射")
 	}
 	upd.SetSmsProduct(in.SMSProduct).SetSocialSchema(in.SocialSchema)
 	if in.DeliveryKind == "social_service" && !sameSocialSchema(existing.SocialSchema, in.SocialSchema) {
@@ -984,7 +984,7 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 	if in.Price >= 0 {
 		upd.SetPrice(in.Price)
 	}
-	// 两个调用方（collect 同步/交互导入）恒发送显式状态：镜像上游可售性
+	// 兩個調用方（collect 同步/交互導入）恆發送顯式狀態：鏡像上游可售性
 	if !existing.AutoListing {
 		if existing.Status == 2 && in.Status == 1 {
 			upd.SetStatus(2)
@@ -1008,7 +1008,7 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 	if !existing.DescriptionProtected && (in.DescriptionSet || in.Description != "") {
 		upd.SetDescription(in.Description)
 	}
-	// cover 恒设（空 = 清空：上游下架/删图时镜像清空，同时调用方已删本地文件）
+	// cover 恆設（空 = 清空：上游下架/刪圖時鏡像清空，同時調用方已刪本地文件）
 	if !existing.CoverProtected {
 		upd.SetCover(in.Cover)
 	}
@@ -1025,10 +1025,10 @@ func (r *ProductRepoImpl) upsertUpstreamProduct(ctx context.Context, in port.Ups
 	return updated.ID, false, nil
 }
 
-// syncUpstreamSkus 上游规格组合差量同步到 product_skus（按上游 SKU 标识匹配）：
-// 新集合有 → 更新价格/规格/上游标识；没有 → 删除（仅删本同步来源的，
-// upstream_sku_id 非空的记录——本地手建 SKU 不受影响）。nil 入参 = 不动。
-// 价格 -1 = 价格保护语义：已有 SKU 跳过改价，新增组合不创建。
+// syncUpstreamSkus 上游規格組合差量同步到 product_skus（按上游 SKU 標識匹配）：
+// 新集合有 → 更新價格/規格/上游標識；沒有 → 刪除（僅刪本同步來源的，
+// upstream_sku_id 非空的記錄——本地手建 SKU 不受影響）。nil 入參 = 不動。
+// 價格 -1 = 價格保護語義：已有 SKU 跳過改價，新增組合不創建。
 func (r *ProductRepoImpl) syncUpstreamSkus(ctx context.Context, subsiteID, productID uint64, in []port.UpstreamSKUInput) error {
 	if in == nil {
 		return nil
@@ -1059,7 +1059,7 @@ func (r *ProductRepoImpl) syncUpstreamSkus(ctx context.Context, subsiteID, produ
 		}
 		w, ok := want[e.UpstreamSkuID]
 		if !ok {
-			// 上游已无此组合：仅删同步来源的 SKU（本地手建 upstream_sku_id 为空）
+			// 上游已無此組合：僅刪同步來源的 SKU（本地手建 upstream_sku_id 為空）
 			if e.UpstreamSkuID != "" {
 				if err := client.ProductSku.DeleteOneID(e.ID).Exec(ctx); err != nil {
 					return err
@@ -1072,7 +1072,7 @@ func (r *ProductRepoImpl) syncUpstreamSkus(ctx context.Context, subsiteID, produ
 			SetName(w.name).
 			SetSpecValues(w.spec).
 			SetUpstreamSkuID(w.id)
-		if w.price >= 0 { // -1 = 价格保护：SKU 保持现价，仅刷新规格与上游标识
+		if w.price >= 0 { // -1 = 價格保護：SKU 保持現價，僅刷新規格與上游標識
 			upd = upd.SetPrice(w.price)
 		}
 		if err := upd.Exec(ctx); err != nil {
@@ -1082,8 +1082,8 @@ func (r *ProductRepoImpl) syncUpstreamSkus(ctx context.Context, subsiteID, produ
 	creates := make([]*ent.ProductSkuCreate, 0, len(want))
 	for _, w := range want {
 		if w.price < 0 {
-			// 价格保护期上游新增的组合：无安全价格可写，跳过创建，
-			// 运营解除保护/强制改价后的下一轮同步补齐
+			// 價格保護期上游新增的組合：無安全價格可寫，跳過創建，
+			// 運營解除保護/強制改價後的下一輪同步補齊
 			continue
 		}
 		creates = append(creates, client.ProductSku.Create().
@@ -1100,7 +1100,7 @@ func (r *ProductRepoImpl) syncUpstreamSkus(ctx context.Context, subsiteID, produ
 	return nil
 }
 
-// ListSupplyCategories 供货目录分类（port.SupplierCatalog；主站一级分类）。
+// ListSupplyCategories 供貨目錄分類（port.SupplierCatalog；主站一級分類）。
 func (r *ProductRepoImpl) ListSupplyCategories(ctx context.Context) ([]port.SupplyCategory, error) {
 	tc := tenancy.FromContext(ctx)
 	rows, err := data.Client(ctx, r.data).Category.Query().
@@ -1117,7 +1117,7 @@ func (r *ProductRepoImpl) ListSupplyCategories(ctx context.Context) ([]port.Supp
 	return out, nil
 }
 
-// UpdateUpstreamPrice 仅更新价格（port.UpstreamProductMaintainer；price scope 轻量路径）。
+// UpdateUpstreamPrice 僅更新價格（port.UpstreamProductMaintainer；price scope 輕量路徑）。
 func (r *ProductRepoImpl) UpdateUpstreamPrice(ctx context.Context, connectionID uint64, productCode string, priceCents int64, skus ...port.UpstreamSKUInput) (bool, error) {
 	tc := tenancy.FromContext(ctx)
 	found := false
@@ -1158,7 +1158,7 @@ func (r *ProductRepoImpl) UpdateUpstreamPrice(ctx context.Context, connectionID 
 	return found, err
 }
 
-// UpdateUpstreamStatus 仅更新上下架状态（port.UpstreamProductMaintainer；status scope 轻量路径）。
+// UpdateUpstreamStatus 僅更新上下架狀態（port.UpstreamProductMaintainer；status scope 輕量路徑）。
 func (r *ProductRepoImpl) UpdateUpstreamStatus(ctx context.Context, connectionID uint64, productCode string, status int8) (bool, error) {
 	changed := false
 	err := data.Tx(ctx, r.data, func(ctx context.Context) error {
@@ -1184,7 +1184,7 @@ func (r *ProductRepoImpl) UpdateUpstreamStatus(ctx context.Context, connectionID
 		}
 		upd := c.Product.UpdateOneID(p.ID).SetStatus(status).SetUpstreamSyncedAt(time.Now().UTC())
 		if status == 0 && p.Status > 0 {
-			upd.SetListingReason("upstream_unavailable").SetListingRestoreStatus(p.Status).SetListingMessage("上游停售或商品已不存在，需人工核实")
+			upd.SetListingReason("upstream_unavailable").SetListingRestoreStatus(p.Status).SetListingMessage("上游停售或商品已不存在，需人工核實")
 		}
 		if e := upd.Exec(ctx); e != nil {
 			return e
@@ -1195,9 +1195,9 @@ func (r *ProductRepoImpl) UpdateUpstreamStatus(ctx context.Context, connectionID
 	return changed, err
 }
 
-// ShelveOffMissing 删除对账：连接下未见商品批量下架（port.UpstreamProductMaintainer）。
-// 只动 status!=0 的（已下架不重复计数）；seen 为空切片时全量下架（引擎侧护栏
-// 保证仅在权威快照完整时调用）。
+// ShelveOffMissing 刪除對賬：連接下未見商品批量下架（port.UpstreamProductMaintainer）。
+// 只動 status!=0 的（已下架不重複計數）；seen 為空切片時全量下架（引擎側護欄
+// 保證僅在權威快照完整時調用）。
 func (r *ProductRepoImpl) ShelveOffMissing(ctx context.Context, connectionID uint64, seen []string) (int64, error) {
 	tc := tenancy.FromContext(ctx)
 	q := data.Client(ctx, r.data).Product.Query().
@@ -1226,7 +1226,7 @@ func (r *ProductRepoImpl) ShelveOffMissing(ctx context.Context, connectionID uin
 	return count, nil
 }
 
-// deleteProductCover 删除本地采集封面文件（/uploads/ 路径；其余忽略）。
+// deleteProductCover 刪除本地採集封面文件（/uploads/ 路徑；其餘忽略）。
 func deleteProductCover(cover string) {
 	if !strings.HasPrefix(cover, "/uploads/") {
 		return
@@ -1236,7 +1236,7 @@ func deleteProductCover(cover string) {
 	_ = mediamods.DeleteLocal(rel)
 }
 
-// ListForSupply 供货目录分页（ supplier 消费；管理面语义含下架）。
+// ListForSupply 供貨目錄分頁（ supplier 消費；管理面語義含下架）。
 func (r *ProductRepoImpl) ListForSupply(ctx context.Context, f port.AdminFilter) ([]port.SupplierProduct, int64, error) {
 	hidden, err := data.HiddenCategoryIDs(ctx, data.Client(ctx, r.data), tenancy.FromContext(ctx).SubsiteID)
 	if err != nil {
@@ -1273,7 +1273,7 @@ func (r *ProductRepoImpl) ListForSupply(ctx context.Context, f port.AdminFilter)
 	return out, int64(total), nil
 }
 
-// GetForSupply 供货单品（含下架）。
+// GetForSupply 供貨單品（含下架）。
 func (r *ProductRepoImpl) GetForSupply(ctx context.Context, productID uint64) (*port.SupplierProduct, error) {
 	row, err := data.Client(ctx, r.data).Product.Query().Where(product.ID(productID), product.SubsiteID(tenancy.FromContext(ctx).SubsiteID), product.StatusGTE(0)).Only(ctx)
 	if ent.IsNotFound(err) {
@@ -1283,17 +1283,17 @@ func (r *ProductRepoImpl) GetForSupply(ctx context.Context, productID uint64) (*
 		return nil, err
 	}
 	if row.DeliveryKind != "card" {
-		return nil, fmt.Errorf("接码商品不支持二级供货")
+		return nil, fmt.Errorf("接碼商品不支持二級供貨")
 	}
 	if hasSKU, e := data.Client(ctx, r.data).ProductSku.Query().Where(productsku.ProductID(row.ID), productsku.SubsiteID(row.SubsiteID)).Exist(ctx); e != nil {
 		return nil, e
 	} else if hasSKU {
-		return nil, fmt.Errorf("多规格商品不支持旧版供货接口")
+		return nil, fmt.Errorf("多規格商品不支持舊版供貨接口")
 	}
 	if yes, e := data.HasLocalDelivery(ctx, data.Client(ctx, r.data), row); e != nil {
 		return nil, e
 	} else if yes {
-		return nil, fmt.Errorf("该商品发货方式不支持旧版供货接口")
+		return nil, fmt.Errorf("該商品發貨方式不支持舊版供貨接口")
 	}
 	hidden, err := data.HiddenCategoryIDs(ctx, data.Client(ctx, r.data), row.SubsiteID)
 	if err != nil {

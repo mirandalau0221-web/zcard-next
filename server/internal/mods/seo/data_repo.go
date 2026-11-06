@@ -1,6 +1,6 @@
 package seo
 
-// 数据查询：sitemap 数据源（上架商品/已发布文章/商品分类）。
+// 數據查詢：sitemap 數據源（上架商品/已發佈文章/商品分類）。
 
 import (
 	"context"
@@ -14,19 +14,19 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/product"
 )
 
-// SitemapProduct 商品 sitemap 条目。
+// SitemapProduct 商品 sitemap 條目。
 type SitemapProduct struct {
 	ID        uint64
 	UpdatedAt int64
 }
 
-// SitemapPost 文章 sitemap 条目。
+// SitemapPost 文章 sitemap 條目。
 type SitemapPost struct {
 	Slug        string
 	PublishedAt int64
 }
 
-// ProductSEO 商品动态渲染数据（爬虫视角）。
+// ProductSEO 商品動態渲染數據（爬蟲視角）。
 type ProductOfferSEO struct {
 	SKU        uint64
 	PriceCents int64
@@ -37,23 +37,23 @@ type ProductSEO struct {
 	Offers          []ProductOfferSEO
 	ID              uint64
 	Name            string
-	DescriptionHTML string // 入库前已 sanitize
+	DescriptionHTML string // 入庫前已 sanitize
 	Cover           string
 	Stock           int64 // >=0 finite, -1 unlimited, -2 unknown; shared with storefront
 	PriceCents      int64
 }
 
-// PostSEO 文章动态渲染数据（爬虫视角；多语言已回落到单值）。
+// PostSEO 文章動態渲染數據（爬蟲視角；多語言已回落到單值）。
 type PostSEO struct {
 	Slug        string
 	Title       string
 	Summary     string
 	Thumbnail   string
-	ContentHTML string // 入库前已 sanitize
+	ContentHTML string // 入庫前已 sanitize
 	PublishedAt int64
 }
 
-// GetPostSEO 按 slug 取已发布文章（未发布/不存在 → nil；多语言 zh_CN → zh → 首个非空）。
+// GetPostSEO 按 slug 取已發佈文章（未發佈/不存在 → nil；多語言 zh_CN → zh → 首個非空）。
 func (r *SeoRepo) GetPostSEO(ctx context.Context, slug string) (*PostSEO, error) {
 	p, err := data.Client(ctx, r.data).Post.Query().
 		Where(post.Slug(slug), post.IsPublished(true), post.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).
@@ -79,17 +79,17 @@ func (r *SeoRepo) GetPostSEO(ctx context.Context, slug string) (*PostSEO, error)
 	return out, nil
 }
 
-// SeoRepo sitemap 数据仓储。
+// SeoRepo sitemap 數據倉儲。
 type SeoRepo struct {
 	data *data.Data
 }
 
-// NewSeoRepo 构造。
+// NewSeoRepo 構造。
 func NewSeoRepo(d *data.Data) *SeoRepo {
 	return &SeoRepo{data: d}
 }
 
-// ListSitemapProducts 上架商品（status=1；隐藏商品不进收录）。
+// ListSitemapProducts 上架商品（status=1；隱藏商品不進收錄）。
 func (r *SeoRepo) ListSitemapProducts(ctx context.Context) ([]SitemapProduct, error) {
 	hidden, err := data.HiddenCategoryIDs(ctx, data.Client(ctx, r.data), tenancy.FromContext(ctx).SubsiteID)
 	if err != nil {
@@ -109,7 +109,7 @@ func (r *SeoRepo) ListSitemapProducts(ctx context.Context) ([]SitemapProduct, er
 	return out, nil
 }
 
-// ListSitemapPosts 已发布文章。
+// ListSitemapPosts 已發佈文章。
 func (r *SeoRepo) ListSitemapPosts(ctx context.Context) ([]SitemapPost, error) {
 	rows, err := data.Client(ctx, r.data).Post.Query().
 		Where(post.IsPublished(true), post.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).

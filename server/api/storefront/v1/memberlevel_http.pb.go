@@ -23,7 +23,7 @@ const OperationStoreMemberLevelServiceGetMyLevel = "/zcard.api.storefront.v1.Sto
 
 type StoreMemberLevelServiceHTTPServer interface {
 	GetInviteBenefit(context.Context, *InviteBenefitRequest) (*InviteBenefitReply, error)
-	// GetMyLevel GetMyLevel 我的等级（当前等级 + 下一等级 + 升级进度 + 积分余额与产生规则）。
+	// GetMyLevel GetMyLevel 我的等級（當前等級 + 下一等級 + 升級進度 + 積分餘額與產生規則）。
 	GetMyLevel(context.Context, *emptypb.Empty) (*MyLevelReply, error)
 }
 
@@ -73,7 +73,7 @@ func _StoreMemberLevelService_GetMyLevel0_HTTP_Handler(srv StoreMemberLevelServi
 
 type StoreMemberLevelServiceHTTPClient interface {
 	GetInviteBenefit(ctx context.Context, req *InviteBenefitRequest, opts ...http.CallOption) (rsp *InviteBenefitReply, err error)
-	// GetMyLevel GetMyLevel 我的等级（当前等级 + 下一等级 + 升级进度 + 积分余额与产生规则）。
+	// GetMyLevel GetMyLevel 我的等級（當前等級 + 下一等級 + 升級進度 + 積分餘額與產生規則）。
 	GetMyLevel(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *MyLevelReply, err error)
 }
 
@@ -101,7 +101,7 @@ func (c *StoreMemberLevelServiceHTTPClientImpl) GetInviteBenefit(ctx context.Con
 	return &out, nil
 }
 
-// GetMyLevel GetMyLevel 我的等级（当前等级 + 下一等级 + 升级进度 + 积分余额与产生规则）。
+// GetMyLevel GetMyLevel 我的等級（當前等級 + 下一等級 + 升級進度 + 積分餘額與產生規則）。
 func (c *StoreMemberLevelServiceHTTPClientImpl) GetMyLevel(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*MyLevelReply, error) {
 	var out MyLevelReply
 	pattern := "/api/v1/storefront/member-level"

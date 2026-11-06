@@ -8,49 +8,49 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminMediaService 素材库管理：分类/上传/列表/改名/移动/批量删除
-// （ref_count>0 需 confirm）/外链导入/复制链接。
-// 上传走 base64（10MB 图 ~13.7MB JSON；管理面可接受，走统一中间件栈）。
+// AdminMediaService 素材庫管理：分類/上傳/列表/改名/移動/批量刪除
+// （ref_count>0 需 confirm）/外鏈導入/複製鏈接。
+// 上傳走 base64（10MB 圖 ~13.7MB JSON；管理面可接受，走統一中間件棧）。
 service AdminMediaService {
-  // CreateCategory 创建分类。
+  // CreateCategory 創建分類。
   rpc CreateCategory(CreateMediaCategoryRequest) returns (MediaCategory) {
     option (google.api.http) = {
       post: "/api/v1/admin/media/categories"
       body: "*"
     };
   }
-  // RenameCategory 分类改名。
+  // RenameCategory 分類改名。
   rpc RenameCategory(RenameMediaCategoryRequest) returns (MediaCategory) {
     option (google.api.http) = {
       post: "/api/v1/admin/media/categories/{id}/rename"
       body: "*"
     };
   }
-  // MoveCategory 分类移动。
+  // MoveCategory 分類移動。
   rpc MoveCategory(MoveMediaCategoryRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/media/categories/{id}/move"
       body: "*"
     };
   }
-  // DeleteCategory 删除分类（有内容拒绝）。
+  // DeleteCategory 刪除分類（有內容拒絕）。
   rpc DeleteCategory(DeleteMediaCategoryRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/api/v1/admin/media/categories/{id}"
     };
   }
-  // ListCategories 分类列表。
+  // ListCategories 分類列表。
   rpc ListCategories(google.protobuf.Empty) returns (ListMediaCategoriesReply) {
     option (google.api.http) = { get: "/api/v1/admin/media/categories" };
   }
-  // Upload 上传（安全三件套：三重校验+重编码+10MB）。
+  // Upload 上傳（安全三件套：三重校驗+重編碼+10MB）。
   rpc Upload(UploadMediaRequest) returns (MediaItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/media/upload"
       body: "*"
     };
   }
-  // ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+  // ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
   rpc ImportFromURL(ImportMediaRequest) returns (MediaItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/media/import"
@@ -68,14 +68,14 @@ service AdminMediaService {
       body: "*"
     };
   }
-  // MoveMedia 素材批量移动。
+  // MoveMedia 素材批量移動。
   rpc MoveMedia(MoveMediaRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/media/move"
       body: "*"
     };
   }
-  // DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+  // DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
   rpc DeleteMedia(DeleteMediaRequest) returns (DeleteMediaReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/media/delete"
@@ -116,8 +116,8 @@ message ListMediaCategoriesReply {
 }
 
 message UploadMediaRequest {
-  string name = 1 [(google.api.field_behavior) = REQUIRED]; // 原始文件名（含扩展名）
-  string content_type = 2; // 声明 MIME（可空——魔数兜底）
+  string name = 1 [(google.api.field_behavior) = REQUIRED]; // 原始文件名（含擴展名）
+  string content_type = 2; // 聲明 MIME（可空——魔數兜底）
   string data_base64 = 3 [(google.api.field_behavior) = REQUIRED];
   uint64 category_id = 4;
 }
@@ -145,7 +145,7 @@ message ListMediaRequest {
   string keyword = 2;
   int32 page = 3;
   int32 page_size = 4;
-  // 仅未分类素材（category_id 为空；与 category_id=0「不过滤」区分）
+  // 僅未分類素材（category_id 為空；與 category_id=0「不過濾」區分）
   bool uncategorized = 5;
   string kind = 6; // image (default), video, or all
 }
@@ -165,16 +165,16 @@ message RenameMediaRequest {
 
 message MoveMediaRequest {
   repeated uint64 ids = 1 [(google.api.field_behavior) = REQUIRED];
-  uint64 category_id = 2; // 0 = 未分类
+  uint64 category_id = 2; // 0 = 未分類
 }
 
 message DeleteMediaRequest {
   repeated uint64 ids = 1 [(google.api.field_behavior) = REQUIRED];
-  bool confirm = 2; // ref_count>0 时必须 true
+  bool confirm = 2; // ref_count>0 時必須 true
 }
 
 message DeleteMediaReply {
   int32 deleted = 1;
-  repeated MediaItem referenced = 2; // 被 confirm=false 拒绝时返回引用清单
+  repeated MediaItem referenced = 2; // 被 confirm=false 拒絕時返回引用清單
   bool need_confirm = 3;
 }

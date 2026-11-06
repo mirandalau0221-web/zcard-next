@@ -25,7 +25,7 @@ const data = ref<DashboardData | null>(null);
 const loadError = ref("");
 const trafficError = ref("");
 
-// KPI 时间窗（今日/近7天/近30天，切换联动 4 张指标卡 + 环比基准）
+// KPI 時間窗（今日/近7天/近30天，切換聯動 4 張指標卡 + 環比基準）
 const rangeOptions = [
   { label: "今日", value: "today" },
   { label: "近7天", value: "7d" },
@@ -58,7 +58,7 @@ function normalizeStat(s?: DashboardStat): DashboardStat {
   }
   return out;
 }
-// proto3 零值字段不输出 → 字段级兜底补 0（杜绝 undefined/NaN）
+// proto3 零值字段不輸出 → 字段級兜底補 0（杜絕 undefined/NaN）
 const statOf = (d: DashboardData | null): DashboardStat => {
   if (!d) return EMPTY;
   const s = range.value === "today" ? d.today : range.value === "7d" ? d.last7d : d.last30d;
@@ -74,13 +74,13 @@ const cur = computed(() => statOf(data.value));
 const prev = computed(() => prevOf(data.value));
 const prevLabel = computed(() =>
   range.value === "today"
-    ? "较昨日同时段"
+    ? "較昨日同時段"
     : range.value === "7d"
-      ? "较前7天同时段"
-      : "较前30天同时段",
+      ? "較前7天同時段"
+      : "較前30天同時段",
 );
 
-/** 环比（%）；无基数/非法值返回 null 显示 — */
+/** 環比（%）；無基數/非法值返回 null 顯示 — */
 function ratio(cur: number, prev: number): number | null {
   if (!Number.isFinite(cur) || !Number.isFinite(prev) || prev === 0) return null;
   return ((cur - prev) / prev) * 100;
@@ -92,36 +92,36 @@ const kpiCards = computed(() => {
   return [
     {
       key: "paid",
-      label: "订单支付金额",
+      label: "訂單支付金額",
       value: data.value ? formatMoney(c.revenue) : "—",
-      sub: `退款 ${formatMoney(c.refunds)} · 净额 ${formatMoney(c.net_revenue)}`,
+      sub: `退款 ${formatMoney(c.refunds)} · 淨額 ${formatMoney(c.net_revenue)}`,
       ratio: ratio(c.revenue, p.revenue),
       sparkline: true,
       timeField: "paid",
     },
     {
       key: "paid_orders",
-      label: "支付订单数",
+      label: "支付訂單數",
       value: data.value ? String(c.paid_orders) : "—",
-      sub: "按付款时间",
+      sub: "按付款時間",
       ratio: ratio(c.paid_orders, p.paid_orders),
       sparkline: false,
       timeField: "paid",
     },
     {
       key: "orders",
-      label: "下单数",
+      label: "下單數",
       value: data.value ? String(c.orders) : "—",
-      sub: "不含已删除订单",
+      sub: "不含已刪除訂單",
       ratio: ratio(c.orders, p.orders),
       sparkline: false,
       timeField: "created",
     },
     {
       key: "profit",
-      label: "预估毛利",
+      label: "預估毛利",
       value: !data.value || c.unknown_cost_orders ? "—" : formatMoney(c.profit),
-      sub: c.unknown_cost_orders ? `${c.unknown_cost_orders} 单成本不完整` : "净支付额减商品成本",
+      sub: c.unknown_cost_orders ? `${c.unknown_cost_orders} 單成本不完整` : "淨支付額減商品成本",
       ratio: c.unknown_cost_orders || p.unknown_cost_orders ? null : ratio(c.profit, p.profit),
       sparkline: false,
       timeField: "",
@@ -129,7 +129,7 @@ const kpiCards = computed(() => {
   ];
 });
 
-// 营收卡迷你趋势线（复用趋势数据）
+// 營收卡迷你趨勢線（複用趨勢數據）
 const { domRef: sparkRef, updateOptions: updateSpark } = useEcharts(() => ({
   grid: { left: 0, right: 0, top: 2, bottom: 0 },
   xAxis: { type: "category", show: false, boundaryGap: false, data: [] as string[] },
@@ -149,19 +149,19 @@ function setSparkDom(el: unknown) {
   sparkRef.value = (el as HTMLElement | null) ?? null;
 }
 
-// 销售趋势主图（营收面积 + 订单柱，双轴）
+// 銷售趨勢主圖（營收面積 + 訂單柱，雙軸）
 const { domRef: mainRef, updateOptions: updateMain } = useEcharts(() => ({
   tooltip: { trigger: "axis" },
-  legend: { data: [`支付金额(${currencyUnit()})`, "支付订单数"], top: "0" },
+  legend: { data: [`支付金額(${currencyUnit()})`, "支付訂單數"], top: "0" },
   grid: { left: "3%", right: "4%", bottom: "3%", top: "18%", containLabel: true },
   xAxis: { type: "category", boundaryGap: false, data: [] as string[] },
   yAxis: [
-    { type: "value", name: `支付金额(${currencyUnit()})`, splitLine: { lineStyle: { type: "dashed" } } },
-    { type: "value", name: "支付订单数", splitLine: { show: false } },
+    { type: "value", name: `支付金額(${currencyUnit()})`, splitLine: { lineStyle: { type: "dashed" } } },
+    { type: "value", name: "支付訂單數", splitLine: { show: false } },
   ],
   series: [
     {
-      name: `支付金额(${currencyUnit()})`,
+      name: `支付金額(${currencyUnit()})`,
       type: "line",
       smooth: true,
       showSymbol: true,
@@ -172,7 +172,7 @@ const { domRef: mainRef, updateOptions: updateMain } = useEcharts(() => ({
       data: [] as number[],
     },
     {
-      name: "支付订单数",
+      name: "支付訂單數",
       type: "bar",
       yAxisIndex: 1,
       barMaxWidth: 16,
@@ -184,7 +184,7 @@ const { domRef: mainRef, updateOptions: updateMain } = useEcharts(() => ({
 
 watch(currencyUnit, (code) => {
   updateMain((opts) => {
-    const label = `支付金额(${code})`;
+    const label = `支付金額(${code})`;
     opts.legend.data[0] = label;
     opts.yAxis[0].name = label;
     opts.series[0].name = label;
@@ -206,7 +206,7 @@ function renderCharts(d: DashboardData) {
   });
 }
 
-// 流量趋势图（PV 柱 + UV 线；跟随 trendDays 天数）
+// 流量趨勢圖（PV 柱 + UV 線；跟隨 trendDays 天數）
 const { domRef: trafficRef, updateOptions: updateTraffic } = useEcharts(() => ({
   tooltip: { trigger: "axis" },
   legend: { data: ["PV", "UV"], top: "0" },
@@ -262,8 +262,8 @@ const topColumns: DataTableColumns<DashboardTopProduct> = [
         () => row.name,
       ),
   },
-  { title: "购买件数", key: "sold_qty", width: 90, render: (row) => row.sold_qty || 0 },
-  { title: "分摊支付额", key: "revenue", width: 110, render: (row) => formatMoney(row.revenue) },
+  { title: "購買件數", key: "sold_qty", width: 90, render: (row) => row.sold_qty || 0 },
+  { title: "分攤支付額", key: "revenue", width: 110, render: (row) => formatMoney(row.revenue) },
 ];
 
 // Show Top 5 plus Other; denominator includes every channel, never just Top 5.
@@ -297,7 +297,7 @@ function channelRate(c: DashboardTopChannel) {
     : 0;
 }
 function channelLabel(c: DashboardTopChannel) {
-  return `${c.name || c.channel}${c.channel_state === "deleted" ? "（已删除）" : c.channel_state === "disabled" ? "（已停用）" : c.channel_state === "legacy" ? "（历史渠道）" : ""}`;
+  return `${c.name || c.channel}${c.channel_state === "deleted" ? "（已刪除）" : c.channel_state === "disabled" ? "（已停用）" : c.channel_state === "legacy" ? "（歷史渠道）" : ""}`;
 }
 const hasSales = computed(() =>
   (data.value?.trend || []).some((p) => Number(p.paid_count) > 0 || Number(p.revenue) > 0),
@@ -319,7 +319,7 @@ function openOrders(timeField: string, channel?: DashboardTopChannel, productId?
   });
 }
 
-// ── 待办事项（点击跳转对应管理页）──
+// ── 待辦事項（點擊跳轉對應管理頁）──
 const todos = computed(() => {
   const p = data.value?.pending;
   if (!p) return [];
@@ -327,40 +327,40 @@ const todos = computed(() => {
     ...(checkAuth("ticket:read")
       ? [
           {
-            label: "待回复工单",
+            label: "待回覆工單",
             value: p.open_tickets || 0,
             path: { path: "/ticket", query: { status: "open" } },
             warn: true,
           },
           {
-            label: "处理中工单",
+            label: "處理中工單",
             value: p.processing_tickets || 0,
             path: { path: "/ticket", query: { status: "processing" } },
             warn: true,
           },
         ]
       : []),
-    // 待审对接申请 → 渠道管理·供货账号 tab（自动筛待审核）
+    // 待審對接申請 → 渠道管理·供貨賬號 tab（自動篩待審核）
     {
-      label: "待审对接申请（全站）",
+      label: "待審對接申請（全站）",
       value: p.pending_supplier_applications,
       path: { path: "/channel", query: { tab: "suppliers", status: "applying" } },
       warn: true,
     },
     {
-      label: "待审核提现（全站）",
+      label: "待審核提現（全站）",
       value: p.pending_withdrawals,
       path: { path: "/wallet", query: { tab: "withdraw", status: "pending" } },
       warn: true,
     },
     {
-      label: "待处理退款",
+      label: "待處理退款",
       value: p.pending_refunds,
       path: { path: "/order", query: { status: "needs_refund" } },
       warn: true,
     },
     {
-      label: "待完成发货",
+      label: "待完成發貨",
       value: p.fulfilling_orders,
       path: { path: "/order", query: { status: "needs_delivery" } },
       warn: false,
@@ -368,16 +368,16 @@ const todos = computed(() => {
     ...(checkAuth("payment:read_detail")
       ? [
           {
-            label: "到账待核对",
+            label: "到賬待核對",
             value: p.payment_reviews || 0,
             path: { path: "/payment-channel", query: { tab: "payments", review_only: "1" } },
             warn: true,
           },
         ]
       : []),
-    // 库存预警 → 商品管理并自动过滤库存不足商品（商品页读 query 启用筛选）
+    // 庫存預警 → 商品管理並自動過濾庫存不足商品（商品頁讀 query 啓用篩選）
     {
-      label: "库存预警",
+      label: "庫存預警",
       value: p.low_stock_products,
       path: { path: "/product", query: { low_stock: "1" } },
       warn: true,
@@ -407,10 +407,10 @@ async function loadDashboard(silent = false) {
             renderCharts(d);
           } else
             loadError.value = data.value
-              ? "更新失败，当前显示上次成功获取的数据"
-              : "统计加载失败，请重试";
+              ? "更新失敗，當前顯示上次成功獲取的數據"
+              : "統計加載失敗，請重試";
         } catch {
-          if (days === trendDays.value) loadError.value = "统计加载失败，请重试";
+          if (days === trendDays.value) loadError.value = "統計加載失敗，請重試";
         } finally {
           loading.value = false;
         }
@@ -422,9 +422,9 @@ async function loadDashboard(silent = false) {
           if (!error && t) {
             renderTraffic(t.points || []);
             trafficError.value = "";
-          } else trafficError.value = "访问统计加载失败";
+          } else trafficError.value = "訪問統計加載失敗";
         } catch {
-          trafficError.value = "访问统计加载失败";
+          trafficError.value = "訪問統計加載失敗";
         } finally {
           trafficLoading.value = false;
         }
@@ -437,7 +437,7 @@ async function loadDashboard(silent = false) {
   }
 }
 
-// KeepAlive 返回首页立即刷新；停留首页时每分钟更新，离开/后台标签页不轮询。
+// KeepAlive 返回首頁立即刷新；停留首頁時每分鐘更新，離開/後台標籤頁不輪詢。
 let requesting = false;
 let rerunRequested = false;
 let refreshTimer: ReturnType<typeof setInterval> | undefined;
@@ -472,14 +472,14 @@ onUnmounted(stopRefresh);
           (data.pending.open_tickets > 0 || data.pending.processing_tickets > 0)
         "
         type="warning"
-        title="工单待处理"
+        title="工單待處理"
       >
         <div class="flex flex-wrap items-center justify-between gap-12px">
           <span
-            >待回复 {{ data.pending.open_tickets || 0 }} 单，处理中
-            {{ data.pending.processing_tickets || 0 }} 单<span
+            >待回覆 {{ data.pending.open_tickets || 0 }} 單，處理中
+            {{ data.pending.processing_tickets || 0 }} 單<span
               v-if="data.pending.urgent_tickets > 0"
-              >，其中 {{ data.pending.urgent_tickets }} 单已付费加急，请优先处理</span
+              >，其中 {{ data.pending.urgent_tickets }} 單已付費加急，請優先處理</span
             >。</span
           >
           <NButton
@@ -491,17 +491,17 @@ onUnmounted(stopRefresh);
                 query: { status: data.pending.open_tickets > 0 ? 'open' : 'processing' },
               })
             "
-            >处理工单</NButton
+            >處理工單</NButton
           >
         </div>
       </NAlert>
-      <!-- 头部：标题 + 在线用户 + KPI 时间窗 -->
+      <!-- 頭部：標題 + 在線用户 + KPI 時間窗 -->
       <div class="flex flex-wrap gap-12px items-center justify-between">
         <span class="flex items-center gap-8px">
           <span class="text-16px font-semibold">工作台</span>
           <span class="flex items-center gap-4px text-13px text-gray-500">
             <span class="h-8px w-8px rounded-full bg-green-500"></span>
-            在线 {{ onlineUsers }} 人
+            在線 {{ onlineUsers }} 人
           </span>
         </span>
         <NRadioGroup v-model:value="range" size="small">
@@ -512,23 +512,23 @@ onUnmounted(stopRefresh);
       </div>
 
       <div class="text-12px text-gray-500">
-        北京时间 · {{ data?.subsite_id ? "当前分站" : "主站" }}订单 · 全站新增用户
+        北京時間 · {{ data?.subsite_id ? "當前分站" : "主站" }}訂單 · 全站新增用户
         {{ data ? cur.new_users : "—" }} 人<span v-if="data?.generated_at">
-          · 更新于
+          · 更新於
           {{
-            new Date(data.generated_at * 1000).toLocaleTimeString("zh-CN", {
+            new Date(data.generated_at * 1000).toLocaleTimeString("zh-TW", {
               timeZone: "Asia/Shanghai",
             })
           }}</span
         >
       </div>
       <NAlert v-if="loadError" type="warning" :title="loadError"
-        ><NButton size="small" @click="loadDashboard()">重新加载</NButton></NAlert
+        ><NButton size="small" @click="loadDashboard()">重新加載</NButton></NAlert
       >
-      <NAlert v-else-if="!data && !loading" type="info" title="暂无统计数据" />
+      <NAlert v-else-if="!data && !loading" type="info" title="暫無統計數據" />
       <SponsorCard />
 
-      <!-- KPI 指标卡（营收带迷你趋势线；环比红涨绿跌） -->
+      <!-- KPI 指標卡（營收帶迷你趨勢線；環比紅漲綠跌） -->
       <NGrid :x-gap="16" :y-gap="16" cols="1 m:2 l:4" responsive="screen">
         <NGi v-for="card in kpiCards" :key="card.key">
           <NCard :bordered="false" size="small" class="h-full">
@@ -541,7 +541,7 @@ onUnmounted(stopRefresh);
               type="button"
               class="mt-6px border-none bg-transparent p-0 cursor-pointer text-26px font-bold leading-tight text-left"
               :disabled="!data"
-              :aria-label="`查看${card.label}明细`"
+              :aria-label="`查看${card.label}明細`"
               @click="openOrders(card.timeField)"
             >
               {{ card.value }}
@@ -563,24 +563,24 @@ onUnmounted(stopRefresh);
         </NGi>
       </NGrid>
 
-      <!-- 中部：销售趋势 + 支付渠道排行 -->
+      <!-- 中部：銷售趨勢 + 支付渠道排行 -->
       <NGrid :x-gap="16" :y-gap="16" cols="1 l:3" responsive="screen">
         <NGi span="1 l:2">
           <NCard :bordered="false">
             <template #header>
               <div class="flex items-center justify-between">
-                <span>订单支付趋势 · {{ rangeLabel }}</span>
+                <span>訂單支付趨勢 · {{ rangeLabel }}</span>
               </div>
             </template>
             <div v-if="data && !hasSales" class="py-20px text-center text-gray-500">
-              该时段暂无支付订单
+              該時段暫無支付訂單
             </div>
             <div v-show="hasSales" ref="mainRef" class="h-320px"></div>
           </NCard>
         </NGi>
         <NGi>
           <div class="flex flex-col gap-16px">
-            <NCard :title="`订单支付方式分布 · ${rangeLabel}`" :bordered="false">
+            <NCard :title="`訂單支付方式分佈 · ${rangeLabel}`" :bordered="false">
               <div v-if="channels.length" class="flex flex-col gap-14px">
                 <div v-for="c in channels" :key="`${c.channel_id}:${c.channel}`">
                   <div class="flex flex-wrap gap-4px items-center justify-between text-13px">
@@ -593,7 +593,7 @@ onUnmounted(stopRefresh);
                       {{ channelLabel(c) }}
                     </button>
                     <span class="text-gray-400">
-                      {{ formatMoney(c.amount) }} · {{ c.total_count || 0 }} 笔 ·
+                      {{ formatMoney(c.amount) }} · {{ c.total_count || 0 }} 筆 ·
                       <span class="font-medium">{{ channelRate(c) }}%</span>
                     </span>
                   </div>
@@ -608,13 +608,13 @@ onUnmounted(stopRefresh);
                 </div>
               </div>
               <div v-else class="py-20px text-center text-13px text-gray-400">
-                该时段暂无订单支付
+                該時段暫無訂單支付
               </div>
             </NCard>
-            <NCard title="流量趋势（PV/UV）" :bordered="false">
+            <NCard title="流量趨勢（PV/UV）" :bordered="false">
               <NSpin :show="trafficLoading">
                 <div v-if="trafficError" class="text-gray-500">
-                  {{ trafficError }} <NButton size="small" @click="loadDashboard()">重试</NButton>
+                  {{ trafficError }} <NButton size="small" @click="loadDashboard()">重試</NButton>
                 </div>
                 <div v-show="!trafficError" ref="trafficRef" class="h-180px"></div>
               </NSpin>
@@ -624,13 +624,13 @@ onUnmounted(stopRefresh);
       </NGrid>
 
       <div class="text-12px text-gray-500">
-        支付金额包含余额支付，不含充值及待核对到账；退款按成功时间计入。预估毛利未扣渠道手续费、佣金等费用，退款不自动冲回商品成本。商品金额按订单最终应付分摊。
+        支付金額包含餘額支付，不含充值及待核對到賬；退款按成功時間計入。預估毛利未扣渠道手續費、佣金等費用，退款不自動衝回商品成本。商品金額按訂單最終應付分攤。
       </div>
-      <!-- 底部：商品销量 Top5 + 待办事项 -->
+      <!-- 底部：商品銷量 Top5 + 待辦事項 -->
       <NGrid :x-gap="16" :y-gap="16" cols="1 l:3" responsive="screen">
         <NGi span="1 l:2">
           <div class="flex flex-col gap-16px">
-            <NCard :title="`商品支付金额 Top5 · ${rangeLabel}`" :bordered="false">
+            <NCard :title="`商品支付金額 Top5 · ${rangeLabel}`" :bordered="false">
               <NDataTable
                 :columns="topColumns"
                 :data="topProducts"
@@ -643,7 +643,7 @@ onUnmounted(stopRefresh);
           </div>
         </NGi>
         <NGi>
-          <NCard title="待办事项" :bordered="false">
+          <NCard title="待辦事項" :bordered="false">
             <div class="flex flex-col">
               <button
                 type="button"
@@ -659,7 +659,7 @@ onUnmounted(stopRefresh);
                   class="rounded-full px-8px py-2px text-12px text-white"
                   >{{ t.value }}</span
                 >
-                <span v-else class="text-12px text-gray-400">无</span>
+                <span v-else class="text-12px text-gray-400">無</span>
               </button>
             </div>
           </NCard>

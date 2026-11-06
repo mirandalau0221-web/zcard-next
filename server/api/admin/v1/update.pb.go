@@ -68,7 +68,7 @@ func (x *ApplyUpdateRequest) GetVersion() string {
 	return ""
 }
 
-// ReleaseNoteEntry 历史版本变更记录（manifest history 段透传）。
+// ReleaseNoteEntry 歷史版本變更記錄（manifest history 段透傳）。
 type ReleaseNoteEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Version       string                 `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
@@ -143,21 +143,21 @@ type UpdateStatus struct {
 	Phase             string              `protobuf:"bytes,1,opt,name=phase,proto3" json:"phase,omitempty"`
 	CurrentVersion    string              `protobuf:"bytes,2,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
 	TargetVersion     string              `protobuf:"bytes,3,opt,name=target_version,json=targetVersion,proto3" json:"target_version,omitempty"`
-	ProgressPercent   int32               `protobuf:"varint,4,opt,name=progress_percent,json=progressPercent,proto3" json:"progress_percent,omitempty"` // downloading 阶段 0-100
+	ProgressPercent   int32               `protobuf:"varint,4,opt,name=progress_percent,json=progressPercent,proto3" json:"progress_percent,omitempty"` // downloading 階段 0-100
 	ErrorMessage      string              `protobuf:"bytes,5,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
-	Source            string              `protobuf:"bytes,6,opt,name=source,proto3" json:"source,omitempty"`                                       // 生效源展示：github | <accel 前缀> | static:<base>
+	Source            string              `protobuf:"bytes,6,opt,name=source,proto3" json:"source,omitempty"`                                       // 生效源展示：github | <accel 前綴> | static:<base>
 	Mode              string              `protobuf:"bytes,7,opt,name=mode,proto3" json:"mode,omitempty"`                                           // 配置模式 auto|github|accel|static
 	SupervisorKind    string              `protobuf:"bytes,8,opt,name=supervisor_kind,json=supervisorKind,proto3" json:"supervisor_kind,omitempty"` // systemd | supervisord | none（none=裸跑，UI 警示）
 	HasUpdate         bool                `protobuf:"varint,9,opt,name=has_update,json=hasUpdate,proto3" json:"has_update,omitempty"`
 	Notes             string              `protobuf:"bytes,10,opt,name=notes,proto3" json:"notes,omitempty"` // 最近一次 check 的 changelog markdown
 	LatestVersion     string              `protobuf:"bytes,11,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
 	CheckedAt         string              `protobuf:"bytes,12,opt,name=checked_at,json=checkedAt,proto3" json:"checked_at,omitempty"`        // RFC3339
-	BackupDir         string              `protobuf:"bytes,13,opt,name=backup_dir,json=backupDir,proto3" json:"backup_dir,omitempty"`        // 本次更新备份目录
-	Busy              bool                `protobuf:"varint,14,opt,name=busy,proto3" json:"busy,omitempty"`                                  // 更新链进行中（apply 单飞互斥）
-	History           []*ReleaseNoteEntry `protobuf:"bytes,15,rep,name=history,proto3" json:"history,omitempty"`                             // 历史版本 changelog（manifest 权威源）
-	BackupReady       bool                `protobuf:"varint,16,opt,name=backup_ready,json=backupReady,proto3" json:"backup_ready,omitempty"` // 备份工具就绪（缺 pg_dump/mysqldump 时 false）
-	BackupHint        string              `protobuf:"bytes,17,opt,name=backup_hint,json=backupHint,proto3" json:"backup_hint,omitempty"`     // 缺失时的事前安装指引
-	PrevVersion       string              `protobuf:"bytes,18,opt,name=prev_version,json=prevVersion,proto3" json:"prev_version,omitempty"`  // 上一次版本（最近一次更新的起点，持久保存）
+	BackupDir         string              `protobuf:"bytes,13,opt,name=backup_dir,json=backupDir,proto3" json:"backup_dir,omitempty"`        // 本次更新備份目錄
+	Busy              bool                `protobuf:"varint,14,opt,name=busy,proto3" json:"busy,omitempty"`                                  // 更新鏈進行中（apply 單飛互斥）
+	History           []*ReleaseNoteEntry `protobuf:"bytes,15,rep,name=history,proto3" json:"history,omitempty"`                             // 歷史版本 changelog（manifest 權威源）
+	BackupReady       bool                `protobuf:"varint,16,opt,name=backup_ready,json=backupReady,proto3" json:"backup_ready,omitempty"` // 備份工具就緒（缺 pg_dump/mysqldump 時 false）
+	BackupHint        string              `protobuf:"bytes,17,opt,name=backup_hint,json=backupHint,proto3" json:"backup_hint,omitempty"`     // 缺失時的事前安裝指引
+	PrevVersion       string              `protobuf:"bytes,18,opt,name=prev_version,json=prevVersion,proto3" json:"prev_version,omitempty"`  // 上一次版本（最近一次更新的起點，持久保存）
 	DockerUpdateReady bool                `protobuf:"varint,19,opt,name=docker_update_ready,json=dockerUpdateReady,proto3" json:"docker_update_ready,omitempty"`
 	DockerUpdateHint  string              `protobuf:"bytes,20,opt,name=docker_update_hint,json=dockerUpdateHint,proto3" json:"docker_update_hint,omitempty"`
 	RollbackReady     bool                `protobuf:"varint,21,opt,name=rollback_ready,json=rollbackReady,proto3" json:"rollback_ready,omitempty"`
@@ -350,7 +350,7 @@ type UpdateCheckResult struct {
 	Notes          string                 `protobuf:"bytes,4,opt,name=notes,proto3" json:"notes,omitempty"`
 	Channel        string                 `protobuf:"bytes,5,opt,name=channel,proto3" json:"channel,omitempty"`
 	Source         string                 `protobuf:"bytes,6,opt,name=source,proto3" json:"source,omitempty"`
-	History        []*ReleaseNoteEntry    `protobuf:"bytes,7,rep,name=history,proto3" json:"history,omitempty"` // 历史版本 changelog
+	History        []*ReleaseNoteEntry    `protobuf:"bytes,7,rep,name=history,proto3" json:"history,omitempty"` // 歷史版本 changelog
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }

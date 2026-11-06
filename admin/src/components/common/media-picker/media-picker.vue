@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * 素材管理选择器（ 前端面核心）：
- * 左：素材网格（选择/分页/搜索/上传/外链导入/批量移动/批量删除[引用确认两段式]）
- * 右：分类面板（全部/未分类/分类树；新建/重命名/删除[非空拒绝]）
- * 单例挂载（App.vue）；pickMedia() Promise API 呼出；管理操作就地生效。
+ * 素材管理選擇器（ 前端面核心）：
+ * 左：素材網格（選擇/分頁/搜索/上傳/外鏈導入/批量移動/批量刪除[引用確認兩段式]）
+ * 右：分類面板（全部/未分類/分類樹；新建/重命名/刪除[非空拒絕]）
+ * 單例掛載（App.vue）；pickMedia() Promise API 呼出；管理操作就地生效。
  */
 import { ref, reactive, computed, watch } from "vue";
 import { NButton, NTag, NPopconfirm, NInput, NModal, NDropdown } from "naive-ui";
@@ -33,7 +33,7 @@ const page = ref(1);
 const pageSize = ref(24);
 const keyword = ref("");
 
-// 当前视图：all | uncategorized | category:<id>
+// 當前視圖：all | uncategorized | category:<id>
 type View = "all" | "uncategorized" | { category: number };
 const view = ref<View>("all");
 const viewKey = computed(() =>
@@ -47,20 +47,20 @@ const currentCategoryId = computed(() =>
   typeof view.value === "object" ? view.value.category : 0,
 );
 
-// 分类
+// 分類
 const categories = ref<MediaCategory[]>([]);
 const showCatCreate = ref(false);
 const newCatName = ref("");
 const newCatParent = ref<number | null>(null);
 const renamingCat = ref<MediaCategory | null>(null);
 const renameCatText = ref("");
-// 移动分类（大厂「移动到」树选择器模式：目标=根或任一非子孙分类）
+// 移動分類（大廠「移動到」樹選擇器模式：目標=根或任一非子孫分類）
 const movingCat = ref<MediaCategory | null>(null);
-const moveCatTarget = ref<number | null>(null); // null = 根分类
-// 分类删除确认（下拉菜单无法包 Popconfirm → NModal）
+const moveCatTarget = ref<number | null>(null); // null = 根分類
+// 分類刪除確認（下拉菜單無法包 Popconfirm → NModal）
 const deleteCatConfirm = reactive({ show: false, cat: null as MediaCategory | null });
 
-// 选择集（按 id；跨分类/跨页保留）
+// 選擇集（按 id；跨分類/跨頁保留）
 const selectedIds = ref<Set<number>>(new Set());
 const knownMedia = new Map<number, { url: string; name: string }>();
 let listSequence = 0;
@@ -75,7 +75,7 @@ function rememberMedia(item: Pick<MediaItem, "id" | "url" | "name">) {
 const canManageSelection = computed(() => selectedIds.value.size > 0 && [...selectedIds.value].every(id => id > 0));
 const selectedPreview = computed(() => [...selectedIds.value].map(id => ({ id, ...knownMedia.get(id) })));
 
-// 本页全选态（批量操作/全部删除入口）
+// 本頁全選態（批量操作/全部刪除入口）
 const pageAllSelected = computed(
   () => items.value.length > 0 && items.value.every((i) => selectedIds.value.has(i.id)),
 );
@@ -90,20 +90,20 @@ function togglePageAll() {
   selectedIds.value = next;
 }
 
-// 上传 / 导入
+// 上傳 / 導入
 const uploading = ref(0);
 const showImport = ref(false);
 const importURL = ref("");
 const importing = ref(false);
 
-// 删除确认（两段式：被引用清单）
+// 刪除確認（兩段式：被引用清單）
 const deleteConfirm = reactive({ show: false, ids: [] as number[], referenced: [] as MediaItem[] });
 
-// 单素材改名
+// 單素材改名
 const renamingMedia = ref<MediaItem | null>(null);
 const renameMediaText = ref("");
 
-// 批量移动
+// 批量移動
 const showMove = ref(false);
 const moveTarget = ref<number | null>(null);
 
@@ -170,13 +170,13 @@ watch(
   () => mediaPickerState.show,
   (show) => {
     if (show) {
-      // 打开时复位视图与选择
+      // 打開時復位視圖與選擇
       view.value = "all";
       page.value = 1;
       keyword.value = "";
       knownMedia.clear();
       const initial = mediaPickerState.multiple ? mediaPickerState.initialURLs : mediaPickerState.initialURLs.slice(0, 1);
-      initial.forEach((url, index) => knownMedia.set(-index - 1, { url, name: "已选素材" }));
+      initial.forEach((url, index) => knownMedia.set(-index - 1, { url, name: "已選素材" }));
       selectedIds.value = new Set(initial.map((_, index) => -index - 1));
       loadCategories();
       loadList();
@@ -203,7 +203,7 @@ function isSelected(item: MediaItem) {
 function handleConfirm() {
   const urls = [...new Set([...selectedIds.value].map(id => knownMedia.get(id)?.url).filter((url): url is string => Boolean(url)))];
   if (!urls.length) {
-    window.$message?.warning("请先选择素材");
+    window.$message?.warning("請先選擇素材");
     return;
   }
   settleMediaPicker(mediaPickerState.multiple ? urls : urls.slice(0, 1));
@@ -213,7 +213,7 @@ function handleCancel() {
   settleMediaPicker(null);
 }
 
-// ── 上传（进当前分类）──
+// ── 上傳（進當前分類）──
 
 async function customRequest({ file, onFinish, onError }: UploadCustomRequestOptions) {
   uploading.value += 1;
@@ -230,10 +230,10 @@ async function customRequest({ file, onFinish, onError }: UploadCustomRequestOpt
       onError();
       return;
     }
-    window.$message?.success("上传成功");
+    window.$message?.success("上傳成功");
     page.value = 1;
     await loadList();
-    // 上传即选中（单选覆盖，多选追加）
+    // 上傳即選中（單選覆蓋，多選追加）
     if (data.id) {
       rememberMedia(data);
       if (mediaPickerState.multiple) selectedIds.value = new Set([...selectedIds.value, data.id]);
@@ -259,14 +259,14 @@ function fileToBase64(file: File): Promise<string> {
 
 function beforeUpload({ file }: { file: { file?: File | null } }) {
   if (file.file && file.file.size > 10 * 1024 * 1024) {
-    window.$message?.error("图片超过 10MB 上限，请压缩后重试");
+    window.$message?.error("圖片超過 10MB 上限，請壓縮後重試");
     return false;
   }
   // File extensions and browser MIME are unreliable; the server inspects bytes.
   return true;
 }
 
-// ── 外链导入 ──
+// ── 外鏈導入 ──
 
 async function handleImport() {
   if (!importURL.value.trim()) return;
@@ -277,7 +277,7 @@ async function handleImport() {
       category_id: currentCategoryId.value || undefined,
     });
     if (!error) {
-      window.$message?.success("导入成功");
+      window.$message?.success("導入成功");
       showImport.value = false;
       importURL.value = "";
       page.value = 1;
@@ -293,20 +293,20 @@ async function handleImport() {
   }
 }
 
-// ── 批量移动 ──
+// ── 批量移動 ──
 
 async function handleMove() {
   if (!canManageSelection.value || moveTarget.value === null) return;
   const { error } = await moveMedia([...selectedIds.value].filter(id => id > 0), moveTarget.value);
   if (!error) {
-    window.$message?.success("已移动");
+    window.$message?.success("已移動");
     showMove.value = false;
     moveTarget.value = null;
     loadList();
   }
 }
 
-// ── 批量删除（两段式引用确认）──
+// ── 批量刪除（兩段式引用確認）──
 
 async function handleDelete(force = false) {
   const ids = deleteConfirm.show ? deleteConfirm.ids : [...selectedIds.value].filter(id => id > 0);
@@ -320,13 +320,13 @@ async function handleDelete(force = false) {
     deleteConfirm.show = true;
     return;
   }
-  window.$message?.success(`已删除 ${reply?.deleted ?? ids.length} 项`);
+  window.$message?.success(`已刪除 ${reply?.deleted ?? ids.length} 項`);
   deleteConfirm.show = false;
   selectedIds.value = new Set();
   loadList();
 }
 
-// ── 分类管理 ──
+// ── 分類管理 ──
 
 async function handleCreateCategory() {
   if (!newCatName.value.trim()) return;
@@ -335,7 +335,7 @@ async function handleCreateCategory() {
     parent_id: newCatParent.value || undefined,
   });
   if (!error) {
-    window.$message?.success("分类已创建");
+    window.$message?.success("分類已創建");
     newCatName.value = "";
     newCatParent.value = null;
     showCatCreate.value = false;
@@ -356,7 +356,7 @@ async function handleRenameCategory() {
 async function handleDeleteCategory(cat: MediaCategory) {
   const { error } = await deleteMediaCategory(cat.id);
   if (!error) {
-    window.$message?.success("分类已删除");
+    window.$message?.success("分類已刪除");
     if (typeof view.value === "object" && view.value.category === cat.id) view.value = "all";
     deleteCatConfirm.show = false;
     loadCategories();
@@ -364,13 +364,13 @@ async function handleDeleteCategory(cat: MediaCategory) {
   }
 }
 
-// ── 分类行 ⋯ 菜单（重命名/移动/删除）──
+// ── 分類行 ⋯ 菜單（重命名/移動/刪除）──
 
 const catMenuOptions: DropdownOption[] = [
   { label: "重命名", key: "rename" },
-  { label: "移动分类到…", key: "move" },
+  { label: "移動分類到…", key: "move" },
   {
-    label: "删除分类",
+    label: "刪除分類",
     key: "delete",
     divided: true,
     props: { style: "color: var(--error-color, #d03050)" },
@@ -394,8 +394,8 @@ function handleCatMenu(key: string | number, cat: MediaCategory) {
   }
 }
 
-// descendantIds 自身 + 全部子孙（BFS）——移动目标的排除集（前端防环第一道；
-// 服务端 MoveCategory 追溯父链 fail-closed 兜底）
+// descendantIds 自身 + 全部子孫（BFS）——移動目標的排除集（前端防環第一道；
+// 服務端 MoveCategory 追溯父鏈 fail-closed 兜底）
 function descendantIds(id: number): Set<number> {
   const out = new Set<number>([id]);
   const queue = [id];
@@ -411,7 +411,7 @@ function descendantIds(id: number): Set<number> {
   return out;
 }
 
-// moveCatTree 可选目标树（排除移动分类自身子树；含缩进深度）
+// moveCatTree 可選目標樹（排除移動分類自身子樹；含縮進深度）
 const moveCatTree = computed(() => {
   if (!movingCat.value) return [];
   const excluded = descendantIds(movingCat.value.id);
@@ -422,11 +422,11 @@ const moveCatTree = computed(() => {
   return flattenTree(filterTree(treeCategories.value));
 });
 
-// 当前父分类名（移动弹窗位置提示）
+// 當前父分類名（移動彈窗位置提示）
 const moveCatParentName = computed(() => {
   if (!movingCat.value) return "";
-  if (!movingCat.value.parent_id) return "根分类";
-  return categories.value.find((c) => c.id === movingCat.value!.parent_id)?.name || "根分类";
+  if (!movingCat.value.parent_id) return "根分類";
+  return categories.value.find((c) => c.id === movingCat.value!.parent_id)?.name || "根分類";
 });
 
 async function handleMoveCategory() {
@@ -435,19 +435,19 @@ async function handleMoveCategory() {
   if (target === movingCat.value.id) return;
   const { error } = await moveMediaCategory(movingCat.value.id, target);
   if (!error) {
-    const to = target === 0 ? "根分类" : categories.value.find((c) => c.id === target)?.name || "";
-    window.$message?.success(`已移动到「${to}」`);
+    const to = target === 0 ? "根分類" : categories.value.find((c) => c.id === target)?.name || "";
+    window.$message?.success(`已移動到「${to}」`);
     movingCat.value = null;
     loadCategories();
   }
 }
 
-// ── 单素材操作 ──
+// ── 單素材操作 ──
 
 function copyURL(url: string) {
   navigator.clipboard?.writeText(url).then(
-    () => window.$message?.success("链接已复制"),
-    () => window.$message?.error("复制失败"),
+    () => window.$message?.success("鏈接已複製"),
+    () => window.$message?.error("複製失敗"),
   );
 }
 
@@ -462,7 +462,7 @@ async function handleRenameMedia() {
 }
 
 const categorySelectOptions = computed(() => [
-  { label: "未分类", value: 0 },
+  { label: "未分類", value: 0 },
   ...flattenTree(treeCategories.value).map((c) => ({
     label: `${"　".repeat(c.depth)}${c.name}`,
     value: c.id,
@@ -474,16 +474,16 @@ const categorySelectOptions = computed(() => [
   <NModal
     :show="mediaPickerState.show"
     preset="card"
-    :title="mediaPickerState.kind === 'video' ? '选择视频' : mediaPickerState.multiple ? '选择图片（可多选）' : '选择图片'"
+    :title="mediaPickerState.kind === 'video' ? '選擇視頻' : mediaPickerState.multiple ? '選擇圖片（可多選）' : '選擇圖片'"
     class="w-960px max-w-[calc(100vw-24px)]"
     style="max-height: calc(100dvh - 24px); overflow-y: auto"
     :mask-closable="false"
     @update:show="(v: boolean) => !v && handleCancel()"
   >
     <p v-if="mediaPickerState.tip" class="mb-12px text-13px" style="color: var(--text-color-2); overflow-wrap: anywhere">{{ mediaPickerState.tip }}</p>
-    <NSelect class="mb-12px sm:hidden" :value="viewKey" :options="[{ label: '全部素材', value: 'all' }, { label: '未分类', value: 'uncategorized' }, ...categories.map(c => ({ label: c.name, value: `cat:${c.id}` }))]" @update:value="(value: string) => switchView(value === 'all' || value === 'uncategorized' ? value : { category: Number(value.slice(4)) })" />
+    <NSelect class="mb-12px sm:hidden" :value="viewKey" :options="[{ label: '全部素材', value: 'all' }, { label: '未分類', value: 'uncategorized' }, ...categories.map(c => ({ label: c.name, value: `cat:${c.id}` }))]" @update:value="(value: string) => switchView(value === 'all' || value === 'uncategorized' ? value : { category: Number(value.slice(4)) })" />
     <div class="flex gap-16px" style="height: min(560px, 62dvh)">
-      <!-- 左：素材网格 -->
+      <!-- 左：素材網格 -->
       <div class="flex min-w-0 flex-1 flex-col gap-12px">
         <div class="flex flex-wrap items-center gap-8px">
           <NUpload v-if="mediaPickerState.kind === 'image'"
@@ -492,22 +492,22 @@ const categorySelectOptions = computed(() => [
             accept="image/*,.apng,.avif,.jfif,.tif,.tiff,.heic,.heif,.ico"
             :on-before-upload="beforeUpload"
           >
-            <NButton v-auth="'media:upload'" size="small" type="primary" :loading="uploading > 0">上传图片</NButton>
+            <NButton v-auth="'media:upload'" size="small" type="primary" :loading="uploading > 0">上傳圖片</NButton>
           </NUpload>
-          <NButton v-if="mediaPickerState.kind === 'image'" v-auth="'media:upload'" size="small" @click="showImport = true">外链导入</NButton>
+          <NButton v-if="mediaPickerState.kind === 'image'" v-auth="'media:upload'" size="small" @click="showImport = true">外鏈導入</NButton>
           <NButton v-if="mediaPickerState.multiple" size="small" quaternary @click="togglePageAll">
-            {{ pageAllSelected ? "取消全选" : "全选本页" }}
+            {{ pageAllSelected ? "取消全選" : "全選本頁" }}
           </NButton>
-          <NButton v-auth="'media:write'" size="small" :disabled="!canManageSelection" title="请先在素材列表中选中要管理的素材" @click="showMove = true">
-            移动到分类{{ selectedIds.size ? `（${selectedIds.size}）` : "" }}
+          <NButton v-auth="'media:write'" size="small" :disabled="!canManageSelection" title="請先在素材列表中選中要管理的素材" @click="showMove = true">
+            移動到分類{{ selectedIds.size ? `（${selectedIds.size}）` : "" }}
           </NButton>
           <NPopconfirm @positive-click="handleDelete(false)">
             <template #trigger>
-              <NButton v-auth="'media:delete'" size="small" type="error" ghost :disabled="!canManageSelection" title="请先在素材列表中选中要管理的素材">
-                删除{{ selectedIds.size ? `（${selectedIds.size}）` : "" }}
+              <NButton v-auth="'media:delete'" size="small" type="error" ghost :disabled="!canManageSelection" title="請先在素材列表中選中要管理的素材">
+                刪除{{ selectedIds.size ? `（${selectedIds.size}）` : "" }}
               </NButton>
             </template>
-            确定删除选中的 {{ selectedIds.size }} 项素材？（被商品引用的会再次确认）
+            確定刪除選中的 {{ selectedIds.size }} 項素材？（被商品引用的會再次確認）
           </NPopconfirm>
           <div class="ml-auto w-180px">
             <NInput
@@ -525,12 +525,12 @@ const categorySelectOptions = computed(() => [
 
         <NScrollbar class="flex-1">
           <div v-if="loading" class="flex h-320px items-center justify-center text-gray-400">
-            加载中…
+            加載中…
           </div>
           <NEmpty
             v-else-if="!items.length"
             class="mt-80px"
-            :description="mediaPickerState.kind === 'video' ? '暂无视频，请返回插入视频窗口上传' : '暂无素材，点击上传图片或外链导入'"
+            :description="mediaPickerState.kind === 'video' ? '暫無視頻，請返回插入視頻窗口上傳' : '暫無素材，點擊上傳圖片或外鏈導入'"
           />
           <div v-else class="grid grid-cols-2 gap-10px sm:grid-cols-5">
             <div
@@ -539,7 +539,7 @@ const categorySelectOptions = computed(() => [
               class="group relative cursor-pointer overflow-hidden rounded-6px border"
               :class="isSelected(item) ? 'border-primary' : 'border-gray-200 dark:border-gray-700'"
               :style="isSelected(item) ? 'box-shadow: 0 0 0 2px var(--primary-color)' : ''"
-              role="button" tabindex="0" :aria-label="`选择素材 ${item.name}`" :aria-pressed="isSelected(item)"
+              role="button" tabindex="0" :aria-label="`選擇素材 ${item.name}`" :aria-pressed="isSelected(item)"
               @keydown.enter.prevent="toggleSelect(item, $event)" @keydown.space.prevent="toggleSelect(item, $event)"
               @click="toggleSelect(item, $event)"
             >
@@ -551,7 +551,7 @@ const categorySelectOptions = computed(() => [
                   >引用{{ item.ref_count }}</NTag
                 >
               </div>
-              <!-- 选择角标 -->
+              <!-- 選擇角標 -->
               <div
                 class="absolute right-4px top-4px h-18px w-18px flex items-center justify-center rounded-full text-12px"
                 :class="
@@ -566,7 +566,7 @@ const categorySelectOptions = computed(() => [
               <div
                 class="absolute inset-x-0 bottom-20px hidden justify-center gap-4px group-hover:flex"
               >
-                <NButton size="tiny" quaternary @click.stop="copyURL(item.url)">复制链接</NButton>
+                <NButton size="tiny" quaternary @click.stop="copyURL(item.url)">複製鏈接</NButton>
                 <NButton
                   v-auth="'media:write'"
                   size="tiny"
@@ -588,17 +588,17 @@ const categorySelectOptions = computed(() => [
           @change="loadList"
         /></div>
         <div class="sm:hidden flex flex-wrap items-center justify-between gap-8px mt-12px">
-          <span class="text-12px text-gray-400">共 {{ total }} 项</span>
+          <span class="text-12px text-gray-400">共 {{ total }} 項</span>
           <NPagination v-model:page="page" :page-size="pageSize" :item-count="total" simple size="small" @update:page="loadList" />
         </div>
       </div>
 
-      <!-- 右：分类面板 -->
+      <!-- 右：分類面板 -->
       <div
         class="hidden sm:flex w-190px shrink-0 flex-col border-l border-gray-200 pl-12px dark:border-gray-700"
       >
         <div class="mb-8px flex items-center justify-between">
-          <span class="text-13px font-medium">素材分类</span>
+          <span class="text-13px font-medium">素材分類</span>
           <NButton
             v-auth="'media:write'"
             size="tiny"
@@ -609,22 +609,22 @@ const categorySelectOptions = computed(() => [
           >
         </div>
 
-        <!-- 新建分类 -->
+        <!-- 新建分類 -->
         <div v-if="showCatCreate" class="mb-8px flex flex-col gap-4px">
           <NInput
             v-model:value="newCatName"
             size="small"
-            placeholder="分类名称"
+            placeholder="分類名稱"
             @keyup.enter="handleCreateCategory"
           />
           <NSelect
             v-model:value="newCatParent"
             size="small"
-            placeholder="父分类（可选）"
+            placeholder="父分類（可選）"
             clearable
             :options="categorySelectOptions.filter((o: any) => o.value !== 0)"
           />
-          <NButton size="tiny" type="primary" @click="handleCreateCategory">创建</NButton>
+          <NButton size="tiny" type="primary" @click="handleCreateCategory">創建</NButton>
         </div>
 
         <NScrollbar class="flex-1">
@@ -651,7 +651,7 @@ const categorySelectOptions = computed(() => [
             "
             @click="switchView('uncategorized')"
           >
-            <span>未分类</span>
+            <span>未分類</span>
           </div>
 
           <template v-for="cat in flattenTree(treeCategories)" :key="cat.id">
@@ -677,7 +677,7 @@ const categorySelectOptions = computed(() => [
               </span>
             </div>
           </template>
-          <NEmpty v-if="!categories.length" size="small" class="mt-24px" description="暂无分类" />
+          <NEmpty v-if="!categories.length" size="small" class="mt-24px" description="暫無分類" />
         </NScrollbar>
       </div>
     </div>
@@ -685,45 +685,45 @@ const categorySelectOptions = computed(() => [
     <template #footer>
       <div class="flex flex-wrap justify-end gap-12px">
         <NButton @click="handleCancel">取消</NButton>
-        <div v-if="selectedPreview.length" class="order-first w-full flex flex-wrap gap-8px" aria-label="已选素材">
+        <div v-if="selectedPreview.length" class="order-first w-full flex flex-wrap gap-8px" aria-label="已選素材">
           <NTag v-for="item in selectedPreview" :key="item.id" closable @close="selectedIds = new Set([...selectedIds].filter(id => id !== item.id))"><span class="inline-block max-w-180px truncate">{{ item.name }}</span></NTag>
         </div>
         <NButton type="primary" :disabled="!selectedIds.size || loading" @click="handleConfirm">
-          确定{{ selectedIds.size ? `（已选 ${selectedIds.size} 张）` : "" }}
+          確定{{ selectedIds.size ? `（已選 ${selectedIds.size} 張）` : "" }}
         </NButton>
       </div>
     </template>
 
-    <!-- 外链导入 -->
-    <NModal v-model:show="showImport" preset="dialog" title="外链导入" style="width: 480px">
+    <!-- 外鏈導入 -->
+    <NModal v-model:show="showImport" preset="dialog" title="外鏈導入" style="width: 480px">
       <NInput
         v-model:value="importURL"
-        placeholder="图片 URL（服务端 SSRF 防护 + 安全三件套校验）"
+        placeholder="圖片 URL（服務端 SSRF 防護 + 安全三件套校驗）"
       />
       <template #action>
         <NButton @click="showImport = false">取消</NButton>
-        <NButton type="primary" :loading="importing" @click="handleImport">导入</NButton>
+        <NButton type="primary" :loading="importing" @click="handleImport">導入</NButton>
       </template>
     </NModal>
 
-    <!-- 批量移动 -->
-    <NModal v-model:show="showMove" preset="dialog" title="移动到分类" style="width: 420px">
+    <!-- 批量移動 -->
+    <NModal v-model:show="showMove" preset="dialog" title="移動到分類" style="width: 420px">
       <NSelect
         v-model:value="moveTarget"
         :options="categorySelectOptions"
-        placeholder="选择目标分类"
+        placeholder="選擇目標分類"
       />
       <template #action>
         <NButton @click="showMove = false">取消</NButton>
-        <NButton type="primary" @click="handleMove">移动</NButton>
+        <NButton type="primary" @click="handleMove">移動</NButton>
       </template>
     </NModal>
 
-    <!-- 引用确认删除（两段式第二段） -->
-    <NModal v-model:show="deleteConfirm.show" preset="dialog" title="删除确认" style="width: 520px">
+    <!-- 引用確認刪除（兩段式第二段） -->
+    <NModal v-model:show="deleteConfirm.show" preset="dialog" title="刪除確認" style="width: 520px">
       <div class="mb-8px">
-        以下 <b>{{ deleteConfirm.referenced.length }}</b> 张素材正被商品引用（共选中
-        {{ deleteConfirm.ids.length }} 张），删除后相关商品图片将裂图：
+        以下 <b>{{ deleteConfirm.referenced.length }}</b> 張素材正被商品引用（共選中
+        {{ deleteConfirm.ids.length }} 張），刪除後相關商品圖片將裂圖：
       </div>
       <div class="max-h-200px overflow-auto rounded-4px bg-gray-50 p-8px dark:bg-gray-800">
         <div
@@ -733,12 +733,12 @@ const categorySelectOptions = computed(() => [
         >
           <img :src="resolveMediaUrl(item.url)" class="h-24px w-24px rounded-2px object-cover" />
           <span class="truncate">{{ item.name }}</span>
-          <NTag size="tiny" type="warning">引用 {{ item.ref_count }} 处</NTag>
+          <NTag size="tiny" type="warning">引用 {{ item.ref_count }} 處</NTag>
         </div>
       </div>
       <template #action>
         <NButton @click="deleteConfirm.show = false">取消</NButton>
-        <NButton type="error" @click="handleDelete(true)">仍要删除</NButton>
+        <NButton type="error" @click="handleDelete(true)">仍要刪除</NButton>
       </template>
     </NModal>
 
@@ -753,36 +753,36 @@ const categorySelectOptions = computed(() => [
       <NInput v-model:value="renameMediaText" @keyup.enter="handleRenameMedia" />
       <template #action>
         <NButton @click="renamingMedia = null">取消</NButton>
-        <NButton type="primary" @click="handleRenameMedia">确定</NButton>
+        <NButton type="primary" @click="handleRenameMedia">確定</NButton>
       </template>
     </NModal>
 
-    <!-- 分类重命名 -->
+    <!-- 分類重命名 -->
     <NModal
       :show="!!renamingCat"
       preset="dialog"
-      title="分类重命名"
+      title="分類重命名"
       style="width: 420px"
       @update:show="(v: boolean) => !v && (renamingCat = null)"
     >
       <NInput v-model:value="renameCatText" @keyup.enter="handleRenameCategory" />
       <template #action>
         <NButton @click="renamingCat = null">取消</NButton>
-        <NButton type="primary" @click="handleRenameCategory">确定</NButton>
+        <NButton type="primary" @click="handleRenameCategory">確定</NButton>
       </template>
     </NModal>
 
-    <!-- 移动分类（树选择器；排除自身子树防环；根分类=移到顶层） -->
+    <!-- 移動分類（樹選擇器；排除自身子樹防環；根分類=移到頂層） -->
     <NModal
       :show="!!movingCat"
       preset="dialog"
-      title="移动分类"
+      title="移動分類"
       style="width: 460px"
       @update:show="(v: boolean) => !v && (movingCat = null)"
     >
       <div class="mb-8px text-13px text-gray-500">
-        「{{ movingCat?.name }}」当前位于：<b>{{ moveCatParentName }}</b
-        >，选择新的上级分类：
+        「{{ movingCat?.name }}」當前位於：<b>{{ moveCatParentName }}</b
+        >，選擇新的上級分類：
       </div>
       <NScrollbar class="max-h-280px rounded-4px border border-gray-200 dark:border-gray-700">
         <div
@@ -794,7 +794,7 @@ const categorySelectOptions = computed(() => [
           "
           @click="moveCatTarget = null"
         >
-          <span>📁 根分类（作为顶级分类）</span>
+          <span>📁 根分類（作為頂級分類）</span>
           <span v-if="moveCatTarget === null" class="text-primary">✓</span>
         </div>
         <div
@@ -813,28 +813,28 @@ const categorySelectOptions = computed(() => [
           <span v-if="moveCatTarget === cat.id" class="text-primary">✓</span>
         </div>
       </NScrollbar>
-      <div class="mt-6px text-12px text-gray-400">不能移动到自身或其子分类下（防环）。</div>
+      <div class="mt-6px text-12px text-gray-400">不能移動到自身或其子分類下（防環）。</div>
       <template #action>
         <NButton @click="movingCat = null">取消</NButton>
-        <NButton type="primary" @click="handleMoveCategory">移动到此处</NButton>
+        <NButton type="primary" @click="handleMoveCategory">移動到此處</NButton>
       </template>
     </NModal>
 
-    <!-- 分类删除确认（⋯ 菜单无法包 Popconfirm → NModal） -->
+    <!-- 分類刪除確認（⋯ 菜單無法包 Popconfirm → NModal） -->
     <NModal
       :show="deleteCatConfirm.show"
       preset="dialog"
-      title="删除分类"
+      title="刪除分類"
       style="width: 420px"
       @update:show="(v: boolean) => !v && (deleteCatConfirm.show = false)"
     >
-      确定删除分类「{{ deleteCatConfirm.cat?.name }}」？分类下有素材或子分类时将被拒绝。
+      確定刪除分類「{{ deleteCatConfirm.cat?.name }}」？分類下有素材或子分類時將被拒絕。
       <template #action>
         <NButton @click="deleteCatConfirm.show = false">取消</NButton>
         <NButton
           type="error"
           @click="deleteCatConfirm.cat && handleDeleteCategory(deleteCatConfirm.cat)"
-          >删除</NButton
+          >刪除</NButton
         >
       </template>
     </NModal>

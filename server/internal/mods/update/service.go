@@ -1,8 +1,8 @@
-// 更新链 service（doc/在线更新方案.md §9）：状态机 + 单飞 + 进度回调 + 重启 hook。
+// 更新鏈 service（doc/在線更新方案.md §9）：狀態機 + 單飛 + 進度回調 + 重啓 hook。
 //
-// 重启分工：本模块落位二进制后调用 restartFn（serve 层注入——优雅停机 +
-// 三分支：进程管理器拉起 / 裸跑 syscall.Exec）；新进程经 update.state pending
-// 健康门确认（updater.HealthGate，main 装配）。
+// 重啓分工：本模塊落位二進制後調用 restartFn（serve 層注入——優雅停機 +
+// 三分支：進程管理器拉起 / 裸跑 syscall.Exec）；新進程經 update.state pending
+// 健康門確認（updater.HealthGate，main 裝配）。
 package update
 
 import (
@@ -23,7 +23,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/updater"
 )
 
-// 阶段取值（前端轮询协议）。
+// 階段取值（前端輪詢協議）。
 const (
 	PhaseIdle        = "idle"
 	PhaseChecking    = "checking"
@@ -31,22 +31,22 @@ const (
 	PhaseDownloading = "downloading"
 	PhaseApplying    = "applying"
 	PhaseRestarting  = "restarting"
-	PhaseVerifying   = "verifying"   // 新进程健康门中（磁盘 state pending 合成）
-	PhaseRolledBack  = "rolled_back" // 最近一次结果为回滚
+	PhaseVerifying   = "verifying"   // 新進程健康門中（磁盤 state pending 合成）
+	PhaseRolledBack  = "rolled_back" // 最近一次結果為回滾
 	PhaseFailed      = "failed"
 )
 
-// ErrBusy 更新链进行中（apply 单飞互斥）。
-var ErrBusy = errors.New("update: 更新正在进行中")
+// ErrBusy 更新鏈進行中（apply 單飛互斥）。
+var ErrBusy = errors.New("update: 更新正在進行中")
 
-// ErrDisabled 面板更新被禁用（多进程模式，方案 §12——api/worker 分进程会撞
-// update.state 且 worker 跑旧代码+新 schema，须走 CLI 滚动）。
-var ErrDisabled = errors.New("update: 当前为多进程部署，面板在线更新已禁用（请用 zcard self-update 滚动各进程）")
+// ErrDisabled 面板更新被禁用（多進程模式，方案 §12——api/worker 分進程會撞
+// update.state 且 worker 跑舊代碼+新 schema，須走 CLI 滾動）。
+var ErrDisabled = errors.New("update: 當前為多進程部署，面板在線更新已禁用（請用 zcard self-update 滾動各進程）")
 
-// probeCacheTTL auto 源探测缓存（方案 §4.3：10 分钟）。
+// probeCacheTTL auto 源探測緩存（方案 §4.3：10 分鐘）。
 const probeCacheTTL = 10 * time.Minute
 
-// Status 状态快照（admin API 下发；Current/Supervisor 每次现算——重启后即新值）。
+// Status 狀態快照（admin API 下發；Current/Supervisor 每次現算——重啓後即新值）。
 type Status struct {
 	Phase         string
 	Current       string
@@ -62,16 +62,16 @@ type Status struct {
 	CheckedAt     time.Time
 	BackupDir     string
 	Busy          bool
-	History       []updater.ReleaseNote // 历史版本 changelog（manifest 权威源）
+	History       []updater.ReleaseNote // 歷史版本 changelog（manifest 權威源）
 	Prev          string                // 上一次版本（最近一次更新的 from——update.state.FromVer 持久保存）
-	BackupReady   bool                  // 备份工具就绪（pg_dump/mysqldump 按方言；缺失则更新会被 fail-closed 中止）
-	BackupHint    string                // 缺失时的安装指引（事前警示，不等更新失败才报）
+	BackupReady   bool                  // 備份工具就緒（pg_dump/mysqldump 按方言；缺失則更新會被 fail-closed 中止）
+	BackupHint    string                // 缺失時的安裝指引（事前警示，不等更新失敗才報）
 	DockerReady   bool
 	DockerHint    string
 	RollbackReady bool
 }
 
-// Service 更新编排。
+// Service 更新編排。
 type Service struct {
 	mu       sync.Mutex
 	busy     bool
@@ -84,10 +84,10 @@ type Service struct {
 	uc        *settings.SettingsUsecase
 	binPath   string
 	restartFn func()
-	disabled  string // 非空=禁用原因（多进程模式）
+	disabled  string // 非空=禁用原因（多進程模式）
 }
 
-// NewService wire 构造。
+// NewService wire 構造。
 func NewService(dataCfg *conf.Data, uc *settings.SettingsUsecase) *Service {
 	bin := ""
 	if p, err := os.Executable(); err == nil {
@@ -100,23 +100,23 @@ func NewService(dataCfg *conf.Data, uc *settings.SettingsUsecase) *Service {
 	return &Service{dataCfg: dataCfg, uc: uc, binPath: bin, st: Status{Phase: PhaseIdle}}
 }
 
-// SetRestartFn serve 层注入重启回调（优雅停机 + 三分支；nil=禁用重启——测试态）。
+// SetRestartFn serve 層注入重啓回調（優雅停機 + 三分支；nil=禁用重啓——測試態）。
 func (s *Service) SetRestartFn(f func()) { s.restartFn = f }
 
-// Disable 禁用面板更新链（serve 层注入：-mode != all 时调用，方案 §12）。
+// Disable 禁用面板更新鏈（serve 層注入：-mode != all 時調用，方案 §12）。
 func (s *Service) Disable(reason string) { s.disabled = reason }
 
-// OnRestartFailed 重启失败复位（serve 层 exec 失败分支调用）：新版本已落盘但进程
-// 未能重启——恢复 busy 允许重试，phase 转 failed 附手动指引（磁盘已是新版）。
+// OnRestartFailed 重啓失敗復位（serve 層 exec 失敗分支調用）：新版本已落盤但進程
+// 未能重啓——恢復 busy 允許重試，phase 轉 failed 附手動指引（磁盤已是新版）。
 func (s *Service) OnRestartFailed(err error) {
 	s.mu.Lock()
 	s.busy = false
 	s.st.Phase = PhaseFailed
-	s.st.Err = fmt.Sprintf("重启失败（新版本已落盘，请手动重启服务生效）: %v", err)
+	s.st.Err = fmt.Sprintf("重啓失敗（新版本已落盤，請手動重啓服務生效）: %v", err)
 	s.mu.Unlock()
 }
 
-// DisabledErr 禁用态错误（空=启用）。
+// DisabledErr 禁用態錯誤（空=啓用）。
 func (s *Service) DisabledErr() error {
 	if s.disabled == "" {
 		return nil
@@ -133,10 +133,10 @@ func (s *Service) sourceConfig(ctx context.Context) updater.SourceConfig {
 	return cfg.Normalize()
 }
 
-// resolveClient 源解析（auto 结果缓存 10 分钟）。
+// resolveClient 源解析（auto 結果緩存 10 分鐘）。
 func (s *Service) resolveClient(ctx context.Context, cfg updater.SourceConfig) (*updater.Client, *updater.ProbeOutcome, error) {
 	if cfg.Mode != "auto" {
-		return updater.ResolveSource(ctx, cfg, 5*time.Second) // 钉死模式无网络探测
+		return updater.ResolveSource(ctx, cfg, 5*time.Second) // 釘死模式無網絡探測
 	}
 	s.mu.Lock()
 	if s.probe != nil && time.Since(s.probedAt) < probeCacheTTL {
@@ -148,7 +148,7 @@ func (s *Service) resolveClient(ctx context.Context, cfg updater.SourceConfig) (
 	s.mu.Unlock()
 	c, out, err := updater.ResolveSource(ctx, cfg, 5*time.Second)
 	if err != nil {
-		// 探测失败清缓存：auto 判定可能基于过期网络快照，下轮重探
+		// 探測失敗清緩存：auto 判定可能基於過期網絡快照，下輪重探
 		s.mu.Lock()
 		s.probe = nil
 		s.mu.Unlock()
@@ -160,7 +160,7 @@ func (s *Service) resolveClient(ctx context.Context, cfg updater.SourceConfig) (
 	return c, out, nil
 }
 
-// CheckResult 检查结果。
+// CheckResult 檢查結果。
 type CheckResult struct {
 	Current   string
 	Latest    string
@@ -168,12 +168,12 @@ type CheckResult struct {
 	Notes     string
 	Channel   string
 	Source    string
-	History   []updater.ReleaseNote // 历史版本 changelog（manifest 权威源）
+	History   []updater.ReleaseNote // 歷史版本 changelog（manifest 權威源）
 }
 
-// Check 手动检查（源解析 + manifest 验签；结果缓存进 status 供弹窗展示）。
-// 更新链进行中拒绝重入：Check 的 phase 迁移会打断下载/应用状态展示，
-// 等待模式被破坏后前端弹窗退回确认态——另一标签页自动检查即触发（线上实录）。
+// Check 手動檢查（源解析 + manifest 驗籤；結果緩存進 status 供彈窗展示）。
+// 更新鏈進行中拒絕重入：Check 的 phase 遷移會打斷下載/應用狀態展示，
+// 等待模式被破壞後前端彈窗退回確認態——另一標籤頁自動檢查即觸發（線上實錄）。
 func (s *Service) Check(ctx context.Context) (*CheckResult, error) {
 	if updater.IsContainer() && os.Getenv("ZCARD_UPDATER_SOCKET") != "" {
 		if st, err := dockerCall(ctx, "/status", nil); err == nil && st.Busy {
@@ -202,7 +202,7 @@ func (s *Service) Check(ctx context.Context) (*CheckResult, error) {
 	cfg := s.sourceConfig(ctx)
 	cli, outcome, err := s.resolveClient(ctx, cfg)
 	if err != nil {
-		s.fail(fmt.Errorf("源解析失败: %w", err))
+		s.fail(fmt.Errorf("源解析失敗: %w", err))
 		return nil, err
 	}
 	pub, err := updater.PublicKey(updater.DefaultPublicKeyHex)
@@ -211,7 +211,7 @@ func (s *Service) Check(ctx context.Context) (*CheckResult, error) {
 	}
 	m, _, err := cli.FetchManifest(ctx, cfg.Channel, pub)
 	if err != nil {
-		s.fail(fmt.Errorf("获取清单失败: %w", err))
+		s.fail(fmt.Errorf("獲取清單失敗: %w", err))
 		return nil, err
 	}
 	res := &CheckResult{
@@ -244,8 +244,8 @@ func (s *Service) pendingTargetLocked() bool {
 	return false
 }
 
-// Apply 触发更新（后台 goroutine 执行链；重复调用 ErrBusy）。
-// 链：磁盘预检 → DB 备份 → 落盘下载（进度）→ 原子替换 → 重启 hook。
+// Apply 觸發更新（後台 goroutine 執行鏈；重複調用 ErrBusy）。
+// 鏈：磁盤預檢 → DB 備份 → 落盤下載（進度）→ 原子替換 → 重啓 hook。
 func (s *Service) Apply(ctx context.Context) error {
 	if updater.IsContainer() {
 		s.mu.Lock()
@@ -266,7 +266,7 @@ func (s *Service) Apply(ctx context.Context) error {
 }
 
 func (s *Service) run() {
-	// 独立 ctx：apply 接口即时返回，请求 ctx 不能带入后台链
+	// 獨立 ctx：apply 接口即時返回，請求 ctx 不能帶入後台鏈
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
 	fail := func(err error) {
@@ -276,14 +276,14 @@ func (s *Service) run() {
 		s.mu.Unlock()
 	}
 	if s.binPath == "" {
-		fail(errors.New("无法定位当前二进制"))
+		fail(errors.New("無法定位當前二進制"))
 		return
 	}
 
 	cfg := s.sourceConfig(ctx)
 	cli, outcome, err := s.resolveClient(ctx, cfg)
 	if err != nil {
-		fail(fmt.Errorf("源解析失败: %w", err))
+		fail(fmt.Errorf("源解析失敗: %w", err))
 		return
 	}
 	pub, err := updater.PublicKey(updater.DefaultPublicKeyHex)
@@ -293,12 +293,12 @@ func (s *Service) run() {
 	}
 	m, _, err := cli.FetchManifest(ctx, cfg.Channel, pub)
 	if err != nil {
-		fail(fmt.Errorf("获取清单失败: %w", err))
+		fail(fmt.Errorf("獲取清單失敗: %w", err))
 		return
 	}
-	// 版本单调（防降级攻击；CLI 同款约束）
+	// 版本單調（防降級攻擊；CLI 同款約束）
 	if !updater.IsSemver(m.Version) || updater.CompareSemver(m.Version, cur()) <= 0 {
-		fail(fmt.Errorf("%w（当前 %s ↔ 目标 %s）", updater.ErrRefuseUpdate, cur(), m.Version))
+		fail(fmt.Errorf("%w（當前 %s ↔ 目標 %s）", updater.ErrRefuseUpdate, cur(), m.Version))
 		return
 	}
 	s.mu.Lock()
@@ -312,23 +312,23 @@ func (s *Service) run() {
 		}
 	}
 	dir := filepath.Dir(s.binPath)
-	// 磁盘预检（方案 §8）：产物 + 64MB 余量
+	// 磁盤預檢（方案 §8）：產物 + 64MB 餘量
 	if err := updater.CheckDiskSpace(dir, assetSize+64<<20); err != nil {
 		fail(err)
 		return
 	}
 
-	// 备份（DB + 旧二进制；失败中止——安全网优先）
+	// 備份（DB + 舊二進制；失敗中止——安全網優先）
 	s.setPhase(PhaseBackingUp)
 	backupDir := updater.BackupPath(s.binPath, cur())
 	if err := BackupDatabase(ctx, s.dataCfg, backupDir); err != nil {
-		fail(fmt.Errorf("备份失败，中止更新: %w", err))
+		fail(fmt.Errorf("備份失敗，中止更新: %w", err))
 		return
 	}
 	_ = copyBinary(s.binPath, filepath.Join(backupDir, "zcard.old"))
 
-	// 落盘下载（流式哈希；进度回调）。源失败自动换下一个候选从头重试（方案 §4.3：
-	// 首选源（auto 探测/钉死）→ 其余加速器逐个兜底，beta 通道排除加速器）
+	// 落盤下載（流式哈希；進度回調）。源失敗自動換下一個候選從頭重試（方案 §4.3：
+	// 首選源（auto 探測/釘死）→ 其餘加速器逐個兜底，beta 通道排除加速器）
 	s.mu.Lock()
 	s.st.Phase, s.st.Progress, s.st.BackupDir = PhaseDownloading, 0, backupDir
 	s.mu.Unlock()
@@ -349,7 +349,7 @@ func (s *Service) run() {
 			}
 		}); err != nil {
 			_ = os.Remove(newPath)
-			dlErr = fmt.Errorf("下载失败（源 %s）: %w", cand.Desc(), err)
+			dlErr = fmt.Errorf("下載失敗（源 %s）: %w", cand.Desc(), err)
 			continue
 		}
 		dlErr = nil
@@ -363,7 +363,7 @@ func (s *Service) run() {
 		return
 	}
 
-	// 原子替换（rename 舞步 + pending 态）
+	// 原子替換（rename 舞步 + pending 態）
 	s.setPhase(PhaseApplying)
 	if err := updater.ApplyFile(s.binPath, cur(), m.Version, newPath); err != nil {
 		_ = os.Remove(newPath)
@@ -374,13 +374,13 @@ func (s *Service) run() {
 	s.st.Phase, s.st.Target, s.st.Source = PhaseRestarting, m.Version, outcome.SourceDesc()
 	s.mu.Unlock()
 
-	// 重启 hook（serve 层三分支；本 goroutine 就此让位——进程即将被停机/替换）
+	// 重啓 hook（serve 層三分支；本 goroutine 就此讓位——進程即將被停機/替換）
 	if s.restartFn != nil {
 		s.restartFn()
 	}
 }
 
-// Rollback 回滚 .prev 并重启（新版不健康时的面板逃生口）。
+// Rollback 回滾 .prev 並重啓（新版不健康時的面板逃生口）。
 func (s *Service) Rollback(ctx context.Context) error {
 	if updater.IsContainer() {
 		st, err := dockerCall(ctx, "/status", nil)
@@ -388,14 +388,14 @@ func (s *Service) Rollback(ctx context.Context) error {
 			return err
 		}
 		if !st.RollbackReady {
-			return fmt.Errorf("没有数据库结构兼容的上一版本可回退")
+			return fmt.Errorf("沒有數據庫結構兼容的上一版本可回退")
 		}
 		return s.applyDocker(ctx, st.RollbackVersion, true)
 	}
 	if s.binPath == "" {
-		return errors.New("update: 无法定位当前二进制")
+		return errors.New("update: 無法定位當前二進制")
 	}
-	// 单飞守卫：更新链进行中（下载/落位中）同时回滚 = 磁盘状态竞态破坏
+	// 單飛守衞：更新鏈進行中（下載/落位中）同時回滾 = 磁盤狀態競態破壞
 	s.mu.Lock()
 	if s.busy || s.checking || s.st.Phase == PhaseChecking {
 		s.mu.Unlock()
@@ -412,7 +412,7 @@ func (s *Service) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// Snapshot 状态快照（Current/Supervisor/Mode 现算；磁盘 state 合成 verifying/rolled_back）。
+// Snapshot 狀態快照（Current/Supervisor/Mode 現算；磁盤 state 合成 verifying/rolled_back）。
 func (s *Service) Snapshot(ctx context.Context) Status {
 	s.mu.Lock()
 	st := s.st
@@ -427,12 +427,12 @@ func (s *Service) Snapshot(ctx context.Context) Status {
 	st.BackupReady, st.BackupHint = s.backupToolStatus()
 	if s.binPath != "" {
 		if state, err := updater.LoadState(s.binPath); err == nil && state != nil {
-			// 新进程延续目标版本（exec 重启后内存态清零，磁盘 state 是唯一延续源——
-			// 前端「等待恢复」以 current==target 判成功，target 断档会假性超时）
+			// 新進程延續目標版本（exec 重啓後內存態清零，磁盤 state 是唯一延續源——
+			// 前端「等待恢復」以 current==target 判成功，target 斷檔會假性超時）
 			if !busy && st.Target == "" && state.ToVer != "" {
 				st.Target = state.ToVer
 			}
-			// 上一次版本号（from 持久保留：更新闭环后仍是最近一次升级起点）
+			// 上一次版本號（from 持久保留：更新閉環後仍是最近一次升級起點）
 			if state.FromVer != "" {
 				st.Prev = state.FromVer
 			}
@@ -466,8 +466,8 @@ func (s *Service) fail(err error) {
 	s.mu.Unlock()
 }
 
-// backupToolStatus 备份工具就绪检测（方言感知）：更新前强制 DB 备份依赖
-// pg_dump/mysqldump——缺失时提前在面板警示安装指引，而非等更新失败才暴露。
+// backupToolStatus 備份工具就緒檢測（方言感知）：更新前強制 DB 備份依賴
+// pg_dump/mysqldump——缺失時提前在面板警示安裝指引，而非等更新失敗才暴露。
 func (s *Service) backupToolStatus() (bool, string) {
 	if s.dataCfg == nil || s.dataCfg.Database == nil {
 		return true, ""
@@ -475,26 +475,26 @@ func (s *Service) backupToolStatus() (bool, string) {
 	switch s.dataCfg.Database.Driver {
 	case "postgres":
 		if _, err := exec.LookPath("pg_dump"); err != nil {
-			return false, "当前数据库为 PostgreSQL，服务器缺少 pg_dump——在线更新将因无法备份数据库而中止。请在服务器执行：apt install -y postgresql-client"
+			return false, "當前數據庫為 PostgreSQL，服務器缺少 pg_dump——在線更新將因無法備份數據庫而中止。請在服務器執行：apt install -y postgresql-client"
 		}
 	case "mysql":
 		if _, err := exec.LookPath("mysqldump"); err != nil {
-			return false, "当前数据库为 MySQL，服务器缺少 mysqldump——在线更新将因无法备份数据库而中止。请在服务器执行：apt install -y default-mysql-client"
+			return false, "當前數據庫為 MySQL，服務器缺少 mysqldump——在線更新將因無法備份數據庫而中止。請在服務器執行：apt install -y default-mysql-client"
 		}
 	}
 	return true, ""
 }
 
-// cur 当前版本（settings 注入的内存值——重启后自然为新版本号）。
+// cur 當前版本（settings 注入的內存值——重啓後自然為新版本號）。
 func cur() string { return settings.ServerVersion() }
 
-// SupervisorKind 进程管理器判定（配置显式覆盖 > 自动探测——宝塔等封装环境
-// env 探测有盲区，方案 §5）。main 的重启三分支与 status 下发共用本口径，
-// 保证「显示的」与「实际分流的」一致。
+// SupervisorKind 進程管理器判定（配置顯式覆蓋 > 自動探測——寶塔等封裝環境
+// env 探測有盲區，方案 §5）。main 的重啓三分支與 status 下發共用本口徑，
+// 保證「顯示的」與「實際分流的」一致。
 func (s *Service) SupervisorKind(ctx context.Context) string { return s.supervisorKind(ctx) }
 
-// supervisorKind 配置显式覆盖 > 自动探测（宝塔等封装环境 env 探测有盲区，
-// 方案 §5——重启三分支正确分流是更新安全前提，配置是权威出口）。
+// supervisorKind 配置顯式覆蓋 > 自動探測（寶塔等封裝環境 env 探測有盲區，
+// 方案 §5——重啓三分支正確分流是更新安全前提，配置是權威出口）。
 func (s *Service) supervisorKind(ctx context.Context) string {
 	if updater.IsContainer() {
 		return "docker"
@@ -507,8 +507,8 @@ func (s *Service) supervisorKind(ctx context.Context) string {
 	return updater.DetectSupervisor()
 }
 
-// downloadCandidates 下载候选源序列：首选源 + 其余加速器兜底（beta 排除——
-// 加速镜像不支持 beta；static/github 钉死模式同样给加速器兜底，网络突变时多一条生路）。
+// downloadCandidates 下載候選源序列：首選源 + 其餘加速器兜底（beta 排除——
+// 加速鏡像不支持 beta；static/github 釘死模式同樣給加速器兜底，網絡突變時多一條生路）。
 func (s *Service) downloadCandidates(cfg updater.SourceConfig, primary *updater.Client) []*updater.Client {
 	out := []*updater.Client{primary}
 	if cfg.Channel == "beta" {
@@ -521,13 +521,13 @@ func (s *Service) downloadCandidates(cfg updater.SourceConfig, primary *updater.
 		}
 		out = append(out, updater.NewClient(updater.SourceAccel, cfg.Repo, acc, ""))
 	}
-	if len(out) > 3 { // 最多试 3 个源（重试成本可控）
+	if len(out) > 3 { // 最多試 3 個源（重試成本可控）
 		out = out[:3]
 	}
 	return out
 }
 
-// downloadTo 流式落盘（DownloadAsset 边写边哈希校验；失败文件由调用方删）。
+// downloadTo 流式落盤（DownloadAsset 邊寫邊哈希校驗；失敗文件由調用方刪）。
 func downloadTo(ctx context.Context, cli *updater.Client, m *updater.Manifest, name, path string, onProgress updater.ProgressFunc) error {
 	f, err := os.Create(path)
 	if err != nil {

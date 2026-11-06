@@ -22,7 +22,7 @@ type ProductControl struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
@@ -38,7 +38,7 @@ type ProductControl struct {
 	MaxLength int32 `json:"max_length,omitempty"`
 	// Required holds the value of the "required" field.
 	Required bool `json:"required,omitempty"`
-	// 选项（select/checkbox/radio）
+	// 選項（select/checkbox/radio）
 	Options []string `json:"options,omitempty"`
 	// Sort holds the value of the "sort" field.
 	Sort         int32 `json:"sort,omitempty"`

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * md-editor-v3 自定义工具栏按钮：素材库插图。
- * insert 由 md-editor-v3 克隆自定义工具栏组件时自动注入（见 NormalToolbar props 注释），
- * 点击后经 pickMedia 选图，在光标处插入 Markdown 图片语法。
- * 注意：generate 必须返回 { targetValue } 对象（universal 替换路径只读 targetValue）。
+ * md-editor-v3 自定義工具欄按鈕：素材庫插圖。
+ * insert 由 md-editor-v3 克隆自定義工具欄組件時自動注入（見 NormalToolbar props 註釋），
+ * 點擊後經 pickMedia 選圖，在光標處插入 Markdown 圖片語法。
+ * 注意：generate 必須返回 { targetValue } 對象（universal 替換路徑只讀 targetValue）。
  */
 import { pickVideo } from "../video-picker";
 import { pickMedia } from "@/components/common/media-picker";
@@ -16,7 +16,7 @@ const props = withDefaults(
     video?: boolean;
     insert?: (generate: (selected: string) => { targetValue: string; select?: boolean }) => void;
   }>(),
-  { title: "素材库图片", insert: () => {} },
+  { title: "素材庫圖片", insert: () => {} },
 );
 
 async function onPick() {
@@ -28,7 +28,7 @@ async function onPick() {
   const urls = await pickMedia({ multiple: true });
   if (!urls?.length) return;
   props.insert(() => ({
-    targetValue: urls.map((url) => `![素材图片](${url})`).join("\n\n"),
+    targetValue: urls.map((url) => `![素材圖片](${url})`).join("\n\n"),
     select: false,
   }));
 }
@@ -60,7 +60,7 @@ async function onPick() {
 </template>
 
 <style scoped>
-/* 纯图标按钮：与 md-editor-v3 内置工具栏按钮同尺寸（24×28），悬停 title 提示「素材库图片」 */
+/* 純圖標按鈕：與 md-editor-v3 內置工具欄按鈕同尺寸（24×28），懸停 title 提示「素材庫圖片」 */
 .zc-md-media-btn {
   display: inline-flex;
   align-items: center;

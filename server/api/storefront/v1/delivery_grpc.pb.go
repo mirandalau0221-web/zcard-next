@@ -27,11 +27,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreDeliveryService 顾客取货(三重门：单号+密码+限流）。
+// StoreDeliveryService 顧客取貨(三重門：單號+密碼+限流）。
 type StoreDeliveryServiceClient interface {
-	// FetchDelivery 取货（一次性明文；默认 1 次后掩码；Cache-Control: no-store）。
+	// FetchDelivery 取貨（一次性明文；默認 1 次後掩碼；Cache-Control: no-store）。
 	FetchDelivery(ctx context.Context, in *FetchDeliveryRequest, opts ...grpc.CallOption) (*FetchDeliveryReply, error)
-	// MaskedDeliveries 我的订单掩码列表。
+	// MaskedDeliveries 我的訂單掩碼列表。
 	MaskedDeliveries(ctx context.Context, in *MaskedDeliveriesRequest, opts ...grpc.CallOption) (*MaskedDeliveriesReply, error)
 }
 
@@ -67,11 +67,11 @@ func (c *storeDeliveryServiceClient) MaskedDeliveries(ctx context.Context, in *M
 // All implementations must embed UnimplementedStoreDeliveryServiceServer
 // for forward compatibility.
 //
-// StoreDeliveryService 顾客取货(三重门：单号+密码+限流）。
+// StoreDeliveryService 顧客取貨(三重門：單號+密碼+限流）。
 type StoreDeliveryServiceServer interface {
-	// FetchDelivery 取货（一次性明文；默认 1 次后掩码；Cache-Control: no-store）。
+	// FetchDelivery 取貨（一次性明文；默認 1 次後掩碼；Cache-Control: no-store）。
 	FetchDelivery(context.Context, *FetchDeliveryRequest) (*FetchDeliveryReply, error)
-	// MaskedDeliveries 我的订单掩码列表。
+	// MaskedDeliveries 我的訂單掩碼列表。
 	MaskedDeliveries(context.Context, *MaskedDeliveriesRequest) (*MaskedDeliveriesReply, error)
 	mustEmbedUnimplementedStoreDeliveryServiceServer()
 }

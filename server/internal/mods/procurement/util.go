@@ -1,6 +1,6 @@
 package procurement
 
-// 工具函数（base64 行编码：多卡密密文 JSON 序列化）。
+// 工具函數（base64 行編碼：多卡密密文 JSON 序列化）。
 
 import "encoding/base64"
 

@@ -1,11 +1,11 @@
-// Package port 为 memberlevel 模块对外契约（零依赖包）。
+// Package port 為 memberlevel 模塊對外契約（零依賴包）。
 package port
 
 import "context"
 
-// RateResolver 会员等级折扣解析（order 价格管线步骤 2 消费）。
-// 返回应付比例万分比（9800=支付98%；0/10000=不折扣）+ 命中的等级 ID。
-// 无等级/用户不存在返回 0。
+// RateResolver 會員等級折扣解析（order 價格管線步驟 2 消費）。
+// 返回應付比例萬分比（9800=支付98%；0/10000=不折扣）+ 命中的等級 ID。
+// 無等級/用户不存在返回 0。
 type RateResolver interface {
 	EffectiveRate(ctx context.Context, userID uint64) (rate int32, levelID uint64, err error)
 }

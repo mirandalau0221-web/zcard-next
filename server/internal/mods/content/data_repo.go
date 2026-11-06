@@ -1,7 +1,7 @@
 package content
 
-// 数据仓储（）：banner/post/category CRUD + 时间窗查询 + 多语言回落。
-// sanitize 纪律：content_json（HTML）入库前经 platform/sanitize.HTML。
+// 數據倉儲（）：banner/post/category CRUD + 時間窗查詢 + 多語言回落。
+// sanitize 紀律：content_json（HTML）入庫前經 platform/sanitize.HTML。
 
 import (
 	"context"
@@ -23,25 +23,25 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/tenancy"
 )
 
-// 哨兵错误。
+// 哨兵錯誤。
 var (
-	ErrNotFound       = errors.New("content: 记录不存在")
+	ErrNotFound       = errors.New("content: 記錄不存在")
 	ErrSlugDuplicated = errors.New("content: slug 已存在")
-	ErrCategoryInUse  = errors.New("content: 分类下存在文章，禁止删除")
+	ErrCategoryInUse  = errors.New("content: 分類下存在文章，禁止刪除")
 )
 
-// ContentRepo 内容仓储。
+// ContentRepo 內容倉儲。
 type ContentRepo struct {
 	data     *data.Data
-	mediaRef mediaport.Referencer // 横幅/文章配图引用（nil 跳过）
+	mediaRef mediaport.Referencer // 橫幅/文章配圖引用（nil 跳過）
 }
 
-// NewContentRepo 构造（mediaRef 素材引用计数，）。
+// NewContentRepo 構造（mediaRef 素材引用計數，）。
 func NewContentRepo(d *data.Data, mediaRef mediaport.Referencer) *ContentRepo {
 	return &ContentRepo{data: d, mediaRef: mediaRef}
 }
 
-// adjustBannerRefs 横幅配图引用（旧释放新引用：image + mobile_image）。
+// adjustBannerRefs 橫幅配圖引用（舊釋放新引用：image + mobile_image）。
 func (r *ContentRepo) adjustBannerRefs(ctx context.Context, oldImage, oldMobile, newImage, newMobile string) {
 	if r.mediaRef == nil {
 		return
@@ -52,7 +52,7 @@ func (r *ContentRepo) adjustBannerRefs(ctx context.Context, oldImage, oldMobile,
 
 // ── Banner ────────────────────────────────────────────────
 
-// BannerInput banner 写入参数。
+// BannerInput banner 寫入參數。
 type BannerInput struct {
 	Name        string
 	Position    string
@@ -67,7 +67,7 @@ type BannerInput struct {
 	Sort        int32
 }
 
-// CreateBanner 创建。
+// CreateBanner 創建。
 func (r *ContentRepo) CreateBanner(ctx context.Context, in BannerInput) (*ent.Banner, error) {
 	title, err := mustLangJSON(in.TitleJSON)
 	if err != nil {
@@ -100,7 +100,7 @@ func (r *ContentRepo) CreateBanner(ctx context.Context, in BannerInput) (*ent.Ba
 	return b, err
 }
 
-// UpdateBanner 更新（零值字段不动）。
+// UpdateBanner 更新（零值字段不動）。
 func (r *ContentRepo) UpdateBanner(ctx context.Context, id uint64, in BannerInput) (*ent.Banner, error) {
 	existing, err := data.Client(ctx, r.data).Banner.Get(ctx, id)
 	if err != nil {
@@ -149,7 +149,7 @@ func (r *ContentRepo) UpdateBanner(ctx context.Context, id uint64, in BannerInpu
 	return b, err
 }
 
-// DeleteBanner 删除。
+// DeleteBanner 刪除。
 func (r *ContentRepo) DeleteBanner(ctx context.Context, id uint64) error {
 	err := data.Client(ctx, r.data).Banner.DeleteOneID(id).Exec(ctx)
 	if err != nil && ent.IsNotFound(err) {
@@ -158,7 +158,7 @@ func (r *ContentRepo) DeleteBanner(ctx context.Context, id uint64) error {
 	return err
 }
 
-// ListBanners 管理面列表（全量含停用；position 过滤）。
+// ListBanners 管理面列表（全量含停用；position 過濾）。
 func (r *ContentRepo) ListBanners(ctx context.Context, position string, page, pageSize int) ([]*ent.Banner, int, error) {
 	q := data.Client(ctx, r.data).Banner.Query().
 		Order(ent.Asc(banner.FieldSort), ent.Desc(banner.FieldID))
@@ -173,7 +173,7 @@ func (r *ContentRepo) ListBanners(ctx context.Context, position string, page, pa
 	return rows, total, err
 }
 
-// ListActiveBanners 生效中横幅（is_active + 时间窗三态过滤 + sort）。
+// ListActiveBanners 生效中橫幅（is_active + 時間窗三態過濾 + sort）。
 func (r *ContentRepo) ListActiveBanners(ctx context.Context, position string) ([]*ent.Banner, error) {
 	now := time.Now().UTC()
 	q := data.Client(ctx, r.data).Banner.Query().
@@ -186,14 +186,14 @@ func (r *ContentRepo) ListActiveBanners(ctx context.Context, position string) ([
 	if err != nil {
 		return nil, err
 	}
-	// 时间窗三态过滤（start/end 均可选）
+	// 時間窗三態過濾（start/end 均可選）
 	out := make([]*ent.Banner, 0, len(rows))
 	for _, b := range rows {
 		if !b.StartAt.IsZero() && now.Before(b.StartAt) {
-			continue // 未开始
+			continue // 未開始
 		}
 		if !b.EndAt.IsZero() && now.After(b.EndAt) {
-			continue // 已结束
+			continue // 已結束
 		}
 		out = append(out, b)
 	}
@@ -202,20 +202,20 @@ func (r *ContentRepo) ListActiveBanners(ctx context.Context, position string) ([
 
 // ── Post ──────────────────────────────────────────────────
 
-// PostInput post 写入参数。
+// PostInput post 寫入參數。
 type PostInput struct {
 	Slug        string
 	Type        string
 	TitleJSON   string
 	SummaryJSON string
-	ContentJSON string // 多语言内容（HTML，逐语言 sanitize）
+	ContentJSON string // 多語言內容（HTML，逐語言 sanitize）
 	Thumbnail   string
 	CategoryID  uint64
 	IsPublished bool
 	Sort        *int32
 }
 
-// CreatePost 创建（slug 唯一；content 逐语言 sanitize）。
+// CreatePost 創建（slug 唯一；content 逐語言 sanitize）。
 func (r *ContentRepo) createPost(ctx context.Context, in PostInput) (*ent.Post, error) {
 	title, err := mustLangJSON(in.TitleJSON)
 	if err != nil {
@@ -261,7 +261,7 @@ func (r *ContentRepo) createPost(ctx context.Context, in PostInput) (*ent.Post, 
 	return p, nil
 }
 
-// UpdatePost 更新（slug/type 不改；内容逐语言 sanitize）。
+// UpdatePost 更新（slug/type 不改；內容逐語言 sanitize）。
 func (r *ContentRepo) updatePost(ctx context.Context, id uint64, in PostInput) (*ent.Post, error) {
 	if _, err := data.Client(ctx, r.data).Post.Get(ctx, id); err != nil {
 		if ent.IsNotFound(err) {
@@ -302,7 +302,7 @@ func (r *ContentRepo) updatePost(ctx context.Context, id uint64, in PostInput) (
 	return upd.Save(ctx)
 }
 
-// SetPublished 发布/取消（首发回填 published_at）。
+// SetPublished 發佈/取消（首發回填 published_at）。
 func (r *ContentRepo) SetPublished(ctx context.Context, id uint64, publish bool) (*ent.Post, error) {
 	existing, err := data.Client(ctx, r.data).Post.Get(ctx, id)
 	if err != nil {
@@ -313,12 +313,12 @@ func (r *ContentRepo) SetPublished(ctx context.Context, id uint64, publish bool)
 	}
 	upd := data.Client(ctx, r.data).Post.UpdateOneID(id).SetIsPublished(publish)
 	if publish && existing.PublishedAt.IsZero() {
-		upd.SetPublishedAt(time.Now().UTC()) // 首发回填（取消再发布不覆盖）
+		upd.SetPublishedAt(time.Now().UTC()) // 首發回填（取消再發布不覆蓋）
 	}
 	return upd.Save(ctx)
 }
 
-// DeletePost 删除。
+// DeletePost 刪除。
 func (r *ContentRepo) deletePost(ctx context.Context, id uint64) error {
 	err := data.Client(ctx, r.data).Post.DeleteOneID(id).Exec(ctx)
 	if err != nil && ent.IsNotFound(err) {
@@ -341,7 +341,7 @@ func (r *ContentRepo) ListPosts(ctx context.Context, typ string, page, pageSize 
 	return rows, total, err
 }
 
-// ListPublishedPosts 已发布文章分页（type + 栏目过滤；0 栏目 = 全部）。
+// ListPublishedPosts 已發佈文章分頁（type + 欄目過濾；0 欄目 = 全部）。
 func (r *ContentRepo) ListPublishedPosts(ctx context.Context, typ string, categoryID uint64, page, pageSize int) ([]*ent.Post, int, error) {
 	q := data.Client(ctx, r.data).Post.Query().
 		Where(post.IsPublished(true), post.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).
@@ -360,7 +360,7 @@ func (r *ContentRepo) ListPublishedPosts(ctx context.Context, typ string, catego
 	return rows, total, err
 }
 
-// GetPublishedBySlug 按 slug 取已发布文章。
+// GetPublishedBySlug 按 slug 取已發佈文章。
 func (r *ContentRepo) GetPublishedBySlug(ctx context.Context, slug string) (*ent.Post, error) {
 	p, err := data.Client(ctx, r.data).Post.Query().
 		Where(post.Slug(slug), post.IsPublished(true), post.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).
@@ -376,7 +376,7 @@ func (r *ContentRepo) GetPublishedBySlug(ctx context.Context, slug string) (*ent
 
 // ── PostCategory ──────────────────────────────────────────
 
-// CreateCategory 创建分类（slug 唯一）。
+// CreateCategory 創建分類（slug 唯一）。
 func (r *ContentRepo) CreateCategory(ctx context.Context, name, slug string, sort int32) (*ent.PostCategory, error) {
 	c, err := data.Client(ctx, r.data).PostCategory.Create().
 		SetName(name).
@@ -392,7 +392,7 @@ func (r *ContentRepo) CreateCategory(ctx context.Context, name, slug string, sor
 	return c, nil
 }
 
-// UpdateCategory 更新分类。
+// UpdateCategory 更新分類。
 func (r *ContentRepo) UpdateCategory(ctx context.Context, id uint64, name string, sort int32) (*ent.PostCategory, error) {
 	if _, err := data.Client(ctx, r.data).PostCategory.Get(ctx, id); err != nil {
 		if ent.IsNotFound(err) {
@@ -407,7 +407,7 @@ func (r *ContentRepo) UpdateCategory(ctx context.Context, id uint64, name string
 	return upd.Save(ctx)
 }
 
-// DeleteCategory 删除分类（存在文章时拒绝）。
+// DeleteCategory 刪除分類（存在文章時拒絕）。
 func (r *ContentRepo) DeleteCategory(ctx context.Context, id uint64) error {
 	n, err := data.Client(ctx, r.data).Post.Query().
 		Where(post.CategoryID(id)).
@@ -425,16 +425,16 @@ func (r *ContentRepo) DeleteCategory(ctx context.Context, id uint64) error {
 	return err
 }
 
-// ListCategories 分类列表（sort 升序）。
+// ListCategories 分類列表（sort 升序）。
 func (r *ContentRepo) ListCategories(ctx context.Context) ([]*ent.PostCategory, error) {
 	return data.Client(ctx, r.data).PostCategory.Query().
 		Order(ent.Asc(postcategory.FieldSort)).
 		All(ctx)
 }
 
-// ── 多语言工具 ────────────────────────────────────────────
+// ── 多語言工具 ────────────────────────────────────────────
 
-// mustLangJSON 校验并解析多语言 JSON（{"zh_CN": "...", "en": "..."}）。
+// mustLangJSON 校驗並解析多語言 JSON（{"zh_CN": "...", "en": "..."}）。
 func mustLangJSON(s string) (map[string]string, error) {
 	if s == "" {
 		return map[string]string{}, nil
@@ -446,8 +446,8 @@ func mustLangJSON(s string) (map[string]string, error) {
 	return m, nil
 }
 
-// sanitizeLangContent 多语言内容逐语言 sanitize（HTML 白名单）。
-// 输入 {"zh_CN": "<p>ok</p><script>x</script>", ...} → 输出同结构已剥离 XSS。
+// sanitizeLangContent 多語言內容逐語言 sanitize（HTML 白名單）。
+// 輸入 {"zh_CN": "<p>ok</p><script>x</script>", ...} → 輸出同結構已剝離 XSS。
 func sanitizeLangContent(s string) (string, error) {
 	if s == "" {
 		return "", nil
@@ -467,21 +467,21 @@ func sanitizeLangContent(s string) (string, error) {
 	return string(b), nil
 }
 
-// LangValue 多语言回落取值（locale → zh_CN → 首个非空）。
+// LangValue 多語言回落取值（locale → zh_CN → 首個非空）。
 func LangValue(m map[string]string, locale string) string {
 	return i18n.Value(m, locale)
 }
 
-// LangContent 多语言内容回落（content_json 是 Text 存 JSON 字符串）。
+// LangContent 多語言內容回落（content_json 是 Text 存 JSON 字符串）。
 func LangContent(contentJSON, locale string) string {
 	var m map[string]string
 	if err := json.Unmarshal([]byte(contentJSON), &m); err != nil {
-		return contentJSON // 非结构化（防御）：原样返回
+		return contentJSON // 非結構化（防禦）：原樣返回
 	}
 	return LangValue(m, locale)
 }
 
-// mediaIDsOf URL 列表 → 素材 id（/uploads/ 前缀才计）。
+// mediaIDsOf URL 列表 → 素材 id（/uploads/ 前綴才計）。
 func mediaIDsOf(ctx context.Context, d *data.Data, urls ...string) []uint64 {
 	var ids []uint64
 	for _, u := range urls {

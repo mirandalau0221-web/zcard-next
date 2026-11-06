@@ -26,7 +26,7 @@ func (r *PaymentRepoImpl) RefundSocial(ctx context.Context, taskID string) (refu
 			return e
 		}
 		if row.Role != "retail" {
-			return refundInvalid("非零售服务退款")
+			return refundInvalid("非零售服務退款")
 		}
 		o, e := c.Order.Get(ctx, row.OrderID)
 		if e != nil {
@@ -37,18 +37,18 @@ func (r *PaymentRepoImpl) RefundSocial(ctx context.Context, taskID string) (refu
 			return e
 		}
 		if len(items) != 1 || items[0].ID != row.OrderItemID || items[0].DeliveryKind != "social_service" || o.UserID != row.UserID || o.SubsiteID != row.SubsiteID || o.BaseCurrency != "CNY" || o.CommerceVersion != 0 || o.TotalAmount != row.RetailPaidAmount {
-			return refundInvalid("服务零售订单身份或金额异常")
+			return refundInvalid("服務零售訂單身份或金額異常")
 		}
 		paid, e := c.Payment.Query().Where(payment.OrderID(o.ID), payment.StatusEQ(payment.StatusSuccess), payment.ReviewReason("")).Only(ctx)
 		if e != nil || paid.Amount != o.TotalAmount || paid.Fee != 0 {
-			return refundInvalid("服务实付款凭证异常")
+			return refundInvalid("服務實付款憑證異常")
 		}
 		target, has, e := data.SocialRetailRefundLimit(ctx, c, o.ID)
 		if e != nil {
 			return e
 		}
 		if !has {
-			return refundInvalid("服务订单凭证缺失")
+			return refundInvalid("服務訂單憑證缺失")
 		}
 		rows, e := c.RefundOrder.Query().Where(refundorder.OrderID(o.ID)).All(ctx)
 		if e != nil {
@@ -57,21 +57,21 @@ func (r *PaymentRepoImpl) RefundSocial(ctx context.Context, taskID string) (refu
 		var refunded int64
 		for _, rf := range rows {
 			if rf.Status == refundorder.StatusCreated || rf.Status == refundorder.StatusProcessing {
-				return refundInvalid("已有退款待核对")
+				return refundInvalid("已有退款待核對")
 			}
 			if rf.Status == refundorder.StatusSucceeded {
 				if rf.Amount < 0 || rf.Amount > o.TotalAmount-refunded {
-					return refundInvalid("历史退款金额异常")
+					return refundInvalid("歷史退款金額異常")
 				}
 				refunded += rf.Amount
 			}
 		}
 		if refunded > target {
-			return refundInvalid("退款超过已确认服务额度，请核对")
+			return refundInvalid("退款超過已確認服務額度，請核對")
 		}
 		refundID = row.RefundID
 		if target > refunded {
-			receipt, e := r.RefundToWallet(ctx, o.ID, target-refunded, &refunded, "服务供货已确认退款", 0)
+			receipt, e := r.RefundToWallet(ctx, o.ID, target-refunded, &refunded, "服務供貨已確認退款", 0)
 			if e != nil {
 				return e
 			}

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// 结构化链接列表编辑器（footer.nav / footer.social / promo.nav_recommend 共用）：
-// 值为 JSON 数组 [{text|icon, url}]；空列表存 null（前台回落默认）。
-// 替代原 JSON textarea（大厂模式：结构化行编辑 + 上下移排序 + 增删，杜绝手写 JSON 出错）。
+// 結構化鏈接列表編輯器（footer.nav / footer.social / promo.nav_recommend 共用）：
+// 值為 JSON 數組 [{text|icon, url}]；空列表存 null（前台回落默認）。
+// 替代原 JSON textarea（大廠模式：結構化行編輯 + 上下移排序 + 增刪，杜絕手寫 JSON 出錯）。
 import { ref, watch } from "vue";
 import { NButton, NInput } from "naive-ui";
 
@@ -10,13 +10,13 @@ type LinkItem = { text?: string; icon?: string; url?: string };
 const props = withDefaults(
   defineProps<{
     value: string | null;
-    /** true = 图标模式（[{icon,url}]，如页脚社交）；false = 文字模式（[{text,url}]） */
+    /** true = 圖標模式（[{icon,url}]，如頁腳社交）；false = 文字模式（[{text,url}]） */
     icon?: boolean;
     textPlaceholder?: string;
     urlPlaceholder?: string;
     max?: number;
   }>(),
-  { icon: false, textPlaceholder: "显示文字", urlPlaceholder: "跳转链接 https://… 或站内路径 /products", max: 8 },
+  { icon: false, textPlaceholder: "顯示文字", urlPlaceholder: "跳轉鏈接 https://… 或站內路徑 /products", max: 8 },
 );
 
 const emit = defineEmits<{ (e: "update", v: LinkItem[] | null): void }>();
@@ -37,7 +37,7 @@ function parse(v: string | null) {
       return;
     }
   } catch {
-    /* 非法 JSON（旧 textarea 手写残留）：按空处理，保存时被结构化值覆盖 */
+    /* 非法 JSON（舊 textarea 手寫殘留）：按空處理，保存時被結構化值覆蓋 */
   }
   items.value = [];
 }
@@ -83,7 +83,7 @@ function move(i: number, dir: -1 | 1) {
         size="small"
         style="width: 110px; flex-shrink: 0;"
         :maxlength="icon ? 4 : 20"
-        :placeholder="icon ? '图标 emoji' : textPlaceholder"
+        :placeholder="icon ? '圖標 emoji' : textPlaceholder"
         @update:value="(v: string) => { icon ? (it.icon = v) : (it.text = v); push(); }"
       />
       <NInput
@@ -93,11 +93,11 @@ function move(i: number, dir: -1 | 1) {
         :placeholder="urlPlaceholder"
         @update:value="push"
       />
-      <NButton size="small" quaternary type="error" class="shrink-0" @click="remove(i)">删除</NButton>
+      <NButton size="small" quaternary type="error" class="shrink-0" @click="remove(i)">刪除</NButton>
     </div>
     <div class="flex items-center gap-8px">
       <NButton v-if="items.length < max" size="small" dashed class="w-96px" @click="add">+ 添加</NButton>
-      <span v-if="!items.length" class="text-11px text-gray-400">未配置——前台显示默认内容</span>
+      <span v-if="!items.length" class="text-11px text-gray-400">未配置——前台顯示默認內容</span>
     </div>
   </div>
 </template>

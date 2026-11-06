@@ -10,7 +10,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/payment/port"
 )
 
-// slowDrivers 慢支付渠道驱动名单（usdt 族）。
+// slowDrivers 慢支付渠道驅動名單（usdt 族）。
 var slowDrivers = map[string]bool{
 	"epusdt":  true,
 	"bepusdt": true,

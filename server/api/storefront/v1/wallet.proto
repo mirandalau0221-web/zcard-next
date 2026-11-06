@@ -9,35 +9,35 @@ import "storefront/v1/payment.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// StoreWalletService 顾客钱包：余额/积分/流水/充值。
+// StoreWalletService 顧客錢包：餘額/積分/流水/充值。
 service StoreWalletService {
-  // GetBalance 余额+积分。
+  // GetBalance 餘額+積分。
   rpc GetBalance(google.protobuf.Empty) returns (BalanceReply) {
     option (google.api.http) = { get: "/api/v1/storefront/wallet" };
   }
-  // ListTransactions 流水（余额）。
+  // ListTransactions 流水（餘額）。
   rpc ListTransactions(ListTxRequest) returns (ListTxReply) {
     option (google.api.http) = { get: "/api/v1/storefront/wallet/transactions" };
   }
-  // CreateRecharge 充值（走支付管线）。
+  // CreateRecharge 充值（走支付管線）。
   rpc CreateRecharge(CreateRechargeRequest) returns (CreateRechargeReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/wallet/recharge"
       body: "*"
     };
   }
-  // RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破；余额入账幂等键 giftcard:<id>）。
+  // RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
   rpc RedeemGiftcard(RedeemGiftcardRequest) returns (RedeemGiftcardReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/wallet/giftcards/redeem"
       body: "*"
     };
   }
-  // ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+  // ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
   rpc ListMyWithdrawals(ListMyWithdrawalsRequest) returns (ListMyWithdrawalsReply) {
     option (google.api.http) = { get: "/api/v1/storefront/wallet/withdrawals/mine" };
   }
-  // CreateWithdrawal 提现申请（佣金提现：冻结口径+白名单+USDT 校验； 执行）。
+  // CreateWithdrawal 提現申請（佣金提現：凍結口徑+白名單+USDT 校驗； 執行）。
   rpc CreateWithdrawal(CreateWithdrawalRequest) returns (CreateWithdrawalReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/wallet/withdrawals"
@@ -72,13 +72,13 @@ message Tx {
   string reference = 6;
   string remark = 7;
   int64 created_at = 8;
-  string display_reference = 9; // 展示用业务单号，reference 保留原始幂等键
+  string display_reference = 9; // 展示用業務單號，reference 保留原始冪等鍵
 }
 
 message CreateRechargeRequest {
   int64 amount_cents = 1 [(google.api.field_behavior) = REQUIRED];
   string channel = 2 [(google.api.field_behavior) = REQUIRED];
-  // 方式标识（多方式渠道必填：易支付 alipay/wxpay、USDT 选链；单方式渠道留空）
+  // 方式標識（多方式渠道必填：易支付 alipay/wxpay、USDT 選鏈；單方式渠道留空）
   optional string method = 3;
   string quote_key = 4;
 }
@@ -86,12 +86,12 @@ message CreateRechargeRequest {
 message CreateRechargeReply {
   uint64 recharge_id = 1;
   uint64 payment_id = 2;
-  string type = 3; // redirect | qrcode | params（与 CreatePaymentReply 同构）
-  string payload = 4; // 支付跳转 URL / 二维码内容 / 参数 JSON
+  string type = 3; // redirect | qrcode | params（與 CreatePaymentReply 同構）
+  string payload = 4; // 支付跳轉 URL / 二維碼內容 / 參數 JSON
   PaymentQuote quote = 5;
 }
 
-// RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破限流；余额入账幂等键 giftcard:<id>）。
+// RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破限流；餘額入賬冪等鍵 giftcard:<id>）。
 message RedeemGiftcardRequest {
   string code = 1 [(google.api.field_behavior) = REQUIRED];
 }
@@ -123,20 +123,20 @@ message MyWithdrawalItem {
   int64 reviewed_at = 9;
   int64 paid_at = 10;
   int64 created_at = 11;
-  string receipt = 12; // 打款回执（流水号/备注）
+  string receipt = 12; // 打款回執（流水號/備註）
 }
 
-// CreateWithdrawalRequest 提现申请（金额/收款方式；method_type 须在白名单内）。
+// CreateWithdrawalRequest 提現申請（金額/收款方式；method_type 須在白名單內）。
 message CreateWithdrawalRequest {
   int64 amount_cents = 1 [(google.api.field_behavior) = REQUIRED];
-  string method_type = 2 [(google.api.field_behavior) = REQUIRED]; // 白名单 type（alipay/wechat/usdt_trc20/bank）
-  string account = 3 [(google.api.field_behavior) = REQUIRED]; // 收款账号（USDT=TRC20 地址）
-  string qr_code_url = 4; // 收款码图片 URL（微信/支付宝可选；admin 审核展示）
+  string method_type = 2 [(google.api.field_behavior) = REQUIRED]; // 白名單 type（alipay/wechat/usdt_trc20/bank）
+  string account = 3 [(google.api.field_behavior) = REQUIRED]; // 收款賬號（USDT=TRC20 地址）
+  string qr_code_url = 4; // 收款碼圖片 URL（微信/支付寶可選；admin 審核展示）
 }
 
 message CreateWithdrawalReply {
   uint64 withdrawal_id = 1;
   int64 amount_cents = 2;
   int64 fee_cents = 3;
-  int64 credited_cents = 4; // 实际到账 = amount - fee
+  int64 credited_cents = 4; // 實際到賬 = amount - fee
 }

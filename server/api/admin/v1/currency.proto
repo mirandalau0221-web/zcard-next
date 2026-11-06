@@ -8,27 +8,27 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminCurrencyService 货币管理（；多币种展示，记账永远基础货币）。
+// AdminCurrencyService 貨幣管理（；多幣種展示，記賬永遠基礎貨幣）。
 service AdminCurrencyService {
-  // ListCurrencies 全部货币（含停用）。
+  // ListCurrencies 全部貨幣（含停用）。
   rpc ListCurrencies(google.protobuf.Empty) returns (CurrencyList) {
     option (google.api.http) = { get: "/api/v1/admin/currencies" };
   }
-  // CreateCurrency 新增货币（code 唯一）。
+  // CreateCurrency 新增貨幣（code 唯一）。
   rpc CreateCurrency(CreateCurrencyRequest) returns (Currency) {
     option (google.api.http) = {
       post: "/api/v1/admin/currencies"
       body: "*"
     };
   }
-  // UpdateCurrency 修改货币（rate/precision/symbol/启停）。
+  // UpdateCurrency 修改貨幣（rate/precision/symbol/啓停）。
   rpc UpdateCurrency(UpdateCurrencyRequest) returns (Currency) {
     option (google.api.http) = {
       put: "/api/v1/admin/currencies/{code}"
       body: "*"
     };
   }
-  // DeleteCurrency 删除货币（无引用时）。
+  // DeleteCurrency 刪除貨幣（無引用時）。
   rpc DeleteCurrency(DeleteCurrencyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { delete: "/api/v1/admin/currencies/{code}" };
   }
@@ -38,7 +38,7 @@ message CurrencyList {
   repeated Currency currencies = 1;
 }
 
-// Currency 货币（rate 为 decimal 字符串）。
+// Currency 貨幣（rate 為 decimal 字符串）。
 message Currency {
   string code = 1;
   string symbol = 2;

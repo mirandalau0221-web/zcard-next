@@ -19,7 +19,7 @@ import (
 var requestKeyPattern = regexp.MustCompile(`^(?:[0-9a-fA-F]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`)
 
 func Required(ctx context.Context) error {
-	return errors.NotFound("order.ACCESS_REQUIRED", i18n.Message(ctx, "order.access_required", "订单访问凭证无效，请使用保存的访问链接或通过下单邮箱验证"))
+	return errors.NotFound("order.ACCESS_REQUIRED", i18n.Message(ctx, "order.access_required", "訂單訪問憑證無效，請使用保存的訪問鏈接或通過下單郵箱驗證"))
 }
 
 // SecureRequestKey accepts the 128-bit random formats emitted by the storefront.

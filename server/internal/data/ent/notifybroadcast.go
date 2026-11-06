@@ -24,21 +24,21 @@ type NotifyBroadcast struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
-	// 正文（群发渠道适配：inbox 原文/email HTML）
+	// 正文（羣發渠道適配：inbox 原文/email HTML）
 	Content string `json:"content,omitempty"`
 	// 投放通道集合（inbox/email/sms/telegram）
 	Channels []string `json:"channels,omitempty"`
-	// 目标筛选
+	// 目標篩選
 	TargetType notifybroadcast.TargetType `json:"target_type,omitempty"`
-	// specified 时的用户 ID 集合
+	// specified 時的用户 ID 集合
 	TargetIds []uint64 `json:"target_ids,omitempty"`
-	// 定时发送（空=立即）
+	// 定時發送（空=立即）
 	ScheduledAt time.Time `json:"scheduled_at,omitempty"`
 	// Status holds the value of the "status" field.
 	Status notifybroadcast.Status `json:"status,omitempty"`
-	// 创建管理员
+	// 創建管理員
 	CreatedBy uint64 `json:"created_by,omitempty"`
-	// 覆盖人数（发送时预估回填）
+	// 覆蓋人數（發送時預估回填）
 	Audience int64 `json:"audience,omitempty"`
 	// SentCount holds the value of the "sent_count" field.
 	SentCount int64 `json:"sent_count,omitempty"`

@@ -188,7 +188,7 @@ func (x *GetDailyStatsReply) GetPoints() []*DailyStatPoint {
 
 type GetDashboardRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TrendDays     int32                  `protobuf:"varint,1,opt,name=trend_days,json=trendDays,proto3" json:"trend_days,omitempty"` // 全部图表与排行天数：1/7/14/30，默认 7
+	TrendDays     int32                  `protobuf:"varint,1,opt,name=trend_days,json=trendDays,proto3" json:"trend_days,omitempty"` // 全部圖表與排行天數：1/7/14/30，默認 7
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -235,12 +235,12 @@ type DashboardStat struct {
 	Orders            int64                  `protobuf:"varint,1,opt,name=orders,proto3" json:"orders,omitempty"`
 	Revenue           int64                  `protobuf:"varint,2,opt,name=revenue,proto3" json:"revenue,omitempty"` // 分
 	PaidOrders        int64                  `protobuf:"varint,3,opt,name=paid_orders,json=paidOrders,proto3" json:"paid_orders,omitempty"`
-	Cost              int64                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`                                                      // 已支付订单成本（分）
-	Profit            int64                  `protobuf:"varint,5,opt,name=profit,proto3" json:"profit,omitempty"`                                                  // 预估毛利 = net_revenue - cost（分）；成本不完整时不可用
-	NewUsers          int64                  `protobuf:"varint,6,opt,name=new_users,json=newUsers,proto3" json:"new_users,omitempty"`                              // 全站新增注册用户
-	Refunds           int64                  `protobuf:"varint,7,opt,name=refunds,proto3" json:"refunds,omitempty"`                                                // 时段内成功退款
-	NetRevenue        int64                  `protobuf:"varint,8,opt,name=net_revenue,json=netRevenue,proto3" json:"net_revenue,omitempty"`                        // 支付金额减成功退款
-	UnknownCostOrders int64                  `protobuf:"varint,9,opt,name=unknown_cost_orders,json=unknownCostOrders,proto3" json:"unknown_cost_orders,omitempty"` // 成本不完整时不展示利润
+	Cost              int64                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`                                                      // 已支付訂單成本（分）
+	Profit            int64                  `protobuf:"varint,5,opt,name=profit,proto3" json:"profit,omitempty"`                                                  // 預估毛利 = net_revenue - cost（分）；成本不完整時不可用
+	NewUsers          int64                  `protobuf:"varint,6,opt,name=new_users,json=newUsers,proto3" json:"new_users,omitempty"`                              // 全站新增註冊用户
+	Refunds           int64                  `protobuf:"varint,7,opt,name=refunds,proto3" json:"refunds,omitempty"`                                                // 時段內成功退款
+	NetRevenue        int64                  `protobuf:"varint,8,opt,name=net_revenue,json=netRevenue,proto3" json:"net_revenue,omitempty"`                        // 支付金額減成功退款
+	UnknownCostOrders int64                  `protobuf:"varint,9,opt,name=unknown_cost_orders,json=unknownCostOrders,proto3" json:"unknown_cost_orders,omitempty"` // 成本不完整時不展示利潤
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -343,9 +343,9 @@ type DashboardTrendPoint struct {
 	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
 	Orders        int64                  `protobuf:"varint,2,opt,name=orders,proto3" json:"orders,omitempty"`
 	Revenue       int64                  `protobuf:"varint,3,opt,name=revenue,proto3" json:"revenue,omitempty"`                      // 分
-	PaidCount     int64                  `protobuf:"varint,4,opt,name=paid_count,json=paidCount,proto3" json:"paid_count,omitempty"` // 已支付单数
-	Cost          int64                  `protobuf:"varint,5,opt,name=cost,proto3" json:"cost,omitempty"`                            // 已支付订单成本（分）
-	Profit        int64                  `protobuf:"varint,6,opt,name=profit,proto3" json:"profit,omitempty"`                        // 预估毛利（分）
+	PaidCount     int64                  `protobuf:"varint,4,opt,name=paid_count,json=paidCount,proto3" json:"paid_count,omitempty"` // 已支付單數
+	Cost          int64                  `protobuf:"varint,5,opt,name=cost,proto3" json:"cost,omitempty"`                            // 已支付訂單成本（分）
+	Profit        int64                  `protobuf:"varint,6,opt,name=profit,proto3" json:"profit,omitempty"`                        // 預估毛利（分）
 	Refunds       int64                  `protobuf:"varint,7,opt,name=refunds,proto3" json:"refunds,omitempty"`
 	NetRevenue    int64                  `protobuf:"varint,8,opt,name=net_revenue,json=netRevenue,proto3" json:"net_revenue,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -515,7 +515,7 @@ type DashboardTopChannel struct {
 	ChannelId     uint64                 `protobuf:"varint,5,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
 	Name          string                 `protobuf:"bytes,6,opt,name=name,proto3" json:"name,omitempty"`
 	ChannelState  string                 `protobuf:"bytes,7,opt,name=channel_state,json=channelState,proto3" json:"channel_state,omitempty"` // active/disabled/deleted/legacy
-	Amount        int64                  `protobuf:"varint,8,opt,name=amount,proto3" json:"amount,omitempty"`                                // 订单支付金额，基础币分
+	Amount        int64                  `protobuf:"varint,8,opt,name=amount,proto3" json:"amount,omitempty"`                                // 訂單支付金額，基礎幣分
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -608,15 +608,15 @@ func (x *DashboardTopChannel) GetAmount() int64 {
 
 type DashboardPending struct {
 	state                       protoimpl.MessageState `protogen:"open.v1"`
-	PendingWithdrawals          int64                  `protobuf:"varint,1,opt,name=pending_withdrawals,json=pendingWithdrawals,proto3" json:"pending_withdrawals,omitempty"`                              // 待审核提现
-	PendingRefunds              int64                  `protobuf:"varint,2,opt,name=pending_refunds,json=pendingRefunds,proto3" json:"pending_refunds,omitempty"`                                          // 待处理退款（refund_pending）
-	FulfillingOrders            int64                  `protobuf:"varint,3,opt,name=fulfilling_orders,json=fulfillingOrders,proto3" json:"fulfilling_orders,omitempty"`                                    // 履约中订单
-	LowStockProducts            int64                  `protobuf:"varint,4,opt,name=low_stock_products,json=lowStockProducts,proto3" json:"low_stock_products,omitempty"`                                  // 库存预警商品数
-	PendingSupplierApplications int64                  `protobuf:"varint,5,opt,name=pending_supplier_applications,json=pendingSupplierApplications,proto3" json:"pending_supplier_applications,omitempty"` // 待审对接申请（supplier_accounts applying）
-	OpenTickets                 int64                  `protobuf:"varint,6,opt,name=open_tickets,json=openTickets,proto3" json:"open_tickets,omitempty"`                                                   // 待回复工单
-	ProcessingTickets           int64                  `protobuf:"varint,7,opt,name=processing_tickets,json=processingTickets,proto3" json:"processing_tickets,omitempty"`                                 // 处理中工单
-	PaymentReviews              int64                  `protobuf:"varint,9,opt,name=payment_reviews,json=paymentReviews,proto3" json:"payment_reviews,omitempty"`                                          // 到账待核对，包含已删除订单
-	UrgentTickets               int64                  `protobuf:"varint,8,opt,name=urgent_tickets,json=urgentTickets,proto3" json:"urgent_tickets,omitempty"`                                             // 未解决的付费加急工单，包含在上述两项中
+	PendingWithdrawals          int64                  `protobuf:"varint,1,opt,name=pending_withdrawals,json=pendingWithdrawals,proto3" json:"pending_withdrawals,omitempty"`                              // 待審核提現
+	PendingRefunds              int64                  `protobuf:"varint,2,opt,name=pending_refunds,json=pendingRefunds,proto3" json:"pending_refunds,omitempty"`                                          // 待處理退款（refund_pending）
+	FulfillingOrders            int64                  `protobuf:"varint,3,opt,name=fulfilling_orders,json=fulfillingOrders,proto3" json:"fulfilling_orders,omitempty"`                                    // 履約中訂單
+	LowStockProducts            int64                  `protobuf:"varint,4,opt,name=low_stock_products,json=lowStockProducts,proto3" json:"low_stock_products,omitempty"`                                  // 庫存預警商品數
+	PendingSupplierApplications int64                  `protobuf:"varint,5,opt,name=pending_supplier_applications,json=pendingSupplierApplications,proto3" json:"pending_supplier_applications,omitempty"` // 待審對接申請（supplier_accounts applying）
+	OpenTickets                 int64                  `protobuf:"varint,6,opt,name=open_tickets,json=openTickets,proto3" json:"open_tickets,omitempty"`                                                   // 待回覆工單
+	ProcessingTickets           int64                  `protobuf:"varint,7,opt,name=processing_tickets,json=processingTickets,proto3" json:"processing_tickets,omitempty"`                                 // 處理中工單
+	PaymentReviews              int64                  `protobuf:"varint,9,opt,name=payment_reviews,json=paymentReviews,proto3" json:"payment_reviews,omitempty"`                                          // 到賬待核對，包含已刪除訂單
+	UrgentTickets               int64                  `protobuf:"varint,8,opt,name=urgent_tickets,json=urgentTickets,proto3" json:"urgent_tickets,omitempty"`                                             // 未解決的付費加急工單，包含在上述兩項中
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
 }
@@ -716,7 +716,7 @@ func (x *DashboardPending) GetUrgentTickets() int64 {
 
 type GetTrafficRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Days          int32                  `protobuf:"varint,1,opt,name=days,proto3" json:"days,omitempty"` // 7/14/30，默认 7
+	Days          int32                  `protobuf:"varint,1,opt,name=days,proto3" json:"days,omitempty"` // 7/14/30，默認 7
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -761,8 +761,8 @@ func (x *GetTrafficRequest) GetDays() int32 {
 type TrafficPoint struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"` // yyyy-mm-dd
-	Pv            int64                  `protobuf:"varint,2,opt,name=pv,proto3" json:"pv,omitempty"`    // 访问量
-	Uv            int64                  `protobuf:"varint,3,opt,name=uv,proto3" json:"uv,omitempty"`    // 独立访客（按 IP 去重）
+	Pv            int64                  `protobuf:"varint,2,opt,name=pv,proto3" json:"pv,omitempty"`    // 訪問量
+	Uv            int64                  `protobuf:"varint,3,opt,name=uv,proto3" json:"uv,omitempty"`    // 獨立訪客（按 IP 去重）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -869,16 +869,16 @@ type DashboardReply struct {
 	Last30D       *DashboardStat         `protobuf:"bytes,3,opt,name=last30d,proto3" json:"last30d,omitempty"`
 	Trend         []*DashboardTrendPoint `protobuf:"bytes,4,rep,name=trend,proto3" json:"trend,omitempty"`
 	TopProducts   []*DashboardTopProduct `protobuf:"bytes,5,rep,name=top_products,json=topProducts,proto3" json:"top_products,omitempty"`
-	Yesterday     *DashboardStat         `protobuf:"bytes,6,opt,name=yesterday,proto3" json:"yesterday,omitempty"` // 环比基准（今日 vs 昨日）
-	Prev7D        *DashboardStat         `protobuf:"bytes,7,opt,name=prev7d,proto3" json:"prev7d,omitempty"`       // 环比基准（近7天 vs 前7天）
-	Prev30D       *DashboardStat         `protobuf:"bytes,8,opt,name=prev30d,proto3" json:"prev30d,omitempty"`     // 环比基准（近30天 vs 前30天）
+	Yesterday     *DashboardStat         `protobuf:"bytes,6,opt,name=yesterday,proto3" json:"yesterday,omitempty"` // 環比基準（今日 vs 昨日）
+	Prev7D        *DashboardStat         `protobuf:"bytes,7,opt,name=prev7d,proto3" json:"prev7d,omitempty"`       // 環比基準（近7天 vs 前7天）
+	Prev30D       *DashboardStat         `protobuf:"bytes,8,opt,name=prev30d,proto3" json:"prev30d,omitempty"`     // 環比基準（近30天 vs 前30天）
 	TopChannels   []*DashboardTopChannel `protobuf:"bytes,9,rep,name=top_channels,json=topChannels,proto3" json:"top_channels,omitempty"`
 	Pending       *DashboardPending      `protobuf:"bytes,10,opt,name=pending,proto3" json:"pending,omitempty"`
 	RangeStart    int64                  `protobuf:"varint,12,opt,name=range_start,json=rangeStart,proto3" json:"range_start,omitempty"`
 	RangeEnd      int64                  `protobuf:"varint,13,opt,name=range_end,json=rangeEnd,proto3" json:"range_end,omitempty"`
 	GeneratedAt   int64                  `protobuf:"varint,14,opt,name=generated_at,json=generatedAt,proto3" json:"generated_at,omitempty"`
 	SubsiteId     uint64                 `protobuf:"varint,15,opt,name=subsite_id,json=subsiteId,proto3" json:"subsite_id,omitempty"`
-	OnlineUsers   int64                  `protobuf:"varint,11,opt,name=online_users,json=onlineUsers,proto3" json:"online_users,omitempty"` // 当前在线用户数（5 分钟活跃窗口）
+	OnlineUsers   int64                  `protobuf:"varint,11,opt,name=online_users,json=onlineUsers,proto3" json:"online_users,omitempty"` // 當前在線用户數（5 分鐘活躍窗口）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1271,7 +1271,7 @@ func (x *ListCommissionsReply) GetPageSize() int32 {
 	return 0
 }
 
-// GetReconciliation 对账总览（：订单×支付×佣金三向核对基础报表）。
+// GetReconciliation 對賬總覽（：訂單×支付×佣金三向核對基礎報表）。
 type GetReconciliationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"` // yyyymmdd；空 = 最新
@@ -1319,12 +1319,12 @@ func (x *GetReconciliationRequest) GetDate() string {
 type ReconciliationSummary struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	Date                string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
-	OrderPaidTotal      int64                  `protobuf:"varint,2,opt,name=order_paid_total,json=orderPaidTotal,proto3" json:"order_paid_total,omitempty"`                // 当日已支付订单额（分）
-	PaymentSuccessTotal int64                  `protobuf:"varint,3,opt,name=payment_success_total,json=paymentSuccessTotal,proto3" json:"payment_success_total,omitempty"` // 当日支付单成功额（分）
-	WalletRechargeTotal int64                  `protobuf:"varint,4,opt,name=wallet_recharge_total,json=walletRechargeTotal,proto3" json:"wallet_recharge_total,omitempty"` // 当日钱包充值（分）
-	CommissionTotal     int64                  `protobuf:"varint,5,opt,name=commission_total,json=commissionTotal,proto3" json:"commission_total,omitempty"`               // 当日佣金计提（分）
+	OrderPaidTotal      int64                  `protobuf:"varint,2,opt,name=order_paid_total,json=orderPaidTotal,proto3" json:"order_paid_total,omitempty"`                // 當日已支付訂單額（分）
+	PaymentSuccessTotal int64                  `protobuf:"varint,3,opt,name=payment_success_total,json=paymentSuccessTotal,proto3" json:"payment_success_total,omitempty"` // 當日支付單成功額（分）
+	WalletRechargeTotal int64                  `protobuf:"varint,4,opt,name=wallet_recharge_total,json=walletRechargeTotal,proto3" json:"wallet_recharge_total,omitempty"` // 當日錢包充值（分）
+	CommissionTotal     int64                  `protobuf:"varint,5,opt,name=commission_total,json=commissionTotal,proto3" json:"commission_total,omitempty"`               // 當日佣金計提（分）
 	OrderCount          int64                  `protobuf:"varint,6,opt,name=order_count,json=orderCount,proto3" json:"order_count,omitempty"`
-	MismatchCount       int64                  `protobuf:"varint,7,opt,name=mismatch_count,json=mismatchCount,proto3" json:"mismatch_count,omitempty"` // 订单/支付额差异数（>0 需人工）
+	MismatchCount       int64                  `protobuf:"varint,7,opt,name=mismatch_count,json=mismatchCount,proto3" json:"mismatch_count,omitempty"` // 訂單/支付額差異數（>0 需人工）
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }

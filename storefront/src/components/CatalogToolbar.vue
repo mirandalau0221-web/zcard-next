@@ -5,9 +5,9 @@ import { computed } from 'vue';
 const props = defineProps<{ title: string; sort: string; view: 'grid' | 'list'; loading: boolean; showSales: boolean }>();
 const emit = defineEmits<{ sort: [string]; view: ['grid' | 'list'] }>();
 const options = computed(() => [
-  { value: 'default', get label() { return $t("综合排序"); } }, { value: 'sales', get label() { return $t("销量优先"); } },
-  { value: 'newest', get label() { return $t("最新上架"); } }, { value: 'price_asc', get label() { return $t("价格从低到高"); } },
-  { value: 'price_desc', get label() { return $t("价格从高到低"); } },
+  { value: 'default', get label() { return $t("綜合排序"); } }, { value: 'sales', get label() { return $t("銷量優先"); } },
+  { value: 'newest', get label() { return $t("最新上架"); } }, { value: 'price_asc', get label() { return $t("價格從低到高"); } },
+  { value: 'price_desc', get label() { return $t("價格從高到低"); } },
 ].filter(option => props.showSales || option.value !== 'sales'));
 const sortTabs = computed(() => options.value.filter(option => !option.value.startsWith('price_')));
 function selectSort(event: Event) { emit('sort', (event.target as HTMLSelectElement).value); }
@@ -19,15 +19,15 @@ function selectSort(event: Event) { emit('sort', (event.target as HTMLSelectElem
     <div class="catalog-tools">
       <span class="catalog-progress" role="status">{{ loading ? $t('更新中…') : '' }}</span>
       <div class="catalog-sort-tabs" role="group" :aria-label="$t('商品排序')">
-        <button v-for="option in sortTabs" :key="option.value" type="button" :aria-pressed="sort === option.value" @click="emit('sort', option.value)">{{ { default: $t('综合'), sales: $t('销量'), newest: $t('最新') }[option.value] }}</button>
-        <button type="button" :aria-pressed="sort.startsWith('price_')" :aria-label="sort === 'price_asc' ? $t('价格从低到高，点击改为从高到低') : $t('价格排序，点击从低到高')" @click="emit('sort', props.sort === 'price_asc' ? 'price_desc' : 'price_asc')">{{ $t('价格') }} <span aria-hidden="true">{{ sort === 'price_asc' ? '↑' : sort === 'price_desc' ? '↓' : '↕' }}</span></button>
+        <button v-for="option in sortTabs" :key="option.value" type="button" :aria-pressed="sort === option.value" @click="emit('sort', option.value)">{{ { default: $t('綜合'), sales: $t('銷量'), newest: $t('最新') }[option.value] }}</button>
+        <button type="button" :aria-pressed="sort.startsWith('price_')" :aria-label="sort === 'price_asc' ? $t('價格從低到高，點擊改為從高到低') : $t('價格排序，點擊從低到高')" @click="emit('sort', props.sort === 'price_asc' ? 'price_desc' : 'price_asc')">{{ $t('價格') }} <span aria-hidden="true">{{ sort === 'price_asc' ? '↑' : sort === 'price_desc' ? '↓' : '↕' }}</span></button>
       </div>
       <select class="catalog-sort-select" :aria-label="$t('商品排序')" :value="sort" @change="selectSort">
         <option v-for="option in options" :key="option.value" :value="option.value">{{ option.label }}</option>
       </select>
-      <div class="catalog-views" role="group" :aria-label="$t('商品视图')">
-        <button type="button" :title="$t('网格视图')" :aria-label="$t('网格视图')" :aria-pressed="view === 'grid'" @click="emit('view', 'grid')"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
-        <button type="button" :title="$t('列表视图')" :aria-label="$t('列表视图')" :aria-pressed="view === 'list'" @click="emit('view', 'list')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></button>
+      <div class="catalog-views" role="group" :aria-label="$t('商品視圖')">
+        <button type="button" :title="$t('網格視圖')" :aria-label="$t('網格視圖')" :aria-pressed="view === 'grid'" @click="emit('view', 'grid')"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+        <button type="button" :title="$t('列表視圖')" :aria-label="$t('列表視圖')" :aria-pressed="view === 'list'" @click="emit('view', 'list')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg></button>
       </div>
     </div>
   </div>

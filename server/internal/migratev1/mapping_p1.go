@@ -1,8 +1,8 @@
 package migratev1
 
-// P1 身份域迁移：users（+wallet/point 快照）→ admin 提取 → invite 链二次遍历。
-// 映射规格《数据迁移工具开发计划》§5.2；密码 bcrypt 直迁（$2y$ 前缀保留，
-// Go x/crypto/bcrypt 可校验——golden vector 钉死）。
+// P1 身份域遷移：users（+wallet/point 快照）→ admin 提取 → invite 鏈二次遍歷。
+// 映射規格《數據遷移工具開發計劃》§5.2；密碼 bcrypt 直遷（$2y$ 前綴保留，
+// Go x/crypto/bcrypt 可校驗——golden vector 釘死）。
 
 import (
 	"context"
@@ -16,10 +16,10 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/authz"
 )
 
-// v1UserMorph spatie model_type（参数绑定传递，避免反斜杠字面量的方言差异）。
+// v1UserMorph spatie model_type（參數綁定傳遞，避免反斜槓字面量的方言差異）。
 const v1UserMorph = "App\\Models\\User"
 
-// MigrateIdentity P1 阶段。
+// MigrateIdentity P1 階段。
 func (m *Migrator) MigrateIdentity(ctx context.Context) error {
 	if err := m.migrateUsers(ctx); err != nil {
 		return err
@@ -30,9 +30,9 @@ func (m *Migrator) MigrateIdentity(ctx context.Context) error {
 	return m.migrateInviteChain(ctx)
 }
 
-// migrateUsers 1.x users → users + wallet_accounts + point_accounts（快照三写）。
-// 丢弃列（2.0 无对应，报告统计）：name/qq/avatar/login_ip/total_recharge/total_consumption。
-// 1.x 明确组的等级权益不落列：2.0 由阈值实时推导，交易域迁完后自动恢复。
+// migrateUsers 1.x users → users + wallet_accounts + point_accounts（快照三寫）。
+// 丟棄列（2.0 無對應，報告統計）：name/qq/avatar/login_ip/total_recharge/total_consumption。
+// 1.x 明確組的等級權益不落列：2.0 由閾值實時推導，交易域遷完後自動恢復。
 func (m *Migrator) migrateUsers(ctx context.Context) error {
 	var (
 		id, balance, points                        int64
@@ -55,10 +55,10 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 				return nil
 			}
 			if gid := nullInt(groupID); gid > 0 {
-				// 显式组对照关系（供对账/客服追溯；等级权益本身由阈值推导）
+				// 顯式組對照關係（供對賬/客服追溯；等級權益本身由閾值推導）
 				if _, ok := m.IDs.Get(ctx, "user_groups", uint64(gid)); !ok {
 					m.RW.AddError("users", uint64(id),
-						fmt.Sprintf("显式用户组 %d 无对应 member_level（等级将按阈值推导）", gid))
+						fmt.Sprintf("顯式用户組 %d 無對應 member_level（等級將按閾值推導）", gid))
 				}
 			}
 			st := user.StatusActive
@@ -81,7 +81,7 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 				return err
 			}
 			if exists {
-				return fmt.Errorf("用户名 %q 已存在于目标库（重复迁移或与 2.0 存量冲突）", username)
+				return fmt.Errorf("用户名 %q 已存在於目標庫（重複遷移或與 2.0 存量衝突）", username)
 			}
 			var lastLoginAt *time.Time
 			if t, ok, err := mustTime(nullStr(lastLogin), m.TZ); err != nil {
@@ -96,7 +96,7 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 				SetNillablePasswordHash(nilIfEmpty(password)).
 				SetStatus(st).
 				SetNillableLastLoginAt(lastLoginAt)
-			if caOK { // 直插行可能零日期——不 Set 走 ent 默认（与 reviews 同防御）
+			if caOK { // 直插行可能零日期——不 Set 走 ent 默認（與 reviews 同防禦）
 				ub = ub.SetCreatedAt(ca)
 			}
 			if uaOK {
@@ -106,19 +106,19 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			// 钱包/积分快照（账务流水自 P5 重放，此处只建快照）
+			// 錢包/積分快照（賬務流水自 P5 重放，此處只建快照）
 			if _, err := m.Client.WalletAccount.Create().
 				SetUserID(u.ID).
 				SetAvailable(balance).
 				Save(ctx); err != nil {
-				return fmt.Errorf("钱包快照失败: %w", err)
+				return fmt.Errorf("錢包快照失敗: %w", err)
 			}
 			if points != 0 {
 				if _, err := m.Client.PointAccount.Create().
 					SetUserID(u.ID).
 					SetBalance(points).
 					Save(ctx); err != nil {
-					return fmt.Errorf("积分快照失败: %w", err)
+					return fmt.Errorf("積分快照失敗: %w", err)
 				}
 			}
 			if _, err := m.IDs.Put(ctx, m.Client, "users", uint64(id), u.ID); err != nil {
@@ -130,8 +130,8 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 	)
 }
 
-// migrateAdmins 1.x spatie 角色提取 → admin_users（username/password bcrypt 直迁）。
-// 1.x admin 与普通用户分属两表，无命名冲突；2.0 需先种内置角色再挂超管。
+// migrateAdmins 1.x spatie 角色提取 → admin_users（username/password bcrypt 直遷）。
+// 1.x admin 與普通用户分屬兩表，無命名衝突；2.0 需先種內置角色再掛超管。
 func (m *Migrator) migrateAdmins(ctx context.Context) error {
 	if m.dry {
 		return m.dryCount(ctx,
@@ -141,11 +141,11 @@ func (m *Migrator) migrateAdmins(ctx context.Context) error {
 			"admin_users", v1UserMorph)
 	}
 	if err := authz.EnsureBuiltinRoles(ctx, m.Client); err != nil {
-		return fmt.Errorf("内置角色种子失败: %w", err)
+		return fmt.Errorf("內置角色種子失敗: %w", err)
 	}
 	role, err := m.Client.AdminRole.Query().Where(adminrole.Code("super_admin")).Only(ctx)
 	if err != nil {
-		return fmt.Errorf("查询内置超管角色失败: %w", err)
+		return fmt.Errorf("查詢內置超管角色失敗: %w", err)
 	}
 	rows, err := m.Src.DB.QueryContext(ctx,
 		"SELECT DISTINCT u.id, u.username, u.password, u.name, u.last_login_at FROM users u "+
@@ -200,8 +200,8 @@ func (m *Migrator) migrateAdmins(ctx context.Context) error {
 	return rows.Err()
 }
 
-// migrateInviteChain pid 链 → invite_l1/l2/l3（二次遍历：全部用户落库后再解析依赖）。
-// 环防护：上溯链遇已见节点即止（自身天然在 seen 中）；幂等：已填 invite_l1 的行跳过。
+// migrateInviteChain pid 鏈 → invite_l1/l2/l3（二次遍歷：全部用户落庫後再解析依賴）。
+// 環防護：上溯鏈遇已見節點即止（自身天然在 seen 中）；冪等：已填 invite_l1 的行跳過。
 func (m *Migrator) migrateInviteChain(ctx context.Context) error {
 	if m.dry {
 		return nil
@@ -241,7 +241,7 @@ func (m *Migrator) migrateInviteChain(ctx context.Context) error {
 		if len(chain) == 0 {
 			continue
 		}
-		// 幂等：重跑时链计算结果确定，直接覆盖等价；跳过已填行省一次写
+		// 冪等：重跑時鏈計算結果確定，直接覆蓋等價；跳過已填行省一次寫
 		existing, err := m.Client.User.Get(ctx, newID)
 		if err != nil {
 			return err
@@ -267,7 +267,7 @@ func (m *Migrator) migrateInviteChain(ctx context.Context) error {
 	return nil
 }
 
-// dryCount 通用计数（dry-run 时 admin 提取等手写 SQL 的预估）。
+// dryCount 通用計數（dry-run 時 admin 提取等手寫 SQL 的預估）。
 func (m *Migrator) dryCount(ctx context.Context, query, table string, args ...any) error {
 	var n int64
 	if err := m.Src.DB.QueryRowContext(ctx, query, args...).Scan(&n); err != nil {

@@ -1,5 +1,5 @@
-// Package sanitize HTML 白名单清洗（规划 §5.20.5 防 XSS）。
-// 商品描述、评价内容、文章内容入库前必经；卡密前端展示配 textContent（前端纪律）。
+// Package sanitize HTML 白名單清洗（規劃 §5.20.5 防 XSS）。
+// 商品描述、評價內容、文章內容入庫前必經；卡密前端展示配 textContent（前端紀律）。
 package sanitize
 
 import (
@@ -13,7 +13,7 @@ import (
 func newPolicy() *bluemonday.Policy {
 	p := bluemonday.NewPolicy()
 
-	// 允许的基础标签（白名单制——不在清单内的一律剥离）
+	// 允許的基礎標籤（白名單制——不在清單內的一律剝離）
 	tags := []string{
 		"a", "abbr", "b", "blockquote", "br", "code", "dd", "del", "div",
 		"dl", "dt", "em", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "i",
@@ -25,7 +25,7 @@ func newPolicy() *bluemonday.Policy {
 		p.AllowElements(t)
 	}
 
-	// 属性白名单
+	// 屬性白名單
 	p.AllowAttrs("href", "title").OnElements("a")
 	p.AllowAttrs("src", "alt", "width", "height").OnElements("img")
 	p.AllowAttrs("class").OnElements("div", "span", "p", "code", "pre")
@@ -33,13 +33,13 @@ func newPolicy() *bluemonday.Policy {
 	p.AllowAttrs("colspan", "rowspan").OnElements("td", "th")
 	p.AllowAttrs("start").OnElements("ol")
 
-	// URL 协议白名单
+	// URL 協議白名單
 	p.AllowURLSchemes("http", "https", "mailto")
-	// 相对 URL 放行（富文本插图 = 素材库同源路径 /uploads/**；协议白名单对绝对 URL 仍生效，
-	// data:/javascript: 一律剥离——wangEditor 输出对拍见 sanitize_wang_test.go）
+	// 相對 URL 放行（富文本插圖 = 素材庫同源路徑 /uploads/**；協議白名單對絕對 URL 仍生效，
+	// data:/javascript: 一律剝離——wangEditor 輸出對拍見 sanitize_wang_test.go）
 	p.AllowRelativeURLs(true)
 
-	// 强制 target=_blank rel=noopener（防钓鱼）
+	// 強制 target=_blank rel=noopener（防釣魚）
 	p.AllowAttrs("target").Matching(bluemonday.SpaceSeparatedTokens).OnElements("a")
 	p.RequireNoFollowOnLinks(true)
 	p.RequireNoFollowOnFullyQualifiedLinks(true)
@@ -49,12 +49,12 @@ func newPolicy() *bluemonday.Policy {
 
 var policy = newPolicy()
 
-// HTML 清洗（白名单外标签/属性/协议全部剥离；script/style/on* 事件一律干掉）。
+// HTML 清洗（白名單外標籤/屬性/協議全部剝離；script/style/on* 事件一律幹掉）。
 func HTML(input string) string {
 	return policy.Sanitize(input)
 }
 
-// Text 纯文本（全部标签剥离——卡密展示用）。
+// Text 純文本（全部標籤剝離——卡密展示用）。
 func Text(input string) string {
 	return bluemonday.StrictPolicy().Sanitize(input)
 }

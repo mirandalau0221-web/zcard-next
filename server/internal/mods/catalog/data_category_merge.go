@@ -21,7 +21,7 @@ func (s *AdminCatalogService) MergeCategories(ctx context.Context, req *adminv1.
 	return s.repo.mergeCategories(ctx, req)
 }
 
-// 预览和提交共用校验；商品、子分类、渠道配置与映射在同一事务内迁移。
+// 預覽和提交共用校驗；商品、子分類、渠道配置與映射在同一事務內遷移。
 func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.MergeCategoriesRequest) (*adminv1.MergeCategoriesReply, error) {
 	reply := &adminv1.MergeCategoriesReply{}
 	err := data.Tx(ctx, r.data, func(ctx context.Context) error {
@@ -36,7 +36,7 @@ func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.Merg
 			}
 		}
 		if len(sources) == 0 || req.TargetId == 0 || sources[req.TargetId] {
-			return fmt.Errorf("请选择来源分类和不同的目标分类")
+			return fmt.Errorf("請選擇來源分類和不同的目標分類")
 		}
 		ids := make([]uint64, 0, len(sources))
 		for id := range sources {
@@ -52,21 +52,21 @@ func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.Merg
 			parents[cat.ID] = cat.ParentID
 		}
 		if _, ok := parents[req.TargetId]; !ok {
-			return fmt.Errorf("目标分类不存在")
+			return fmt.Errorf("目標分類不存在")
 		}
 		for id := range sources {
 			if _, ok := parents[id]; !ok {
-				return fmt.Errorf("来源分类已变化，请刷新后重试")
+				return fmt.Errorf("來源分類已變化，請刷新後重試")
 			}
 		}
 		seen := map[uint64]bool{}
 		for id := req.TargetId; id != 0; id = parents[id] {
 			if sources[id] || seen[id] {
-				return fmt.Errorf("不能合并到来源分类的子分类中")
+				return fmt.Errorf("不能合併到來源分類的子分類中")
 			}
 			seen[id] = true
 		}
-		// 分类优惠直接改成目标会扩大优惠范围，因此要求先由运营调整活动。
+		// 分類優惠直接改成目標會擴大優惠範圍，因此要求先由運營調整活動。
 		referenced := func(scope map[string]any) bool {
 			raw, _ := json.Marshal(scope["category_ids"])
 			var values []any
@@ -85,7 +85,7 @@ func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.Merg
 		}
 		for _, row := range coupons {
 			if referenced(row.Scope) {
-				return fmt.Errorf("来源分类被优惠券引用，请先调整优惠券适用范围")
+				return fmt.Errorf("來源分類被優惠券引用，請先調整優惠券適用範圍")
 			}
 		}
 		promotions, err := c.Promotion.Query().All(ctx)
@@ -94,7 +94,7 @@ func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.Merg
 		}
 		for _, row := range promotions {
 			if referenced(row.Scope) {
-				return fmt.Errorf("来源分类被促销活动引用，请先调整活动适用范围")
+				return fmt.Errorf("來源分類被促銷活動引用，請先調整活動適用範圍")
 			}
 		}
 		products, err := c.Product.Query().Where(product.CategoryIDIn(ids...), product.SubsiteID(tenant)).Count(ctx)
@@ -117,7 +117,7 @@ func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.Merg
 			return e
 		}
 		if has {
-			return fmt.Errorf("来源分类设置了置顶或推荐，请先在置顶与推荐面板移除配置，再合并分类")
+			return fmt.Errorf("來源分類設置了置頂或推薦，請先在置頂與推薦面板移除配置，再合併分類")
 		}
 		if req.Preview {
 			return nil
@@ -127,7 +127,7 @@ func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.Merg
 			return err
 		}
 		for _, conn := range conns {
-			// 获取最新配置后修改，避免覆盖其他渠道设置。
+			// 獲取最新配置後修改，避免覆蓋其他渠道設置。
 			if err := c.SupplyConnection.UpdateOneID(conn.ID).AddRetryMax(0).Exec(ctx); err != nil {
 				return err
 			}
@@ -159,7 +159,7 @@ func (r *ProductRepoImpl) mergeCategories(ctx context.Context, req *adminv1.Merg
 		if _, err = c.SupplyMapping.Update().Where(supplymapping.LocalCategoryIDIn(ids...)).SetLocalCategoryID(req.TargetId).Save(ctx); err != nil {
 			return err
 		}
-		// 先解除来源之间父子引用，再统一删除；未选中的子分类已迁移。
+		// 先解除來源之間父子引用，再統一刪除；未選中的子分類已遷移。
 		if _, err = c.Category.Update().Where(category.IDIn(ids...)).ClearParentID().Save(ctx); err != nil {
 			return err
 		}

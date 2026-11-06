@@ -23,13 +23,13 @@ const OperationStoreContentServiceListPostCategories = "/zcard.api.storefront.v1
 const OperationStoreContentServiceListPosts = "/zcard.api.storefront.v1.StoreContentService/ListPosts"
 
 type StoreContentServiceHTTPServer interface {
-	// GetPost GetPost 文章详情（slug；未发布返回 404 语义）。
+	// GetPost GetPost 文章詳情（slug；未發佈返回 404 語義）。
 	GetPost(context.Context, *GetPostRequest) (*GetPostReply, error)
-	// ListBanners ListBanners 生效中横幅（position 过滤 + sort 排序 + 时间窗过滤）。
+	// ListBanners ListBanners 生效中橫幅（position 過濾 + sort 排序 + 時間窗過濾）。
 	ListBanners(context.Context, *ListBannersRequest) (*ListBannersReply, error)
-	// ListPostCategories ListPostCategories 分类列表。
+	// ListPostCategories ListPostCategories 分類列表。
 	ListPostCategories(context.Context, *ListPostCategoriesRequest) (*ListPostCategoriesReply, error)
-	// ListPosts ListPosts 已发布文章分页（type 过滤）。
+	// ListPosts ListPosts 已發佈文章分頁（type 過濾）。
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsReply, error)
 }
 
@@ -121,13 +121,13 @@ func _StoreContentService_ListPostCategories0_HTTP_Handler(srv StoreContentServi
 }
 
 type StoreContentServiceHTTPClient interface {
-	// GetPost GetPost 文章详情（slug；未发布返回 404 语义）。
+	// GetPost GetPost 文章詳情（slug；未發佈返回 404 語義）。
 	GetPost(ctx context.Context, req *GetPostRequest, opts ...http.CallOption) (rsp *GetPostReply, err error)
-	// ListBanners ListBanners 生效中横幅（position 过滤 + sort 排序 + 时间窗过滤）。
+	// ListBanners ListBanners 生效中橫幅（position 過濾 + sort 排序 + 時間窗過濾）。
 	ListBanners(ctx context.Context, req *ListBannersRequest, opts ...http.CallOption) (rsp *ListBannersReply, err error)
-	// ListPostCategories ListPostCategories 分类列表。
+	// ListPostCategories ListPostCategories 分類列表。
 	ListPostCategories(ctx context.Context, req *ListPostCategoriesRequest, opts ...http.CallOption) (rsp *ListPostCategoriesReply, err error)
-	// ListPosts ListPosts 已发布文章分页（type 过滤）。
+	// ListPosts ListPosts 已發佈文章分頁（type 過濾）。
 	ListPosts(ctx context.Context, req *ListPostsRequest, opts ...http.CallOption) (rsp *ListPostsReply, err error)
 }
 
@@ -139,7 +139,7 @@ func NewStoreContentServiceHTTPClient(client *http.Client) StoreContentServiceHT
 	return &StoreContentServiceHTTPClientImpl{client}
 }
 
-// GetPost GetPost 文章详情（slug；未发布返回 404 语义）。
+// GetPost GetPost 文章詳情（slug；未發佈返回 404 語義）。
 func (c *StoreContentServiceHTTPClientImpl) GetPost(ctx context.Context, in *GetPostRequest, opts ...http.CallOption) (*GetPostReply, error) {
 	var out GetPostReply
 	pattern := "/api/v1/storefront/posts/{slug}"
@@ -156,7 +156,7 @@ func (c *StoreContentServiceHTTPClientImpl) GetPost(ctx context.Context, in *Get
 	return &out, nil
 }
 
-// ListBanners ListBanners 生效中横幅（position 过滤 + sort 排序 + 时间窗过滤）。
+// ListBanners ListBanners 生效中橫幅（position 過濾 + sort 排序 + 時間窗過濾）。
 func (c *StoreContentServiceHTTPClientImpl) ListBanners(ctx context.Context, in *ListBannersRequest, opts ...http.CallOption) (*ListBannersReply, error) {
 	var out ListBannersReply
 	pattern := "/api/v1/storefront/banners"
@@ -173,7 +173,7 @@ func (c *StoreContentServiceHTTPClientImpl) ListBanners(ctx context.Context, in 
 	return &out, nil
 }
 
-// ListPostCategories ListPostCategories 分类列表。
+// ListPostCategories ListPostCategories 分類列表。
 func (c *StoreContentServiceHTTPClientImpl) ListPostCategories(ctx context.Context, in *ListPostCategoriesRequest, opts ...http.CallOption) (*ListPostCategoriesReply, error) {
 	var out ListPostCategoriesReply
 	pattern := "/api/v1/storefront/post-categories"
@@ -190,7 +190,7 @@ func (c *StoreContentServiceHTTPClientImpl) ListPostCategories(ctx context.Conte
 	return &out, nil
 }
 
-// ListPosts ListPosts 已发布文章分页（type 过滤）。
+// ListPosts ListPosts 已發佈文章分頁（type 過濾）。
 func (c *StoreContentServiceHTTPClientImpl) ListPosts(ctx context.Context, in *ListPostsRequest, opts ...http.CallOption) (*ListPostsReply, error) {
 	var out ListPostsReply
 	pattern := "/api/v1/storefront/posts"

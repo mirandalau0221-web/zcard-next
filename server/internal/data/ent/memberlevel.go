@@ -30,17 +30,17 @@ type MemberLevel struct {
 	BadgeColor string `json:"badge_color,omitempty"`
 	// ThresholdType holds the value of the "threshold_type" field.
 	ThresholdType memberlevel.ThresholdType `json:"threshold_type,omitempty"`
-	// 累计充值阈值（分；countAsRecharge 口径防刷）
+	// 累計充值閾值（分；countAsRecharge 口徑防刷）
 	ThresholdRecharge int64 `json:"threshold_recharge,omitempty"`
-	// 累计消费阈值（分）
+	// 累計消費閾值（分）
 	ThresholdConsume int64 `json:"threshold_consume,omitempty"`
 	// AcquireMode holds the value of the "acquire_mode" field.
 	AcquireMode string `json:"acquire_mode,omitempty"`
 	// DisplayMode holds the value of the "display_mode" field.
 	DisplayMode string `json:"display_mode,omitempty"`
-	// 等级折扣（万分比）
+	// 等級折扣（萬分比）
 	Discount int32 `json:"discount,omitempty"`
-	// 积分产生规则（消费 X 元产 Y 分）
+	// 積分產生規則（消費 X 元產 Y 分）
 	PointsRule map[string]interface{} `json:"points_rule,omitempty"`
 	// Sort holds the value of the "sort" field.
 	Sort int32 `json:"sort,omitempty"`

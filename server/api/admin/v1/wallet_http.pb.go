@@ -30,25 +30,25 @@ const OperationAdminWalletServicePayWithdrawal = "/zcard.api.admin.v1.AdminWalle
 const OperationAdminWalletServiceReviewWithdrawal = "/zcard.api.admin.v1.AdminWalletService/ReviewWithdrawal"
 
 type AdminWalletServiceHTTPServer interface {
-	// Adjust Adjust 手动调账（需 wallet:adjust 权限 + 原因必填 + 审计）。
+	// Adjust Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
 	Adjust(context.Context, *AdjustRequest) (*Balance, error)
-	// AdjustPoints AdjustPoints 积分调整（正=增加 负=扣减；复用积分账本与审计）。
+	// AdjustPoints AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
 	AdjustPoints(context.Context, *AdjustPointsRequest) (*PointsBalance, error)
-	// CreateGiftcardBatch CreateGiftcardBatch 礼品卡批次创建（批量生成密文 code；giftcard:write）。
+	// CreateGiftcardBatch CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
 	CreateGiftcardBatch(context.Context, *CreateGiftcardBatchRequest) (*CreateGiftcardBatchReply, error)
-	// DeleteGiftcardBatch DeleteGiftcardBatch 删除批次并作废未兑换卡，保留已兑换记录。
+	// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
 	DeleteGiftcardBatch(context.Context, *DeleteGiftcardBatchRequest) (*emptypb.Empty, error)
-	// GetBalance GetBalance 指定用户余额。
+	// GetBalance GetBalance 指定用户餘額。
 	GetBalance(context.Context, *GetBalanceRequest) (*Balance, error)
 	// ListGiftcardBatches ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(context.Context, *ListGiftcardBatchesRequest) (*ListGiftcardBatchesReply, error)
 	// ListTransactions ListTransactions 指定用户流水。
 	ListTransactions(context.Context, *ListWalletTxRequest) (*ListWalletTxReply, error)
-	// ListWithdrawals ListWithdrawals 提现单列表（状态筛选）。
+	// ListWithdrawals ListWithdrawals 提現單列表（狀態篩選）。
 	ListWithdrawals(context.Context, *ListWithdrawalsRequest) (*ListWithdrawalsReply, error)
-	// PayWithdrawal PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣减 + 流水）。
+	// PayWithdrawal PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣減 + 流水）。
 	PayWithdrawal(context.Context, *PayWithdrawalRequest) (*WithdrawalItem, error)
-	// ReviewWithdrawal ReviewWithdrawal 审核（通过→approved 保持锁定；驳回→rejected 解锁回余额）。
+	// ReviewWithdrawal ReviewWithdrawal 審核（通過→approved 保持鎖定；駁回→rejected 解鎖回餘額）。
 	ReviewWithdrawal(context.Context, *ReviewWithdrawalRequest) (*WithdrawalItem, error)
 }
 
@@ -278,25 +278,25 @@ func _AdminWalletService_ListTransactions0_HTTP_Handler(srv AdminWalletServiceHT
 }
 
 type AdminWalletServiceHTTPClient interface {
-	// Adjust Adjust 手动调账（需 wallet:adjust 权限 + 原因必填 + 审计）。
+	// Adjust Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
 	Adjust(ctx context.Context, req *AdjustRequest, opts ...http.CallOption) (rsp *Balance, err error)
-	// AdjustPoints AdjustPoints 积分调整（正=增加 负=扣减；复用积分账本与审计）。
+	// AdjustPoints AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
 	AdjustPoints(ctx context.Context, req *AdjustPointsRequest, opts ...http.CallOption) (rsp *PointsBalance, err error)
-	// CreateGiftcardBatch CreateGiftcardBatch 礼品卡批次创建（批量生成密文 code；giftcard:write）。
+	// CreateGiftcardBatch CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
 	CreateGiftcardBatch(ctx context.Context, req *CreateGiftcardBatchRequest, opts ...http.CallOption) (rsp *CreateGiftcardBatchReply, err error)
-	// DeleteGiftcardBatch DeleteGiftcardBatch 删除批次并作废未兑换卡，保留已兑换记录。
+	// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
 	DeleteGiftcardBatch(ctx context.Context, req *DeleteGiftcardBatchRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// GetBalance GetBalance 指定用户余额。
+	// GetBalance GetBalance 指定用户餘額。
 	GetBalance(ctx context.Context, req *GetBalanceRequest, opts ...http.CallOption) (rsp *Balance, err error)
 	// ListGiftcardBatches ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(ctx context.Context, req *ListGiftcardBatchesRequest, opts ...http.CallOption) (rsp *ListGiftcardBatchesReply, err error)
 	// ListTransactions ListTransactions 指定用户流水。
 	ListTransactions(ctx context.Context, req *ListWalletTxRequest, opts ...http.CallOption) (rsp *ListWalletTxReply, err error)
-	// ListWithdrawals ListWithdrawals 提现单列表（状态筛选）。
+	// ListWithdrawals ListWithdrawals 提現單列表（狀態篩選）。
 	ListWithdrawals(ctx context.Context, req *ListWithdrawalsRequest, opts ...http.CallOption) (rsp *ListWithdrawalsReply, err error)
-	// PayWithdrawal PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣减 + 流水）。
+	// PayWithdrawal PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣減 + 流水）。
 	PayWithdrawal(ctx context.Context, req *PayWithdrawalRequest, opts ...http.CallOption) (rsp *WithdrawalItem, err error)
-	// ReviewWithdrawal ReviewWithdrawal 审核（通过→approved 保持锁定；驳回→rejected 解锁回余额）。
+	// ReviewWithdrawal ReviewWithdrawal 審核（通過→approved 保持鎖定；駁回→rejected 解鎖回餘額）。
 	ReviewWithdrawal(ctx context.Context, req *ReviewWithdrawalRequest, opts ...http.CallOption) (rsp *WithdrawalItem, err error)
 }
 
@@ -308,7 +308,7 @@ func NewAdminWalletServiceHTTPClient(client *http.Client) AdminWalletServiceHTTP
 	return &AdminWalletServiceHTTPClientImpl{client}
 }
 
-// Adjust Adjust 手动调账（需 wallet:adjust 权限 + 原因必填 + 审计）。
+// Adjust Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
 func (c *AdminWalletServiceHTTPClientImpl) Adjust(ctx context.Context, in *AdjustRequest, opts ...http.CallOption) (*Balance, error) {
 	var out Balance
 	pattern := "/api/v1/admin/wallet/{user_id}/adjust"
@@ -326,7 +326,7 @@ func (c *AdminWalletServiceHTTPClientImpl) Adjust(ctx context.Context, in *Adjus
 	return &out, nil
 }
 
-// AdjustPoints AdjustPoints 积分调整（正=增加 负=扣减；复用积分账本与审计）。
+// AdjustPoints AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
 func (c *AdminWalletServiceHTTPClientImpl) AdjustPoints(ctx context.Context, in *AdjustPointsRequest, opts ...http.CallOption) (*PointsBalance, error) {
 	var out PointsBalance
 	pattern := "/api/v1/admin/wallet/{user_id}/adjust-points"
@@ -344,7 +344,7 @@ func (c *AdminWalletServiceHTTPClientImpl) AdjustPoints(ctx context.Context, in 
 	return &out, nil
 }
 
-// CreateGiftcardBatch CreateGiftcardBatch 礼品卡批次创建（批量生成密文 code；giftcard:write）。
+// CreateGiftcardBatch CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
 func (c *AdminWalletServiceHTTPClientImpl) CreateGiftcardBatch(ctx context.Context, in *CreateGiftcardBatchRequest, opts ...http.CallOption) (*CreateGiftcardBatchReply, error) {
 	var out CreateGiftcardBatchReply
 	pattern := "/api/v1/admin/wallet/giftcard-batches"
@@ -362,7 +362,7 @@ func (c *AdminWalletServiceHTTPClientImpl) CreateGiftcardBatch(ctx context.Conte
 	return &out, nil
 }
 
-// DeleteGiftcardBatch DeleteGiftcardBatch 删除批次并作废未兑换卡，保留已兑换记录。
+// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
 func (c *AdminWalletServiceHTTPClientImpl) DeleteGiftcardBatch(ctx context.Context, in *DeleteGiftcardBatchRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/wallet/giftcard-batches/{id}"
@@ -379,7 +379,7 @@ func (c *AdminWalletServiceHTTPClientImpl) DeleteGiftcardBatch(ctx context.Conte
 	return &out, nil
 }
 
-// GetBalance GetBalance 指定用户余额。
+// GetBalance GetBalance 指定用户餘額。
 func (c *AdminWalletServiceHTTPClientImpl) GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...http.CallOption) (*Balance, error) {
 	var out Balance
 	pattern := "/api/v1/admin/wallet/{user_id}"
@@ -430,7 +430,7 @@ func (c *AdminWalletServiceHTTPClientImpl) ListTransactions(ctx context.Context,
 	return &out, nil
 }
 
-// ListWithdrawals ListWithdrawals 提现单列表（状态筛选）。
+// ListWithdrawals ListWithdrawals 提現單列表（狀態篩選）。
 func (c *AdminWalletServiceHTTPClientImpl) ListWithdrawals(ctx context.Context, in *ListWithdrawalsRequest, opts ...http.CallOption) (*ListWithdrawalsReply, error) {
 	var out ListWithdrawalsReply
 	pattern := "/api/v1/admin/wallet/withdrawals"
@@ -447,7 +447,7 @@ func (c *AdminWalletServiceHTTPClientImpl) ListWithdrawals(ctx context.Context, 
 	return &out, nil
 }
 
-// PayWithdrawal PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣减 + 流水）。
+// PayWithdrawal PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣減 + 流水）。
 func (c *AdminWalletServiceHTTPClientImpl) PayWithdrawal(ctx context.Context, in *PayWithdrawalRequest, opts ...http.CallOption) (*WithdrawalItem, error) {
 	var out WithdrawalItem
 	pattern := "/api/v1/admin/wallet/withdrawals/{id}/pay"
@@ -465,7 +465,7 @@ func (c *AdminWalletServiceHTTPClientImpl) PayWithdrawal(ctx context.Context, in
 	return &out, nil
 }
 
-// ReviewWithdrawal ReviewWithdrawal 审核（通过→approved 保持锁定；驳回→rejected 解锁回余额）。
+// ReviewWithdrawal ReviewWithdrawal 審核（通過→approved 保持鎖定；駁回→rejected 解鎖回餘額）。
 func (c *AdminWalletServiceHTTPClientImpl) ReviewWithdrawal(ctx context.Context, in *ReviewWithdrawalRequest, opts ...http.CallOption) (*WithdrawalItem, error) {
 	var out WithdrawalItem
 	pattern := "/api/v1/admin/wallet/withdrawals/{id}/review"

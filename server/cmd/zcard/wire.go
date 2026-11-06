@@ -1,7 +1,7 @@
 //go:build wireinject
 // +build wireinject
 
-// wire 注入桩（build tag 保证不进最终构建；wire 命令生成 wire_gen.go）。
+// wire 注入樁（build tag 保證不進最終構建；wire 命令生成 wire_gen.go）。
 
 package main
 
@@ -17,13 +17,13 @@ import (
 	"github.com/google/wire"
 )
 
-// appDeps wire 装配产物打包（wire 多具体返回值受限）。
+// appDeps wire 裝配產物打包（wire 多具體返回值受限）。
 type appDeps struct {
 	App    *kratos.App
-	Update *update.Service // serve 层挂更新重启 hook 用
+	Update *update.Service // serve 層掛更新重啓 hook 用
 }
 
-// wireApp init kratos application（update.Service 旁路返回——serve 层挂重启 hook）。
+// wireApp init kratos application（update.Service 旁路返回——serve 層掛重啓 hook）。
 func wireApp(
 	serverConf *conf.Server,
 	dataConf *conf.Data,

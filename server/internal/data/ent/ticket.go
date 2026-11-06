@@ -21,9 +21,9 @@ type Ticket struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 雪花 T 前缀，不可枚举
+	// 雪花 T 前綴，不可枚舉
 	TicketNo string `json:"ticket_no,omitempty"`
-	// NULL=游客
+	// NULL=遊客
 	UserID uint64 `json:"user_id,omitempty"`
 	// GuestContact holds the value of the "guest_contact" field.
 	GuestContact string `json:"guest_contact,omitempty"`
@@ -39,9 +39,9 @@ type Ticket struct {
 	Status ticket.Status `json:"status,omitempty"`
 	// FirstReplyAt holds the value of the "first_reply_at" field.
 	FirstReplyAt time.Time `json:"first_reply_at,omitempty"`
-	// SLA 预留（M4 告警）
+	// SLA 預留（M4 告警）
 	SLADueAt time.Time `json:"sla_due_at,omitempty"`
-	// 1-5 评价
+	// 1-5 評價
 	Satisfaction int8 `json:"satisfaction,omitempty"`
 	selectValues sql.SelectValues
 }

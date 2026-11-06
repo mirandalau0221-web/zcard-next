@@ -1,7 +1,7 @@
 package order
 
-// 管理列表已售聚合：order_items × orders（paid 及之后状态）quantity 合计，
-// 供 catalog 管理列表 SoldCount 展示（通道 A 端口消费）。
+// 管理列表已售聚合：order_items × orders（paid 及之後狀態）quantity 合計，
+// 供 catalog 管理列表 SoldCount 展示（通道 A 端口消費）。
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/orderitem"
 )
 
-// SoldBatch 批量已售数量（一条 GROUP BY；无订单的商品无条目）。
+// SoldBatch 批量已售數量（一條 GROUP BY；無訂單的商品無條目）。
 func (uc *OrderUsecase) SoldBatch(ctx context.Context, productIDs []uint64) (map[uint64]int64, error) {
 	out := make(map[uint64]int64, len(productIDs))
 	if len(productIDs) == 0 {

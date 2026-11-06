@@ -14,8 +14,8 @@ import (
 func (r *RepoImpl) PutThemeState(ctx context.Context, key, expected string, raw json.RawMessage, extra []port.Item) error {
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		client := data.Client(ctx, r.data)
-		// 保留已有状态并返回该行；DO NOTHING 在 SQLite/PG 冲突时不返回 ID，
-		// Ent 会报 sql.ErrNoRows，导致草稿之后的发布及再次保存失败。
+		// 保留已有狀態並返回該行；DO NOTHING 在 SQLite/PG 衝突時不返回 ID，
+		// Ent 會報 sql.ErrNoRows，導致草稿之後的發佈及再次保存失敗。
 		if err := client.Setting.Create().SetGroup(themeStateGroup).SetKey(key).SetValue(json.RawMessage(`{}`)).OnConflict(sql.ConflictColumns(setting.FieldGroup, setting.FieldKey)).Ignore().Exec(ctx); err != nil {
 			return err
 		}
@@ -32,7 +32,7 @@ func (r *RepoImpl) PutThemeState(ctx context.Context, key, expected string, raw 
 			return err
 		}
 		if state.Revision != expected {
-			return errors.Conflict("theme.CONFLICT", "设置已被其他页面更新，请重新加载")
+			return errors.Conflict("theme.CONFLICT", "設置已被其他頁面更新，請重新加載")
 		}
 		if err = client.Setting.UpdateOneID(row.ID).SetValue(raw).Exec(ctx); err != nil {
 			return err

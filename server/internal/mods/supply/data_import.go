@@ -1,15 +1,15 @@
 package supply
 
-// D：交互式商品导入（预览 + 勾选 + 定价策略 + 类目映射）。
+// D：交互式商品導入（預覽 + 勾選 + 定價策略 + 類目映射）。
 //
-// PreviewProducts 实时经适配器拉目录（分页协议最多 100 页），
-// 按上游分类聚合树并标注 already_imported；60s 进程内缓存
-// （1.x 同款——避免导入弹窗反复打上游）
-// ImportProducts 将勾选快照、定价和类目映射持久化为后台任务；实现见
-// data_import_task.go / data_import_worker.go，逐商品保存检查点并自动恢复。
+// PreviewProducts 實時經適配器拉目錄（分頁協議最多 100 頁），
+// 按上游分類聚合樹並標註 already_imported；60s 進程內緩存
+// （1.x 同款——避免導入彈窗反覆打上游）
+// ImportProducts 將勾選快照、定價和類目映射持久化為後台任務；實現見
+// data_import_task.go / data_import_worker.go，逐商品保存檢查點並自動恢復。
 //
-// 定价模式：channel（跟随渠道）| percent（本次加价%）| fixed（+固定金额）| equal（原价）|
-// pending（待定价：不算价、导入后不上架 status=0，运营补价后再上）。
+// 定價模式：channel（跟隨渠道）| percent（本次加價%）| fixed（+固定金額）| equal（原價）|
+// pending（待定價：不算價、導入後不上架 status=0，運營補價後再上）。
 
 import (
 	"context"
@@ -27,7 +27,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// previewCache 连接级预览缓存（60s）。
+// previewCache 連接級預覽緩存（60s）。
 var previewCache = struct {
 	sync.Mutex
 	m map[uint64]previewEntry
@@ -42,10 +42,10 @@ type previewEntry struct {
 
 const (
 	previewTTL      = 60 * time.Second
-	previewMaxPages = 100 // ×50/页 = 5000 商品上限（导入预览须覆盖目标站全部分类与商品）
+	previewMaxPages = 100 // ×50/頁 = 5000 商品上限（導入預覽須覆蓋目標站全部分類與商品）
 )
 
-// PreviewProducts 上游商品预览（缓存 60s）。
+// PreviewProducts 上游商品預覽（緩存 60s）。
 func (s *AdminSupplyService) PreviewProducts(ctx context.Context, req *adminv1.PreviewProductsRequest) (*adminv1.PreviewProductsReply, error) {
 	if req.Page > 0 && req.SnapshotId == "" {
 		return s.previewCatalogPage(ctx, req)
@@ -68,11 +68,11 @@ func (s *AdminSupplyService) PreviewProducts(ctx context.Context, req *adminv1.P
 // UI quotes one product at a time, rather than blocking a large catalog load.
 func (s *AdminSupplyService) pricePreview(ctx context.Context, conn *ent.SupplyConnection, a adapter.Adapter, entry *previewEntry, code string) (*adminv1.PreviewProductsReply, error) {
 	if entry.identity != previewIdentity(conn) {
-		return nil, fmt.Errorf("货源账号已变化，请刷新商品目录")
+		return nil, fmt.Errorf("貨源賬號已變化，請刷新商品目錄")
 	}
 	if code != "" {
 		if _, ok := entry.byCode[code]; !ok {
-			return nil, fmt.Errorf("商品已不在预览目录，请重新加载")
+			return nil, fmt.Errorf("商品已不在預覽目錄，請重新加載")
 		}
 	}
 	quoter, needsQuote := a.(adapter.AccountQuoter)
@@ -139,12 +139,12 @@ func (s *AdminSupplyService) pricePreview(ctx context.Context, conn *ent.SupplyC
 		return nil, err
 	}
 	if previewIdentity(current) != previewIdentity(conn) || current.ExchangeRate != conn.ExchangeRate {
-		return nil, fmt.Errorf("货源账号或汇率已变化，请重新加载商品目录")
+		return nil, fmt.Errorf("貨源賬號或匯率已變化，請重新加載商品目錄")
 	}
 	return reply, nil
 }
 
-// loadPreview 取/建预览缓存。
+// loadPreview 取/建預覽緩存。
 func previewIdentity(conn *ent.SupplyConnection) [32]byte {
 	return sha256.Sum256([]byte(conn.Driver + "\x00" + conn.BaseURL + "\x00" + string(conn.Credentials)))
 }
@@ -175,7 +175,7 @@ func (s *AdminSupplyService) fetchPreview(ctx context.Context, connectionID uint
 	if err != nil {
 		return nil, err
 	}
-	// 预览优先只拉目录，避免 ACG 皮肤站逐品 inventory 查询拖垮大目录。
+	// 預覽優先只拉目錄，避免 ACG 皮膚站逐品 inventory 查詢拖垮大目錄。
 	byCat := map[string][]adapter.Product{}
 	catNames := map[string]string{}
 	byCode := map[string]adapter.Product{}
@@ -203,16 +203,16 @@ func (s *AdminSupplyService) fetchPreview(ctx context.Context, connectionID uint
 			progress(len(byCode))
 		}
 		if len(byCode) > 50000 {
-			return nil, catalogLoadError("商品目录超过 50000 件，请缩小货源目录范围")
+			return nil, catalogLoadError("商品目錄超過 50000 件，請縮小貨源目錄範圍")
 		}
 		if !list.HasMore {
 			break
 		}
 		if page == previewMaxPages {
-			return nil, catalogLoadError("商品目录超过最大页数，未保存不完整目录，请缩小货源目录范围")
+			return nil, catalogLoadError("商品目錄超過最大頁數，未保存不完整目錄，請縮小貨源目錄範圍")
 		}
 	}
-	// ACG 已携带分类，避免为分类名再次下载整个商品目录。
+	// ACG 已攜帶分類，避免為分類名再次下載整個商品目錄。
 	if categories == nil {
 		categories, err = a.ListCategories(ctx)
 		if err != nil {
@@ -222,7 +222,7 @@ func (s *AdminSupplyService) fetchPreview(ctx context.Context, connectionID uint
 	for _, c := range categories {
 		catNames[c.ID] = c.Name
 	}
-	// 已导入标注
+	// 已導入標註
 	imported := map[string]bool{}
 	if ms, _, err := s.repo.ListMappings(ctx, connectionID, 1, 100000); err == nil {
 		for _, m := range ms {
@@ -234,7 +234,7 @@ func (s *AdminSupplyService) fetchPreview(ctx context.Context, connectionID uint
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	// 聚合（分类顺序稳定：按首个商品出现顺序不可控 → 用 catNames/ID 排序太重，保持 map 迭代 + 排序键）
+	// 聚合（分類順序穩定：按首個商品出現順序不可控 → 用 catNames/ID 排序太重，保持 map 迭代 + 排序鍵）
 	entry := &previewEntry{at: time.Now(), byCode: byCode, identity: previewIdentity(conn)}
 	orderedCats := make([]string, 0, len(byCat))
 	for c := range byCat {
@@ -244,7 +244,7 @@ func (s *AdminSupplyService) fetchPreview(ctx context.Context, connectionID uint
 	for _, catID := range orderedCats {
 		pc := &adminv1.PreviewCategory{Code: catID, Name: catNames[catID]}
 		if pc.Name == "" {
-			pc.Name = "分类 " + catID
+			pc.Name = "分類 " + catID
 		}
 		for _, p := range byCat[catID] {
 			pc.Products = append(pc.Products, &adminv1.PreviewProduct{
@@ -260,7 +260,7 @@ func (s *AdminSupplyService) fetchPreview(ctx context.Context, connectionID uint
 	return entry, nil
 }
 
-// adapterForConnection 连接 → 适配器装配（预览/导入共用）。
+// adapterForConnection 連接 → 適配器裝配（預覽/導入共用）。
 func (s *AdminSupplyService) adapterForConnection(ctx context.Context, connectionID uint64) (*ent.SupplyConnection, adapter.Adapter, error) {
 	conn, err := s.repo.GetConnection(ctx, connectionID)
 	if err != nil {

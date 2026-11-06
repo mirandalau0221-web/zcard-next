@@ -1,7 +1,7 @@
 package server
 
-// EnsureInstalled 中间件（）：未安装时除 /install、/health、静态资源外一律 302 /install。
-// i18n 中间件：Accept-Language 解析 → i18n.WithLocale（默认语言 settings.i18n，当前 zh_CN）。
+// EnsureInstalled 中間件（）：未安裝時除 /install、/health、靜態資源外一律 302 /install。
+// i18n 中間件：Accept-Language 解析 → i18n.WithLocale（默認語言 settings.i18n，當前 zh_CN）。
 
 import (
 	"context"
@@ -17,29 +17,29 @@ import (
 	"github.com/go-kratos/kratos/v3/transport"
 )
 
-// installGuard 未安装守门（Filter 层——直接操作 ResponseWriter；
-// middleware 返回 nil reply 会被生成的 handler 类型断言 panic，不可用）。
-// 未安装时业务 API 302 /install（Web 安装向导）；豁免：安装页/健康检查/
-// 安装 API/非 API 静态资源。已安装直通（ops.installed_at 点查）。
+// installGuard 未安裝守門（Filter 層——直接操作 ResponseWriter；
+// middleware 返回 nil reply 會被生成的 handler 類型斷言 panic，不可用）。
+// 未安裝時業務 API 302 /install（Web 安裝嚮導）；豁免：安裝頁/健康檢查/
+// 安裝 API/非 API 靜態資源。已安裝直通（ops.installed_at 點查）。
 func installGuard(isInstalled func() bool) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if !isInstalled() {
 				p := r.URL.Path
-				// 安装页 / 健康检查 / 安装 API：放行
+				// 安裝頁 / 健康檢查 / 安裝 API：放行
 				if p == "/install" || p == "/health" || strings.HasPrefix(p, "/api/v1/admin/install") {
 					next.ServeHTTP(w, r)
 					return
 				}
-				// 业务 API：302 安装向导
+				// 業務 API：302 安裝嚮導
 				if strings.HasPrefix(p, "/api/") {
 					w.Header().Set("Location", "/install")
 					w.WriteHeader(http.StatusFound)
 					return
 				}
-				// 非 API：静态资源放行（安装页要加载 JS/CSS/字体）；
-				// 其余（/ 首页、SPA 路由、/admin/ 后台等）一律 302 /install——
-				// 客户访问首页即见安装入口，无需知道 /install 路径
+				// 非 API：靜態資源放行（安裝頁要加載 JS/CSS/字體）；
+				// 其餘（/ 首頁、SPA 路由、/admin/ 後台等）一律 302 /install——
+				// 客户訪問首頁即見安裝入口，無需知道 /install 路徑
 				if isStaticAsset(p) {
 					next.ServeHTTP(w, r)
 					return
@@ -48,8 +48,8 @@ func installGuard(isInstalled func() bool) func(http.Handler) http.Handler {
 				w.WriteHeader(http.StatusFound)
 				return
 			}
-			// 已安装：/install 返回静态提示页（不依赖前端 JS——SPA 未加载
-			// 也能看到提示）；其余路径直通
+			// 已安裝：/install 返回靜態提示頁（不依賴前端 JS——SPA 未加載
+			// 也能看到提示）；其餘路徑直通
 			if r.URL.Path == "/install" {
 				w.Header().Set("Content-Type", "text/html; charset=utf-8")
 				w.WriteHeader(http.StatusOK)
@@ -61,13 +61,13 @@ func installGuard(isInstalled func() bool) func(http.Handler) http.Handler {
 	}
 }
 
-// installedPage 已安装提示页（服务端直出静态页；样式与新项目 UI 一致）。
+// installedPage 已安裝提示頁（服務端直出靜態頁；樣式與新項目 UI 一致）。
 const installedPage = `<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>系统已安装</title>
+<title>系統已安裝</title>
 <style>
   body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
     background:linear-gradient(160deg,#eff6ff 0%,#f8fafc 60%,#eef2ff 100%);
@@ -96,28 +96,28 @@ const installedPage = `<!doctype html>
 <body>
   <div class="card">
     <div class="icon">🔒</div>
-    <h1>系统已安装</h1>
-    <p>安装已完成，本页为安装向导入口，无需重复安装。</p>
+    <h1>系統已安裝</h1>
+    <p>安裝已完成，本頁為安裝嚮導入口，無需重複安裝。</p>
     <div class="links">
-      <a class="primary" href="/">进入前台</a>
-      <a class="secondary" href="/admin/">后台管理</a>
+      <a class="primary" href="/">進入前台</a>
+      <a class="secondary" href="/admin/">後台管理</a>
     </div>
     <details>
-      <summary>如何重新安装？</summary>
-      <p class="warn">⚠️ 重新安装会清空当前全部数据（商品/订单/用户），请先备份数据库！</p>
+      <summary>如何重新安裝？</summary>
+      <p class="warn">⚠️ 重新安裝會清空當前全部數據（商品/訂單/用户），請先備份數據庫！</p>
       <ol>
-        <li><b>SQLite</b>：删除数据库文件 <code>data/zcard.db</code></li>
-        <li><b>PostgreSQL / MySQL</b>：清空数据库（重建或执行 <code>DROP DATABASE</code>；安装标记在库内，仅删配置不会回到未安装）</li>
-        <li>若曾用在线向导切换过数据库：删除 <code>configs/database.yaml</code> 与 <code>data/.install-pending.json</code></li>
-        <li>重启服务后访问 <code>/install</code> 即回到安装向导</li>
+        <li><b>SQLite</b>：刪除數據庫文件 <code>data/zcard.db</code></li>
+        <li><b>PostgreSQL / MySQL</b>：清空數據庫（重建或執行 <code>DROP DATABASE</code>；安裝標記在庫內，僅刪配置不會回到未安裝）</li>
+        <li>若曾用在線嚮導切換過數據庫：刪除 <code>configs/database.yaml</code> 與 <code>data/.install-pending.json</code></li>
+        <li>重啓服務後訪問 <code>/install</code> 即回到安裝嚮導</li>
       </ol>
     </details>
   </div>
 </body>
 </html>`
 
-// isStaticAsset 静态资源判定：/assets/ 目录（vite 产物）或常见资源扩展名放行；
-// .html 视为 SPA 页面（vite-ssg 扁平页），未安装时也跳安装向导。
+// isStaticAsset 靜態資源判定：/assets/ 目錄（vite 產物）或常見資源擴展名放行；
+// .html 視為 SPA 頁面（vite-ssg 扁平頁），未安裝時也跳安裝嚮導。
 func isStaticAsset(p string) bool {
 	if strings.HasPrefix(p, "/assets/") {
 		return true
@@ -134,7 +134,7 @@ func isStaticAsset(p string) bool {
 func i18nMiddleware(cfg settingsport.Provider) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
-			defaultLocale, enabledLocales := "zh_CN", []string{"zh_CN"}
+			defaultLocale, enabledLocales := "zh_TW", []string{"zh_TW"}
 			if cfg != nil {
 				if raw, err := cfg.GetDefault(ctx, "i18n", "default_locale", nil); err == nil && len(raw) != 0 {
 					_ = json.Unmarshal(raw, &defaultLocale)

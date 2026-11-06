@@ -1,14 +1,14 @@
 package server
 
-// 中间件：租户解析（Host → tenancy.Context）与 admin realm JWT 鉴权（双 realm 防串用）。
+// 中間件：租户解析（Host → tenancy.Context）與 admin realm JWT 鑑權（雙 realm 防串用）。
 //
-// 权限判定经 authz.Directory（模块声明式目录，）——本文件不再手工维护映射；
-// 目录 miss = fail-closed：403 + 错误日志（新增路由漏声明会在启动对账时直接失败，
-// 运行时 miss 属异常路径，绝不默认放行）。
+// 權限判定經 authz.Directory（模塊聲明式目錄，）——本文件不再手工維護映射；
+// 目錄 miss = fail-closed：403 + 錯誤日誌（新增路由漏聲明會在啓動對賬時直接失敗，
+// 運行時 miss 屬異常路徑，絕不默認放行）。
 //
-// operation 形态（Kratos v3）：
-// - HTTP：生成的 pb 路由 operation = proto 方法全名（带前导斜杠）
-// - gRPC：同构
+// operation 形態（Kratos v3）：
+// - HTTP：生成的 pb 路由 operation = proto 方法全名（帶前導斜槓）
+// - gRPC：同構
 
 import (
 	"context"
@@ -34,12 +34,12 @@ import (
 	khttp "github.com/go-kratos/kratos/v3/transport/http"
 )
 
-// DomainResolver 域名→租户解析端口（reseller 模块实现；server 不依赖业务实现）。
+// DomainResolver 域名→租户解析端口（reseller 模塊實現；server 不依賴業務實現）。
 type DomainResolver interface {
 	ResolveDomain(ctx context.Context, host string) (subsiteID uint64, siteName string, err error)
 }
 
-// domainCache 域名解析缓存（30s——reseller_sites 变更窗口）。
+// domainCache 域名解析緩存（30s——reseller_sites 變更窗口）。
 type domainCache struct {
 	mu  sync.RWMutex
 	m   map[string]domainCacheEntry
@@ -69,11 +69,11 @@ func (c *domainCache) put(host string, subsiteID uint64, siteName string) {
 	c.mu.Unlock()
 }
 
-// tenantFilter 域名解析过滤器（）。
-// http.Filter 层实现（Kratos 中间件的 Transporter 是内部 *khttp.Transport——
-// 拿不到 Host 字段，恒主站；与 audit/supplier 同款 Filter 模式）。
-// Host → verified 分站域名 → 分站上下文；未匹配/未验证 → 主站兜底（fail-open 绝不 5xx）。
-// req.WithContext 后续中间件与业务 handler 自动继承租户上下文。
+// tenantFilter 域名解析過濾器（）。
+// http.Filter 層實現（Kratos 中間件的 Transporter 是內部 *khttp.Transport——
+// 拿不到 Host 字段，恆主站；與 audit/supplier 同款 Filter 模式）。
+// Host → verified 分站域名 → 分站上下文；未匹配/未驗證 → 主站兜底（fail-open 絕不 5xx）。
+// req.WithContext 後續中間件與業務 handler 自動繼承租户上下文。
 func tenantFilter(mainDomain string, resolver DomainResolver) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +86,7 @@ func tenantFilter(mainDomain string, resolver DomainResolver) func(http.Handler)
 					dcache.put(host, id, "")
 					tc.SubsiteID, tc.IsMain = id, false
 				} else {
-					dcache.put(host, 0, "") // 负缓存（主站）30s
+					dcache.put(host, 0, "") // 負緩存（主站）30s
 				}
 			}
 			next.ServeHTTP(w, r.WithContext(tenancy.WithContext(r.Context(), tc)))
@@ -94,9 +94,9 @@ func tenantFilter(mainDomain string, resolver DomainResolver) func(http.Handler)
 	}
 }
 
-// userAuthMiddleware storefront 用户 realm JWT（storefront 面需要登录态的端点：
-// wallet/ticket/affiliate/user.me）。解析失败放行（claims 为 nil，业务端自行 401——
-// 避免游客可访问的列表端点被一刀切）。
+// userAuthMiddleware storefront 用户 realm JWT（storefront 面需要登錄態的端點：
+// wallet/ticket/affiliate/user.me）。解析失敗放行（claims 為 nil，業務端自行 401——
+// 避免遊客可訪問的列表端點被一刀切）。
 func userAuthMiddleware(signer *authn.Signer) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
@@ -129,8 +129,8 @@ const (
 	adminOpPrefix   = "/zcard.api.admin.v1."
 )
 
-// isAdminOperation 是否管理面操作（admin realm 鉴权目标；Public 声明的登录路由豁免）。
-// storefront/supply/回调路由一律不挂 JWT（架构测试规则 9）。
+// isAdminOperation 是否管理面操作（admin realm 鑑權目標；Public 聲明的登錄路由豁免）。
+// storefront/supply/回調路由一律不掛 JWT（架構測試規則 9）。
 func isAdminOperation(operation string, dir *authz.Directory) bool {
 	if strings.HasPrefix(operation, adminOpPrefix) {
 		if _, public, ok := dir.PermissionForOp(operation); ok && public {
@@ -141,13 +141,13 @@ func isAdminOperation(operation string, dir *authz.Directory) bool {
 	return strings.HasPrefix(operation, adminPathPrefix)
 }
 
-// adminAuthMiddleware admin realm 鉴权：JWT 校验 → 账户实时状态（enabled + 当前
-// RoleID，禁用/换角色即时生效）→ 权限点校验（RBAC）→ 注入 claims。
-// 超管角色（*）通配放行（authz 模块）。
+// adminAuthMiddleware admin realm 鑑權：JWT 校驗 → 賬户實時狀態（enabled + 當前
+// RoleID，禁用/換角色即時生效）→ 權限點校驗（RBAC）→ 注入 claims。
+// 超管角色（*）通配放行（authz 模塊）。
 //
-// 每请求按主键回查 admin_users 一次（管理面低频、PK get 代价可忽略）——JWT 内的
-// RoleID 是签发时快照，换角色后旧 token 若沿用快照将保留旧权限直至过期，此处
-// 以库中当前值为准（fail-closed：账户不存在/查询失败一律 401）。
+// 每請求按主鍵回查 admin_users 一次（管理面低頻、PK get 代價可忽略）——JWT 內的
+// RoleID 是簽發時快照，換角色後舊 token 若沿用快照將保留舊權限直至過期，此處
+// 以庫中當前值為準（fail-closed：賬户不存在/查詢失敗一律 401）。
 func adminAuthMiddleware(signer *authn.Signer, az port.Authorizer, dir *authz.Directory, admins identityport.AdminReader) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
@@ -157,34 +157,34 @@ func adminAuthMiddleware(signer *authn.Signer, az port.Authorizer, dir *authz.Di
 			}
 			token := bearerToken(tr.RequestHeader().Get("Authorization"))
 			if token == "" {
-				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 			}
 			claims, err := signer.Verify(authn.RealmAdmin, token)
 			if err != nil {
-				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "令牌无效或已过期")
+				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "令牌無效或已過期")
 			}
 			acc, err := admins.Admin(ctx, claims.Subject)
 			if err != nil || acc == nil {
-				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "账户不存在")
+				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "賬户不存在")
 			}
 			if claims.AuthVersion != acc.AuthVersion {
-				return nil, errors.Unauthorized("identity.SESSION_INVALID", "安全设置已变更，请重新登录")
+				return nil, errors.Unauthorized("identity.SESSION_INVALID", "安全設置已變更，請重新登錄")
 			}
 			if !acc.Enabled {
-				return nil, errors.Unauthorized("identity.ADMIN_DISABLED", "账号已禁用")
+				return nil, errors.Unauthorized("identity.ADMIN_DISABLED", "賬號已禁用")
 			}
 			claims.RoleID = acc.RoleID
 			if perm, _, ok := dir.PermissionForOp(tr.Operation()); ok && !az.Allowed(ctx, claims.RoleID, perm) {
-				return nil, errors.Forbidden("authz.PERMISSION_DENIED", "权限不足")
+				return nil, errors.Forbidden("authz.PERMISSION_DENIED", "權限不足")
 			}
 			return handler(identity.WithClaims(ctx, claims), req)
 		}
 	}
 }
 
-// storefrontVisitMiddleware storefront 访问埋点（）：PV/UV 明细 + 登录用户在线心跳。
-// 注册在 userAuthMiddleware 之后（需已解析 claims）；仅 selector 匹配 storefront
-// operation；埋点写失败忽略——统计性质绝不阻断业务请求。
+// storefrontVisitMiddleware storefront 訪問埋點（）：PV/UV 明細 + 登錄用户在線心跳。
+// 註冊在 userAuthMiddleware 之後（需已解析 claims）；僅 selector 匹配 storefront
+// operation；埋點寫失敗忽略——統計性質絕不阻斷業務請求。
 func storefrontVisitMiddleware(tracker *audit.TrackRepo) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
@@ -213,7 +213,7 @@ func bearerToken(header string) string {
 	return ""
 }
 
-// reconcileRoutes 启动对账（ fail-fast）：真实路由表逐条核对 admin 前缀必须已声明权限点。
+// reconcileRoutes 啓動對賬（ fail-fast）：真實路由表逐條核對 admin 前綴必須已聲明權限點。
 func reconcileRoutes(srv *khttp.Server, dir *authz.Directory) error {
 	var routes []authz.RouteInfo
 	err := srv.WalkRoute(func(ri khttp.RouteInfo) error {

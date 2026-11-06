@@ -31,21 +31,21 @@ const OperationAdminPaymentServiceListRefunds = "/zcard.api.admin.v1.AdminPaymen
 const OperationAdminPaymentServiceUpdateChannel = "/zcard.api.admin.v1.AdminPaymentService/UpdateChannel"
 
 type AdminPaymentServiceHTTPServer interface {
-	// CapturePayment CapturePayment 补单（主动拉网关状态复走回调管线）。
+	// CapturePayment CapturePayment 補單（主動拉網關狀態復走回調管線）。
 	CapturePayment(context.Context, *CapturePaymentRequest) (*Payment, error)
 	CreateChannel(context.Context, *CreateChannelRequest) (*Channel, error)
 	// CreateRefund ── 退款 ──
 	CreateRefund(context.Context, *CreateRefundRequest) (*RefundOrder, error)
 	DeleteChannel(context.Context, *DeleteChannelRequest) (*emptypb.Empty, error)
-	// FieldOptions FieldOptions 驱动字段选项动态加载（epusdt network/token 以网关 supported_assets
-	// 为准；网关不可达时后端回落静态矩阵并标记 fallback）。
+	// FieldOptions FieldOptions 驅動字段選項動態加載（epusdt network/token 以網關 supported_assets
+	// 為準；網關不可達時後端回落靜態矩陣並標記 fallback）。
 	FieldOptions(context.Context, *FieldOptionsRequest) (*FieldOptionsReply, error)
 	GetPayment(context.Context, *GetPaymentRequest) (*Payment, error)
 	// ListChannels ── 渠道管理 ──
 	ListChannels(context.Context, *emptypb.Empty) (*ChannelList, error)
-	// ListDrivers ListDrivers 驱动元数据（含配置字段 schema——admin 配置面动态表单渲染）。
+	// ListDrivers ListDrivers 驅動元數據（含配置字段 schema——admin 配置面動態表單渲染）。
 	ListDrivers(context.Context, *emptypb.Empty) (*DriverList, error)
-	// ListPayments ── 支付单 ──
+	// ListPayments ── 支付單 ──
 	ListPayments(context.Context, *ListPaymentsRequest) (*ListPaymentsReply, error)
 	ListRefunds(context.Context, *ListRefundsRequest) (*ListRefundsReply, error)
 	UpdateChannel(context.Context, *UpdateChannelRequest) (*Channel, error)
@@ -291,21 +291,21 @@ func _AdminPaymentService_ListRefunds0_HTTP_Handler(srv AdminPaymentServiceHTTPS
 }
 
 type AdminPaymentServiceHTTPClient interface {
-	// CapturePayment CapturePayment 补单（主动拉网关状态复走回调管线）。
+	// CapturePayment CapturePayment 補單（主動拉網關狀態復走回調管線）。
 	CapturePayment(ctx context.Context, req *CapturePaymentRequest, opts ...http.CallOption) (rsp *Payment, err error)
 	CreateChannel(ctx context.Context, req *CreateChannelRequest, opts ...http.CallOption) (rsp *Channel, err error)
 	// CreateRefund ── 退款 ──
 	CreateRefund(ctx context.Context, req *CreateRefundRequest, opts ...http.CallOption) (rsp *RefundOrder, err error)
 	DeleteChannel(ctx context.Context, req *DeleteChannelRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// FieldOptions FieldOptions 驱动字段选项动态加载（epusdt network/token 以网关 supported_assets
-	// 为准；网关不可达时后端回落静态矩阵并标记 fallback）。
+	// FieldOptions FieldOptions 驅動字段選項動態加載（epusdt network/token 以網關 supported_assets
+	// 為準；網關不可達時後端回落靜態矩陣並標記 fallback）。
 	FieldOptions(ctx context.Context, req *FieldOptionsRequest, opts ...http.CallOption) (rsp *FieldOptionsReply, err error)
 	GetPayment(ctx context.Context, req *GetPaymentRequest, opts ...http.CallOption) (rsp *Payment, err error)
 	// ListChannels ── 渠道管理 ──
 	ListChannels(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ChannelList, err error)
-	// ListDrivers ListDrivers 驱动元数据（含配置字段 schema——admin 配置面动态表单渲染）。
+	// ListDrivers ListDrivers 驅動元數據（含配置字段 schema——admin 配置面動態表單渲染）。
 	ListDrivers(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *DriverList, err error)
-	// ListPayments ── 支付单 ──
+	// ListPayments ── 支付單 ──
 	ListPayments(ctx context.Context, req *ListPaymentsRequest, opts ...http.CallOption) (rsp *ListPaymentsReply, err error)
 	ListRefunds(ctx context.Context, req *ListRefundsRequest, opts ...http.CallOption) (rsp *ListRefundsReply, err error)
 	UpdateChannel(ctx context.Context, req *UpdateChannelRequest, opts ...http.CallOption) (rsp *Channel, err error)
@@ -319,7 +319,7 @@ func NewAdminPaymentServiceHTTPClient(client *http.Client) AdminPaymentServiceHT
 	return &AdminPaymentServiceHTTPClientImpl{client}
 }
 
-// CapturePayment CapturePayment 补单（主动拉网关状态复走回调管线）。
+// CapturePayment CapturePayment 補單（主動拉網關狀態復走回調管線）。
 func (c *AdminPaymentServiceHTTPClientImpl) CapturePayment(ctx context.Context, in *CapturePaymentRequest, opts ...http.CallOption) (*Payment, error) {
 	var out Payment
 	pattern := "/api/v1/admin/payments/{id}/capture"
@@ -388,8 +388,8 @@ func (c *AdminPaymentServiceHTTPClientImpl) DeleteChannel(ctx context.Context, i
 	return &out, nil
 }
 
-// FieldOptions FieldOptions 驱动字段选项动态加载（epusdt network/token 以网关 supported_assets
-// 为准；网关不可达时后端回落静态矩阵并标记 fallback）。
+// FieldOptions FieldOptions 驅動字段選項動態加載（epusdt network/token 以網關 supported_assets
+// 為準；網關不可達時後端回落靜態矩陣並標記 fallback）。
 func (c *AdminPaymentServiceHTTPClientImpl) FieldOptions(ctx context.Context, in *FieldOptionsRequest, opts ...http.CallOption) (*FieldOptionsReply, error) {
 	var out FieldOptionsReply
 	pattern := "/api/v1/admin/payment/drivers/{code}/field-options"
@@ -439,7 +439,7 @@ func (c *AdminPaymentServiceHTTPClientImpl) ListChannels(ctx context.Context, in
 	return &out, nil
 }
 
-// ListDrivers ListDrivers 驱动元数据（含配置字段 schema——admin 配置面动态表单渲染）。
+// ListDrivers ListDrivers 驅動元數據（含配置字段 schema——admin 配置面動態表單渲染）。
 func (c *AdminPaymentServiceHTTPClientImpl) ListDrivers(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*DriverList, error) {
 	var out DriverList
 	pattern := "/api/v1/admin/payment/drivers"
@@ -456,7 +456,7 @@ func (c *AdminPaymentServiceHTTPClientImpl) ListDrivers(ctx context.Context, in 
 	return &out, nil
 }
 
-// ListPayments ── 支付单 ──
+// ListPayments ── 支付單 ──
 func (c *AdminPaymentServiceHTTPClientImpl) ListPayments(ctx context.Context, in *ListPaymentsRequest, opts ...http.CallOption) (*ListPaymentsReply, error) {
 	var out ListPaymentsReply
 	pattern := "/api/v1/admin/payments"

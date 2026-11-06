@@ -29,7 +29,7 @@ type Coupon struct {
 	BatchId       string                 `protobuf:"bytes,2,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"`
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`    // fixed | percent
-	Value         int64                  `protobuf:"varint,5,opt,name=value,proto3" json:"value,omitempty"` // fixed=分；percent=万分比
+	Value         int64                  `protobuf:"varint,5,opt,name=value,proto3" json:"value,omitempty"` // fixed=分；percent=萬分比
 	Code          string                 `protobuf:"bytes,6,opt,name=code,proto3" json:"code,omitempty"`
 	Status        string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"` // unused | used | disabled
 	unknownFields protoimpl.UnknownFields
@@ -121,7 +121,7 @@ type CouponList struct {
 	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	Batches       []string               `protobuf:"bytes,5,rep,name=batches,proto3" json:"batches,omitempty"` // 去重批次列表（筛选下拉用）
+	Batches       []string               `protobuf:"bytes,5,rep,name=batches,proto3" json:"batches,omitempty"` // 去重批次列表（篩選下拉用）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,7 +194,7 @@ func (x *CouponList) GetBatches() []string {
 type ListCouponsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	BatchId       string                 `protobuf:"bytes,2,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"` // 按批次筛选
+	BatchId       string                 `protobuf:"bytes,2,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"` // 按批次篩選
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -423,7 +423,7 @@ func (x *DisableCouponRequest) GetBatchId() string {
 	return ""
 }
 
-// DeleteCoupons：ids 非空按 id 删；batch_id 非空删该批次全部未使用。两者只生效其一（ids 优先）。
+// DeleteCoupons：ids 非空按 id 刪；batch_id 非空刪該批次全部未使用。兩者只生效其一（ids 優先）。
 type DeleteCouponsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ids           []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
@@ -575,7 +575,7 @@ func (x *ExportCouponsRequest) GetBatchId() string {
 type ExportCouponsReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
-	Csv           string                 `protobuf:"bytes,2,opt,name=csv,proto3" json:"csv,omitempty"` // 含 BOM + 表头，前端直接落盘
+	Csv           string                 `protobuf:"bytes,2,opt,name=csv,proto3" json:"csv,omitempty"` // 含 BOM + 表頭，前端直接落盤
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -624,7 +624,7 @@ func (x *ExportCouponsReply) GetCsv() string {
 	return ""
 }
 
-// GrantCoupon 批次赠送指定用户（领取）。
+// GrantCoupon 批次贈送指定用户（領取）。
 type GrantCouponRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	BatchId       string                 `protobuf:"bytes,1,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"`
@@ -729,7 +729,7 @@ func (x *GrantCouponReply) GetGranted() int32 {
 	return 0
 }
 
-// CreateFlashSale 创建秒杀（限量与卡密同锁）。
+// CreateFlashSale 創建秒殺（限量與卡密同鎖）。
 type CreateFlashSaleRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ProductId     uint64                 `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
@@ -833,7 +833,7 @@ type FlashSaleItem struct {
 	LimitQty      int32                  `protobuf:"varint,7,opt,name=limit_qty,json=limitQty,proto3" json:"limit_qty,omitempty"`
 	SoldQty       int32                  `protobuf:"varint,8,opt,name=sold_qty,json=soldQty,proto3" json:"sold_qty,omitempty"`
 	PerUserLimit  int32                  `protobuf:"varint,9,opt,name=per_user_limit,json=perUserLimit,proto3" json:"per_user_limit,omitempty"`
-	ReservedQty   int32                  `protobuf:"varint,10,opt,name=reserved_qty,json=reservedQty,proto3" json:"reserved_qty,omitempty"` // 待付款预占，不计已售
+	ReservedQty   int32                  `protobuf:"varint,10,opt,name=reserved_qty,json=reservedQty,proto3" json:"reserved_qty,omitempty"` // 待付款預佔，不計已售
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1102,15 +1102,15 @@ func (x *DeleteFlashSaleRequest) GetId() uint64 {
 	return 0
 }
 
-// UpsertPromotion 创建/更新促销。
+// UpsertPromotion 創建/更新促銷。
 type UpsertPromotionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 0=创建
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 0=創建
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	ScopeJson     string                 `protobuf:"bytes,3,opt,name=scope_json,json=scopeJson,proto3" json:"scope_json,omitempty"`           // {"product_ids":[1,2]} / {"category_ids":[3]} / 空=全场
+	ScopeJson     string                 `protobuf:"bytes,3,opt,name=scope_json,json=scopeJson,proto3" json:"scope_json,omitempty"`           // {"product_ids":[1,2]} / {"category_ids":[3]} / 空=全場
 	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`                                      // fixed | percent | special_price
-	Threshold     int64                  `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`                           // 满 X（分）
-	Discount      int64                  `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"`                             // fixed=分；percent=万分比
+	Threshold     int64                  `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`                           // 滿 X（分）
+	Discount      int64                  `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"`                             // fixed=分；percent=萬分比
 	SpecialPrice  int64                  `protobuf:"varint,7,opt,name=special_price,json=specialPrice,proto3" json:"special_price,omitempty"` // special_price=分
 	StartAt       int64                  `protobuf:"varint,8,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
 	EndAt         int64                  `protobuf:"varint,9,opt,name=end_at,json=endAt,proto3" json:"end_at,omitempty"`

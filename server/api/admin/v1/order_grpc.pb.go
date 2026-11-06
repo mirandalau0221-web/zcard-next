@@ -30,15 +30,15 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminOrderService 订单管理。
+// AdminOrderService 訂單管理。
 type AdminOrderServiceClient interface {
-	// ListOrders 订单列表（游标分页）。
+	// ListOrders 訂單列表（遊標分頁）。
 	ListOrders(ctx context.Context, in *ListOrdersRequest, opts ...grpc.CallOption) (*ListOrdersReply, error)
-	// GetOrder 订单详情（含金额行+状态事件时间线）。
+	// GetOrder 訂單詳情（含金額行+狀態事件時間線）。
 	GetOrder(ctx context.Context, in *GetAdminOrderRequest, opts ...grpc.CallOption) (*AdminOrder, error)
-	// CancelOrder 取消订单（pending 可取消）。
+	// CancelOrder 取消訂單（pending 可取消）。
 	CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// DeleteOrders 从管理列表移除已取消或已过期的未付款订单，保留关联记录。
+	// DeleteOrders 從管理列表移除已取消或已過期的未付款訂單，保留關聯記錄。
 	DeleteOrders(ctx context.Context, in *DeleteOrdersRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -94,15 +94,15 @@ func (c *adminOrderServiceClient) DeleteOrders(ctx context.Context, in *DeleteOr
 // All implementations must embed UnimplementedAdminOrderServiceServer
 // for forward compatibility.
 //
-// AdminOrderService 订单管理。
+// AdminOrderService 訂單管理。
 type AdminOrderServiceServer interface {
-	// ListOrders 订单列表（游标分页）。
+	// ListOrders 訂單列表（遊標分頁）。
 	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersReply, error)
-	// GetOrder 订单详情（含金额行+状态事件时间线）。
+	// GetOrder 訂單詳情（含金額行+狀態事件時間線）。
 	GetOrder(context.Context, *GetAdminOrderRequest) (*AdminOrder, error)
-	// CancelOrder 取消订单（pending 可取消）。
+	// CancelOrder 取消訂單（pending 可取消）。
 	CancelOrder(context.Context, *CancelOrderRequest) (*emptypb.Empty, error)
-	// DeleteOrders 从管理列表移除已取消或已过期的未付款订单，保留关联记录。
+	// DeleteOrders 從管理列表移除已取消或已過期的未付款訂單，保留關聯記錄。
 	DeleteOrders(context.Context, *DeleteOrdersRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAdminOrderServiceServer()
 }

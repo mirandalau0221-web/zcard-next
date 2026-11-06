@@ -1,6 +1,6 @@
 package inventory
 
-// wire providers（CardCipher 由 bootstrap 按密钥解析构造）。
+// wire providers（CardCipher 由 bootstrap 按密鑰解析構造）。
 
 import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/inventory/port"
@@ -14,10 +14,10 @@ var ProviderSet = wire.NewSet(
 	NewCardRepoImpl,
 	wire.Bind(new(CardRepo), new(*CardRepoImpl)),
 	wire.Bind(new(port.Inventory), new(*CardRepoImpl)),
-	// ：供货交付卡密读取 + 失败回滚（supplier 消费，通道 A）
+	// ：供貨交付卡密讀取 + 失敗回滾（supplier 消費，通道 A）
 	wire.Bind(new(port.CardContentReader), new(*CardRepoImpl)),
 	wire.Bind(new(port.CardReleaser), new(*CardRepoImpl)),
-	// 管理列表批量库存（catalog 消费，通道 A）
+	// 管理列表批量庫存（catalog 消費，通道 A）
 	wire.Bind(new(port.StockBatcher), new(*CardRepoImpl)),
 	NewAdminInventoryService,
 )

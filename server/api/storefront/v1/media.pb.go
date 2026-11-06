@@ -68,7 +68,7 @@ func (x *StoreUploadRequest) GetDataBase64() string {
 
 type StoreUploadReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"` // /uploads/... 访问路径
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"` // /uploads/... 訪問路徑
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

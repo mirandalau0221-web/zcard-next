@@ -13,7 +13,7 @@ import (
 const ScopeImport = "import"
 const taskLeaseSeconds = 120
 
-var errTaskLeaseLost = errors.New("货源任务执行权已失效")
+var errTaskLeaseLost = errors.New("貨源任務執行權已失效")
 
 type taskLeaseKey struct{}
 type taskLease struct {

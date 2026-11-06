@@ -10,7 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v3/errors"
 )
 
-var ErrProductLocked = errors.Conflict("catalog.PRODUCT_LOCKED", "商品已锁定，请先解锁后再操作")
+var ErrProductLocked = errors.Conflict("catalog.PRODUCT_LOCKED", "商品已鎖定，請先解鎖後再操作")
 
 func IsProductLocked(err error) bool { return stderrors.Is(err, ErrProductLocked) }
 
@@ -32,7 +32,7 @@ func GuardProductWrite(ctx context.Context, d *Data, id uint64) (*ent.Product, e
 	p, err := q.Only(ctx)
 
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在或已删除")
+		return nil, errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在或已刪除")
 	}
 	if err != nil {
 		return nil, err

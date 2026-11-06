@@ -1,6 +1,6 @@
 package coupon
 
-// 优惠券仓储（M1b 基础版：批量生成 + 校验核销 + 作废）。
+// 優惠券倉儲（M1b 基礎版：批量生成 + 校驗核銷 + 作廢）。
 
 import (
 	"context"
@@ -16,19 +16,19 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/money"
 )
 
-// CouponRepoImpl 券仓储。
+// CouponRepoImpl 券倉儲。
 type CouponRepoImpl struct {
 	data *data.Data
 }
 
-// NewCouponRepoImpl 构造。
+// NewCouponRepoImpl 構造。
 func NewCouponRepoImpl(d *data.Data) *CouponRepoImpl {
 	return &CouponRepoImpl{data: d}
 }
 
 var _ port.CouponResolver = (*CouponRepoImpl)(nil)
 
-// ListCoupons 券列表（状态/批次筛选 + 分页；total 与批次去重列表供前端筛选）。
+// ListCoupons 券列表（狀態/批次篩選 + 分頁；total 與批次去重列表供前端篩選）。
 func (r *CouponRepoImpl) ListCoupons(ctx context.Context, status, batchID string, page, size int) ([]*ent.Coupon, int, []string, error) {
 	client := data.Client(ctx, r.data)
 	q := client.Coupon.Query()
@@ -52,7 +52,7 @@ func (r *CouponRepoImpl) ListCoupons(ctx context.Context, status, batchID string
 	if err != nil {
 		return nil, 0, nil, err
 	}
-	// 批次去重列表（供筛选下拉；batch_id 建有索引）
+	// 批次去重列表（供篩選下拉；batch_id 建有索引）
 	all, err := client.Coupon.Query().Select(coupon.FieldBatchID).All(ctx)
 	if err != nil {
 		return nil, 0, nil, err
@@ -70,7 +70,7 @@ func (r *CouponRepoImpl) ListCoupons(ctx context.Context, status, batchID string
 	return rows, total, batches, nil
 }
 
-// DeleteCoupons 按 id 批量删除（仅未使用；已使用/已作废跳过保审计痕迹）。
+// DeleteCoupons 按 id 批量刪除（僅未使用；已使用/已作廢跳過保審計痕跡）。
 func (r *CouponRepoImpl) DeleteCoupons(ctx context.Context, ids []uint64) (int, error) {
 	if len(ids) == 0 {
 		return 0, nil
@@ -80,7 +80,7 @@ func (r *CouponRepoImpl) DeleteCoupons(ctx context.Context, ids []uint64) (int, 
 		Exec(ctx)
 }
 
-// DeleteBatchUnused 删除整批次全部未使用券。
+// DeleteBatchUnused 刪除整批次全部未使用券。
 func (r *CouponRepoImpl) DeleteBatchUnused(ctx context.Context, batchID string) (int, error) {
 	if batchID == "" {
 		return 0, nil
@@ -90,7 +90,7 @@ func (r *CouponRepoImpl) DeleteBatchUnused(ctx context.Context, batchID string) 
 		Exec(ctx)
 }
 
-// ExportCSV 导出券码 CSV（状态/批次筛选；含 BOM + 表头，Excel 直开）。
+// ExportCSV 導出券碼 CSV（狀態/批次篩選；含 BOM + 表頭，Excel 直開）。
 func (r *CouponRepoImpl) ExportCSV(ctx context.Context, status, batchID string) (string, error) {
 	q := data.Client(ctx, r.data).Coupon.Query()
 	if status != "" {
@@ -104,15 +104,15 @@ func (r *CouponRepoImpl) ExportCSV(ctx context.Context, status, batchID string) 
 		return "", err
 	}
 	var b strings.Builder
-	b.WriteString("\uFEFF批次,名称,类型,面值,券码,状态,过期时间\n")
+	b.WriteString("\uFEFF批次,名稱,類型,面值,券碼,狀態,過期時間\n")
 	for _, c := range rows {
-		typ := "满减"
+		typ := "滿減"
 		val := fmt.Sprintf("%d分", c.Value)
 		if c.Type == coupon.TypePercent {
 			typ = "折扣"
-			val = fmt.Sprintf("%g折", float64(c.Value)/1000) // 万分比 → 折
+			val = fmt.Sprintf("%g折", float64(c.Value)/1000) // 萬分比 → 折
 		}
-		statusZh := map[string]string{"unused": "未使用", "used": "已使用", "disabled": "已作废"}[string(c.Status)]
+		statusZh := map[string]string{"unused": "未使用", "used": "已使用", "disabled": "已作廢"}[string(c.Status)]
 		if statusZh == "" {
 			statusZh = string(c.Status)
 		}
@@ -120,13 +120,13 @@ func (r *CouponRepoImpl) ExportCSV(ctx context.Context, status, batchID string) 
 		if !c.ExpireAt.IsZero() {
 			expire = c.ExpireAt.Local().Format("2006-01-02 15:04")
 		}
-		// 名称/批次含逗号时加引号转义（RFC 4180）
+		// 名稱/批次含逗號時加引號轉義（RFC 4180）
 		fmt.Fprintf(&b, "%s,%s,%s,%s,%s,%s,%s\n", csvEscape(c.BatchID), csvEscape(c.Name), typ, val, c.Code, statusZh, expire)
 	}
 	return b.String(), nil
 }
 
-// csvEscape CSV 字段含逗号/引号/换行时按 RFC 4180 加引号。
+// csvEscape CSV 字段含逗號/引號/換行時按 RFC 4180 加引號。
 func csvEscape(s string) string {
 	if strings.ContainsAny(s, ",\"\n\r") {
 		return `"` + strings.ReplaceAll(s, `"`, `""`) + `"`
@@ -134,7 +134,7 @@ func csvEscape(s string) string {
 	return s
 }
 
-// CreateBatch 批量生成券码。
+// CreateBatch 批量生成券碼。
 func (r *CouponRepoImpl) createBatch(ctx context.Context, name, typ string, value int64, count int32, expireAt *time.Time) (int32, error) {
 	if _, err := couponDiscount(coupon.Type(typ), value, 0); err != nil {
 		return 0, err
@@ -158,7 +158,7 @@ func (r *CouponRepoImpl) createBatch(ctx context.Context, name, typ string, valu
 	return count, nil
 }
 
-// Disable 作废（按 batch_id）。
+// Disable 作廢（按 batch_id）。
 func (r *CouponRepoImpl) Disable(ctx context.Context, batchID string) (int, error) {
 	return data.Client(ctx, r.data).Coupon.Update().
 		Where(coupon.BatchID(batchID), coupon.StatusEQ(coupon.StatusUnused)).
@@ -166,7 +166,7 @@ func (r *CouponRepoImpl) Disable(ctx context.Context, batchID string) (int, erro
 		Save(ctx)
 }
 
-// Resolve 校验券并返回面额。
+// Resolve 校驗券並返回面額。
 func (r *CouponRepoImpl) Resolve(ctx context.Context, code string, userID uint64, orderAmount money.Cents) (money.Cents, uint64, error) {
 	if code == "" {
 		return 0, 0, nil
@@ -189,7 +189,7 @@ func (r *CouponRepoImpl) Resolve(ctx context.Context, code string, userID uint64
 	return value, c.ID, err
 }
 
-// couponDiscount 与后台券面显示一致：9500=9.5折；折让向下取整到分。
+// couponDiscount 與後台券面顯示一致：9500=9.5折；折讓向下取整到分。
 func couponDiscount(typ coupon.Type, configured int64, base money.Cents) (money.Cents, error) {
 	var value money.Cents
 	switch typ {
@@ -207,7 +207,7 @@ func couponDiscount(typ coupon.Type, configured int64, base money.Cents) (money.
 		return 0, fmt.Errorf("coupon.TYPE_INVALID")
 	}
 	if value > base {
-		value = base // 券不找零，且不得抵扣范围外商品。
+		value = base // 券不找零，且不得抵扣範圍外商品。
 	}
 	return value, nil
 }
@@ -229,7 +229,7 @@ func (r *CouponRepoImpl) MarkUsed(ctx context.Context, couponID, orderID uint64)
 		return err
 	}
 	if n != 1 {
-		return fmt.Errorf("coupon.NOT_AVAILABLE: 优惠券已使用、已作废或已过期")
+		return fmt.Errorf("coupon.NOT_AVAILABLE: 優惠券已使用、已作廢或已過期")
 	}
 	return nil
 }

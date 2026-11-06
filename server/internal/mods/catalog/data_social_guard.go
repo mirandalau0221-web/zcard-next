@@ -15,7 +15,7 @@ func validateSocialProduct(current *ent.Product, in *port.ProductInput) error {
 		return nil
 	}
 	if in.GoodsType != nil && *in.GoodsType != "virtual" || in.FulfillmentMode != "" && in.FulfillmentMode != "auto" || in.StockType != "" && in.StockType != "card" || in.DirectContent != nil || in.Price != 0 || in.FactoryPrice > 0 || in.PointsRequired != 0 || in.ManualStock != nil || in.PhysicalStock != nil {
-		return fmt.Errorf("社交服务使用绑定货源的购买规则和动态报价，不能改为卡密、实物或人工交付")
+		return fmt.Errorf("社交服務使用綁定貨源的購買規則和動態報價，不能改為卡密、實物或人工交付")
 	}
 	return nil
 }

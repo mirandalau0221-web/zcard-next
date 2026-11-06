@@ -1,7 +1,7 @@
 package server
 
-// gRPC Server（规划 D2：HTTP/gRPC 双协议免费获得；M4 聚合平台阶段某些模块
-// 直接以 gRPC 互联，无需重写接口）。当前注册与 HTTP 相同的服务面。
+// gRPC Server（規劃 D2：HTTP/gRPC 雙協議免費獲得；M4 聚合平台階段某些模塊
+// 直接以 gRPC 互聯，無需重寫接口）。當前註冊與 HTTP 相同的服務面。
 
 import (
 	adminv1 "github.com/NovaWorks/zcard-next/server/api/admin/v1"
@@ -28,7 +28,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// NewGRPCServer 构造 gRPC server（wire provider）。
+// NewGRPCServer 構造 gRPC server（wire provider）。
 func NewGRPCServer(
 	c *conf.Server,
 	authSvc *identity.AdminAuthService,
@@ -51,8 +51,8 @@ func NewGRPCServer(
 	memberLevelStoreSvc *memberlevel.StoreMemberLevelService,
 	licenseStoreSvc *license.StoreLicenseService,
 ) *kgrpc.Server {
-	// addr 为空 = 不启用 gRPC（单机 HTTP 部署形态；部分容器环境回环绑定受限
-	// bind EADDRNOTAVAIL——留空即完全跳过，装配侧过滤 nil）
+	// addr 為空 = 不啓用 gRPC（單機 HTTP 部署形態；部分容器環境迴環綁定受限
+	// bind EADDRNOTAVAIL——留空即完全跳過，裝配側過濾 nil）
 	if c == nil || c.Grpc == nil || c.Grpc.Addr == "" {
 		return nil
 	}
@@ -66,7 +66,7 @@ func NewGRPCServer(
 				}
 				return nil
 			}),
-			// gRPC 侧 admin 鉴权 M1 接 metadata（当前管理面以 HTTP 为主）
+			// gRPC 側 admin 鑑權 M1 接 metadata（當前管理面以 HTTP 為主）
 		),
 	}
 	if c != nil && c.Grpc != nil {
@@ -101,6 +101,6 @@ func NewGRPCServer(
 	storefrontv1.RegisterStoreCatalogServiceServer(srv, catalogSvc)
 	storefrontv1.RegisterStoreMemberLevelServiceServer(srv, memberLevelStoreSvc)
 	storefrontv1.RegisterStoreLicenseServiceServer(srv, licenseStoreSvc)
-	// reflection 已由 kratos v3 grpc server 内置（手动注册会 duplicate panic）
+	// reflection 已由 kratos v3 grpc server 內置（手動註冊會 duplicate panic）
 	return srv
 }

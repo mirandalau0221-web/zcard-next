@@ -1,24 +1,24 @@
 <template>
   <div class="card" style="max-width: 420px; margin: 40px auto;">
-    <h2 style="margin-bottom: 16px;">{{ $t('登录') }}</h2>
+    <h2 style="margin-bottom: 16px;">{{ $t('登錄') }}</h2>
     <div class="field">
-      <label>{{ $t('账号') }}</label>
-      <input class="input" v-model="username" type="text" :placeholder="$t('用户名 / 邮箱 / 手机号')" @keyup.enter="submit" />
+      <label>{{ $t('賬號') }}</label>
+      <input class="input" v-model="username" type="text" :placeholder="$t('用户名 / 郵箱 / 手機號')" @keyup.enter="submit" />
     </div>
     <div class="field">
-      <label>{{ $t('密码') }}</label>
-      <input class="input" v-model="password" type="password" :placeholder="$t('密码')" @keyup.enter="submit" />
+      <label>{{ $t('密碼') }}</label>
+      <input class="input" v-model="password" type="password" :placeholder="$t('密碼')" @keyup.enter="submit" />
     </div>
     <div v-if="captchaCfg.login" class="field">
-      <label>{{ $t('图形验证码 *') }}</label>
+      <label>{{ $t('圖形驗證碼 *') }}</label>
       <CaptchaInput ref="captchaRef" @update:code="captchaCode = $event" @update:captcha-id="captchaId = $event" />
     </div>
     <div v-if="error" class="error">{{ uiText(error) }}</div>
     <button class="btn" style="width: 100%; margin-top: 8px;" :disabled="loading" @click="submit">
-      {{ loading ? $t('登录中…') : $t('登录') }}
+      {{ loading ? $t('登錄中…') : $t('登錄') }}
     </button>
-    <div class="muted" style="margin-top: 12px; text-align: center;"> {{ $t('没有账号？') }}<router-link :to="{ path: '/register', query: $route.query.redirect ? { redirect: String($route.query.redirect) } : {} }">{{ $t('注册') }}</router-link>
-      ｜ <router-link to="/forgot-password">{{ $t('忘记密码？') }}</router-link>
+    <div class="muted" style="margin-top: 12px; text-align: center;"> {{ $t('沒有賬號？') }}<router-link :to="{ path: '/register', query: $route.query.redirect ? { redirect: String($route.query.redirect) } : {} }">{{ $t('註冊') }}</router-link>
+      ｜ <router-link to="/forgot-password">{{ $t('忘記密碼？') }}</router-link>
     </div>
   </div>
 </template>
@@ -50,13 +50,13 @@ onMounted(async () => {
 
 async function submit() {
   if (!username.value || !password.value) {
-    error.value = $t("请输入账号和密码");
+    error.value = $t("請輸入賬號和密碼");
     return;
   }
   loading.value = true;
   error.value = '';
   if (captchaCfg.value.login && !captchaCode.value) {
-    error.value = $t("请输入图形验证码");
+    error.value = $t("請輸入圖形驗證碼");
     return;
   }
   const { data, error: err } = await login({
@@ -67,12 +67,12 @@ async function submit() {
   });
   loading.value = false;
   if (err || !data) {
-    error.value = err || $t("登录失败");
-    captchaRef.value?.refresh(); // 失败自动换图
+    error.value = err || $t("登錄失敗");
+    captchaRef.value?.refresh(); // 失敗自動換圖
     return;
   }
   setToken(data.access_token);
-  await refreshAuth(); // 顶栏登录态即时更新（SPA 内不整页刷新）
+  await refreshAuth(); // 頂欄登錄態即時更新（SPA 內不整頁刷新）
   router.push(typeof route.query.redirect === 'string' ? route.query.redirect : '/member');
 }
 </script>

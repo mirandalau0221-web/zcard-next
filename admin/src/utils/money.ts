@@ -1,8 +1,8 @@
 import { displayPrecision, formatCents, fromCents, toCents } from '../../../packages/money/index';
-// 金额工具（铁律 15：DB/API 一律 int64「分」，前端显示 /100 为元、提交 *100 为分）。
-// 符号与小数位取后台默认货币（settings i18n.base_currency → currencies 表）；
-// 未加载完成回退 ¥/2。显示与输入独立：两位之后按有效位显示，提交按十进制精确换算并拒绝不足一分。
-// 全站金额显示/提交必须经本文件，禁止内联 `xxx / 100` 或硬编码符号（架构测试守护）。
+// 金額工具（鐵律 15：DB/API 一律 int64「分」，前端顯示 /100 為元、提交 *100 為分）。
+// 符號與小數位取後台默認貨幣（settings i18n.base_currency → currencies 表）；
+// 未加載完成回退 ¥/2。顯示與輸入獨立：兩位之後按有效位顯示，提交按十進制精確換算並拒絕不足一分。
+// 全站金額顯示/提交必須經本文件，禁止內聯 `xxx / 100` 或硬編碼符號（架構測試守護）。
 
 import { reactive } from "vue";
 import { fetchSettings, fetchCurrencies } from "@/service/api";
@@ -10,9 +10,9 @@ import { localStg } from "@/utils/storage";
 
 export interface CurrencyMeta {
   code: string;
-  symbol: string; // 货币符号（¥/$）
+  symbol: string; // 貨幣符號（¥/$）
   position: string; // prefix | suffix
-  precision: number; // 小数位（CNY=2、JPY=0）
+  precision: number; // 小數位（CNY=2、JPY=0）
 }
 
 const DEFAULT_META: CurrencyMeta = { code: "CNY", symbol: "¥", position: "prefix", precision: 2 };
@@ -32,7 +32,7 @@ export function currencyUnit(): string {
   return current.code;
 }
 
-// fenToYuan 分 → 元字符串（不含符号；纯整数运算，禁止浮点参与）。
+// fenToYuan 分 → 元字符串（不含符號；純整數運算，禁止浮點參與）。
 export function fenToYuan(cents: number): string {
   return formatCents(cents, current.precision);
 }
@@ -45,29 +45,29 @@ export function centsToYuan(cents: number): number {
   return fromCents(cents);
 }
 
-// formatMoney 带符号格式化（显示唯一入口；符号位置感知）。
+// formatMoney 帶符號格式化（顯示唯一入口；符號位置感知）。
 export function formatMoney(cents: number): string {
   const v = fenToYuan(cents);
   return current.position === "suffix" ? `${v}${current.symbol}` : `${current.symbol}${v}`;
 }
 
-// formatSignedMoney 有符号金额（流水/调账：正数带 +，负数 fenToYuan 自带 -）。
+// formatSignedMoney 有符號金額（流水/調賬：正數帶 +，負數 fenToYuan 自帶 -）。
 export function formatSignedMoney(cents: number): string {
   const v = fenToYuan(cents);
   const body = cents > 0 ? `+${v}` : v;
   return current.position === "suffix" ? `${body}${current.symbol}` : `${current.symbol}${body}`;
 }
 
-// ── 默认货币加载（后台 i18n.base_currency → /admin/currencies 符号/位置/小数位）──
+// ── 默認貨幣加載（後台 i18n.base_currency → /admin/currencies 符號/位置/小數位）──
 
 let initPromise: Promise<void> | null = null;
 
 export function initCurrency(force = false): Promise<void> {
   if (force) initPromise = null;
   if (!initPromise) {
-    // 未登录（登录页）时跳过：本初始化走需鉴权的 admin 接口，401 会触发
-    // 全局登出级联（onBackendFail → resetStore），曾把刚登录成功的会话清掉。
-    // 登录成功后由 auth store 以 force=true 重新初始化。
+    // 未登錄（登錄頁）時跳過：本初始化走需鑑權的 admin 接口，401 會觸發
+    // 全局登出級聯（onBackendFail → resetStore），曾把剛登錄成功的會話清掉。
+    // 登錄成功後由 auth store 以 force=true 重新初始化。
     if (!localStg.get("token")) {
       initPromise = Promise.resolve();
       return initPromise;
@@ -86,7 +86,7 @@ export function initCurrency(force = false): Promise<void> {
             const v = JSON.parse(entry.value_json);
             if (typeof v === "string" && v) baseCode = v;
           } catch {
-            /* 非法配置回退默认 */
+            /* 非法配置回退默認 */
           }
         }
         const list: any[] = ((currencyRes as any)?.data as any)?.currencies || [];
@@ -96,35 +96,35 @@ export function initCurrency(force = false): Promise<void> {
           setCurrency({ code: baseCode, symbol: cur.symbol, position: cur.position, precision: cur.precision ?? 0 });
         }
       } catch {
-        /* 加载失败回退默认 ¥/2 */
+        /* 加載失敗回退默認 ¥/2 */
       }
     })();
   }
   return initPromise;
 }
 
-// 兼容已保存的充值备注：只转换系统生成的整段文案，金额跟随当前货币。
-// 原始流水与账务金额保持不变，其他人工备注原样显示。
+// 兼容已保存的充值備註：只轉換系統生成的整段文案，金額跟隨當前貨幣。
+// 原始流水與賬務金額保持不變，其他人工備註原樣顯示。
 export function formatTransactionRemark(remark?: string): string {
   if (!remark) return '';
-  const match = /^(充值到账|对接账户自助充值到账)（(?:用户 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*赠送\s*(\d+)\s*分）$/.exec(remark);
+  const match = /^(充值到賬|對接賬户自助充值到賬)（(?:用户 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*贈送\s*(\d+)\s*分）$/.exec(remark);
   if (!match) return remark;
   const principal = Number(match[3]);
   const gift = Number(match[4]);
   const total = principal + gift;
   if (![principal, gift, total].every(Number.isSafeInteger)) return remark;
   const amount = gift > 0
-    ? `${formatMoney(total)}（本金 ${formatMoney(principal)}＋赠送 ${formatMoney(gift)}）`
+    ? `${formatMoney(total)}（本金 ${formatMoney(principal)}＋贈送 ${formatMoney(gift)}）`
     : formatMoney(principal);
   return `${match[1]} ${amount}${match[2] ? `（用户 #${match[2]}）` : ''}`;
 }
 
 export const TRANSACTION_TYPES: Record<string, string> = {
-  adjust: '人工调账', recharge: '余额充值', order_pay: '订单支付', payment: '订单支付',
-  order_refund: '订单退款', refund: '订单退款', ticket_urgent: '工单付费加急',
-  commission: '分销佣金入账', commission_debt: '佣金欠款扣回', commission_reversal: '佣金退回',
-  withdraw: '提现', freeze: '余额冻结', unfreeze: '余额解冻', giftcard: '礼品卡兑换',
-  earn_recharge: '充值赠送积分', redeem: '积分兑换',
+  adjust: '人工調賬', recharge: '餘額充值', order_pay: '訂單支付', payment: '訂單支付',
+  order_refund: '訂單退款', refund: '訂單退款', ticket_urgent: '工單付費加急',
+  commission: '分銷佣金入賬', commission_debt: '佣金欠款扣回', commission_reversal: '佣金退回',
+  withdraw: '提現', freeze: '餘額凍結', unfreeze: '餘額解凍', giftcard: '禮品卡兑換',
+  earn_recharge: '充值贈送積分', redeem: '積分兑換',
 };
 export function transactionType(type?: string): string {
   return TRANSACTION_TYPES[type || ''] || '其他收支';
@@ -135,7 +135,7 @@ export function transactionAmount(row: { direction: string; amount_cents: number
 export function transactionReference(row: { id?: number; display_reference?: string; reference?: string }): string {
   if (row.display_reference) return row.display_reference;
   const [kind, id] = (row.reference || '').split(':');
-  const labels: Record<string, string> = { order_pay: '订单', order_refund: '退款记录', ticket_urgent: '工单', recharge: '充值支付记录', giftcard: '礼品卡', commission: '佣金记录', adjust: '调账记录' };
+  const labels: Record<string, string> = { order_pay: '訂單', order_refund: '退款記錄', ticket_urgent: '工單', recharge: '充值支付記錄', giftcard: '禮品卡', commission: '佣金記錄', adjust: '調賬記錄' };
   return labels[kind] && id ? `${labels[kind]} ${kind === 'ticket_urgent' ? '' : '#'}${id}` : `流水 #${row.id || '—'}`;
 }
 export function transactionRemark(row: { id?: number; type?: string; remark?: string; reference?: string; display_reference?: string }): string {

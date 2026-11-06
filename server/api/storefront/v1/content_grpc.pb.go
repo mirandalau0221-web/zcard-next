@@ -29,16 +29,16 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreContentService 前台内容：横幅（生效时间窗）、文章（公告/博客）、分类。
-// 多语言字段按请求语言回落（zh_CN 默认）。
+// StoreContentService 前台內容：橫幅（生效時間窗）、文章（公告/博客）、分類。
+// 多語言字段按請求語言回落（zh_CN 默認）。
 type StoreContentServiceClient interface {
-	// ListBanners 生效中横幅（position 过滤 + sort 排序 + 时间窗过滤）。
+	// ListBanners 生效中橫幅（position 過濾 + sort 排序 + 時間窗過濾）。
 	ListBanners(ctx context.Context, in *ListBannersRequest, opts ...grpc.CallOption) (*ListBannersReply, error)
-	// ListPosts 已发布文章分页（type 过滤）。
+	// ListPosts 已發佈文章分頁（type 過濾）。
 	ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsReply, error)
-	// GetPost 文章详情（slug；未发布返回 404 语义）。
+	// GetPost 文章詳情（slug；未發佈返回 404 語義）。
 	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostReply, error)
-	// ListPostCategories 分类列表。
+	// ListPostCategories 分類列表。
 	ListPostCategories(ctx context.Context, in *ListPostCategoriesRequest, opts ...grpc.CallOption) (*ListPostCategoriesReply, error)
 }
 
@@ -94,16 +94,16 @@ func (c *storeContentServiceClient) ListPostCategories(ctx context.Context, in *
 // All implementations must embed UnimplementedStoreContentServiceServer
 // for forward compatibility.
 //
-// StoreContentService 前台内容：横幅（生效时间窗）、文章（公告/博客）、分类。
-// 多语言字段按请求语言回落（zh_CN 默认）。
+// StoreContentService 前台內容：橫幅（生效時間窗）、文章（公告/博客）、分類。
+// 多語言字段按請求語言回落（zh_CN 默認）。
 type StoreContentServiceServer interface {
-	// ListBanners 生效中横幅（position 过滤 + sort 排序 + 时间窗过滤）。
+	// ListBanners 生效中橫幅（position 過濾 + sort 排序 + 時間窗過濾）。
 	ListBanners(context.Context, *ListBannersRequest) (*ListBannersReply, error)
-	// ListPosts 已发布文章分页（type 过滤）。
+	// ListPosts 已發佈文章分頁（type 過濾）。
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsReply, error)
-	// GetPost 文章详情（slug；未发布返回 404 语义）。
+	// GetPost 文章詳情（slug；未發佈返回 404 語義）。
 	GetPost(context.Context, *GetPostRequest) (*GetPostReply, error)
-	// ListPostCategories 分类列表。
+	// ListPostCategories 分類列表。
 	ListPostCategories(context.Context, *ListPostCategoriesRequest) (*ListPostCategoriesReply, error)
 	mustEmbedUnimplementedStoreContentServiceServer()
 }

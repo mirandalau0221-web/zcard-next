@@ -1,25 +1,25 @@
 import { t as $t, localeTag } from '@/i18n';
 import { loadPublicConfig } from '@/config';
 /**
- * SEO 工具：站点级配置消费（/api/v1/storefront/config 公开下发）+ 页面级 head 声明。
- * 基于 @unhead/vue（vite-ssg 内置）：SSG 构建时输出到静态 HTML，客户端水合后动态更新。
- * 通过 vite-ssg 注入的 head 实例操作（head.push 不依赖组件 setup 上下文——
- * async setup 的 await 之后 useHead/inject 不可用）。
- * SSR 安全：不依赖 window/document（canonical 基准用 site.url）。
+ * SEO 工具：站點級配置消費（/api/v1/storefront/config 公開下發）+ 頁面級 head 聲明。
+ * 基於 @unhead/vue（vite-ssg 內置）：SSG 構建時輸出到靜態 HTML，客户端水合後動態更新。
+ * 通過 vite-ssg 注入的 head 實例操作（head.push 不依賴組件 setup 上下文——
+ * async setup 的 await 之後 useHead/inject 不可用）。
+ * SSR 安全：不依賴 window/document（canonical 基準用 site.url）。
  */
 
 type HeadEntry = Record<string, any>;
 
 let activeHead: { push: (entry: HeadEntry) => unknown } | null = null;
 
-/** 由 vite-ssg createApp 回调注入 head 实例（main.ts） */
+/** 由 vite-ssg createApp 回調注入 head 實例（main.ts） */
 export function setActiveHead(head: { push: (entry: HeadEntry) => unknown } | undefined) {
   activeHead = head ?? null;
 }
 
 function headPush(entry: HeadEntry) {
   if (!activeHead) {
-    console.warn($t("[seo] head 未注入（setActiveHead 未调用）"));
+    console.warn($t("[seo] head 未注入（setActiveHead 未調用）"));
     return;
   }
   activeHead.push(entry);
@@ -48,7 +48,7 @@ function parseStr(raw: string | undefined, dflt = ""): string {
   }
 }
 
-/** 站点 SEO 配置（失败回退默认值；SSR 构建期经 VITE_SSG_API 访问，客户端同源） */
+/** 站點 SEO 配置（失敗回退默認值；SSR 構建期經 VITE_SSG_API 訪問，客户端同源） */
 export async function fetchSiteSeo(): Promise<SiteSeoConfig> {
 
   const def: SiteSeoConfig = { get name() { return $t("商店"); }, url: "", logo: "", seoTitle: "", seoKeywords: "", seoDesc: "", verificationGoogle: "", verificationBing: "" };
@@ -71,33 +71,33 @@ export async function fetchSiteSeo(): Promise<SiteSeoConfig> {
   }
 }
 
-/** 页面级 SEO 元数据 */
+/** 頁面級 SEO 元數據 */
 export interface SeoMeta {
   title?: string;
   description?: string;
   keywords?: string;
-  /** 缺省 = 站点地址（site.url） */
+  /** 缺省 = 站點地址（site.url） */
   canonical?: string;
   ogImage?: string;
   ogType?: string; // website | article | product
   jsonLd?: object | object[];
 }
 
-/** 绝对 URL 归一（相对路径拼站点基准） */
+/** 絕對 URL 歸一（相對路徑拼站點基準） */
 function absUrl(u: string, base: string): string {
   if (!u) return "";
   return /^https?:\/\//i.test(u) ? u : base + u;
 }
 
-/** 站点 URL 基准（SSR 无 window：site.url 优先，空则客户端 origin） */
+/** 站點 URL 基準（SSR 無 window：site.url 優先，空則客户端 origin） */
 function siteBase(site: SiteSeoConfig): string {
   if (site.url) return site.url;
   return typeof window !== "undefined" ? window.location.origin : "";
 }
 
 /**
- * 声明页面级 SEO（幂等）：title/canonical/meta/og/JSON-LD。
- * 所有键每次全量输出（缺省空串）+ key 去重——避免 SPA 导航残留旧页 meta。
+ * 聲明頁面級 SEO（冪等）：title/canonical/meta/og/JSON-LD。
+ * 所有鍵每次全量輸出（缺省空串）+ key 去重——避免 SPA 導航殘留舊頁 meta。
  */
 export function applySeo(meta: SeoMeta, site: SiteSeoConfig) {
   const base = siteBase(site);
@@ -119,12 +119,12 @@ export function applySeo(meta: SeoMeta, site: SiteSeoConfig) {
   });
 }
 
-/** 站点兜底 SEO（首页/非 SEO 页面） */
+/** 站點兜底 SEO（首頁/非 SEO 頁面） */
 export function applyDefaultSeo(site: SiteSeoConfig) {
   const base = siteBase(site);
   applySeo(
     {
-      title: site.seoTitle || $t("{0} - 自动发卡商城", [site.name]),
+      title: site.seoTitle || $t("{0} - 自動髮卡商城", [site.name]),
       description: site.seoDesc,
       keywords: site.seoKeywords,
       ogType: "website",
@@ -140,7 +140,7 @@ export function applyDefaultSeo(site: SiteSeoConfig) {
   );
 }
 
-/** 站长验证码 meta（GSC/Bing 验证；SSG 输出到静态页 head） */
+/** 站長驗證碼 meta（GSC/Bing 驗證；SSG 輸出到靜態頁 head） */
 export function applyVerification(site: SiteSeoConfig) {
   headPush({
     meta: [
@@ -154,7 +154,7 @@ export function applyVerification(site: SiteSeoConfig) {
   });
 }
 
-/** HTML 转纯文本（meta description 用；无 DOM 依赖，SSR 安全） */
+/** HTML 轉純文本（meta description 用；無 DOM 依賴，SSR 安全） */
 export function stripHtml(html: string): string {
   return html
     .replace(/<[^>]*>/g, " ")
@@ -168,7 +168,7 @@ export function stripHtml(html: string): string {
     .trim();
 }
 
-/** 截断到 maxLen（中文按字符计） */
+/** 截斷到 maxLen（中文按字符計） */
 export function truncate(text: string, maxLen = 150): string {
   return text.length > maxLen ? text.slice(0, maxLen - 1) + "…" : text;
 }

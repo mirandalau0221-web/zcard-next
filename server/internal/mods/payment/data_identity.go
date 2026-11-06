@@ -27,7 +27,7 @@ func (r *PaymentRepoImpl) channelForPayment(ctx context.Context, p *ent.Payment)
 			return nil, err
 		}
 		if ch.Code != p.Channel || (p.DriverSnapshot != "" && ch.Driver != p.DriverSnapshot) {
-			return nil, fmt.Errorf("payment.CHANNEL_CHANGED: 请核对历史支付渠道")
+			return nil, fmt.Errorf("payment.CHANNEL_CHANGED: 請核對歷史支付渠道")
 		}
 		return ch, nil
 	}

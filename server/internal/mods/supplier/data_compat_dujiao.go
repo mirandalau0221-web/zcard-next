@@ -1,21 +1,21 @@
 package supplier
 
-// B：dujiao-next 协议兼容层（对外供货）。
+// B：dujiao-next 協議兼容層（對外供貨）。
 //
-// 让任何 dujiao-next 站点在「站点连接」里填本站地址 + 我方发的
-// (api_key, api_secret) 即可对接——不改对方一行代码。
+// 讓任何 dujiao-next 站點在「站點連接」裏填本站地址 + 我方發的
+// (api_key, api_secret) 即可對接——不改對方一行代碼。
 //
-// 端点（前缀 /api/v1/upstream，全部需 3 头鉴权）：
+// 端點（前綴 /api/v1/upstream，全部需 3 頭鑑權）：
 // POST /ping | GET /categories | GET /products | GET /products/{id}
 // POST /orders | GET /orders/{id} | POST /orders/{id}/cancel
 //
-// 协议事实来源：dujiao-next internal/modules/upstreamapi/transport/http/*（字段/
-// 错误码/金额口径逐字对齐）。金额：内部分 → 字符串元两位小数；卡密：纯文本
-// \n 连接（fulfillment.payload）；余额不足：HTTP 200 + ok=false + payment_failed
-// （对方客户端的钱包扣款失败口径）。
+// 協議事實來源：dujiao-next internal/modules/upstreamapi/transport/http/*（字段/
+// 錯誤碼/金額口徑逐字對齊）。金額：內部分 → 字符串元兩位小數；卡密：純文本
+// \n 連接（fulfillment.payload）；餘額不足：HTTP 200 + ok=false + payment_failed
+// （對方客户端的錢包扣款失敗口徑）。
 //
-// 实现：原生 http.Handler（HandlePrefix 挂载）——外部协议契约不进我们的 proto/
-// OpenAPI；业务核心复用 SupplyAPIService.fulfillOrder。
+// 實現：原生 http.Handler（HandlePrefix 掛載）——外部協議契約不進我們的 proto/
+// OpenAPI；業務核心複用 SupplyAPIService.fulfillOrder。
 
 import (
 	"context"
@@ -36,15 +36,15 @@ import (
 	catalogport "github.com/NovaWorks/zcard-next/server/internal/mods/catalog/port"
 )
 
-// dujiao 时间窗（对方 MaxTimestampSkew=60；比自家协议 300s 严格，按对方来）。
+// dujiao 時間窗（對方 MaxTimestampSkew=60；比自家協議 300s 嚴格，按對方來）。
 const dujiaoTimeSkew = 60
 
-// RegisterDujiaoCompat 挂载 dujiao 兼容路由（/api/v1/upstream/；须在 SPA 兜底前注册）。
+// RegisterDujiaoCompat 掛載 dujiao 兼容路由（/api/v1/upstream/；須在 SPA 兜底前註冊）。
 func RegisterDujiaoCompat(srv *khttp.Server, svc *SupplyAPIService) {
 	srv.HandlePrefix("/api/v1/upstream/", dujiaoMux(svc))
 }
 
-// dujiaoMux 路由表（独立构造便于契约测试）。
+// dujiaoMux 路由表（獨立構造便於契約測試）。
 func dujiaoMux(svc *SupplyAPIService) *http.ServeMux {
 	h := &dujiaoCompat{svc: svc}
 	mux := http.NewServeMux()
@@ -53,16 +53,16 @@ func dujiaoMux(svc *SupplyAPIService) *http.ServeMux {
 	mux.HandleFunc("/api/v1/upstream/products", h.wrap(h.products))
 	mux.HandleFunc("/api/v1/upstream/products/", h.wrap(h.productDetail)) // /{id}
 	mux.HandleFunc("/api/v1/upstream/orders", h.wrap(h.createOrder))
-	mux.HandleFunc("/api/v1/upstream/orders/", h.wrap(h.orderAction)) // /{id} 与 /{id}/cancel
+	mux.HandleFunc("/api/v1/upstream/orders/", h.wrap(h.orderAction)) // /{id} 與 /{id}/cancel
 	return mux
 }
 
-// dujiaoCompat 兼容层处理器。
+// dujiaoCompat 兼容層處理器。
 type dujiaoCompat struct {
 	svc *SupplyAPIService
 }
 
-// wrap 3 头鉴权 + JSON 错误壳（成功壳由各 handler 写）。
+// wrap 3 頭鑑權 + JSON 錯誤殼（成功殼由各 handler 寫）。
 func (h *dujiaoCompat) wrap(fn func(w http.ResponseWriter, r *http.Request, account *ent.SupplierAccount)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		account, err := h.authenticate(r)
@@ -88,48 +88,48 @@ func (h *dujiaoCompat) wrap(fn func(w http.ResponseWriter, r *http.Request, acco
 		}
 		currency, err := data.BaseCurrency(r.Context(), h.svc.repo.data)
 		if err != nil || currency != "CNY" {
-			writeDujiaoErr(w, http.StatusBadRequest, "currency_unsupported", "此协议仅支持人民币计价")
+			writeDujiaoErr(w, http.StatusBadRequest, "currency_unsupported", "此協議僅支持人民幣計價")
 			return
 		}
 		fn(w, r, account)
 	}
 }
 
-// authenticate 3 头校验：解析 → ±60s → key 查账户 → protocol=dujiao_next → 验签。
+// authenticate 3 頭校驗：解析 → ±60s → key 查賬户 → protocol=dujiao_next → 驗籤。
 func (h *dujiaoCompat) authenticate(r *http.Request) (*ent.SupplierAccount, error) {
 	key := r.Header.Get("Dujiao-Next-Api-Key")
 	tsStr := r.Header.Get("Dujiao-Next-Timestamp")
 	sig := r.Header.Get("Dujiao-Next-Signature")
 	if key == "" || tsStr == "" || sig == "" {
-		return nil, newAuthError(errMissingHeaders, "缺少 Dujiao-Next-Api-Key/Timestamp/Signature 头")
+		return nil, newAuthError(errMissingHeaders, "缺少 Dujiao-Next-Api-Key/Timestamp/Signature 頭")
 	}
 	ts, err := strconv.ParseInt(tsStr, 10, 64)
 	if err != nil || abs64(time.Now().Unix()-ts) > dujiaoTimeSkew {
-		return nil, newAuthError(errTimestampSkew, "timestamp 非法或超出 ±60s 时间窗")
+		return nil, newAuthError(errTimestampSkew, "timestamp 非法或超出 ±60s 時間窗")
 	}
 	account, secret, err := h.svc.repo.AccountByKey(r.Context(), key)
 	if err != nil {
 		return nil, newAuthError(errUnknownKey, "未知 api_key")
 	}
 	if string(account.Status) != "approved" {
-		return nil, newAuthError(errAccountDisabled, "账户未审核或已禁用")
+		return nil, newAuthError(errAccountDisabled, "賬户未審核或已禁用")
 	}
-	// IP 白名单（空名单放行；非空须命中）
+	// IP 白名單（空名單放行；非空須命中）
 	if !ipAllowed(account.IPWhitelist, r) {
-		return nil, newAuthError(errAccountDisabled, "请求 IP 不在白名单内")
+		return nil, newAuthError(errAccountDisabled, "請求 IP 不在白名單內")
 	}
 	if string(account.Protocol) != "dujiao_next" {
-		return nil, newAuthError(errUnknownKey, "该 api_key 不是 dujiao_next 兼容账号")
+		return nil, newAuthError(errUnknownKey, "該 api_key 不是 dujiao_next 兼容賬號")
 	}
 	body, _ := io.ReadAll(r.Body)
-	r.Body = io.NopCloser(strings.NewReader(string(body))) // 恢复（后续 handler 解析需要）
+	r.Body = io.NopCloser(strings.NewReader(string(body))) // 恢復（後續 handler 解析需要）
 	if subtle.ConstantTimeCompare([]byte(dujiaoSign(secret, r.Method, r.URL.Path, tsStr, body)), []byte(sig)) != 1 {
-		return nil, newAuthError(errInvalidSig, "签名校验失败")
+		return nil, newAuthError(errInvalidSig, "簽名校驗失敗")
 	}
 	return account, nil
 }
 
-// ── 端点实现 ────────────────────────────────────────────────
+// ── 端點實現 ────────────────────────────────────────────────
 
 func (h *dujiaoCompat) ping(w http.ResponseWriter, r *http.Request, account *ent.SupplierAccount) {
 	balance, _ := h.svc.repo.BalanceOf(r.Context(), account.ID)
@@ -158,7 +158,7 @@ func (h *dujiaoCompat) products(w http.ResponseWriter, r *http.Request, account 
 		pageSize = 50
 	}
 	includeInactive := q.Get("include_inactive") == "true"
-	// updated_after 透传忽略（全量返回；对方 upsert 幂等无害，v1 从简）
+	// updated_after 透傳忽略（全量返回；對方 upsert 冪等無害，v1 從簡）
 	status := int8(1)
 	if includeInactive {
 		status = -1
@@ -170,7 +170,7 @@ func (h *dujiaoCompat) products(w http.ResponseWriter, r *http.Request, account 
 	}
 	pricing, err := h.svc.repo.LoadPricing(r.Context(), account.ID)
 	if err != nil {
-		writeDujiaoErr(w, http.StatusInternalServerError, "pricing_unavailable", "供货定价读取失败")
+		writeDujiaoErr(w, http.StatusInternalServerError, "pricing_unavailable", "供貨定價讀取失敗")
 		return
 	}
 	out := make([]map[string]any, 0, len(items))
@@ -197,7 +197,7 @@ func (h *dujiaoCompat) productDetail(w http.ResponseWriter, r *http.Request, acc
 	}
 	pricing, err := h.svc.repo.LoadPricing(r.Context(), account.ID)
 	if err != nil {
-		writeDujiaoErr(w, http.StatusInternalServerError, "pricing_unavailable", "供货定价读取失败")
+		writeDujiaoErr(w, http.StatusInternalServerError, "pricing_unavailable", "供貨定價讀取失敗")
 		return
 	}
 	writeDujiaoOK(w, map[string]any{"product": h.dujiaoProduct(r, account, *p, pricing)})
@@ -214,7 +214,7 @@ func (h *dujiaoCompat) createOrder(w http.ResponseWriter, r *http.Request, accou
 	body, _ := io.ReadAll(r.Body)
 	if len(body) > 0 {
 		if err := json.Unmarshal(body, &req); err != nil {
-			writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "请求体解析失败")
+			writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "請求體解析失敗")
 			return
 		}
 	}
@@ -222,10 +222,10 @@ func (h *dujiaoCompat) createOrder(w http.ResponseWriter, r *http.Request, accou
 		req.Quantity = 1
 	}
 	if req.DownstreamOrderNo == "" {
-		writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "downstream_order_no 必填（幂等键）")
+		writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "downstream_order_no 必填（冪等鍵）")
 		return
 	}
-	// sku_id 即我方商品 ID（products 响应里每个商品单 SKU，SKU id = 商品 id）
+	// sku_id 即我方商品 ID（products 響應裏每個商品單 SKU，SKU id = 商品 id）
 	productID, err := parseUintAny(req.SkuID)
 	if err != nil || productID == 0 {
 		writeDujiaoErr(w, http.StatusBadRequest, "sku_unavailable", "sku_id 非法")
@@ -239,12 +239,12 @@ func (h *dujiaoCompat) createOrder(w http.ResponseWriter, r *http.Request, accou
 	if out.rejected {
 		switch out.errCode {
 		case "insufficient_balance":
-			// dujiao 钱包扣款失败口径：HTTP 200 + ok=false + payment_failed
-			writeDujiaoErr(w, http.StatusOK, "payment_failed", "供货余额不足")
+			// dujiao 錢包扣款失敗口徑：HTTP 200 + ok=false + payment_failed
+			writeDujiaoErr(w, http.StatusOK, "payment_failed", "供貨餘額不足")
 		case "product_unavailable":
 			writeDujiaoErr(w, http.StatusBadRequest, "product_unavailable", "商品不可用")
 		case "no_stock":
-			writeDujiaoErr(w, http.StatusConflict, "insufficient_stock", "库存不足")
+			writeDujiaoErr(w, http.StatusConflict, "insufficient_stock", "庫存不足")
 		default:
 			writeDujiaoErr(w, http.StatusBadRequest, "bad_request", out.errMsg)
 		}
@@ -262,44 +262,44 @@ func (h *dujiaoCompat) createOrder(w http.ResponseWriter, r *http.Request, accou
 func (h *dujiaoCompat) orderAction(w http.ResponseWriter, r *http.Request, account *ent.SupplierAccount) {
 	rest := strings.TrimPrefix(r.URL.Path, "/api/v1/upstream/orders/")
 	if rest == "" {
-		writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "缺少订单 ID")
+		writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "缺少訂單 ID")
 		return
 	}
 	idStr, action, _ := strings.Cut(rest, "/")
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "订单 ID 非法")
+		writeDujiaoErr(w, http.StatusBadRequest, "bad_request", "訂單 ID 非法")
 		return
 	}
 	idNum, _ := strconv.ParseUint(idStr, 10, 64)
 	ctx := withAccount(r, account.ID)
 	o, err := h.svc.repo.GetAccountSupplyOrder(ctx, account.ID, id)
 	if err != nil {
-		writeDujiaoErr(w, http.StatusNotFound, "order_not_found", "订单不存在")
+		writeDujiaoErr(w, http.StatusNotFound, "order_not_found", "訂單不存在")
 		return
 	}
 	if o.AccountID != account.ID {
-		writeDujiaoErr(w, http.StatusNotFound, "order_not_found", "订单不存在") // 防枚举
+		writeDujiaoErr(w, http.StatusNotFound, "order_not_found", "訂單不存在") // 防枚舉
 		return
 	}
 	switch action {
 	case "cancel":
 		ok, err := h.svc.repo.RefundUndelivered(ctx, account.ID, o.ID)
 		if err != nil {
-			writeDujiaoErr(w, http.StatusInternalServerError, "cancel_failed", "取消失败，请稍后重试")
+			writeDujiaoErr(w, http.StatusInternalServerError, "cancel_failed", "取消失敗，請稍後重試")
 			return
 		}
 		if !ok {
-			writeDujiaoErr(w, http.StatusConflict, "cancel_not_allowed", "交付中或已交付订单不可取消")
+			writeDujiaoErr(w, http.StatusConflict, "cancel_not_allowed", "交付中或已交付訂單不可取消")
 			return
 		}
 		writeDujiaoOK(w, map[string]any{
 			"order_id": idNum, "order_no": o.DownstreamOrderNo, "status": "canceled",
 		})
-	default: // 查单
+	default: // 查單
 		_, refunded, err := h.svc.repo.orderPayments(ctx, account.ID, o.ID)
 		if err != nil {
-			writeDujiaoErr(w, http.StatusInternalServerError, "order_read_failed", "读取订单失败")
+			writeDujiaoErr(w, http.StatusInternalServerError, "order_read_failed", "讀取訂單失敗")
 			return
 		}
 		reply := map[string]any{
@@ -321,7 +321,7 @@ func (h *dujiaoCompat) orderAction(w http.ResponseWriter, r *http.Request, accou
 	}
 }
 
-// dujiaoProduct 商品行（单 SKU：SKU id = 商品 id；金额字符串元）。
+// dujiaoProduct 商品行（單 SKU：SKU id = 商品 id；金額字符串元）。
 func (h *dujiaoCompat) dujiaoProduct(r *http.Request, account *ent.SupplierAccount, p catalogport.SupplierProduct, pricing *supplierPricing) map[string]any {
 	ctx := withAccount(r, account.ID)
 	price := pricing.Price(p.ID, 0, p.CategoryID, p.Price)
@@ -334,10 +334,10 @@ func (h *dujiaoCompat) dujiaoProduct(r *http.Request, account *ent.SupplierAccou
 		stockStatus = "out_of_stock"
 	}
 	return map[string]any{
-		"id":               p.ID, // dujiao 客户端 uint（字符串 unmarshal 失败）
+		"id":               p.ID, // dujiao 客户端 uint（字符串 unmarshal 失敗）
 		"slug":             fmt.Sprintf("p-%d", p.ID),
 		"seo_meta":         map[string]any{},
-		"title":            map[string]any{"zh-CN": p.Name}, // dujiao 多语言对象（jsonmap.JSON）
+		"title":            map[string]any{"zh-CN": p.Name}, // dujiao 多語言對象（jsonmap.JSON）
 		"description":      map[string]any{"zh-CN": p.Description},
 		"content":          map[string]any{"zh-CN": p.Description},
 		"images":           imgList(p.Cover),
@@ -346,7 +346,7 @@ func (h *dujiaoCompat) dujiaoProduct(r *http.Request, account *ent.SupplierAccou
 		"fulfillment_type": "auto",
 		"is_active":        p.Status == 1,
 		"category_id":      p.CategoryID,
-		"updated_at":       time.Now().UTC().Format(time.RFC3339), // 客户端不消费（增量信任上游过滤）；对齐协议字段
+		"updated_at":       time.Now().UTC().Format(time.RFC3339), // 客户端不消費（增量信任上游過濾）；對齊協議字段
 		"skus": []map[string]any{{
 			"id": p.ID, "sku_code": "default",
 			"price_amount": centsToYuanStr(price),
@@ -358,7 +358,7 @@ func (h *dujiaoCompat) dujiaoProduct(r *http.Request, account *ent.SupplierAccou
 
 // ── 工具 ───────────────────────────────────────────────────
 
-// dujiaoStatus 我方状态 → dujiao 口径。
+// dujiaoStatus 我方狀態 → dujiao 口徑。
 func dujiaoStatus(status string, deliveredNow bool) string {
 	if deliveredNow {
 		return "delivered"
@@ -375,7 +375,7 @@ func dujiaoStatus(status string, deliveredNow bool) string {
 	}
 }
 
-// centsToYuanStr 分 → "12.34"（字符串元两位小数；dujiao 全端点口径）。
+// centsToYuanStr 分 → "12.34"（字符串元兩位小數；dujiao 全端點口徑）。
 func centsToYuanStr(cents int64) string {
 	neg := ""
 	if cents < 0 {
@@ -384,7 +384,7 @@ func centsToYuanStr(cents int64) string {
 	return fmt.Sprintf("%s%d.%02d", neg, cents/100, cents%100)
 }
 
-// dujiaoSiteName connect/ping 回显店铺名。
+// dujiaoSiteName connect/ping 回顯店鋪名。
 func dujiaoSiteName(account *ent.SupplierAccount) string {
 	if account.DisplayName != "" {
 		return account.DisplayName
@@ -404,12 +404,12 @@ func writeDujiaoErr(w http.ResponseWriter, status int, code, msg string) {
 	_ = json.NewEncoder(w).Encode(map[string]any{"ok": false, "error_code": code, "error_message": msg})
 }
 
-// withAccount 注入账户上下文（fulfillOrder/仓库层消费 SupplyAccountID）。
+// withAccount 注入賬户上下文（fulfillOrder/倉庫層消費 SupplyAccountID）。
 func withAccount(r *http.Request, accountID uint64) context.Context {
 	return context.WithValue(r.Context(), accountCtxKey{}, accountID)
 }
 
-// parseUintAny JSON 数值/字符串 → uint64。
+// parseUintAny JSON 數值/字符串 → uint64。
 func parseUintAny(v any) (uint64, error) {
 	switch x := v.(type) {
 	case float64:
@@ -422,14 +422,14 @@ func parseUintAny(v any) (uint64, error) {
 		return x, nil
 	case int:
 		if x < 0 {
-			return 0, fmt.Errorf("负数")
+			return 0, fmt.Errorf("負數")
 		}
 		return uint64(x), nil
 	}
-	return 0, fmt.Errorf("无法解析 %T", v)
+	return 0, fmt.Errorf("無法解析 %T", v)
 }
 
-// imgList 封面 → images 数组（dujiao 字段形态）。
+// imgList 封面 → images 數組（dujiao 字段形態）。
 func imgList(cover string) []string {
 	if cover == "" {
 		return []string{}

@@ -26,7 +26,7 @@ type SecurityAuditLog struct {
 	Action string `json:"action,omitempty"`
 	// IP holds the value of the "ip" field.
 	IP string `json:"ip,omitempty"`
-	// 关键 ID 等（明文卡密/凭据绝不入内）
+	// 關鍵 ID 等（明文卡密/憑據絕不入內）
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt    time.Time `json:"created_at,omitempty"`

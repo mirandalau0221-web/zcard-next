@@ -12,7 +12,7 @@ import (
 
 func u64str(v uint64) string { return strconv.FormatUint(v, 10) }
 
-// priceYuan 分 → 元字符串（两位小数）。
+// priceYuan 分 → 元字符串（兩位小數）。
 func priceYuan(cents int64) string {
 	return money.Cents(cents).Format(2)
 }
@@ -21,7 +21,7 @@ func timeFmt(unix int64) string {
 	return time.Unix(unix, 0).UTC().Format("2006-01-02T15:04:05Z")
 }
 
-// TryRenderBot 见文件头注释。
+// TryRenderBot 見文件頭註釋。
 func (s *SeoService) TryRenderBot(w http.ResponseWriter, r *http.Request) bool {
 	path := strings.TrimRight(r.URL.Path, "/")
 	segment := strings.Split(strings.TrimPrefix(path, "/"), "/")[0]
@@ -30,7 +30,7 @@ func (s *SeoService) TryRenderBot(w http.ResponseWriter, r *http.Request) bool {
 	}
 	d, status, err := s.pageData(r)
 	if err != nil {
-		d = noindexPage(s.loadSite(r.Context()), r.Host, path, "页面暂时无法加载")
+		d = noindexPage(s.loadSite(r.Context()), r.Host, path, "頁面暫時無法加載")
 		status = 503
 	}
 	output, err := renderPage(d)

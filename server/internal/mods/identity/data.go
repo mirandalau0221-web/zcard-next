@@ -1,6 +1,6 @@
 package identity
 
-// 员工仓储 Ent 实现（Ent 收口边界内：data.go 允许 import ent，架构测试 -5）。
+// 員工倉儲 Ent 實現（Ent 收口邊界內：data.go 允許 import ent，架構測試 -5）。
 
 import (
 	"context"
@@ -16,18 +16,18 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// ErrAdminUserNotFound 员工不存在。
-var ErrAdminUserNotFound = errors.New("identity: 员工不存在")
+// ErrAdminUserNotFound 員工不存在。
+var ErrAdminUserNotFound = errors.New("identity: 員工不存在")
 
-// AdminUserRepoImpl 员工仓储实现。
+// AdminUserRepoImpl 員工倉儲實現。
 type AdminUserRepoImpl struct {
 	data *data.Data
 }
 
-// NewAdminUserRepoImpl 构造。
+// NewAdminUserRepoImpl 構造。
 func NewAdminUserRepoImpl(d *data.Data) *AdminUserRepoImpl { return &AdminUserRepoImpl{data: d} }
 
-// FindByUsername 按用户名查找（登录热路径，UNIQUE(username) 索引命中）。
+// FindByUsername 按用户名查找（登錄熱路徑，UNIQUE(username) 索引命中）。
 func (r *AdminUserRepoImpl) FindByUsername(ctx context.Context, username string) (*AdminUser, error) {
 	row, err := data.Client(ctx, r.data).AdminUser.Query().
 		Where(adminuser.Username(username)).
@@ -55,7 +55,7 @@ func (r *AdminUserRepoImpl) FindByUsername(ctx context.Context, username string)
 	}, nil
 }
 
-// TouchLogin 更新最近登录 IP 与时间（审计辅助）。
+// TouchLogin 更新最近登錄 IP 與時間（審計輔助）。
 func (r *AdminUserRepoImpl) TouchLogin(ctx context.Context, id uint64, ip string, at time.Time) error {
 	_, err := data.Client(ctx, r.data).AdminUser.UpdateOneID(id).
 		SetLastLoginIP(ip).
@@ -64,10 +64,10 @@ func (r *AdminUserRepoImpl) TouchLogin(ctx context.Context, id uint64, ip string
 	return err
 }
 
-// ── 员工管理（port.AdminMutator 实现，authz API 面消费；）────────────
+// ── 員工管理（port.AdminMutator 實現，authz API 面消費；）────────────
 
-// Admin 按 ID 取员工账户（port.AdminReader 实现——admin 鉴权中间件每请求
-// 校验 enabled 与当前 RoleID，禁用/换角色即时生效）。
+// Admin 按 ID 取員工賬户（port.AdminReader 實現——admin 鑑權中間件每請求
+// 校驗 enabled 與當前 RoleID，禁用/換角色即時生效）。
 func (r *AdminUserRepoImpl) Admin(ctx context.Context, id uint64) (*port.AdminAccount, error) {
 	row, err := data.Client(ctx, r.data).AdminUser.Get(ctx, id)
 	if ent.IsNotFound(err) {
@@ -82,7 +82,7 @@ func (r *AdminUserRepoImpl) Admin(ctx context.Context, id uint64) (*port.AdminAc
 	}, nil
 }
 
-// List 全部员工。
+// List 全部員工。
 func (r *AdminUserRepoImpl) List(ctx context.Context) ([]port.AdminAccount, error) {
 	rows, err := data.Client(ctx, r.data).AdminUser.Query().Order(ent.Asc(adminuser.FieldID)).All(ctx)
 	if err != nil {
@@ -98,7 +98,7 @@ func (r *AdminUserRepoImpl) List(ctx context.Context) ([]port.AdminAccount, erro
 	return out, nil
 }
 
-// Create 创建员工（用户名唯一；密码 bcrypt）。
+// Create 創建員工（用户名唯一；密碼 bcrypt）。
 func (r *AdminUserRepoImpl) Create(ctx context.Context, in port.AdminInput) (*port.AdminAccount, error) {
 	hash, err := crypto.HashPassword(in.Password)
 	if err != nil {
@@ -119,7 +119,7 @@ func (r *AdminUserRepoImpl) Create(ctx context.Context, in port.AdminInput) (*po
 	return &port.AdminAccount{ID: row.ID, Username: row.Username, Nickname: row.Nickname, RoleID: row.RoleID, Enabled: true}, nil
 }
 
-// Update 更新员工（nil 字段不动；Enabled 非 nil 时切换）。
+// Update 更新員工（nil 字段不動；Enabled 非 nil 時切換）。
 func (r *AdminUserRepoImpl) Update(ctx context.Context, id uint64, in port.AdminInput) (*port.AdminAccount, error) {
 	q := data.Client(ctx, r.data).AdminUser.UpdateOneID(id)
 	if in.Nickname != "" {
@@ -144,12 +144,12 @@ func (r *AdminUserRepoImpl) Update(ctx context.Context, id uint64, in port.Admin
 	return &port.AdminAccount{ID: row.ID, Username: row.Username, Nickname: row.Nickname, AuthVersion: row.AuthVersion, RoleID: row.RoleID, Enabled: row.Enabled, TOTPEnabled: len(row.TotpSecret) > 0}, nil
 }
 
-// RoleInUse 角色是否仍有员工挂载。
+// RoleInUse 角色是否仍有員工掛載。
 func (r *AdminUserRepoImpl) RoleInUse(ctx context.Context, roleID uint64) (bool, error) {
 	return data.Client(ctx, r.data).AdminUser.Query().Where(adminuser.RoleID(roleID)).Exist(ctx)
 }
 
-// ResetPassword 重置员工密码（bcrypt）——凭据接管类操作，调用方须同时吊销会话。
+// ResetPassword 重置員工密碼（bcrypt）——憑據接管類操作，調用方須同時吊銷會話。
 func (r *AdminUserRepoImpl) ResetPassword(ctx context.Context, id uint64, password string) error {
 	hash, err := crypto.HashPassword(password)
 	if err != nil {
@@ -165,13 +165,13 @@ func (r *AdminUserRepoImpl) ResetPassword(ctx context.Context, id uint64, passwo
 	})
 }
 
-// ClearTOTP 解绑员工 TOTP（port.AdminMutator；幂等——未绑定时同样成功）。
+// ClearTOTP 解綁員工 TOTP（port.AdminMutator；冪等——未綁定時同樣成功）。
 func (r *AdminUserRepoImpl) ClearTOTP(ctx context.Context, id uint64) error {
 	return ResetAdminTwoFactor(ctx, r.data, id, 0, "server recovery")
 }
 
-// RevokeAdminSessions 吊销员工全部未吊销的管理面会话（密码重置/解绑 TOTP 后强制重登；
-// user realm 会话不受影响）。
+// RevokeAdminSessions 吊銷員工全部未吊銷的管理面會話（密碼重置/解綁 TOTP 後強制重登；
+// user realm 會話不受影響）。
 func (r *AdminUserRepoImpl) RevokeAdminSessions(ctx context.Context, id uint64) error {
 	_, err := data.Client(ctx, r.data).Session.Update().
 		Where(
@@ -184,7 +184,7 @@ func (r *AdminUserRepoImpl) RevokeAdminSessions(ctx context.Context, id uint64) 
 	return err
 }
 
-// Delete 删除员工（同事务清其管理面会话，防残留可刷新的 refresh token）。
+// Delete 刪除員工（同事務清其管理面會話，防殘留可刷新的 refresh token）。
 func (r *AdminUserRepoImpl) Delete(ctx context.Context, id uint64) error {
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		client := data.Client(ctx, r.data)
@@ -197,15 +197,15 @@ func (r *AdminUserRepoImpl) Delete(ctx context.Context, id uint64) error {
 	})
 }
 
-// ── TOTP 仓储方法（）────────────────────────────────────
+// ── TOTP 倉儲方法（）────────────────────────────────────
 
-// SetTOTPSecret 存储 TOTP 密钥密文。
+// SetTOTPSecret 存儲 TOTP 密鑰密文。
 func (r *AdminUserRepoImpl) SetTOTPSecret(ctx context.Context, id uint64, secret []byte) error {
 	_, err := data.Client(ctx, r.data).AdminUser.UpdateOneID(id).SetTotpSecret(secret).Save(ctx)
 	return err
 }
 
-// ClearTOTPSecret 清除 TOTP 绑定。
+// ClearTOTPSecret 清除 TOTP 綁定。
 func (r *AdminUserRepoImpl) ClearTOTPSecret(ctx context.Context, id uint64) error {
 	return ResetAdminTwoFactor(ctx, r.data, id, 0, "server recovery")
 }

@@ -34,12 +34,12 @@ func passwordError(s State) error {
 	if s.Locked() {
 		seconds := max(1, int(math.Ceil(time.Until(s.ExpiresAt).Seconds())))
 		minutes := (seconds + 59) / 60
-		return errors.New(429, "order.FETCH_LOCKED", fmt.Sprintf("查询失败已达 5 次，此订单在当前网络下已暂时锁定，请约 %d 分钟后重试", minutes)).WithMetadata(map[string]string{
+		return errors.New(429, "order.FETCH_LOCKED", fmt.Sprintf("查詢失敗已達 5 次，此訂單在當前網絡下已暫時鎖定，請約 %d 分鐘後重試", minutes)).WithMetadata(map[string]string{
 			"retry_after_seconds": strconv.Itoa(seconds), "remaining_attempts": "0",
 		})
 	}
 	remaining := max(0, MaxFailures-s.Failures)
-	return errors.NotFound("order.NOT_FOUND", fmt.Sprintf("订单不存在或查询密码错误，还可尝试 %d 次；连续失败 5 次将锁定 30 分钟", remaining)).WithMetadata(map[string]string{"remaining_attempts": strconv.Itoa(remaining)})
+	return errors.NotFound("order.NOT_FOUND", fmt.Sprintf("訂單不存在或查詢密碼錯誤，還可嘗試 %d 次；連續失敗 5 次將鎖定 30 分鐘", remaining)).WithMetadata(map[string]string{"remaining_attempts": strconv.Itoa(remaining)})
 }
 
 // PublicError preserves actionable password feedback without leaking storage errors.
@@ -48,7 +48,7 @@ func PublicError(err error) error {
 	if e.Reason == "order.NOT_FOUND" || e.Reason == "order.FETCH_LOCKED" || e.Reason == "order.QUERY_PASSWORD_REQUIRED" || e.Reason == "order.ACCESS_REQUIRED" {
 		return e
 	}
-	return errors.InternalServer("order.QUERY_FAILED", "订单查询暂时失败，请稍后重试")
+	return errors.InternalServer("order.QUERY_FAILED", "訂單查詢暫時失敗，請稍後重試")
 }
 
 func Verify(ctx context.Context, gate Gate, no, hash, password, ip string) error {
@@ -74,7 +74,7 @@ func Verify(ctx context.Context, gate Gate, no, hash, password, ip string) error
 	}
 	// Opening a payment return URL without a saved password is not a failed guess.
 	if password == "" {
-		return errors.BadRequest("order.QUERY_PASSWORD_REQUIRED", "请输入下单时设置的查询密码")
+		return errors.BadRequest("order.QUERY_PASSWORD_REQUIRED", "請輸入下單時設置的查詢密碼")
 	}
 	if hash == "" || !crypto.VerifyPassword(hash, password) {
 		state := State{Failures: 1}

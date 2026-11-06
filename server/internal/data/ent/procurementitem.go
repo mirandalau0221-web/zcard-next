@@ -28,9 +28,9 @@ type ProcurementItem struct {
 	UpstreamSku string `json:"upstream_sku,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int32 `json:"quantity,omitempty"`
-	// 单位成本（分）
+	// 單位成本（分）
 	UnitCost int64 `json:"unit_cost,omitempty"`
-	// 到手卡密密文（base64 行，AES-GCM，零明文落盘）
+	// 到手卡密密文（base64 行，AES-GCM，零明文落盤）
 	ReceivedContent []string `json:"received_content,omitempty"`
 	selectValues    sql.SelectValues
 }

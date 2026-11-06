@@ -1,6 +1,6 @@
 package admincmd
 
-// 配置装载（与 main 的 loadBootstrap 同源逻辑，避免相互依赖）。
+// 配置裝載（與 main 的 loadBootstrap 同源邏輯，避免相互依賴）。
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func scanConf(dir string, out *conf.Bootstrap) error {
 	c := config.New(config.WithSource(file.NewSource(dir)))
 	defer c.Close()
 	if err := c.Load(); err != nil {
-		return fmt.Errorf("读取配置失败（目录 %s）: %w", dir, err)
+		return fmt.Errorf("讀取配置失敗（目錄 %s）: %w", dir, err)
 	}
 	return c.Scan(out)
 }

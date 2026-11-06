@@ -36,23 +36,23 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreOrderService 顾客下单。
+// StoreOrderService 顧客下單。
 type StoreOrderServiceClient interface {
 	SendOrderAccessCode(ctx context.Context, in *OrderAccessCodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RecoverOrderAccess(ctx context.Context, in *OrderAccessRecoveryRequest, opts ...grpc.CallOption) (*OrderAccessReply, error)
 	QuoteOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderReply, error)
 	ShippingRegions(ctx context.Context, in *ShippingRegionsRequest, opts ...grpc.CallOption) (*ShippingRegionsReply, error)
 	ReceiveShipment(ctx context.Context, in *ReceiveShipmentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// CreateOrder 下单（锁卡→算价→快照→事件；Idempotency-Key 头防重）。
+	// CreateOrder 下單（鎖卡→算價→快照→事件；Idempotency-Key 頭防重）。
 	CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderReply, error)
-	// GetOrder 凭单号+查询密码查单（三重门之一二：查询密码/登录态本人）。
+	// GetOrder 憑單號+查詢密碼查單（三重門之一二：查詢密碼/登錄態本人）。
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderReply, error)
-	// ListMyOrders 我的订单（登录态；offset 分页）。
+	// ListMyOrders 我的訂單（登錄態；offset 分頁）。
 	ListMyOrders(ctx context.Context, in *ListMyOrdersRequest, opts ...grpc.CallOption) (*ListMyOrdersReply, error)
-	// ListGuestOrders 游客按下单联系方式查订单列表（邮箱/手机号；精简信息——
-	// 卡密仍需逐单查询密码，防枚举：查不到返回空）。
+	// ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號；精簡信息——
+	// 卡密仍需逐單查詢密碼，防枚舉：查不到返回空）。
 	ListGuestOrders(ctx context.Context, in *ListGuestOrdersRequest, opts ...grpc.CallOption) (*ListGuestOrdersReply, error)
-	// CancelMyOrder 取消本人待支付订单（pending 可取消；锁卡释放+返券）。
+	// CancelMyOrder 取消本人待支付訂單（pending 可取消；鎖卡釋放+返券）。
 	CancelMyOrder(ctx context.Context, in *CancelMyOrderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -168,23 +168,23 @@ func (c *storeOrderServiceClient) CancelMyOrder(ctx context.Context, in *CancelM
 // All implementations must embed UnimplementedStoreOrderServiceServer
 // for forward compatibility.
 //
-// StoreOrderService 顾客下单。
+// StoreOrderService 顧客下單。
 type StoreOrderServiceServer interface {
 	SendOrderAccessCode(context.Context, *OrderAccessCodeRequest) (*emptypb.Empty, error)
 	RecoverOrderAccess(context.Context, *OrderAccessRecoveryRequest) (*OrderAccessReply, error)
 	QuoteOrder(context.Context, *CreateOrderRequest) (*CreateOrderReply, error)
 	ShippingRegions(context.Context, *ShippingRegionsRequest) (*ShippingRegionsReply, error)
 	ReceiveShipment(context.Context, *ReceiveShipmentRequest) (*emptypb.Empty, error)
-	// CreateOrder 下单（锁卡→算价→快照→事件；Idempotency-Key 头防重）。
+	// CreateOrder 下單（鎖卡→算價→快照→事件；Idempotency-Key 頭防重）。
 	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderReply, error)
-	// GetOrder 凭单号+查询密码查单（三重门之一二：查询密码/登录态本人）。
+	// GetOrder 憑單號+查詢密碼查單（三重門之一二：查詢密碼/登錄態本人）。
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderReply, error)
-	// ListMyOrders 我的订单（登录态；offset 分页）。
+	// ListMyOrders 我的訂單（登錄態；offset 分頁）。
 	ListMyOrders(context.Context, *ListMyOrdersRequest) (*ListMyOrdersReply, error)
-	// ListGuestOrders 游客按下单联系方式查订单列表（邮箱/手机号；精简信息——
-	// 卡密仍需逐单查询密码，防枚举：查不到返回空）。
+	// ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號；精簡信息——
+	// 卡密仍需逐單查詢密碼，防枚舉：查不到返回空）。
 	ListGuestOrders(context.Context, *ListGuestOrdersRequest) (*ListGuestOrdersReply, error)
-	// CancelMyOrder 取消本人待支付订单（pending 可取消；锁卡释放+返券）。
+	// CancelMyOrder 取消本人待支付訂單（pending 可取消；鎖卡釋放+返券）。
 	CancelMyOrder(context.Context, *CancelMyOrderRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedStoreOrderServiceServer()
 }

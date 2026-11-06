@@ -62,11 +62,11 @@ func LoadSettings(t *Theme) (*SettingsSchema, error) {
 		return nil, err
 	}
 	if len(b) > 128<<10 {
-		return nil, fmt.Errorf("主题设置定义超过 128KB")
+		return nil, fmt.Errorf("主題設置定義超過 128KB")
 	}
 	var s SettingsSchema
 	if err = json.Unmarshal(b, &s); err != nil {
-		return nil, fmt.Errorf("主题设置定义不是合法 JSON")
+		return nil, fmt.Errorf("主題設置定義不是合法 JSON")
 	}
 	if err = s.Validate(); err != nil {
 		return nil, err
@@ -75,33 +75,33 @@ func LoadSettings(t *Theme) (*SettingsSchema, error) {
 }
 func (s *SettingsSchema) Validate() error {
 	if s.Version != 1 || len(s.Groups) == 0 || len(s.Groups) > 20 {
-		return fmt.Errorf("不支持的设置版本或分组数量")
+		return fmt.Errorf("不支持的設置版本或分組數量")
 	}
 	seen := map[string]bool{}
 	groups := map[string]bool{}
 	total := 0
 	for _, g := range s.Groups {
 		if g.ID == "" || groups[g.ID] || g.Label == "" {
-			return fmt.Errorf("设置分组标识和名称必须有效且唯一")
+			return fmt.Errorf("設置分組標識和名稱必須有效且唯一")
 		}
 		groups[g.ID] = true
 		for _, f := range g.Fields {
 			total++
 			if !settingKey.MatchString(f.Key) || seen[f.Key] || f.Label == "" {
-				return fmt.Errorf("设置字段无效或重复: %s", f.Key)
+				return fmt.Errorf("設置字段無效或重複: %s", f.Key)
 			}
 			if strings.HasPrefix(f.Key, "template.") && !legacyThemeKeys[f.Key] {
-				return fmt.Errorf("主题不可覆盖业务或系统设置: %s", f.Key)
+				return fmt.Errorf("主題不可覆蓋業務或系統設置: %s", f.Key)
 			}
 			if f.RenamedFrom != "" && (!settingKey.MatchString(f.RenamedFrom) || f.RenamedFrom == f.Key) {
-				return fmt.Errorf("无效的旧字段名: %s", f.RenamedFrom)
+				return fmt.Errorf("無效的舊字段名: %s", f.RenamedFrom)
 			}
 			if f.Min != nil && f.Max != nil && *f.Min > *f.Max {
-				return fmt.Errorf("字段范围无效: %s", f.Key)
+				return fmt.Errorf("字段範圍無效: %s", f.Key)
 			}
 			seen[f.Key] = true
 			if f.Capability != "" && f.Capability != "cart" && f.Capability != "reviews" && f.Capability != "recharge" && f.Capability != "affiliate" {
-				return fmt.Errorf("未知业务能力: %s", f.Capability)
+				return fmt.Errorf("未知業務能力: %s", f.Capability)
 			}
 			if err := f.ValidateValue(f.Default); err != nil {
 				return err
@@ -109,22 +109,22 @@ func (s *SettingsSchema) Validate() error {
 		}
 	}
 	if total > 120 {
-		return fmt.Errorf("主题设置最多 120 项")
+		return fmt.Errorf("主題設置最多 120 項")
 	}
 	for _, g := range s.Groups {
 		for _, f := range g.Fields {
 			if f.RenamedFrom != "" && seen[f.RenamedFrom] {
-				return fmt.Errorf("旧字段仍在当前定义中")
+				return fmt.Errorf("舊字段仍在當前定義中")
 			}
 			if f.VisibleWhen != nil && !seen[f.VisibleWhen.Field] {
-				return fmt.Errorf("条件引用了未知字段")
+				return fmt.Errorf("條件引用了未知字段")
 			}
 		}
 	}
 	return nil
 }
 func (f SettingsField) ValidateValue(v any) error {
-	bad := func() error { return fmt.Errorf("%s：设置值不符合字段要求", f.Label) }
+	bad := func() error { return fmt.Errorf("%s：設置值不符合字段要求", f.Label) }
 	switch f.Type {
 	case "switch":
 		if _, ok := v.(bool); !ok {
@@ -169,7 +169,7 @@ func (f SettingsField) ValidateValue(v any) error {
 			return bad()
 		}
 	default:
-		return fmt.Errorf("未知设置控件: %s", f.Type)
+		return fmt.Errorf("未知設置控件: %s", f.Type)
 	}
 	return nil
 }
@@ -209,13 +209,13 @@ func (s *SettingsSchema) ValidateValues(values map[string]any) error {
 					return err
 				}
 			} else {
-				return fmt.Errorf("缺少设置: %s", f.Label)
+				return fmt.Errorf("缺少設置: %s", f.Label)
 			}
 		}
 	}
 	for k := range values {
 		if !known[k] {
-			return fmt.Errorf("未知设置: %s", k)
+			return fmt.Errorf("未知設置: %s", k)
 		}
 	}
 	return nil
@@ -228,7 +228,7 @@ type SettingsVersion struct {
 
 func SettingsVersions(key string) []SettingsVersion {
 	if key == "classic" {
-		return []SettingsVersion{{"builtin", "内置主题"}}
+		return []SettingsVersion{{"builtin", "內置主題"}}
 	}
 	var out []SettingsVersion
 	entries, err := os.ReadDir(Root + "/" + key)

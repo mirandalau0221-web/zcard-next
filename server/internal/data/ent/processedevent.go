@@ -19,7 +19,7 @@ type ProcessedEvent struct {
 	ID uint64 `json:"id,omitempty"`
 	// outbox_events.id
 	EventID uint64 `json:"event_id,omitempty"`
-	// 消费者标识（模块.处理器名）
+	// 消費者標識（模塊.處理器名）
 	Consumer string `json:"consumer,omitempty"`
 	// ProcessedAt holds the value of the "processed_at" field.
 	ProcessedAt  time.Time `json:"processed_at,omitempty"`

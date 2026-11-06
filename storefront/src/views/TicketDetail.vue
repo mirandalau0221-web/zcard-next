@@ -5,66 +5,66 @@
         <h2>{{ ticket?.ticket_no }}</h2>
         <div class="actions">
           <span :class="ticket?.priority === 'urgent_paid' ? 'badge red' : 'badge gray'">
-            {{ ticket?.priority === 'urgent_paid' ? $t('已加急') : $t('普通优先级') }}
+            {{ ticket?.priority === 'urgent_paid' ? $t('已加急') : $t('普通優先級') }}
           </span>
           <span :class="statusBadge">{{ statusText }}</span>
         </div>
       </div>
       <div class="muted" style="margin-top: 4px;">
-        {{ ticket?.type === 'presale' ? $t('售前') : $t('售后') }} {{ $t('· 创建于') }} {{ fmtTime(ticket?.created_at || 0) }}
+        {{ ticket?.type === 'presale' ? $t('售前') : $t('售後') }} {{ $t('· 創建於') }} {{ fmtTime(ticket?.created_at || 0) }}
       </div>
       <div class="actions" style="margin-top: 12px;" v-if="ticket">
         <button class="btn secondary" v-if="urgentAvailable"
                 :disabled="urging" type="button" @click.stop.prevent="openUrgent">
-          {{ urging ? $t('处理中…') : urgentFee > 0 ? $t('付费加急（{0}）', [formatMoney(urgentFee)]) : $t('免费加急') }}
+          {{ urging ? $t('處理中…') : urgentFee > 0 ? $t('付費加急（{0}）', [formatMoney(urgentFee)]) : $t('免費加急') }}
         </button>
         <template v-if="ticket.status === 'resolved' && !ticket.satisfaction">
-          <span class="muted">{{ $t('对本单服务评价：') }}</span>
+          <span class="muted">{{ $t('對本單服務評價：') }}</span>
           <select v-model.number="rateValue" style="padding: 4px;">
-            <option :value="5">{{ $t('★★★★★ 很满意') }}</option>
-            <option :value="4">{{ $t('★★★★ 满意') }}</option>
+            <option :value="5">{{ $t('★★★★★ 很滿意') }}</option>
+            <option :value="4">{{ $t('★★★★ 滿意') }}</option>
             <option :value="3">{{ $t('★★★ 一般') }}</option>
-            <option :value="2">{{ $t('★★ 不满意') }}</option>
-            <option :value="1">{{ $t('★ 很不满意') }}</option>
+            <option :value="2">{{ $t('★★ 不滿意') }}</option>
+            <option :value="1">{{ $t('★ 很不滿意') }}</option>
           </select>
-          <button class="btn secondary" @click="doRate">{{ $t('提交评价') }}</button>
+          <button class="btn secondary" @click="doRate">{{ $t('提交評價') }}</button>
         </template>
-        <span v-if="ticket.satisfaction" class="muted">{{ $t('已评价：') }}{{ '★'.repeat(ticket.satisfaction) }}</span>
+        <span v-if="ticket.satisfaction" class="muted">{{ $t('已評價：') }}{{ '★'.repeat(ticket.satisfaction) }}</span>
       </div>
       <div v-if="actionError" class="error" style="margin-top: 8px;">{{ uiText(actionError) }}</div>
       <div v-if="urgentError" class="error" style="margin-top:8px;">{{ uiText(urgentError) }}</div>
-      <div v-if="urgentOk" class="success" style="margin-top: 8px;" role="status">{{ urgentOk.already_urgent ? $t('工单已加急，本次未重复扣费') : urgentOk.fee_cents > 0 ? $t('加急成功，已扣费 {0}，客服将优先处理', [formatMoney(urgentOk.fee_cents)]) : $t('已免费加急，客服将优先处理') }}</div>
+      <div v-if="urgentOk" class="success" style="margin-top: 8px;" role="status">{{ urgentOk.already_urgent ? $t('工單已加急，本次未重複扣費') : urgentOk.fee_cents > 0 ? $t('加急成功，已扣費 {0}，客服將優先處理', [formatMoney(urgentOk.fee_cents)]) : $t('已免費加急，客服將優先處理') }}</div>
     </div>
 
-    <!-- 会话流（内部备注后端已过滤；user 右侧蓝、admin 左侧灰、system 居中） -->
+    <!-- 會話流（內部備註後端已過濾；user 右側藍、admin 左側灰、system 居中） -->
     <div class="card" style="margin-bottom: 16px;">
       <div class="chat">
         <div v-for="m in messages" :key="m.id" :class="`msg ${m.sender_type}`">
           <div v-if="m.sender_type !== 'user'" class="muted" style="margin-bottom: 2px;">
-            {{ m.sender_type === 'admin' ? $t('客服') : $t('系统') }} · {{ fmtTime(m.created_at) }}
+            {{ m.sender_type === 'admin' ? $t('客服') : $t('系統') }} · {{ fmtTime(m.created_at) }}
           </div>
           <div v-else class="muted" style="margin-bottom: 2px; text-align: right;">{{ fmtTime(m.created_at) }}</div>
           <div>{{ m.content }}</div>
         </div>
-        <div v-if="!messages.length" class="muted" style="text-align: center;">{{ $t('加载中…') }}</div>
+        <div v-if="!messages.length" class="muted" style="text-align: center;">{{ $t('加載中…') }}</div>
       </div>
     </div>
 
-    <!-- 回复 -->
+    <!-- 回覆 -->
     <div class="card" v-if="ticket && ticket.status !== 'closed'">
       <div class="field">
-        <label>{{ $t('追加回复') }}</label>
-        <textarea class="input" v-model="replyContent" rows="3" :placeholder="$t('补充信息或回复客服')"></textarea>
+        <label>{{ $t('追加回復') }}</label>
+        <textarea class="input" v-model="replyContent" rows="3" :placeholder="$t('補充信息或回覆客服')"></textarea>
       </div>
       <div v-if="replyError" class="error" style="margin-bottom: 8px;">{{ uiText(replyError) }}</div>
-      <button class="btn" :disabled="replying || !replyContent.trim()" @click="doReply">{{ replying ? $t('发送中…') : $t('发送') }}</button>
+      <button class="btn" :disabled="replying || !replyContent.trim()" @click="doReply">{{ replying ? $t('發送中…') : $t('發送') }}</button>
     </div>
     <dialog ref="urgentDialog" class="urgent-dialog" aria-labelledby="urgent-title" @cancel.prevent="closeUrgent">
-      <h3 id="urgent-title">{{ quotedFee > 0 ? $t('确认付费加急') : $t('确认免费加急') }}</h3>
-      <p>{{ quotedFee > 0 ? $t('本次将从账户余额扣除 {0}，确认后客服将优先处理。', [formatMoney(quotedFee)]) : $t('本次加急免费，确认后客服将优先处理。') }}</p>
+      <h3 id="urgent-title">{{ quotedFee > 0 ? $t('確認付費加急') : $t('確認免費加急') }}</h3>
+      <p>{{ quotedFee > 0 ? $t('本次將從賬户餘額扣除 {0}，確認後客服將優先處理。', [formatMoney(quotedFee)]) : $t('本次加急免費，確認後客服將優先處理。') }}</p>
       <div class="urgent-dialog-actions">
         <button type="button" class="btn secondary" :disabled="urging" @click.stop.prevent="closeUrgent">{{ $t('取消') }}</button>
-        <button type="button" class="btn btn-primary" :disabled="urging" @click.stop.prevent="doUrgent">{{ urging ? $t('处理中…') : quotedFee > 0 ? $t('确认支付 {0}', [formatMoney(quotedFee)]) : $t('确认免费加急') }}</button>
+        <button type="button" class="btn btn-primary" :disabled="urging" @click.stop.prevent="doUrgent">{{ urging ? $t('處理中…') : quotedFee > 0 ? $t('確認支付 {0}', [formatMoney(quotedFee)]) : $t('確認免費加急') }}</button>
       </div>
     </dialog>
   </div>
@@ -97,7 +97,7 @@ const urgentDialog = ref<HTMLDialogElement | null>(null);
 const rateValue = ref(5);
 
 const statusText = computed(() =>
-  ({ get open() { return $t("待处理"); }, get processing() { return $t("处理中"); }, get resolved() { return $t("已解决"); }, get closed() { return $t("已关闭"); } } as Record<string, string>)[ticket.value?.status || ''] || ticket.value?.status
+  ({ get open() { return $t("待處理"); }, get processing() { return $t("處理中"); }, get resolved() { return $t("已解決"); }, get closed() { return $t("已關閉"); } } as Record<string, string>)[ticket.value?.status || ''] || ticket.value?.status
 );
 const statusBadge = computed(() =>
   ({ open: 'badge orange', processing: 'badge blue', resolved: 'badge green', closed: 'badge gray' } as Record<string, string>)[ticket.value?.status || ''] || 'badge gray'
@@ -152,11 +152,11 @@ async function doUrgent() {
   urging.value = false;
   urgentDialog.value?.close();
   if (error || !data) {
-    actionError.value = error || $t("加急失败（余额不足？）");
+    actionError.value = error || $t("加急失敗（餘額不足？）");
     return;
   }
   if (!data.paid) {
-    actionError.value = data.error || $t("加急失败");
+    actionError.value = data.error || $t("加急失敗");
     return;
   }
   urgentOk.value = data;

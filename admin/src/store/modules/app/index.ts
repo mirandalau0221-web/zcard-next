@@ -57,12 +57,16 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
     routeStore.resetRouteCache();
   }
 
-  const locale = ref<App.I18n.LangType>(localStg.get("lang") || "zh-CN");
+  // Legacy stored preference "zh-CN" resolves to Traditional Chinese now.
+  const storedLang = localStg.get("lang");
+  const locale = ref<App.I18n.LangType>(
+    (storedLang === "zh-CN" ? "zh-TW" : storedLang || "zh-TW") as App.I18n.LangType,
+  );
 
   const localeOptions: App.I18n.LangOption[] = [
     {
-      label: "中文",
-      key: "zh-CN",
+      label: "繁體中文",
+      key: "zh-TW",
     },
     {
       label: "English",

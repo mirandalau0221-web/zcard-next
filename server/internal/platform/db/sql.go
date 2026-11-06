@@ -5,17 +5,17 @@ import (
 	"strings"
 )
 
-// SQL 跨方言 SQL 原语构造器——internal/data/report 层唯一允许的裸 SQL 构造入口。
-// 业务代码一律走 Ent builder；在业务代码拼接本包产出的方言 SQL 同样被架构测试拦截。
+// SQL 跨方言 SQL 原語構造器——internal/data/report 層唯一允許的裸 SQL 構造入口。
+// 業務代碼一律走 Ent builder；在業務代碼拼接本包產出的方言 SQL 同樣被架構測試攔截。
 type SQL struct{ d Dialect }
 
-// New 按方言构造。
+// New 按方言構造。
 func New(d Dialect) *SQL { return &SQL{d: d} }
 
-// Dialect 返回当前方言。
+// Dialect 返回當前方言。
 func (s *SQL) Dialect() Dialect { return s.d }
 
-// Placeholder 第 i 个占位符（从 1 起）：MySQL/SQLite `?`，PG `$i`。
+// Placeholder 第 i 個佔位符（從 1 起）：MySQL/SQLite `?`，PG `$i`。
 func (s *SQL) Placeholder(i int) string {
 	if s.d == Postgres {
 		return fmt.Sprintf("$%d", i)
@@ -23,7 +23,7 @@ func (s *SQL) Placeholder(i int) string {
 	return "?"
 }
 
-// Placeholders 生成 n 个占位符（逗号分隔），用于 IN (...)。
+// Placeholders 生成 n 個佔位符（逗號分隔），用於 IN (...)。
 func (s *SQL) Placeholders(n, from int) string {
 	parts := make([]string, n)
 	for i := 0; i < n; i++ {
@@ -32,7 +32,7 @@ func (s *SQL) Placeholders(n, from int) string {
 	return strings.Join(parts, ", ")
 }
 
-// QuoteIdent 引用标识符：MySQL “ `id` “，PG/SQLite `"id"`。
+// QuoteIdent 引用標識符：MySQL “ `id` “，PG/SQLite `"id"`。
 func (s *SQL) QuoteIdent(id string) string {
 	if s.d == MySQL {
 		return "`" + id + "`"
@@ -40,7 +40,7 @@ func (s *SQL) QuoteIdent(id string) string {
 	return `"` + id + `"`
 }
 
-// ILike 大小写不敏感匹配表达式（片段内含占位符）。
+// ILike 大小寫不敏感匹配表達式（片段內含佔位符）。
 func (s *SQL) ILike(col string) string {
 	if s.d == Postgres {
 		return col + " ILIKE ?"
@@ -48,7 +48,7 @@ func (s *SQL) ILike(col string) string {
 	return "LOWER(" + col + ") LIKE LOWER(?)"
 }
 
-// Concat 字符串拼接表达式。
+// Concat 字符串拼接表達式。
 func (s *SQL) Concat(exprs ...string) string {
 	if s.d == MySQL {
 		return "CONCAT(" + strings.Join(exprs, ", ") + ")"
@@ -56,7 +56,7 @@ func (s *SQL) Concat(exprs ...string) string {
 	return "(" + strings.Join(exprs, " || ") + ")"
 }
 
-// DateAdd 日期加减表达式：unit 取 second/minute/hour/day。
+// DateAdd 日期加減表達式：unit 取 second/minute/hour/day。
 func (s *SQL) DateAdd(col, unit string, n int) string {
 	switch s.d {
 	case MySQL:
@@ -72,7 +72,7 @@ func (s *SQL) DateAdd(col, unit string, n int) string {
 	}
 }
 
-// Bool 布尔字面量：MySQL 1/0，PG/SQLite TRUE/FALSE。
+// Bool 布爾字面量：MySQL 1/0，PG/SQLite TRUE/FALSE。
 func (s *SQL) Bool(v bool) string {
 	if s.d == MySQL {
 		if v {
@@ -86,7 +86,7 @@ func (s *SQL) Bool(v bool) string {
 	return "FALSE"
 }
 
-// Paginate 分页子句：MySQL `LIMIT offset, limit`，PG/SQLite `LIMIT limit OFFSET offset`。
+// Paginate 分頁子句：MySQL `LIMIT offset, limit`，PG/SQLite `LIMIT limit OFFSET offset`。
 func (s *SQL) Paginate(limit, offset int) string {
 	if s.d == MySQL {
 		return fmt.Sprintf("LIMIT %d, %d", offset, limit)
@@ -94,8 +94,8 @@ func (s *SQL) Paginate(limit, offset int) string {
 	return fmt.Sprintf("LIMIT %d OFFSET %d", limit, offset)
 }
 
-// ForUpdate 行锁子句（下单锁卡/支付回调热路径）。
-// SQLite 返回空串：无行锁，走 BEGIN IMMEDIATE 单写者 + affected rows CAS 语义（§5.20.3）。
+// ForUpdate 行鎖子句（下單鎖卡/支付回調熱路徑）。
+// SQLite 返回空串：無行鎖，走 BEGIN IMMEDIATE 單寫者 + affected rows CAS 語義（§5.20.3）。
 func (s *SQL) ForUpdate(skipLocked bool) string {
 	switch s.d {
 	case MySQL, Postgres:
@@ -107,7 +107,7 @@ func (s *SQL) ForUpdate(skipLocked bool) string {
 	return ""
 }
 
-// NowSQL 当前时间表达式。
+// NowSQL 當前時間表達式。
 func (s *SQL) NowSQL() string {
 	if s.d == SQLite {
 		return "CURRENT_TIMESTAMP"

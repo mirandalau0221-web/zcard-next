@@ -23,11 +23,11 @@ type ResellerRelatedAccount struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 分站 profile user_id
 	ResellerID uint64 `json:"reseller_id,omitempty"`
-	// 关联用户
+	// 關聯用户
 	UserID uint64 `json:"user_id,omitempty"`
 	// family/same_device/sub_account...
 	RelationType string `json:"relation_type,omitempty"`
-	// 判定依据
+	// 判定依據
 	Source string `json:"source,omitempty"`
 	// Status holds the value of the "status" field.
 	Status       resellerrelatedaccount.Status `json:"status,omitempty"`

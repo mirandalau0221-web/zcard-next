@@ -80,7 +80,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 			timeout = conf.Timeout
 		}
 		if len(ch.Methods) > 0 {
-			return fmt.Errorf("payment.METHODS_INVALID: 此渠道不支持本地支付方式列表，请在渠道参数中配置币种与网络")
+			return fmt.Errorf("payment.METHODS_INVALID: 此渠道不支持本地支付方式列表，請在渠道參數中配置幣種與網絡")
 		}
 		var amount int64
 		var subsite uint64
@@ -93,7 +93,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 				return err
 			}
 			if o.Status != order.StatusPendingPayment || o.ExpiryReview || !time.Now().Before(o.ExpiredAt) {
-				return fmt.Errorf("payment.ORDER_EXPIRED: 订单已关闭或待核对")
+				return fmt.Errorf("payment.ORDER_EXPIRED: 訂單已關閉或待核對")
 			}
 			if err := r.checkPaymentUsage(ch, method, scenePurchase); err != nil {
 				return err
@@ -103,7 +103,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 			if o.ExpiredAt.Before(deadline) {
 				deadline = o.ExpiredAt
 			}
-			a.Subject = "订单 " + o.OrderNo
+			a.Subject = "訂單 " + o.OrderNo
 			a.ReturnURL = absolutePayURL(ctx, "/payment/"+o.OrderNo)
 			q.Where(payment.OrderID(orderID))
 		} else if rechargeID > 0 && orderID == 0 {
@@ -123,7 +123,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 			}
 			amount = ro.Amount
 			scope = scene
-			a.Subject = "余额充值"
+			a.Subject = "餘額充值"
 			a.ReturnURL = absolutePayURL(ctx, "/member?tab=recharge")
 			if ch.Driver == "upay" && ro.Target == rechargeorder.TargetSupply {
 				a.ReturnURL = absolutePayURL(ctx, "/member?tab=supplier")
@@ -138,7 +138,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 		p, err = r.nativeAttempt(txCtx, q, ch, method)
 		if ent.IsNotFound(err) {
 			if time.Until(deadline) <= minimum {
-				return fmt.Errorf("payment.ORDER_EXPIRED: 剩余支付时间不足 180 秒，请重新下单")
+				return fmt.Errorf("payment.ORDER_EXPIRED: 剩餘支付時間不足 180 秒，請重新下單")
 			}
 			ref, err := bepusdtNonce()
 			if err != nil {
@@ -170,7 +170,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 			return err
 		} else {
 			if p.Status != payment.StatusPending {
-				return fmt.Errorf("payment.NOT_PENDING: 支付已处理，请刷新页面")
+				return fmt.Errorf("payment.NOT_PENDING: 支付已處理，請刷新頁面")
 			}
 			if pricingOf(p).Base != amount {
 				return fmt.Errorf("payment.AMOUNT_MISMATCH")
@@ -184,23 +184,23 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 				return fmt.Errorf("payment.ATTEMPT_INVALID")
 			}
 			if !time.Now().Before(p.ExpiresAt) {
-				return fmt.Errorf("payment.ORDER_EXPIRED: 支付已过期，请重新下单")
+				return fmt.Errorf("payment.ORDER_EXPIRED: 支付已過期，請重新下單")
 			}
 			if a.PaymentURL != "" {
 				cached = true
 				return nil
 			}
 			if time.Now().Before(a.LeaseUntil) {
-				return fmt.Errorf("payment.IN_PROGRESS: 正在发起支付，请稍后重试")
+				return fmt.Errorf("payment.IN_PROGRESS: 正在發起支付，請稍後重試")
 			}
 			// UPAY only deduplicates pending orders. Repeating an unknown request
 			// after upstream settlement/expiry can create another payable trade.
 			if ch.Driver == "upay" && a.RequestSent {
 				unknown = true
-				return fmt.Errorf("payment.RESULT_UNKNOWN: UPAY PRO 下单结果待核对，请联系管理员；请勿重复付款")
+				return fmt.Errorf("payment.RESULT_UNKNOWN: UPAY PRO 下單結果待核對，請聯繫管理員；請勿重複付款")
 			}
 			if time.Until(p.ExpiresAt) <= minimum {
-				return fmt.Errorf("payment.ORDER_EXPIRED: 剩余支付时间不足 180 秒，请重新下单")
+				return fmt.Errorf("payment.ORDER_EXPIRED: 剩餘支付時間不足 180 秒，請重新下單")
 			}
 		}
 		a.RequestSent = true
@@ -213,7 +213,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 		// A process may have died before recording the request failure. Persist
 		// the review flag outside the rolled-back creation transaction.
 		if unknown && p != nil {
-			if e := data.Client(ctx, r.data).Payment.Update().Where(payment.ID(p.ID), payment.StatusEQ(payment.StatusPending), payment.ReviewReasonEQ("")).SetReviewReason(fmt.Sprintf("UPAY PRO 下单结果待核对，网关商户单号 %s；请勿重复付款", p.GatewayOrderRef)).Exec(ctx); e != nil {
+			if e := data.Client(ctx, r.data).Payment.Update().Where(payment.ID(p.ID), payment.StatusEQ(payment.StatusPending), payment.ReviewReasonEQ("")).SetReviewReason(fmt.Sprintf("UPAY PRO 下單結果待核對，網關商户單號 %s；請勿重複付款", p.GatewayOrderRef)).Exec(ctx); e != nil {
 				return nil, e
 			}
 		}
@@ -248,7 +248,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 		state.LeaseUntil = time.Time{}
 		update := c.Payment.UpdateOneID(p.ID)
 		if createErr != nil && p.DriverSnapshot == "upay" && current.Status == payment.StatusPending {
-			update.SetReviewReason(fmt.Sprintf("UPAY PRO 下单结果待核对，网关商户单号 %s；请勿重复付款", p.GatewayOrderRef))
+			update.SetReviewReason(fmt.Sprintf("UPAY PRO 下單結果待核對，網關商户單號 %s；請勿重複付款", p.GatewayOrderRef))
 		}
 		if createErr == nil {
 			if current.ChannelOrderNo != "" && current.ChannelOrderNo != info.ChannelOrderNo {
@@ -275,7 +275,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 			return nil, err
 		}
 		if o.Status != order.StatusPendingPayment || !time.Now().Before(o.ExpiredAt) {
-			return nil, fmt.Errorf("payment.ORDER_NOT_PENDING: 订单状态已变化，请刷新页面查看结果")
+			return nil, fmt.Errorf("payment.ORDER_NOT_PENDING: 訂單狀態已變化，請刷新頁面查看結果")
 		}
 	}
 	return &port.RechargePaymentInfo{BaseCents: pricingOf(p).Base, FeeCents: p.Fee, TotalCents: p.Amount, PaymentID: p.ID, Type: info.Type, Payload: string(info.Payload)}, nil
@@ -309,7 +309,7 @@ func (r *PaymentRepoImpl) checkBepusdtConfigChange(ctx context.Context, ch *ent.
 		return err
 	}
 	if pending {
-		return fmt.Errorf("payment.CHANNEL_BUSY: 此渠道仍有未确认支付，请保留原配置处理回调；更换网关或网络请新建渠道")
+		return fmt.Errorf("payment.CHANNEL_BUSY: 此渠道仍有未確認支付，請保留原配置處理回調；更換網關或網絡請新建渠道")
 	}
 	return nil
 }

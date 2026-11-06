@@ -1,4 +1,4 @@
-// 登录态（）：轻量响应式状态（无 Pinia 依赖，单例模块）。
+// 登錄態（）：輕量響應式狀態（無 Pinia 依賴，單例模塊）。
 import { reactive } from 'vue';
 import { me } from '@/api';
 import { getToken, clearToken } from '@/api/client';
@@ -9,7 +9,7 @@ export const authState = reactive({
   loaded: false
 });
 
-// refreshAuth 启动/登录后调用；无 token 静默，token 失效由 client 401 层清理。
+// refreshAuth 啓動/登錄後調用；無 token 靜默，token 失效由 client 401 層清理。
 export async function refreshAuth() {
   if (!getToken()) {
     authState.loggedIn = false;

@@ -21,19 +21,19 @@ type OrderAmountLine struct {
 	ID uint64 `json:"id,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uint64 `json:"order_id,omitempty"`
-	// 订单子项（NULL=父单级，如整单优惠券）
+	// 訂單子項（NULL=父單級，如整單優惠券）
 	ItemID uint64 `json:"item_id,omitempty"`
-	// 金额行类型（新增折扣类型只加枚举值）
+	// 金額行類型（新增折扣類型只加枚舉值）
 	Type orderamountline.Type `json:"type,omitempty"`
-	// 有符号分（折扣为负、加价为正）
+	// 有符號分（折扣為負、加價為正）
 	Amount int64 `json:"amount,omitempty"`
-	// 来源类型 member_level/coupon/flash_sale/points/subsite/manual
+	// 來源類型 member_level/coupon/flash_sale/points/subsite/manual
 	SourceType string `json:"source_type,omitempty"`
-	// 来源 ID（优惠券/会员等级/秒杀）
+	// 來源 ID（優惠券/會員等級/秒殺）
 	SourceID uint64 `json:"source_id,omitempty"`
-	// 管线顺序（PriceCalculator 步骤序，可重放）
+	// 管線順序（PriceCalculator 步驟序，可重放）
 	Seq int32 `json:"seq,omitempty"`
-	// 快照（费率/汇率/取整规则）
+	// 快照（費率/匯率/取整規則）
 	Meta map[string]interface{} `json:"meta,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`

@@ -1,6 +1,6 @@
 package schema
 
-// 所有权：mods/lottery。免费抽奖与订单/账务分离；站点、账号与请求唯一键防重复发奖。
+// 所有權：mods/lottery。免費抽獎與訂單/賬務分離；站點、賬號與請求唯一鍵防重複發獎。
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
@@ -30,7 +30,7 @@ func (LotteryPrize) Fields() []ent.Field {
 		field.Uint64("id"), field.Uint64("activity_id"), field.String("name").MaxLen(100), field.String("image").MaxLen(2048).Default(""),
 		field.String("mode").MaxLen(16), field.Uint64("product_id").Default(0), field.Uint64("sku_id").Default(0), field.Int32("probability").Default(0),
 		field.Int32("quantity").Default(1), field.Int32("issued").Default(0), field.Int32("sort").Default(0), field.Bool("enabled").Default(true),
-		field.Bytes("content").Optional().Comment("固定内容/领取说明密文，仅获奖者或配置管理员读取"),
+		field.Bytes("content").Optional().Comment("固定內容/領取説明密文，僅獲獎者或配置管理員讀取"),
 	}
 }
 func (LotteryPrize) Indexes() []ent.Index {
@@ -70,7 +70,7 @@ func (LotteryDraw) Fields() []ent.Field {
 		field.String("activity_name").MaxLen(100), field.String("prize_name").MaxLen(100).Default(""), field.String("mode").MaxLen(16).Default(""), field.String("status").MaxLen(20),
 		field.Uint64("prize_id").Default(0), field.Uint64("product_id").Default(0), field.Uint64("sku_id").Default(0), field.Uint64("card_id").Optional().Nillable(),
 		field.Int64("cost").Default(0), field.Int32("revision"), field.JSON("rule_snapshot", map[string]any{}).Optional(),
-		field.Bytes("content").Optional().Comment("抽奖专用密文，AAD 绑定中奖编号和站点"), field.Time("delivered_at").SchemaType(mysqlTime).Optional(), field.Uint64("admin_id").Default(0), field.String("remark").MaxLen(500).Default(""),
+		field.Bytes("content").Optional().Comment("抽獎專用密文，AAD 綁定中獎編號和站點"), field.Time("delivered_at").SchemaType(mysqlTime).Optional(), field.Uint64("admin_id").Default(0), field.String("remark").MaxLen(500).Default(""),
 	}
 }
 func (LotteryDraw) Indexes() []ent.Index {

@@ -1,7 +1,7 @@
 package supply
 
-// 采购网关实现（ 消费方端口）：连接凭据解密 → 适配器装配 → 提交/查询/退款。
-// 库存查询失败保留错误，避免付款前将未知库存当作充足。
+// 採購網關實現（ 消費方端口）：連接憑據解密 → 適配器裝配 → 提交/查詢/退款。
+// 庫存查詢失敗保留錯誤，避免付款前將未知庫存當作充足。
 
 import (
 	"context"
@@ -20,24 +20,24 @@ import (
 	supplyport "github.com/NovaWorks/zcard-next/server/internal/mods/supply/port"
 )
 
-// ErrCooldownActive 渠道熔断冷却中（可重试口径：procurement 退避轮询自然吸收）。
+// ErrCooldownActive 渠道熔斷冷卻中（可重試口徑：procurement 退避輪詢自然吸收）。
 var ErrCooldownActive = errors.New("supply: rate limit cooldown active")
 
-// Gateway supply 采购网关（实现 supplyport.UpstreamGateway 与 orderport.UpstreamStockGate）。
-// S2：出站共享自适应节奏器——熔断冷却中直接拒绝（可重试口径），
-// 限流信号反馈降速、成功反馈回升（采购请求量小，主要防持续撞墙）。
+// Gateway supply 採購網關（實現 supplyport.UpstreamGateway 與 orderport.UpstreamStockGate）。
+// S2：出站共享自適應節奏器——熔斷冷卻中直接拒絕（可重試口徑），
+// 限流信號反饋降速、成功反饋回升（採購請求量小，主要防持續撞牆）。
 type Gateway struct {
 	repo   *SupplyRepoImpl
-	pacer  *Pacer                    // nil = 不节流（测试）
-	reader catalogport.ProductReader // 商品/SKU 上游映射（CheckOrderItems 预检用）
+	pacer  *Pacer                    // nil = 不節流（測試）
+	reader catalogport.ProductReader // 商品/SKU 上游映射（CheckOrderItems 預檢用）
 }
 
-// NewGateway 构造。
+// NewGateway 構造。
 func NewGateway(repo *SupplyRepoImpl, pacer *Pacer, reader catalogport.ProductReader) *Gateway {
 	return &Gateway{repo: repo, pacer: pacer, reader: reader}
 }
 
-// FailStrategyOf 渠道级失败策略（port 实现；读连接 settings.failure_action）。
+// FailStrategyOf 渠道級失敗策略（port 實現；讀連接 settings.failure_action）。
 func (g *Gateway) FailStrategyOf(ctx context.Context, connectionID uint64) string {
 	conn, err := g.repo.GetConnection(ctx, connectionID)
 	if err != nil {
@@ -49,19 +49,19 @@ func (g *Gateway) FailStrategyOf(ctx context.Context, connectionID uint64) strin
 	return "auto_refund"
 }
 
-// gate 出站前置：熔断冷却判定（冷却中返回可重试错误——procurement 侧退避轮询）。
+// gate 出站前置：熔斷冷卻判定（冷卻中返回可重試錯誤——procurement 側退避輪詢）。
 func (g *Gateway) gate(ctx context.Context, connectionID uint64) (*ent.SupplyConnection, error) {
 	conn, err := g.repo.GetConnection(ctx, connectionID)
 	if err != nil {
 		return nil, err
 	}
 	if g.pacer != nil && g.pacer.CooldownActive(conn) {
-		return nil, fmt.Errorf("supply: 渠道熔断冷却中（上游限流），采购稍后自动重试: %w", ErrCooldownActive)
+		return nil, fmt.Errorf("supply: 渠道熔斷冷卻中（上游限流），採購稍後自動重試: %w", ErrCooldownActive)
 	}
 	return conn, nil
 }
 
-// feedback 出站结果反馈节奏器（err 分类：限流降速 / 成功回升）。
+// feedback 出站結果反饋節奏器（err 分類：限流降速 / 成功回升）。
 func (g *Gateway) feedback(ctx context.Context, conn *ent.SupplyConnection, err error) {
 	if g.pacer == nil {
 		return
@@ -75,7 +75,7 @@ func (g *Gateway) feedback(ctx context.Context, conn *ent.SupplyConnection, err 
 	}
 }
 
-// adapterFor 按连接构造适配器（凭据解密失败 → 明确错误）。
+// adapterFor 按連接構造適配器（憑據解密失敗 → 明確錯誤）。
 func (g *Gateway) adapterFor(ctx context.Context, connectionID uint64) (adapter.Adapter, error) {
 	conn, err := g.repo.GetConnection(ctx, connectionID)
 	if err != nil {
@@ -87,13 +87,13 @@ func (g *Gateway) adapterFor(ctx context.Context, connectionID uint64) (adapter.
 	}
 	var creds adapter.Credentials
 	if err := json.Unmarshal([]byte(credsJSON), &creds); err != nil {
-		return nil, errors.New("supply: 凭据结构不合法（请重新配置连接）")
+		return nil, errors.New("supply: 憑據結構不合法（請重新配置連接）")
 	}
 	return adapter.New(conn.Driver, conn.BaseURL, creds, parseRetryIntervals(conn.RetryIntervals))
 }
 
-// ListOrders 上游订单列表（ 对账数据源；dashboard port 消费——类型转换收口在此）。
-// 协议不支持 → ErrUpstreamListUnsupported（对账 job failed 可查）。
+// ListOrders 上游訂單列表（ 對賬數據源；dashboard port 消費——類型轉換收口在此）。
+// 協議不支持 → ErrUpstreamListUnsupported（對賬 job failed 可查）。
 func (g *Gateway) ListOrders(ctx context.Context, connectionID uint64, start, end time.Time) ([]dashboardport.UpstreamOrder, error) {
 	a, err := g.adapterFor(ctx, connectionID)
 	if err != nil {
@@ -119,7 +119,7 @@ func (g *Gateway) ListOrders(ctx context.Context, connectionID uint64, start, en
 	return out, nil
 }
 
-// Submit 提交采购。永久错误归一化（哨兵 → procurement 状态机判 rejected）。
+// Submit 提交採購。永久錯誤歸一化（哨兵 → procurement 狀態機判 rejected）。
 func (g *Gateway) Submit(ctx context.Context, req supplyport.PurchaseRequest) (*supplyport.PurchaseResult, error) {
 	conn, err := g.gate(ctx, req.ConnectionID)
 	if err != nil {
@@ -161,7 +161,7 @@ func (g *Gateway) Submit(ctx context.Context, req supplyport.PurchaseRequest) (*
 	}, nil
 }
 
-// Query 查询上游订单。
+// Query 查詢上游訂單。
 func (g *Gateway) Query(ctx context.Context, connectionID uint64, upstreamOrderID string) (*supplyport.PurchaseOrderInfo, error) {
 	conn, err := g.gate(ctx, connectionID)
 	if err != nil {
@@ -183,8 +183,8 @@ func (g *Gateway) Query(ctx context.Context, connectionID uint64, upstreamOrderI
 	}, nil
 }
 
-// CheckStock 实时库存：-1 仅表示上游明确不限；错误不可伪装成不限。
-// skuCode 为上游规格标识（acg=race|k=v 编码 / dujiao=sku_id），可空走商品级口径。
+// CheckStock 實時庫存：-1 僅表示上游明確不限；錯誤不可偽裝成不限。
+// skuCode 為上游規格標識（acg=race|k=v 編碼 / dujiao=sku_id），可空走商品級口徑。
 func (g *Gateway) CheckStock(ctx context.Context, connectionID uint64, productCode, skuCode string) (int32, error) {
 	started := time.Now().UTC()
 	a, err := g.adapterFor(ctx, connectionID)
@@ -209,9 +209,9 @@ func (g *Gateway) CheckStock(ctx context.Context, connectionID uint64, productCo
 	return stock, nil
 }
 
-// CheckOrderItems 下单前上游代发项实时库存预检（实现 orderport.UpstreamStockGate 接口，
-// order 创建订单消费）：把上游缺货或查询失败的单挡在付款前。
-// 本地商品由本地锁卡校验；对接商品查库存失败拒单，明确不限(-1)可下单。
+// CheckOrderItems 下單前上游代發項實時庫存預檢（實現 orderport.UpstreamStockGate 接口，
+// order 創建訂單消費）：把上游缺貨或查詢失敗的單擋在付款前。
+// 本地商品由本地鎖卡校驗；對接商品查庫存失敗拒單，明確不限(-1)可下單。
 func (g *Gateway) CheckItems(ctx context.Context, subsiteID uint64, items []orderport.UpstreamStockItem) error {
 	filtered := make([]orderport.UpstreamStockItem, 0, len(items))
 	for _, it := range items {
@@ -232,7 +232,7 @@ func (g *Gateway) CheckItems(ctx context.Context, subsiteID uint64, items []orde
 		case "reuse":
 			src, e := data.CurrentDeliverySource(ctx, data.Client(ctx, g.repo.data), p, it.SkuID)
 			if e != nil || !data.SourceAdmissible(src) {
-				return fmt.Errorf("该规格复用内容暂不可售")
+				return fmt.Errorf("該規格複用內容暫不可售")
 			}
 			if src.Status == "ready" || src.Status == "submitting" || src.Status == "polling" {
 				continue
@@ -245,7 +245,7 @@ func (g *Gateway) CheckItems(ctx context.Context, subsiteID uint64, items []orde
 	}, subsiteID, filtered)
 }
 
-// checkOrderItems 预检纯逻辑（reader/stock 可注入——单测覆盖决策矩阵）。
+// checkOrderItems 預檢純邏輯（reader/stock 可注入——單測覆蓋決策矩陣）。
 func checkOrderItems(ctx context.Context, reader catalogport.ProductReader,
 	stock func(connectionID uint64, productCode, skuCode string) (int32, error),
 	subsiteID uint64, items []orderport.UpstreamStockItem) error {
@@ -255,37 +255,37 @@ func checkOrderItems(ctx context.Context, reader catalogport.ProductReader,
 	for _, it := range items {
 		p, err := reader.Get(ctx, subsiteID, it.ProductID)
 		if err != nil {
-			continue // 商品不可读：交由订单主流程判定（PRODUCT_NOT_FOUND）
+			continue // 商品不可讀：交由訂單主流程判定（PRODUCT_NOT_FOUND）
 		}
 		if p.UpstreamSourceID == 0 {
-			continue // 非上游项：本地卡密走事务内锁卡，直发无库存概念
+			continue // 非上游項：本地卡密走事務內鎖卡，直髮無庫存概念
 		}
 		if p.UpstreamProductCode == "" {
-			return fmt.Errorf("supply.STOCK_UNAVAILABLE: 商品「%s」缺少上游商品标识", p.Name)
+			return fmt.Errorf("supply.STOCK_UNAVAILABLE: 商品「%s」缺少上游商品標識", p.Name)
 		}
 		skuCode := ""
 		if it.SkuID > 0 {
 			skuCode = reader.SkuUpstreamCode(ctx, subsiteID, it.SkuID)
 			if skuCode == "" {
-				return fmt.Errorf("supply.STOCK_UNAVAILABLE: 商品「%s」缺少上游规格标识", p.Name)
+				return fmt.Errorf("supply.STOCK_UNAVAILABLE: 商品「%s」缺少上游規格標識", p.Name)
 			}
 		}
 		n, err := stock(p.UpstreamSourceID, p.UpstreamProductCode, skuCode)
 		if err != nil || n < -1 {
-			return fmt.Errorf("supply.STOCK_UNAVAILABLE: 商品「%s」暂时无法确认库存，请稍后重试", p.Name)
+			return fmt.Errorf("supply.STOCK_UNAVAILABLE: 商品「%s」暫時無法確認庫存，請稍後重試", p.Name)
 		}
 		if n == -1 {
-			continue // 上游明确返回无限库存。
+			continue // 上游明確返回無限庫存。
 		}
 
 		if n < int32(it.Quantity) {
-			return fmt.Errorf("supply: 商品「%s」上游库存不足（余 %d 需 %d）: %w", p.Name, n, it.Quantity, supplyport.ErrUpstreamNoStock)
+			return fmt.Errorf("supply: 商品「%s」上游庫存不足（餘 %d 需 %d）: %w", p.Name, n, it.Quantity, supplyport.ErrUpstreamNoStock)
 		}
 	}
 	return nil
 }
 
-// Refund 向上游传导退款（acg_faka 等不支持 → ErrRefundNotSupported）。
+// Refund 向上遊傳導退款（acg_faka 等不支持 → ErrRefundNotSupported）。
 func (g *Gateway) Refund(ctx context.Context, connectionID uint64, upstreamOrderID string) error {
 	a, err := g.adapterFor(ctx, connectionID)
 	if err != nil {
@@ -298,8 +298,8 @@ func (g *Gateway) Refund(ctx context.Context, connectionID uint64, upstreamOrder
 	return err
 }
 
-// submitCallbackURL 回调地址决策：请求显式指定 > 连接配置 callback_url（运营在
-// 渠道管理里登记的本站公网回调地址； E 提交时自动携带给上游）。
+// submitCallbackURL 回調地址決策：請求顯式指定 > 連接配置 callback_url（運營在
+// 渠道管理裏登記的本站公網回調地址； E 提交時自動攜帶給上游）。
 func (g *Gateway) submitCallbackURL(ctx context.Context, connectionID uint64, explicit string) string {
 	if explicit != "" {
 		return explicit

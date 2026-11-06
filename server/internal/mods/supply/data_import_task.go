@@ -74,7 +74,7 @@ func (r *SupplyRepoImpl) importProductRevision(ctx context.Context, p *ent.Produ
 
 func importRequestIdentity(req *adminv1.ImportProductsRequest) (string, string, error) {
 	if len(req.Codes) == 0 || len(req.Codes) > 5000 {
-		return "", "", fmt.Errorf("请选择 1–5000 件商品")
+		return "", "", fmt.Errorf("請選擇 1–5000 件商品")
 	}
 	normalized := proto.Clone(req).(*adminv1.ImportProductsRequest)
 	normalized.RequestKey = ""
@@ -83,7 +83,7 @@ func importRequestIdentity(req *adminv1.ImportProductsRequest) (string, string, 
 	normalized.Codes = compactCodes(normalized.Codes)
 	for _, code := range normalized.Codes {
 		if code == "" || len(code) > 128 {
-			return "", "", fmt.Errorf("商品标识无效")
+			return "", "", fmt.Errorf("商品標識無效")
 		}
 	}
 	sort.Slice(normalized.CategoryDrafts, func(i, j int) bool {
@@ -100,7 +100,7 @@ func importRequestIdentity(req *adminv1.ImportProductsRequest) (string, string, 
 		key = hash
 	} // backward-compatible idempotency for older clients
 	if len(key) > 64 {
-		return "", "", fmt.Errorf("提交标识过长")
+		return "", "", fmt.Errorf("提交標識過長")
 	}
 	return key, hash, nil
 }
@@ -124,7 +124,7 @@ func (s *AdminSupplyService) existingImport(ctx context.Context, connectionID ui
 		return nil, err
 	}
 	if t.RequestHash != hash {
-		return nil, fmt.Errorf("同一次提交的参数已变化，请重新发起导入")
+		return nil, fmt.Errorf("同一次提交的參數已變化，請重新發起導入")
 	}
 	if _, err := readImportPayload(ctx, t, true); err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ func (s *AdminSupplyService) existingImport(ctx context.Context, connectionID ui
 func readImportPayload(ctx context.Context, t *ent.SupplySyncTask, checkTenant bool) (*importPayload, error) {
 	var p importPayload
 	if t.Scope != ScopeImport || json.Unmarshal(t.ImportPayload, &p) != nil {
-		return nil, fmt.Errorf("不是有效的商品导入任务")
+		return nil, fmt.Errorf("不是有效的商品導入任務")
 	}
 	if checkTenant && p.Tenant != tenancy.FromContext(ctx).SubsiteID {
 		return nil, ErrNotFound
@@ -165,7 +165,7 @@ func (s *AdminSupplyService) ImportProducts(ctx context.Context, req *adminv1.Im
 		return nil, err
 	}
 	if entry.identity != previewIdentity(conn) {
-		return nil, fmt.Errorf("货源账号已变化，请刷新目录")
+		return nil, fmt.Errorf("貨源賬號已變化，請刷新目錄")
 	}
 	task, err := s.createImportTask(ctx, conn, req, entry.byCode, key, hash)
 	if err != nil {
@@ -196,7 +196,7 @@ func (s *AdminSupplyService) importAccepted(ctx context.Context, t *ent.SupplySy
 // HTTP calls are made here; the preview snapshot survives process/cache expiry.
 func (s *AdminSupplyService) createImportTask(ctx context.Context, conn *ent.SupplyConnection, req *adminv1.ImportProductsRequest, products map[string]adapter.Product, key, hash string) (*ent.SupplySyncTask, error) {
 	if string(conn.Status) != "active" {
-		return nil, fmt.Errorf("货源已停用，请启用后再导入")
+		return nil, fmt.Errorf("貨源已停用，請啓用後再導入")
 	}
 	mode, percent, amount := req.PricingMode, req.MarkupPercent, req.MarkupAmountCents
 	if mode == "" {
@@ -212,7 +212,7 @@ func (s *AdminSupplyService) createImportTask(ctx context.Context, conn *ent.Sup
 	switch mode {
 	case PriceModeChannel, PriceModePercent, PriceModeFixed, PriceModeEqual, PriceModePending:
 	default:
-		return nil, fmt.Errorf("无效的导入定价策略")
+		return nil, fmt.Errorf("無效的導入定價策略")
 	}
 	if err := validatePricing(conn.ExchangeRate, percent, amount, string(conn.PriceRoundingMode)); err != nil {
 		return nil, err
@@ -220,7 +220,7 @@ func (s *AdminSupplyService) createImportTask(ctx context.Context, conn *ent.Sup
 	codes := compactCodes(req.Codes)
 	for _, code := range codes {
 		if _, ok := products[code]; !ok {
-			return nil, fmt.Errorf("商品 %s 已不在目录，请刷新后重试", code)
+			return nil, fmt.Errorf("商品 %s 已不在目錄，請刷新後重試", code)
 		}
 	}
 	var task *ent.SupplySyncTask
@@ -240,7 +240,7 @@ func (s *AdminSupplyService) createImportTask(ctx context.Context, conn *ent.Sup
 			return err
 		}
 		if importFingerprint(current) != importFingerprint(conn) {
-			return fmt.Errorf("货源配置已变化，请刷新后重试")
+			return fmt.Errorf("貨源配置已變化，請刷新後重試")
 		}
 		cats, err := s.saveImportCategories(ctx, req, products, mode, percent, amount)
 		if err != nil {
@@ -294,7 +294,7 @@ func (s *AdminSupplyService) createImportTask(ctx context.Context, conn *ent.Sup
 					}
 					b.SetLocalProductID(local.ID).SetLocalRevision(revision)
 					if local.IsLocked {
-						b.SetState("skipped").SetErrorCode("PRODUCT_LOCKED").SetErrorSummary("商品已锁定，已跳过")
+						b.SetState("skipped").SetErrorCode("PRODUCT_LOCKED").SetErrorSummary("商品已鎖定，已跳過")
 					}
 				}
 				builders = append(builders, b)
@@ -417,10 +417,10 @@ func (s *AdminSupplyService) prepareImportRetry(ctx context.Context, req *adminv
 			return err
 		}
 		if string(conn.Status) != "active" {
-			return fmt.Errorf("货源已停用，请启用后再继续任务")
+			return fmt.Errorf("貨源已停用，請啓用後再繼續任務")
 		}
 		if conn.SyncLeaseUntil > time.Now().Unix() {
-			return fmt.Errorf("货源任务尚未停止，请稍后再试")
+			return fmt.Errorf("貨源任務尚未停止，請稍後再試")
 		}
 		t, err = s.repo.GetSyncTask(ctx, req.Id)
 		if err != nil {
@@ -433,7 +433,7 @@ func (s *AdminSupplyService) prepareImportRetry(ctx context.Context, req *adminv
 		// Never silently change the meaning of a queued pricing/category selection.
 		if payload.Fingerprint != importFingerprint(conn) {
 			if !req.ConfirmConfig {
-				return fmt.Errorf("货源配置已变化，请确认使用当前配置后继续")
+				return fmt.Errorf("貨源配置已變化，請確認使用當前配置後繼續")
 			}
 			payload.Fingerprint = importFingerprint(conn)
 			payload.Categories = categoryMapFromSettings(conn.Settings)
@@ -454,14 +454,14 @@ func (s *AdminSupplyService) prepareImportRetry(ctx context.Context, req *adminv
 		case "remaining", "":
 			q.Where(supplyimportitem.StateIn("pending", "retry", "failed"))
 		default:
-			return fmt.Errorf("重试范围无效")
+			return fmt.Errorf("重試範圍無效")
 		}
 		targets, err := q.Select(supplyimportitem.FieldCode).All(ctx)
 		if err != nil {
 			return err
 		}
 		if len(targets) == 0 {
-			return fmt.Errorf("没有需要重试的商品")
+			return fmt.Errorf("沒有需要重試的商品")
 		}
 		payload.ActiveCodes = make([]string, 0, len(targets))
 		for _, item := range targets {
@@ -484,4 +484,4 @@ func (s *AdminSupplyService) prepareImportRetry(ctx context.Context, req *adminv
 	return task, err
 }
 
-var errImportChanged = errors.New("商品已被人工修改，已跳过以保留当前设置")
+var errImportChanged = errors.New("商品已被人工修改，已跳過以保留當前設置")

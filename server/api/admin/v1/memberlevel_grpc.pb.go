@@ -32,7 +32,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminMemberLevelService 会员等级管理。
+// AdminMemberLevelService 會員等級管理。
 type AdminMemberLevelServiceClient interface {
 	ConfigureInviteLevel(ctx context.Context, in *ConfigureInviteLevelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AssignUserLevel(ctx context.Context, in *AssignUserLevelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -114,7 +114,7 @@ func (c *adminMemberLevelServiceClient) DeleteMemberLevel(ctx context.Context, i
 // All implementations must embed UnimplementedAdminMemberLevelServiceServer
 // for forward compatibility.
 //
-// AdminMemberLevelService 会员等级管理。
+// AdminMemberLevelService 會員等級管理。
 type AdminMemberLevelServiceServer interface {
 	ConfigureInviteLevel(context.Context, *ConfigureInviteLevelRequest) (*emptypb.Empty, error)
 	AssignUserLevel(context.Context, *AssignUserLevelRequest) (*emptypb.Empty, error)

@@ -1,14 +1,14 @@
 package audit
 
-// 操作审计过滤器（）：变更类 admin 操作（POST/PUT/DELETE）自动落 audit_logs。
+// 操作審計過濾器（）：變更類 admin 操作（POST/PUT/DELETE）自動落 audit_logs。
 //
-// 实现为 http.Filter（非 Kratos middleware）——中间件层的 Transporter 是内部
-// *khttp.Transport 类型，拿不到原始 *http.Request（method/path/body）；
-// Filter 层直接持有请求与响应状态（supplier HMAC 同款模式）。
+// 實現為 http.Filter（非 Kratos middleware）——中間件層的 Transporter 是內部
+// *khttp.Transport 類型，拿不到原始 *http.Request（method/path/body）；
+// Filter 層直接持有請求與響應狀態（supplier HMAC 同款模式）。
 //
-// before/after 快照：由各模块注册的「路由前缀 → 取值函数」注册表提供；
-// 未注册的路由仍记录操作元数据（无快照）。敏感字段脱敏（凭据永不入审计）。
-// 纪律：审计写失败不阻断业务（异步落库；失败仅日志——1.x 纪律）。
+// before/after 快照：由各模塊註冊的「路由前綴 → 取值函數」註冊表提供；
+// 未註冊的路由仍記錄操作元數據（無快照）。敏感字段脱敏（憑據永不入審計）。
+// 紀律：審計寫失敗不阻斷業務（異步落庫；失敗僅日誌——1.x 紀律）。
 
 import (
 	"context"
@@ -20,27 +20,27 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/authn"
 )
 
-// snapshotFn 快照取值函数（聚合键 → 变更前数据；由业务模块注册）。
+// snapshotFn 快照取值函數（聚合鍵 → 變更前數據；由業務模塊註冊）。
 type snapshotFn func(ctx context.Context, r *http.Request) (before map[string]any)
 
-// snapshotRegistry 路由前缀 → 快照函数（各模块 service 声明自己的审计聚合键）。
+// snapshotRegistry 路由前綴 → 快照函數（各模塊 service 聲明自己的審計聚合鍵）。
 var snapshotRegistry = map[string]snapshotFn{}
 
-// RegisterSnapshot 注册快照函数（routePrefix 如 /api/v1/admin/settings）。
+// RegisterSnapshot 註冊快照函數（routePrefix 如 /api/v1/admin/settings）。
 func RegisterSnapshot(routePrefix string, fn snapshotFn) {
 	snapshotRegistry[routePrefix] = fn
 }
 
-// OpAuditFilter 操作审计过滤器工厂。
-// signer：admin JWT 校验器（操作者身份取自令牌——鉴权中间件注入的 claims 只
-// 存在于下游 handler ctx，不会写回 Filter 层的 *http.Request，故此处自行校验；
-// HMAC 校验代价可忽略）。
-// permOf：operation → 权限点（authz 目录查询注入，避免循环依赖）。
-// 响应状态：仅 2xx 记录（错误响应未产生变更）。
+// OpAuditFilter 操作審計過濾器工廠。
+// signer：admin JWT 校驗器（操作者身份取自令牌——鑑權中間件注入的 claims 只
+// 存在於下游 handler ctx，不會寫回 Filter 層的 *http.Request，故此處自行校驗；
+// HMAC 校驗代價可忽略）。
+// permOf：operation → 權限點（authz 目錄查詢注入，避免循環依賴）。
+// 響應狀態：僅 2xx 記錄（錯誤響應未產生變更）。
 func OpAuditFilter(repo *AuditRepo, signer *authn.Signer, permOf func(op string) (code string, ok bool), opOf func(r *http.Request) string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// 只审计变更类管理面操作（GET 不落）
+			// 只審計變更類管理面操作（GET 不落）
 			if (r.Method != http.MethodPost && r.Method != http.MethodPut && r.Method != http.MethodDelete) ||
 				!strings.HasPrefix(r.URL.Path, "/api/v1/admin/") {
 				next.ServeHTTP(w, r)
@@ -51,13 +51,13 @@ func OpAuditFilter(repo *AuditRepo, signer *authn.Signer, permOf func(op string)
 				next.ServeHTTP(w, r)
 				return
 			}
-			// 请求载荷读取（body 恢复供后续解码）
+			// 請求載荷讀取（body 恢復供後續解碼）
 			bodyAfter := ReadBodyJSON(r)
 
 			rec := &statusRecorder{ResponseWriter: w, code: http.StatusOK}
 			next.ServeHTTP(rec, r)
 
-			// 非 2xx：未产生变更不落审计
+			// 非 2xx：未產生變更不落審計
 			if rec.code < 200 || rec.code >= 300 {
 				return
 			}
@@ -68,7 +68,7 @@ func OpAuditFilter(repo *AuditRepo, signer *authn.Signer, permOf func(op string)
 				IP:           clientIP(r),
 				UserAgent:    truncate(r.UserAgent(), 255),
 			}
-			// 操作者：admin JWT 直接校验（见函数注释）；失败留 0 = 未知
+			// 操作者：admin JWT 直接校驗（見函數註釋）；失敗留 0 = 未知
 			if signer != nil {
 				if tok, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer "); ok {
 					if claims, err := signer.Verify(authn.RealmAdmin, strings.TrimSpace(tok)); err == nil {
@@ -81,19 +81,19 @@ func OpAuditFilter(repo *AuditRepo, signer *authn.Signer, permOf func(op string)
 					in.PermissionPoint = code
 				}
 			}
-			// before：注册表命中时查库取旧值语义（各模块声明聚合键）
+			// before：註冊表命中時查庫取舊值語義（各模塊聲明聚合鍵）
 			if fn, ok := matchSnapshot(r.URL.Path); ok {
 				in.Before = fn(r.Context(), r)
 			}
 			in.After = bodyAfter
 
-			// 异步落库（repo 内部吞错——审计失败不影响业务）
+			// 異步落庫（repo 內部吞錯——審計失敗不影響業務）
 			go repo.WriteOpLog(context.WithoutCancel(r.Context()), in)
 		})
 	}
 }
 
-// statusRecorder 捕获响应状态码。
+// statusRecorder 捕獲響應狀態碼。
 type statusRecorder struct {
 	http.ResponseWriter
 	code int
@@ -104,7 +104,7 @@ func (r *statusRecorder) WriteHeader(code int) {
 	r.ResponseWriter.WriteHeader(code)
 }
 
-// matchSnapshot 路由前缀匹配快照函数（最长前缀优先）。
+// matchSnapshot 路由前綴匹配快照函數（最長前綴優先）。
 func matchSnapshot(path string) (snapshotFn, bool) {
 	best := ""
 	var fn snapshotFn
@@ -130,7 +130,7 @@ func truncate(s string, n int) string {
 	return s
 }
 
-// ReadBodyJSON 读请求体为 map（body 恢复供后续解码；敏感字段脱敏）。
+// ReadBodyJSON 讀請求體為 map（body 恢復供後續解碼；敏感字段脱敏）。
 func ReadBodyJSON(r *http.Request) map[string]any {
 	if r.Body == nil {
 		return nil
@@ -179,7 +179,7 @@ func ReadBodyJSON(r *http.Request) map[string]any {
 		}
 		m = metadata
 	}
-	// 抽奖配置的 content 包含私密奖品；仅保留规则元数据，原请求体已恢复。
+	// 抽獎配置的 content 包含私密獎品；僅保留規則元數據，原請求體已恢復。
 	if strings.HasPrefix(r.URL.Path, "/api/v1/admin/lottery/") {
 		if prizes, ok := m["prizes"].([]any); ok {
 			for _, raw := range prizes {
@@ -231,7 +231,7 @@ func inventoryAuditID(value any) bool {
 	return false
 }
 
-// redact 敏感字段脱敏（凭据/密码/密钥永不入审计快照）。
+// redact 敏感字段脱敏（憑據/密碼/密鑰永不入審計快照）。
 func redact(m map[string]any) map[string]any {
 	sensitive := map[string]bool{
 		"code": true, "totp_code": true, "captcha_code": true, "challenge": true, "recovery_ticket": true, "recovery_code": true, "recovery_codes": true, "otpauth_url": true, "refresh_token": true, "access_token": true, "new_password": true,

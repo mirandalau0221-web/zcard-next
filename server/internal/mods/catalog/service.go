@@ -1,6 +1,6 @@
 package catalog
 
-// 前台商品目录 API（游客可访问；薄 transport：校验 + 装配 + DTO 映射）。
+// 前台商品目錄 API（遊客可訪問；薄 transport：校驗 + 裝配 + DTO 映射）。
 
 import (
 	"context"
@@ -23,27 +23,27 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// StoreCatalogService 前台目录服务（实现 storefrontv1.StoreCatalogService）。
+// StoreCatalogService 前台目錄服務（實現 storefrontv1.StoreCatalogService）。
 type StoreCatalogService struct {
 	stockLookup port.StockLookup
 	flash       couponport.FlashReader
 	storefrontv1.UnimplementedStoreCatalogServiceServer
 	uc *CatalogUsecase
-	// pricer 分站定价（：listing 与 checkout 共用同一 ResolveUnitPrice——1.x 铁律；
-	// nil = 主站直营形态不解析分站价）。
+	// pricer 分站定價（：listing 與 checkout 共用同一 ResolveUnitPrice——1.x 鐵律；
+	// nil = 主站直營形態不解析分站價）。
 	pricer resellerport.Pricer
-	// sold 批量已售数量（列表/详情展示 + sales 排序；nil 容错降级 0）
+	// sold 批量已售數量（列表/詳情展示 + sales 排序；nil 容錯降級 0）
 	sold orderport.SoldCounter
 }
 
-// NewStoreCatalogService 构造。
+// NewStoreCatalogService 構造。
 func NewStoreCatalogService(uc *CatalogUsecase, pricer resellerport.Pricer, sold orderport.SoldCounter) *StoreCatalogService {
 	return &StoreCatalogService{uc: uc, pricer: pricer, sold: sold}
 }
 
-// ListProducts 商品列表（游客可访问；隐藏商品不出现在列表）。
-// 分页参数缺省：page=1 / page_size=20（嵌套 message 的 query 绑定为 page.page=1 形式）。
-// 排序：default（综合）/ newest / price_asc / price_desc 走 SQL；sales 全量拉取后按销量内存排序分页。
+// ListProducts 商品列表（遊客可訪問；隱藏商品不出現在列表）。
+// 分頁參數缺省：page=1 / page_size=20（嵌套 message 的 query 綁定為 page.page=1 形式）。
+// 排序：default（綜合）/ newest / price_asc / price_desc 走 SQL；sales 全量拉取後按銷量內存排序分頁。
 func (s *StoreCatalogService) ListProducts(ctx context.Context, req *storefrontv1.ListProductsRequest) (*storefrontv1.ListProductsReply, error) {
 	tc := tenancy.FromContext(ctx)
 	page := req.GetPage()
@@ -68,20 +68,20 @@ func (s *StoreCatalogService) ListProducts(ctx context.Context, req *storefrontv
 	var items []port.Product
 	var total int64
 	if salesSort {
-		// sales 排序：全量拉取（上架商品量可控）→ 内存按销量排序 → 手动分页
+		// sales 排序：全量拉取（上架商品量可控）→ 內存按銷量排序 → 手動分頁
 		all, err := s.uc.ListAllVisible(ctx, filter)
 		if err != nil {
-			return nil, errors.InternalServer("catalog.LIST_FAILED", "读取商品列表失败")
+			return nil, errors.InternalServer("catalog.LIST_FAILED", "讀取商品列表失敗")
 		}
 		items, total = all, int64(len(all))
 	} else {
 		var err error
 		items, total, err = s.uc.ListVisible(ctx, filter)
 		if err != nil {
-			return nil, errors.InternalServer("catalog.LIST_FAILED", "读取商品列表失败")
+			return nil, errors.InternalServer("catalog.LIST_FAILED", "讀取商品列表失敗")
 		}
 	}
-	// 批量销量（列表展示 + sales 排序）
+	// 批量銷量（列表展示 + sales 排序）
 	var solds map[uint64]int64
 	if s.sold != nil {
 		ids := make([]uint64, 0, len(items))
@@ -116,7 +116,7 @@ func (s *StoreCatalogService) ListProducts(ctx context.Context, req *storefrontv
 	}
 	offers, err := s.flashOffers(ctx, ids)
 	if err != nil {
-		return nil, errors.InternalServer("catalog.FLASH_FAILED", "读取活动价格失败，请重试")
+		return nil, errors.InternalServer("catalog.FLASH_FAILED", "讀取活動價格失敗，請重試")
 	}
 	snapshots, _ := s.uc.repo.StockSnapshotBatch(ctx, ids)
 	stocks := map[uint64]int64{}
@@ -128,7 +128,7 @@ func (s *StoreCatalogService) ListProducts(ctx context.Context, req *storefrontv
 		p := &items[i]
 		if tc.SubsiteID != tenancy.MainSubsiteID && s.pricer != nil {
 			if sp, err := s.pricer.ResolveUnitPrice(ctx, tc.SubsiteID, p.ID, 0, p.Price); err == nil {
-				p.Price = sp // 分站价（下限保护在 ResolveUnitPrice 内）
+				p.Price = sp // 分站價（下限保護在 ResolveUnitPrice 內）
 			}
 		}
 		item := toStorefrontProduct(p, stocks, solds[p.ID])
@@ -147,11 +147,11 @@ func (s *StoreCatalogService) ListProducts(ctx context.Context, req *storefrontv
 	return reply, nil
 }
 
-// ListCategories 可见分类列表（hide=false；分站白名单；按 sort 排序）。
+// ListCategories 可見分類列表（hide=false；分站白名單；按 sort 排序）。
 func (s *StoreCatalogService) ListCategories(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.ListCategoriesReply, error) {
 	rows, err := s.uc.ListVisibleCategories(ctx, tenancy.FromContext(ctx).SubsiteID)
 	if err != nil {
-		return nil, errors.InternalServer("catalog.CATEGORY_FAILED", "读取分类失败")
+		return nil, errors.InternalServer("catalog.CATEGORY_FAILED", "讀取分類失敗")
 	}
 	reply := &storefrontv1.ListCategoriesReply{}
 	for _, c := range rows {
@@ -162,7 +162,7 @@ func (s *StoreCatalogService) ListCategories(ctx context.Context, _ *emptypb.Emp
 	return reply, nil
 }
 
-// GetProduct 商品详情（下架/隐藏商品对游客返回 404，不暴露存在性， 必测项）。
+// GetProduct 商品詳情（下架/隱藏商品對遊客返回 404，不暴露存在性， 必測項）。
 func (s *StoreCatalogService) GetProduct(ctx context.Context, req *storefrontv1.GetProductRequest) (*storefrontv1.Product, error) {
 	tc := tenancy.FromContext(ctx)
 	p, err := s.uc.GetVisible(ctx, tc.SubsiteID, req.GetId())
@@ -170,14 +170,14 @@ func (s *StoreCatalogService) GetProduct(ctx context.Context, req *storefrontv1.
 		if stderrors.Is(err, ErrProductNotFound) {
 			return nil, errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在")
 		}
-		return nil, errors.InternalServer("catalog.GET_FAILED", "读取商品失败")
+		return nil, errors.InternalServer("catalog.GET_FAILED", "讀取商品失敗")
 	}
 	if p.Status == 2 {
 		if tr, ok := transport.FromServerContext(ctx); ok {
 			tr.ReplyHeader().Set("Cache-Control", "no-store, private")
 		}
 	}
-	// ：分站单价（listing=checkout 同源；SKU 规则优先于商品规则由定价引擎裁定）
+	// ：分站單價（listing=checkout 同源；SKU 規則優先於商品規則由定價引擎裁定）
 	base := p.Price
 	if tc.SubsiteID != tenancy.MainSubsiteID && s.pricer != nil {
 		if sp, err := s.pricer.ResolveUnitPrice(ctx, tc.SubsiteID, p.ID, 0, base); err == nil {
@@ -198,7 +198,7 @@ func (s *StoreCatalogService) GetProduct(ctx context.Context, req *storefrontv1.
 	}
 	offers, err := s.flashOffers(ctx, []uint64{p.ID})
 	if err != nil {
-		return nil, errors.InternalServer("catalog.FLASH_FAILED", "读取活动价格失败，请重试")
+		return nil, errors.InternalServer("catalog.FLASH_FAILED", "讀取活動價格失敗，請重試")
 	}
 	out.FlashSale = toFlashOffer(offers[couponport.FlashKey{ProductID: p.ID}])
 	if p.DeliveryKind != "social_service" && p.ProductKind != "sms_channel" && p.UpstreamSourceID != 0 && s.stockLookup != nil {
@@ -217,7 +217,7 @@ func (s *StoreCatalogService) GetProduct(ctx context.Context, req *storefrontv1.
 	}
 	controls, err := s.uc.ListControls(ctx, req.GetId())
 	if err != nil {
-		return nil, errors.InternalServer("catalog.CONTROL_FAILED", "读取控件失败")
+		return nil, errors.InternalServer("catalog.CONTROL_FAILED", "讀取控件失敗")
 	}
 	for _, c := range controls {
 		out.Controls = append(out.Controls, &storefrontv1.ProductControl{
@@ -228,7 +228,7 @@ func (s *StoreCatalogService) GetProduct(ctx context.Context, req *storefrontv1.
 	}
 	reviews, err := s.uc.ListProductReviews(ctx, req.GetId())
 	if err != nil {
-		return nil, errors.InternalServer("catalog.REVIEW_FAILED", "读取评价失败")
+		return nil, errors.InternalServer("catalog.REVIEW_FAILED", "讀取評價失敗")
 	}
 	for _, rv := range reviews {
 		item := &storefrontv1.ReviewItem{
@@ -242,12 +242,12 @@ func (s *StoreCatalogService) GetProduct(ctx context.Context, req *storefrontv1.
 	}
 	skus, err := s.uc.ListSkus(ctx, req.GetId())
 	if err != nil {
-		return nil, errors.InternalServer("catalog.SKU_FAILED", "读取规格失败")
+		return nil, errors.InternalServer("catalog.SKU_FAILED", "讀取規格失敗")
 	}
 	for _, sku := range skus {
 		skuBase := sku.Price
 		if skuBase == 0 {
-			skuBase = base // 继承商品基础价
+			skuBase = base // 繼承商品基礎價
 		}
 		skuPrice := skuBase
 		if tc.SubsiteID != tenancy.MainSubsiteID && s.pricer != nil {
@@ -283,16 +283,16 @@ func toStorefrontProduct(p *port.Product, stocks map[uint64]int64, soldCount int
 		Name:            name,
 		Slug:            p.Slug,
 		Cover:           p.Cover,
-		Description:     description, // 商品详情（上游采集/后台编辑； 漏映射导致前台全部无描述）
+		Description:     description, // 商品詳情（上游採集/後台編輯； 漏映射導致前台全部無描述）
 		PriceCents:      int64(p.Price),
 		StockType:       p.StockType,
 		FulfillmentMode: p.FulfillmentMode, ManualStock: p.ManualStock,
 		Stock:             stock,
 		StockVisible:      proto.Bool(p.StockVisible),
-		PointsRequired:    p.PointsRequired, // 积分商城（；0=常规商品）
+		PointsRequired:    p.PointsRequired, // 積分商城（；0=常規商品）
 		SalesCount:        soldCount,
 		CategoryRecommend: p.CategoryRecommend, CategoryPinned: p.CategoryPinned,
-		IsRecommend: p.IsRecommend, // 运营推荐（首页推荐位）
+		IsRecommend: p.IsRecommend, // 運營推薦（首頁推薦位）
 	}
 }
 

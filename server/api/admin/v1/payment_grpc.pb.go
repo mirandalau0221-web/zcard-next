@@ -37,22 +37,22 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminPaymentService 支付管理：渠道 CRUD + 支付单 + 退款。
+// AdminPaymentService 支付管理：渠道 CRUD + 支付單 + 退款。
 type AdminPaymentServiceClient interface {
 	// ── 渠道管理 ──
 	ListChannels(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ChannelList, error)
-	// ListDrivers 驱动元数据（含配置字段 schema——admin 配置面动态表单渲染）。
+	// ListDrivers 驅動元數據（含配置字段 schema——admin 配置面動態表單渲染）。
 	ListDrivers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DriverList, error)
-	// FieldOptions 驱动字段选项动态加载（epusdt network/token 以网关 supported_assets
-	// 为准；网关不可达时后端回落静态矩阵并标记 fallback）。
+	// FieldOptions 驅動字段選項動態加載（epusdt network/token 以網關 supported_assets
+	// 為準；網關不可達時後端回落靜態矩陣並標記 fallback）。
 	FieldOptions(ctx context.Context, in *FieldOptionsRequest, opts ...grpc.CallOption) (*FieldOptionsReply, error)
 	CreateChannel(ctx context.Context, in *CreateChannelRequest, opts ...grpc.CallOption) (*Channel, error)
 	UpdateChannel(ctx context.Context, in *UpdateChannelRequest, opts ...grpc.CallOption) (*Channel, error)
 	DeleteChannel(ctx context.Context, in *DeleteChannelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ── 支付单 ──
+	// ── 支付單 ──
 	ListPayments(ctx context.Context, in *ListPaymentsRequest, opts ...grpc.CallOption) (*ListPaymentsReply, error)
 	GetPayment(ctx context.Context, in *GetPaymentRequest, opts ...grpc.CallOption) (*Payment, error)
-	// CapturePayment 补单（主动拉网关状态复走回调管线）。
+	// CapturePayment 補單（主動拉網關狀態復走回調管線）。
 	CapturePayment(ctx context.Context, in *CapturePaymentRequest, opts ...grpc.CallOption) (*Payment, error)
 	// ── 退款 ──
 	CreateRefund(ctx context.Context, in *CreateRefundRequest, opts ...grpc.CallOption) (*RefundOrder, error)
@@ -181,22 +181,22 @@ func (c *adminPaymentServiceClient) ListRefunds(ctx context.Context, in *ListRef
 // All implementations must embed UnimplementedAdminPaymentServiceServer
 // for forward compatibility.
 //
-// AdminPaymentService 支付管理：渠道 CRUD + 支付单 + 退款。
+// AdminPaymentService 支付管理：渠道 CRUD + 支付單 + 退款。
 type AdminPaymentServiceServer interface {
 	// ── 渠道管理 ──
 	ListChannels(context.Context, *emptypb.Empty) (*ChannelList, error)
-	// ListDrivers 驱动元数据（含配置字段 schema——admin 配置面动态表单渲染）。
+	// ListDrivers 驅動元數據（含配置字段 schema——admin 配置面動態表單渲染）。
 	ListDrivers(context.Context, *emptypb.Empty) (*DriverList, error)
-	// FieldOptions 驱动字段选项动态加载（epusdt network/token 以网关 supported_assets
-	// 为准；网关不可达时后端回落静态矩阵并标记 fallback）。
+	// FieldOptions 驅動字段選項動態加載（epusdt network/token 以網關 supported_assets
+	// 為準；網關不可達時後端回落靜態矩陣並標記 fallback）。
 	FieldOptions(context.Context, *FieldOptionsRequest) (*FieldOptionsReply, error)
 	CreateChannel(context.Context, *CreateChannelRequest) (*Channel, error)
 	UpdateChannel(context.Context, *UpdateChannelRequest) (*Channel, error)
 	DeleteChannel(context.Context, *DeleteChannelRequest) (*emptypb.Empty, error)
-	// ── 支付单 ──
+	// ── 支付單 ──
 	ListPayments(context.Context, *ListPaymentsRequest) (*ListPaymentsReply, error)
 	GetPayment(context.Context, *GetPaymentRequest) (*Payment, error)
-	// CapturePayment 补单（主动拉网关状态复走回调管线）。
+	// CapturePayment 補單（主動拉網關狀態復走回調管線）。
 	CapturePayment(context.Context, *CapturePaymentRequest) (*Payment, error)
 	// ── 退款 ──
 	CreateRefund(context.Context, *CreateRefundRequest) (*RefundOrder, error)

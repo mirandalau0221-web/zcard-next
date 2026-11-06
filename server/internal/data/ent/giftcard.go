@@ -25,15 +25,15 @@ type Giftcard struct {
 	BatchID uint64 `json:"batch_id,omitempty"`
 	// AES-256-GCM 密文（ZCARD_CARD_KEY）
 	Code []byte `json:"code,omitempty"`
-	// keyed hash（兑换检索，防爆破限流配套）
+	// keyed hash（兑換檢索，防爆破限流配套）
 	CodeHash string `json:"code_hash,omitempty"`
-	// 面额（分）
+	// 面額（分）
 	Amount int64 `json:"amount,omitempty"`
 	// Currency holds the value of the "currency" field.
 	Currency string `json:"currency,omitempty"`
 	// Status holds the value of the "status" field.
 	Status giftcard.Status `json:"status,omitempty"`
-	// 兑换用户
+	// 兑換用户
 	UsedBy uint64 `json:"used_by,omitempty"`
 	// UsedAt holds the value of the "used_at" field.
 	UsedAt time.Time `json:"used_at,omitempty"`

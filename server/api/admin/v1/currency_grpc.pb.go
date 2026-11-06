@@ -30,15 +30,15 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminCurrencyService 货币管理（；多币种展示，记账永远基础货币）。
+// AdminCurrencyService 貨幣管理（；多幣種展示，記賬永遠基礎貨幣）。
 type AdminCurrencyServiceClient interface {
-	// ListCurrencies 全部货币（含停用）。
+	// ListCurrencies 全部貨幣（含停用）。
 	ListCurrencies(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CurrencyList, error)
-	// CreateCurrency 新增货币（code 唯一）。
+	// CreateCurrency 新增貨幣（code 唯一）。
 	CreateCurrency(ctx context.Context, in *CreateCurrencyRequest, opts ...grpc.CallOption) (*Currency, error)
-	// UpdateCurrency 修改货币（rate/precision/symbol/启停）。
+	// UpdateCurrency 修改貨幣（rate/precision/symbol/啓停）。
 	UpdateCurrency(ctx context.Context, in *UpdateCurrencyRequest, opts ...grpc.CallOption) (*Currency, error)
-	// DeleteCurrency 删除货币（无引用时）。
+	// DeleteCurrency 刪除貨幣（無引用時）。
 	DeleteCurrency(ctx context.Context, in *DeleteCurrencyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -94,15 +94,15 @@ func (c *adminCurrencyServiceClient) DeleteCurrency(ctx context.Context, in *Del
 // All implementations must embed UnimplementedAdminCurrencyServiceServer
 // for forward compatibility.
 //
-// AdminCurrencyService 货币管理（；多币种展示，记账永远基础货币）。
+// AdminCurrencyService 貨幣管理（；多幣種展示，記賬永遠基礎貨幣）。
 type AdminCurrencyServiceServer interface {
-	// ListCurrencies 全部货币（含停用）。
+	// ListCurrencies 全部貨幣（含停用）。
 	ListCurrencies(context.Context, *emptypb.Empty) (*CurrencyList, error)
-	// CreateCurrency 新增货币（code 唯一）。
+	// CreateCurrency 新增貨幣（code 唯一）。
 	CreateCurrency(context.Context, *CreateCurrencyRequest) (*Currency, error)
-	// UpdateCurrency 修改货币（rate/precision/symbol/启停）。
+	// UpdateCurrency 修改貨幣（rate/precision/symbol/啓停）。
 	UpdateCurrency(context.Context, *UpdateCurrencyRequest) (*Currency, error)
-	// DeleteCurrency 删除货币（无引用时）。
+	// DeleteCurrency 刪除貨幣（無引用時）。
 	DeleteCurrency(context.Context, *DeleteCurrencyRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAdminCurrencyServiceServer()
 }

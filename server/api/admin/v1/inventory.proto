@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminInventoryService 卡密库存管理：导入/导出/列表/操作。
+// AdminInventoryService 卡密庫存管理：導入/導出/列表/操作。
 service AdminInventoryService {
   rpc GetTargets(InventoryTargetsRequest) returns (InventoryTargetsReply) {
     option (google.api.http) = { get: "/api/v1/admin/inventory/targets" };
@@ -22,55 +22,55 @@ service AdminInventoryService {
   rpc PreviewCancelImport(CancelImportRequest) returns (CancelImportPreviewReply) {
     option (google.api.http) = { get: "/api/v1/admin/inventory/imports/{id}/preview" };
   }
-  // ImportPreview 上传预览（去重统计 + 样本预览）。
+  // ImportPreview 上傳預覽（去重統計 + 樣本預覽）。
   rpc ImportPreview(ImportPreviewRequest) returns (ImportPreviewReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/inventory/preview"
       body: "*"
     };
   }
-  // ImportConfirm 确认导入（分片写入 + 批次追踪）。
+  // ImportConfirm 確認導入（分片寫入 + 批次追蹤）。
   rpc ImportConfirm(ImportConfirmRequest) returns (ImportBatch) {
     option (google.api.http) = {
       post: "/api/v1/admin/inventory/import"
       body: "*"
     };
   }
-  // ListImports 导入批次列表。
+  // ListImports 導入批次列表。
   rpc ListImports(ListImportsRequest) returns (ListImportsReply) {
     option (google.api.http) = { get: "/api/v1/admin/inventory/imports" };
   }
-  // CancelImport 撤销批次（删除本批 available 卡）。
+  // CancelImport 撤銷批次（刪除本批 available 卡）。
   rpc CancelImport(CancelImportRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/inventory/imports/{id}/cancel"
       body: "*"
     };
   }
-  // ListCards 卡密列表（掩码默认；card:view_content 权限才可见完整内容）。
+  // ListCards 卡密列表（掩碼默認；card:view_content 權限才可見完整內容）。
   rpc ListCards(ListCardsRequest) returns (ListCardsReply) {
     option (google.api.http) = { get: "/api/v1/admin/inventory/cards" };
   }
-  // ExportCards 导出卡密（card:export 权限 + 审计 + 限流 + CsvSafe）。
+  // ExportCards 導出卡密（card:export 權限 + 審計 + 限流 + CsvSafe）。
   rpc ExportCards(ExportCardsRequest) returns (ExportCardsReply) {
     option (google.api.http) = { post: "/api/v1/admin/inventory/export" body: "*" };
   }
-  // ToggleCard 禁用/启用单张卡。
+  // ToggleCard 禁用/啓用單張卡。
   rpc ToggleCard(ToggleCardRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/api/v1/admin/inventory/cards/{id}/toggle"
       body: "*"
     };
   }
-  // ViewCardContent 查看完整卡密（card:view_content 权限 + 安全审计）。
+  // ViewCardContent 查看完整卡密（card:view_content 權限 + 安全審計）。
   rpc ViewCardContent(ViewCardContentRequest) returns (ViewCardContentReply) {
     option (google.api.http) = { get: "/api/v1/admin/inventory/cards/{id}/content" };
   }
-  // UpdateCardContent 编辑未使用的单张卡密（独立敏感权限；版本冲突时不覆盖）。
+  // UpdateCardContent 編輯未使用的單張卡密（獨立敏感權限；版本衝突時不覆蓋）。
   rpc UpdateCardContent(UpdateCardContentRequest) returns (UpdateCardContentReply) {
     option (google.api.http) = { put: "/api/v1/admin/inventory/cards/{id}/content" body: "*" };
   }
-  // ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限）。
+  // ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限）。
   rpc ListPremiumCards(ListPremiumCardsRequest) returns (ListPremiumCardsReply) {
     option (google.api.http) = { get: "/api/v1/admin/inventory/cards/premium" };
   }
@@ -80,8 +80,8 @@ message ImportPreviewRequest {
   uint64 product_id = 1 [(google.api.field_behavior) = REQUIRED];
   repeated string lines = 2 [(google.api.field_behavior) = REQUIRED];
   bool dedup = 3;
-  uint64 sku_id = 4; // 有规格商品必须明确选择；无规格商品使用 0。
-  string import_format = 5; // 默认/line=整行完整卡密；premium=显式旧靓号格式，仅交付首段。
+  uint64 sku_id = 4; // 有規格商品必須明確選擇；無規格商品使用 0。
+  string import_format = 5; // 默認/line=整行完整卡密；premium=顯式舊靚號格式，僅交付首段。
 }
 
 message ImportPreviewReply {
@@ -113,16 +113,16 @@ message ImportBatch {
   int32 skipped = 5;
   int32 failed = 6;
   string status = 7;
-  optional uint64 sku_id = 8; // 导入时的目标；旧批次缺失表示历史未记录。
-  string sku_name = 9; // 导入时名称快照。
+  optional uint64 sku_id = 8; // 導入時的目標；舊批次缺失表示歷史未記錄。
+  string sku_name = 9; // 導入時名稱快照。
   string product_name = 10;
-  repeated InventorySkuCount remaining = 11; // 当前卡密分布，不改写导入来源。
+  repeated InventorySkuCount remaining = 11; // 當前卡密分佈，不改寫導入來源。
 }
 
 message ListImportsRequest {
   uint64 product_id = 1;
-  optional uint64 sku_id = 2; // 按原导入目标筛选，省略为全部。
-  bool legacy_only = 3; // 仅历史未记录目标的批次。
+  optional uint64 sku_id = 2; // 按原導入目標篩選，省略為全部。
+  bool legacy_only = 3; // 僅歷史未記錄目標的批次。
 }
 
 message ListImportsReply {
@@ -131,7 +131,7 @@ message ListImportsReply {
 
 message CancelImportRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
-  string expected_revision = 2; // 新界面使用预览返回的批次分布指纹。
+  string expected_revision = 2; // 新界面使用預覽返回的批次分佈指紋。
 }
 
 message ListCardsRequest {
@@ -139,7 +139,7 @@ message ListCardsRequest {
   string status = 2; // available | reserved | used | disabled
   int32 page = 3;
   int32 page_size = 4;
-  optional uint64 sku_id = 5; // 省略=全部，0=NULL/0 默认池，正数=指定规格。
+  optional uint64 sku_id = 5; // 省略=全部，0=NULL/0 默認池，正數=指定規格。
   optional uint64 import_id = 6;
 }
 
@@ -148,7 +148,7 @@ message ListCardsReply {
   int64 total = 2;
 }
 
-// CardInfo 卡密信息（内容默认掩码 ****尾4位）。
+// CardInfo 卡密信息（內容默認掩碼 ****尾4位）。
 message CardInfo {
   uint64 id = 1;
   uint64 product_id = 2;
@@ -157,7 +157,7 @@ message CardInfo {
   string note = 5;
   int64 created_at = 6;
   int64 used_at = 7;
-  string lottery_draw_no = 8; // 抽奖发放的中奖编号，不改变卡密库存状态
+  string lottery_draw_no = 8; // 抽獎發放的中獎編號，不改變卡密庫存狀態
   uint64 sku_id = 9;
   string sku_name = 10;
   uint64 import_id = 11;
@@ -169,7 +169,7 @@ message ExportCardsRequest {
 }
 
 message ExportCardsReply {
-  repeated string lines = 1; // CsvSafe 处理后的卡密行
+  repeated string lines = 1; // CsvSafe 處理後的卡密行
 }
 
 message ToggleCardRequest {
@@ -183,7 +183,7 @@ message ViewCardContentRequest {
 
 message ViewCardContentReply {
   uint64 id = 1;
-  string content = 2; // 完整明文（一次性下发；Cache-Control: no-store 由 transport 保证）
+  string content = 2; // 完整明文（一次性下發；Cache-Control: no-store 由 transport 保證）
   int32 version = 3;
   bool can_edit = 4;
   string edit_block_reason = 5;
@@ -210,14 +210,14 @@ message ListPremiumCardsReply {
   int64 total = 2;
 }
 
-// PremiumCardInfo 靓号卡（内容掩码；draft_premium 预选加价）。
+// PremiumCardInfo 靚號卡（內容掩碼；draft_premium 預選加價）。
 message PremiumCardInfo {
   uint64 id = 1;
   uint64 product_id = 2;
   string masked_content = 3; // ****尾4位
-  int64 draft_premium = 4; // 预选加价（分）
-  int64 draft_cost = 5; // 预选成本（分）
-  int64 price_cents = 6; // 靓号自选价（0=商品价+premium）
+  int64 draft_premium = 4; // 預選加價（分）
+  int64 draft_cost = 5; // 預選成本（分）
+  int64 price_cents = 6; // 靚號自選價（0=商品價+premium）
   string status = 7;
   uint64 sku_id = 8;
   string sku_name = 9;
@@ -267,7 +267,7 @@ message AssignCardsRequest {
   uint64 sku_id = 2;
   repeated uint64 card_ids = 3;
   optional int64 expected_revision = 4;
-  string request_key = 5; // 审计关联标识。
+  string request_key = 5; // 審計關聯標識。
 }
 message AssignCardsReply { int64 assigned = 1; }
 message CancelImportPreviewReply {

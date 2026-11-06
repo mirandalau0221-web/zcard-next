@@ -44,13 +44,13 @@ type paymentPricing struct {
 
 func validateFee(fee int64, kind, bearer string) error {
 	if fee < 0 || (kind != "fixed" && kind != "percent") || (bearer != "merchant" && bearer != "user") || (kind == "percent" && fee > 10000) || (kind == "fixed" && fee > 100000000) {
-		return errors.BadRequest("payment.INVALID_FEE", "手续费须为 0–100% 或 0–1000000 元，承担方须为商家或用户")
+		return errors.BadRequest("payment.INVALID_FEE", "手續費須為 0–100% 或 0–1000000 元，承擔方須為商家或用户")
 	}
 	return nil
 }
 func validateRecommendation(label, description string) error {
 	if utf8.RuneCountInString(label) > 6 || utf8.RuneCountInString(description) > 60 || strings.ContainsAny(label+description, "\r\n") {
-		return errors.BadRequest("payment.INVALID_RECOMMENDATION", "推荐标签最多 6 字，说明最多 60 字，不能换行")
+		return errors.BadRequest("payment.INVALID_RECOMMENDATION", "推薦標籤最多 6 字，説明最多 60 字，不能換行")
 	}
 	return nil
 }
@@ -77,7 +77,7 @@ func (r *PaymentRepoImpl) price(ctx context.Context, ch *ent.PaymentChannel, bas
 		return p, err
 	}
 	if base <= 0 || !money.ValidCents(base) {
-		return p, errors.BadRequest("payment.INVALID_AMOUNT", "支付金额超出允许范围")
+		return p, errors.BadRequest("payment.INVALID_AMOUNT", "支付金額超出允許範圍")
 	}
 	if ch.Driver == "wallet" {
 		p.Rate = 0
@@ -91,7 +91,7 @@ func (r *PaymentRepoImpl) price(ctx context.Context, ch *ent.PaymentChannel, bas
 		p.Total += p.Fee
 	}
 	if !money.ValidCents(p.Total) {
-		return p, errors.BadRequest("payment.INVALID_AMOUNT", "含手续费金额超出允许范围")
+		return p, errors.BadRequest("payment.INVALID_AMOUNT", "含手續費金額超出允許範圍")
 	}
 	if ch.Driver != "wallet" && !isNativeCryptoDriver(ch.Driver) {
 		var err error
@@ -123,7 +123,7 @@ func pricingQuote(p paymentPricing, channel string, channelID uint64, scope stri
 func checkQuote(ctx context.Context, q *storefrontv1.PaymentQuote) error {
 	key := port.QuoteKey(ctx)
 	if (key != "" && key != q.QuoteKey) || (key == "" && q.FeeCents > 0) {
-		return errors.BadRequest("payment.QUOTE_CHANGED", "支付金额已变化，请刷新费用明细后再次确认")
+		return errors.BadRequest("payment.QUOTE_CHANGED", "支付金額已變化，請刷新費用明細後再次確認")
 	}
 	return nil
 }
@@ -149,7 +149,7 @@ func (s *StorePaymentService) paymentOrder(ctx context.Context, no, password str
 	o, err := data.Client(ctx, s.data).Order.Query().
 		Where(order.OrderNo(no), order.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("order.NOT_FOUND", "订单不存在或查询密码错误")
+		return nil, errors.NotFound("order.NOT_FOUND", "訂單不存在或查詢密碼錯誤")
 	}
 	if err != nil {
 		return nil, err
@@ -160,7 +160,7 @@ func (s *StorePaymentService) paymentOrder(ctx context.Context, no, password str
 			if o.OrderAccessTokenHash != "" {
 				return nil, orderaccess.Required(ctx)
 			}
-			return nil, errors.NotFound("order.NOT_FOUND", "订单不存在或查询凭证无效")
+			return nil, errors.NotFound("order.NOT_FOUND", "訂單不存在或查詢憑證無效")
 		}
 	}
 	return o, nil
@@ -168,10 +168,10 @@ func (s *StorePaymentService) paymentOrder(ctx context.Context, no, password str
 
 func authorizeWalletPayment(ctx context.Context, o *ent.Order) error {
 	if identity.ClaimsFromContext(ctx) == nil {
-		return errors.Unauthorized("identity.UNAUTHORIZED", "余额支付需登录订单所属账户")
+		return errors.Unauthorized("identity.UNAUTHORIZED", "餘額支付需登錄訂單所屬賬户")
 	}
 	if !paymentOrderOwner(ctx, o) {
-		return errors.Forbidden("payment.ORDER_OWNER_REQUIRED", "余额支付只能由订单所属账户操作")
+		return errors.Forbidden("payment.ORDER_OWNER_REQUIRED", "餘額支付只能由訂單所屬賬户操作")
 	}
 	return nil
 }
@@ -194,13 +194,13 @@ func (s *StorePaymentService) QuotePayment(ctx context.Context, req *storefrontv
 			return nil, errors.BadRequest("payment.CURRENCY_MISMATCH", err.Error())
 		}
 		if o.Status != order.StatusPendingPayment || o.ExpiryReview || !time.Now().Before(o.ExpiredAt) {
-			return nil, errors.BadRequest("payment.ORDER_NOT_PENDING", "订单不在待支付状态")
+			return nil, errors.BadRequest("payment.ORDER_NOT_PENDING", "訂單不在待支付狀態")
 		}
 		base, subsite, orderID, scope = o.TotalAmount, o.SubsiteID, o.ID, o.OrderNo
 		purchaseOrder = o
 	} else if scene == sceneMemberRecharge || scene == sceneSupplyRecharge {
 		if identity.ClaimsFromContext(ctx) == nil {
-			return nil, errors.Unauthorized("identity.UNAUTHORIZED", "请先登录")
+			return nil, errors.Unauthorized("identity.UNAUTHORIZED", "請先登錄")
 		}
 	} else {
 		return nil, errors.BadRequest("payment.SCENE_INVALID", "不支持的支付用途")
@@ -221,7 +221,7 @@ func (s *StorePaymentService) QuotePayment(ctx context.Context, req *storefrontv
 		old, e := s.repo.nativeAttempt(ctx, data.Client(ctx, s.data).Payment.Query().Where(payment.ChannelID(ch.ID), payment.OrderID(orderID), payment.DriverSnapshot(ch.Driver)), ch, req.GetMethod())
 		if e == nil {
 			if old.Status != payment.StatusPending || !time.Now().Before(old.ExpiresAt) {
-				return nil, errors.BadRequest("payment.ORDER_EXPIRED", "支付已关闭或过期，请重新下单")
+				return nil, errors.BadRequest("payment.ORDER_EXPIRED", "支付已關閉或過期，請重新下單")
 			}
 			return pricingQuote(pricingOf(old), ch.Code, ch.ID, scope, old.ID), nil
 		}
@@ -243,7 +243,7 @@ func (s *AdminPaymentService) saveCheckout(ctx context.Context, ch *ent.PaymentC
 		return nil, err
 	}
 	if ch.Driver == "wallet" && (ch.Fee != 0 || bearer == "user") {
-		return nil, errors.BadRequest("payment.INVALID_FEE", "余额支付固定免手续费")
+		return nil, errors.BadRequest("payment.INVALID_FEE", "餘額支付固定免手續費")
 	}
 	if err := validateRecommendation(label, description); err != nil {
 		return nil, err
@@ -252,10 +252,10 @@ func (s *AdminPaymentService) saveCheckout(ctx context.Context, ch *ent.PaymentC
 }
 func (s *AdminPaymentService) UpdateChannel(ctx context.Context, req *adminv1.UpdateChannelRequest) (*adminv1.Channel, error) {
 	if req.Fee != nil && req.GetFee() < 0 {
-		return nil, errors.BadRequest("payment.INVALID_FEE", "手续费不能为负数")
+		return nil, errors.BadRequest("payment.INVALID_FEE", "手續費不能為負數")
 	}
 	if req.Sort != nil && req.GetSort() < 0 {
-		return nil, errors.BadRequest("payment.INVALID_SORT", "排序不能为负数")
+		return nil, errors.BadRequest("payment.INVALID_SORT", "排序不能為負數")
 	}
 	var result *adminv1.Channel
 	err := data.Tx(ctx, s.data, func(tx context.Context) error {
@@ -297,5 +297,5 @@ func paymentCreationError(err error) error {
 	if errors.Code(err) == 400 {
 		return err
 	}
-	return errors.InternalServer("payment.CREATE_FAILED", "创建支付失败")
+	return errors.InternalServer("payment.CREATE_FAILED", "創建支付失敗")
 }

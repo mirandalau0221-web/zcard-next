@@ -22,11 +22,11 @@ type Setting struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 设置分组：site/template/trade/security/ops/notify...
+	// 設置分組：site/template/trade/security/ops/notify...
 	Group string `json:"group,omitempty"`
 	// Key holds the value of the "key" field.
 	Key string `json:"key,omitempty"`
-	// 设置值（JSON 文档）
+	// 設置值（JSON 文檔）
 	Value        json.RawMessage `json:"value,omitempty"`
 	selectValues sql.SelectValues
 }

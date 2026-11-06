@@ -8,24 +8,24 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminOrderService 订单管理。
+// AdminOrderService 訂單管理。
 service AdminOrderService {
-  // ListOrders 订单列表（游标分页）。
+  // ListOrders 訂單列表（遊標分頁）。
   rpc ListOrders(ListOrdersRequest) returns (ListOrdersReply) {
     option (google.api.http) = { get: "/api/v1/admin/orders" };
   }
-  // GetOrder 订单详情（含金额行+状态事件时间线）。
+  // GetOrder 訂單詳情（含金額行+狀態事件時間線）。
   rpc GetOrder(GetAdminOrderRequest) returns (AdminOrder) {
     option (google.api.http) = { get: "/api/v1/admin/orders/{order_no}" };
   }
-  // CancelOrder 取消订单（pending 可取消）。
+  // CancelOrder 取消訂單（pending 可取消）。
   rpc CancelOrder(CancelOrderRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/orders/{order_no}/cancel"
       body: "*"
     };
   }
-  // DeleteOrders 从管理列表移除已取消或已过期的未付款订单，保留关联记录。
+  // DeleteOrders 從管理列表移除已取消或已過期的未付款訂單，保留關聯記錄。
   rpc DeleteOrders(DeleteOrdersRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/orders/delete"
@@ -39,12 +39,12 @@ message ListOrdersRequest {
   string status = 1;
   uint64 cursor = 2;
   int32 limit = 3;
-  string keyword = 4; // 订单号或联系方式（包含匹配）。
+  string keyword = 4; // 訂單號或聯繫方式（包含匹配）。
   int64 start_time = 5;
   int64 end_time = 6;
   string time_field = 7; // created/paid
   uint64 channel_id = 8;
-  string channel_code = 9; // 历史无 channel_id 流水
+  string channel_code = 9; // 歷史無 channel_id 流水
   uint64 product_id = 10;
 }
 
@@ -57,7 +57,7 @@ message GetAdminOrderRequest {
   string order_no = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// AdminOrder 管理面订单（含成本；StripCostPrice 由 service 判权限）。
+// AdminOrder 管理面訂單（含成本；StripCostPrice 由 service 判權限）。
 message AdminOrder {
   string shipping_status = 40;
   int64 shipping_cents = 41;
@@ -103,7 +103,7 @@ message AdminOrderItem {
   optional bool inventory_tracked = 39;
   string form_answers_json = 18;
   uint64 assigned_admin_id = 19;
-  uint64 id = 17; // 订单商品项 ID，人工补发使用
+  uint64 id = 17; // 訂單商品項 ID，人工補發使用
   uint64 product_id = 1;
   uint64 sku_id = 2;
   int32 quantity = 3;
@@ -111,14 +111,14 @@ message AdminOrderItem {
   int64 amount_cents = 5;
   string fulfillment_type = 6;
   string fulfillment_status = 7;
-  string name = 8; // 商品名（联查当前）
+  string name = 8; // 商品名（聯查當前）
   string sku_name = 9; // SKU 名快照
   int64 cost_cents = 10; // 成本快照（分）
-  bool is_self = 11; // 自营（upstream_source_id 为空）
-  uint64 upstream_source_id = 12; // 货源连接 ID
+  bool is_self = 11; // 自營（upstream_source_id 為空）
+  uint64 upstream_source_id = 12; // 貨源連接 ID
   string upstream_source_name = 13; // 上游渠道名
-  string upstream_driver = 14; // 上游驱动（zcard/dujiao_next/acg_faka）
-  string upstream_product_code = 15; // 上游商品标识
+  string upstream_driver = 14; // 上游驅動（zcard/dujiao_next/acg_faka）
+  string upstream_product_code = 15; // 上游商品標識
   string upstream_url = 16; // 上游地址（base_url）
 }
 

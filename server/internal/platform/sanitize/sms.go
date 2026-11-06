@@ -16,10 +16,10 @@ func SMSPublicContent(kind, name, description string) (string, string) {
 	}
 	old := name
 	if strings.HasSuffix(strings.TrimSpace(name), "· 接码服务") {
-		name = "接码服务"
+		name = "接碼服務"
 		description = strings.ReplaceAll(description, old, name)
 		description = strings.ReplaceAll(description, html.EscapeString(old), name)
 	}
-	description = smsLegacyHeading.ReplaceAllString(description, "${1}接码服务")
+	description = smsLegacyHeading.ReplaceAllString(description, "${1}接碼服務")
 	return name, description
 }

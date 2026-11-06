@@ -17,13 +17,13 @@ type FailedTask struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// 任务类型（event:order.paid / card:import...）
+	// 任務類型（event:order.paid / card:import...）
 	TaskType string `json:"task_type,omitempty"`
-	// 任务载荷
+	// 任務載荷
 	Payload []byte `json:"payload,omitempty"`
-	// 失败原因
+	// 失敗原因
 	Error string `json:"error,omitempty"`
-	// 已重试次数
+	// 已重試次數
 	RetryCount int32 `json:"retry_count,omitempty"`
 	// pending=待重放；done=已重放
 	Status failedtask.Status `json:"status,omitempty"`

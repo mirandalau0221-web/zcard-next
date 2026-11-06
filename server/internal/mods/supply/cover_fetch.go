@@ -1,11 +1,11 @@
 package supply
 
-// 上游商品图采集（cover 落本地）：同步时把上游封面下载到本地 uploads，
-// 避免相对路径（acg 站 /assets/cache/images/...）在本地店面渲染 404。
+// 上游商品圖採集（cover 落本地）：同步時把上游封面下載到本地 uploads，
+// 避免相對路徑（acg 站 /assets/cache/images/...）在本地店面渲染 404。
 //
-// 目录按渠道名分组（uploads/<渠道名>/，重名渠道自动加 2/3……；解析结果
-// 持久化到连接 settings.cover_dir，重启沿用）；失败 fail-open：返回完整
-// 上游 URL（上游可直连时仍可显示），不阻断同步。同一服务内按 URL 去重。
+// 目錄按渠道名分組（uploads/<渠道名>/，重名渠道自動加 2/3……；解析結果
+// 持久化到連接 settings.cover_dir，重啓沿用）；失敗 fail-open：返回完整
+// 上游 URL（上游可直連時仍可顯示），不阻斷同步。同一服務內按 URL 去重。
 
 import (
 	"context"
@@ -22,7 +22,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/httpx"
 )
 
-// maxCoverBytes 封面大小上限（2MB——发卡商品图足够；Content-Length 不可信时 LimitReader 兜底）。
+// maxCoverBytes 封面大小上限（2MB——髮卡商品圖足夠；Content-Length 不可信時 LimitReader 兜底）。
 const maxCoverBytes = 2 << 20
 
 var coverClient = httpx.NewSafeClient(10 * time.Second)
@@ -61,15 +61,15 @@ func resolveUpstreamURL(baseURL, cover string) string {
 	return u.String()
 }
 
-// downloadCover 下载上游封面到本地 uploads/<coverDir>/；返回本地 URL（/uploads/...）。
-// 任何失败均 fail-open：返回完整上游 URL（记录 warn，不阻断同步）。
+// downloadCover 下載上游封面到本地 uploads/<coverDir>/；返回本地 URL（/uploads/...）。
+// 任何失敗均 fail-open：返回完整上游 URL（記錄 warn，不阻斷同步）。
 func (s *SyncService) downloadCover(ctx context.Context, baseURL, cover, coverDir string) string {
 	src := resolveUpstreamURL(baseURL, cover)
 	if src == "" {
 		return ""
 	}
 	key := coverDir + "|" + src
-	// 去重缓存（并发任务加锁）
+	// 去重緩存（併發任務加鎖）
 	s.coverMu.Lock()
 	if s.coverCache == nil {
 		s.coverCache = map[string]string{}
@@ -120,7 +120,7 @@ func mediaFetchError(err error) error {
 	return err
 }
 
-// fetchCover 单次下载 + 落盘（无缓存）。
+// fetchCover 單次下載 + 落盤（無緩存）。
 func (s *SyncService) fetchCover(ctx context.Context, src, coverDir, referer string) string {
 	if ctx.Err() != nil {
 		return src
@@ -195,8 +195,8 @@ func coverExt(ctype, src string) string {
 	return ""
 }
 
-// allocateCoverDir 从已占用目录名集合中分配唯一名：name 空闲用 name，否则
-// name2/name3……（首个空闲）。name 净化后为空则返回空（年月目录兜底）。
+// allocateCoverDir 從已佔用目錄名集合中分配唯一名：name 空閒用 name，否則
+// name2/name3……（首個空閒）。name 淨化後為空則返回空（年月目錄兜底）。
 func allocateCoverDir(existing map[string]bool, name string) string {
 	if name == "" {
 		return ""
@@ -213,7 +213,7 @@ func allocateCoverDir(existing map[string]bool, name string) string {
 	return ""
 }
 
-// itoa 小整数转十进制。
+// itoa 小整數轉十進制。
 func itoa(i int) string {
 	if i == 0 {
 		return "0"
@@ -228,7 +228,7 @@ func itoa(i int) string {
 	return string(b[p:])
 }
 
-// listUploadSubDirs 扫描 uploads/ 一级目录名（不存在返回空集）。
+// listUploadSubDirs 掃描 uploads/ 一級目錄名（不存在返回空集）。
 func listUploadSubDirs() map[string]bool {
 	out := map[string]bool{}
 	entries, err := os.ReadDir(media.StorageRoot)
@@ -243,8 +243,8 @@ func listUploadSubDirs() map[string]bool {
 	return out
 }
 
-// sanitizeSubDir 渠道名 → 目录名（与 media.sanitizeSubDir 同规则：中文/字母/
-// 数字/._- 保留，其余替换为 -；截断 60；空返回空）。
+// sanitizeSubDir 渠道名 → 目錄名（與 media.sanitizeSubDir 同規則：中文/字母/
+// 數字/._- 保留，其餘替換為 -；截斷 60；空返回空）。
 func sanitizeSubDir(name string) string {
 	var b strings.Builder
 	for _, r := range name {
@@ -263,7 +263,7 @@ func sanitizeSubDir(name string) string {
 	return out
 }
 
-// deleteLocalCover 删除本地封面文件（cover 为 /uploads/ 路径时；其余忽略）。
+// deleteLocalCover 刪除本地封面文件（cover 為 /uploads/ 路徑時；其餘忽略）。
 func deleteLocalCover(cover string) {
 	if !strings.HasPrefix(cover, "/uploads/") {
 		return

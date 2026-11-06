@@ -1,4 +1,4 @@
-// Package port 为 wallet 模块对外契约（零依赖包）。
+// Package port 為 wallet 模塊對外契約（零依賴包）。
 package port
 
 import (
@@ -10,63 +10,63 @@ import (
 
 var ErrInsufficientBalance = errors.New("wallet.INSUFFICIENT_BALANCE")
 
-// Direction 流水方向（string(8)，与 ent schema 一致）。
+// Direction 流水方向（string(8)，與 ent schema 一致）。
 const (
 	DirectionIn  = "in"
 	DirectionOut = "out"
 )
 
-// Entry 账务入账请求（一切余额变动的唯一入口 InTx 的参数）。
+// Entry 賬務入賬請求（一切餘額變動的唯一入口 InTx 的參數）。
 type Entry struct {
 	UserID    uint64
 	Direction string
 	Type      string // order_pay/order_refund/recharge/commission/adjust...
 	Amount    money.Cents
-	Reference string // 幂等键（重复提交直接返回成功，§5.6）
+	Reference string // 冪等鍵（重複提交直接返回成功，§5.6）
 	OrderID   uint64
 	Operator  uint64
 	Remark    string
 }
 
-// PointEntry 积分入账请求（与 Entry 同构）。
+// PointEntry 積分入賬請求（與 Entry 同構）。
 type PointEntry struct {
 	UserID    uint64
 	Direction string // in | out
 	Type      string // earn_recharge / earn_consume / redeem / adjust ...
-	Amount    int64  // 正数
-	Reference string // 幂等键
+	Amount    int64  // 正數
+	Reference string // 冪等鍵
 	OrderID   uint64
 	Remark    string
 }
 
-// Points 积分账本窄接口（payment 充值赠送消费，通道 B 同事务）。
+// Points 積分賬本窄接口（payment 充值贈送消費，通道 B 同事務）。
 type Points interface {
 	PointCreditInTx(ctx context.Context, e PointEntry) error
 }
 
-// PointsDebiter 积分扣减（order 积分兑换下单消费，通道 B 同事务）。
+// PointsDebiter 積分扣減（order 積分兑換下單消費，通道 B 同事務）。
 type PointsDebiter interface {
 	PointDebitInTx(ctx context.Context, e PointEntry) error
 }
 
-// PointsReader 积分余额读取（memberlevel 等级进度页消费）。
+// PointsReader 積分餘額讀取（memberlevel 等級進度頁消費）。
 type PointsReader interface {
 	GetPoints(ctx context.Context, userID uint64) (int64, error)
 }
 
-// RechargeReader 累计充值口径（memberlevel 升级阈值消费；countAsRecharge——
-// 仅 type=recharge 的真实入账，互转/调账/退款不计，防小号互转刷级）。
+// RechargeReader 累計充值口徑（memberlevel 升級閾值消費；countAsRecharge——
+// 僅 type=recharge 的真實入賬，互轉/調賬/退款不計，防小號互轉刷級）。
 type RechargeReader interface {
 	CumulativeRecharge(ctx context.Context, userID uint64) (int64, error)
 }
 
-// Wallet 钱包窄接口（order 余额支付 / payment 退款 / affiliate 佣金入账消费，通道 B 同事务）。
+// Wallet 錢包窄接口（order 餘額支付 / payment 退款 / affiliate 佣金入賬消費，通道 B 同事務）。
 type Wallet interface {
-	// CreditInTx 入账（充值/退款回/佣金）；幂等重入：reference 已存在直接返回成功。
+	// CreditInTx 入賬（充值/退款回/佣金）；冪等重入：reference 已存在直接返回成功。
 	CreditInTx(ctx context.Context, e Entry) error
-	// DebitInTx 扣款（余额支付下单）；余额不足返回 ErrInsufficientBalance，订单不创建。
+	// DebitInTx 扣款（餘額支付下單）；餘額不足返回 ErrInsufficientBalance，訂單不創建。
 	DebitInTx(ctx context.Context, e Entry) error
-	// Lock / Unlock 冻结流转（佣金/分站利润冻结期、提现申请）。
+	// Lock / Unlock 凍結流轉（佣金/分站利潤凍結期、提現申請）。
 	Lock(ctx context.Context, userID uint64, amount money.Cents, availableAt int64) error
 	Unlock(ctx context.Context, userID uint64, amount money.Cents) error
 }

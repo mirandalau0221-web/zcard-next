@@ -20,7 +20,7 @@ import (
 func (r *DeliveryRepoImpl) ManualDeliver(ctx context.Context, orderNo, content, logisticsNo, remark string, adminID uint64, itemID ...uint64) error {
 	content, logisticsNo = strings.TrimSpace(content), strings.TrimSpace(logisticsNo)
 	if (content == "") == (logisticsNo == "") {
-		return fmt.Errorf("卡密内容与物流单号必须且只能填写一项")
+		return fmt.Errorf("卡密內容與物流單號必須且只能填寫一項")
 	}
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		client := data.Client(ctx, r.data)
@@ -36,12 +36,12 @@ func (r *DeliveryRepoImpl) ManualDeliver(ctx context.Context, orderNo, content, 
 			return err
 		}
 		if processing {
-			return fmt.Errorf("退款处理中，请先核实退款结果")
+			return fmt.Errorf("退款處理中，請先核實退款結果")
 		}
 		if has, e := data.HasSMSOrder(ctx, client, o.ID); e != nil {
 			return e
 		} else if has {
-			return fmt.Errorf("接码订单须等待供货会话确认，不能人工补发卡密")
+			return fmt.Errorf("接碼訂單須等待供貨會話確認，不能人工補發卡密")
 		}
 		its, err := client.OrderItem.Query().Where(orderitem.OrderID(o.ID)).Order(ent.Asc(orderitem.FieldID)).All(ctx)
 		if err != nil {
@@ -63,17 +63,17 @@ func (r *DeliveryRepoImpl) ManualDeliver(ctx context.Context, orderNo, content, 
 			}
 		}
 		if target != nil && target.GoodsType == "physical" {
-			return fmt.Errorf("实体商品请使用快递发货操作")
+			return fmt.Errorf("實體商品請使用快遞發貨操作")
 		}
 		if target == nil {
-			return fmt.Errorf("请选择本订单中需要补发的商品")
+			return fmt.Errorf("請選擇本訂單中需要補發的商品")
 		}
 		if target.CanceledQuantity > 0 || target.FulfillmentStatus == "refunded" {
-			return fmt.Errorf("该商品已取消或退款，不能补发")
+			return fmt.Errorf("該商品已取消或退款，不能補發")
 		}
 
 		if target.FulfillmentType == orderitem.FulfillmentTypeManual && target.AssignedAdminID != 0 && target.AssignedAdminID != adminID {
-			return fmt.Errorf("该商品已由其他管理员领取")
+			return fmt.Errorf("該商品已由其他管理員領取")
 		}
 
 		counts, err := r.deliveredQuantities(ctx, o.ID, its)
@@ -82,7 +82,7 @@ func (r *DeliveryRepoImpl) ManualDeliver(ctx context.Context, orderNo, content, 
 		}
 		remaining := int(target.Quantity) - counts[target.ID]
 		if remaining <= 0 {
-			return fmt.Errorf("该商品已发货，请刷新订单")
+			return fmt.Errorf("該商品已發貨，請刷新訂單")
 		}
 		var lines []string
 		for _, line := range strings.Split(content, "\n") {
@@ -91,7 +91,7 @@ func (r *DeliveryRepoImpl) ManualDeliver(ctx context.Context, orderNo, content, 
 			}
 		}
 		if content != "" && len(lines) != remaining {
-			return fmt.Errorf("该商品待补发 %d 条，请每行填写一条卡密", remaining)
+			return fmt.Errorf("該商品待補發 %d 條，請每行填寫一條卡密", remaining)
 		}
 
 		po, err := client.ProcurementOrder.Query().Where(procurementorder.OrderItemID(target.ID)).Only(ctx)
@@ -102,15 +102,15 @@ func (r *DeliveryRepoImpl) ManualDeliver(ctx context.Context, orderNo, content, 
 			switch po.Status {
 			case procurementorder.StatusManual, procurementorder.StatusRejected, procurementorder.StatusRefunding:
 			default:
-				return fmt.Errorf("上游采购仍在进行或已交付，请先在采购单核实并转人工，避免重复发货")
+				return fmt.Errorf("上游採購仍在進行或已交付，請先在採購單核實並轉人工，避免重複發貨")
 			}
 			// Also supports old refunding receipts whose executor never ran.
-			n, err := client.ProcurementOrder.Update().Where(procurementorder.ID(po.ID), procurementorder.StatusEQ(po.Status)).SetStatus(procurementorder.StatusFulfilled).SetLastError("管理员已人工补发，原采购异常已处理").Save(ctx)
+			n, err := client.ProcurementOrder.Update().Where(procurementorder.ID(po.ID), procurementorder.StatusEQ(po.Status)).SetStatus(procurementorder.StatusFulfilled).SetLastError("管理員已人工補發，原採購異常已處理").Save(ctx)
 			if err != nil {
 				return err
 			}
 			if n != 1 {
-				return fmt.Errorf("采购单已变化，请刷新后重试")
+				return fmt.Errorf("採購單已變化，請刷新後重試")
 			}
 		}
 		now := time.Now().UTC()
@@ -147,7 +147,7 @@ func (r *DeliveryRepoImpl) ManualDeliver(ctx context.Context, orderNo, content, 
 		if _, err := client.Card.Update().Where(card.OrderID(o.ID), card.ProductID(target.ProductID), skuFilter, card.StatusEQ(card.StatusReserved)).SetStatus(card.StatusAvailable).ClearOrderID().ClearLockedAt().Save(ctx); err != nil {
 			return err
 		}
-		if _, err := client.RefundOrder.Update().Where(refundorder.OrderID(o.ID), refundorder.StatusEQ(refundorder.StatusCreated), refundorder.ChannelEQ(refundorder.ChannelUpstream)).SetStatus(refundorder.StatusFailed).SetReason("旧自动退款未执行，管理员已选择人工补发").Save(ctx); err != nil {
+		if _, err := client.RefundOrder.Update().Where(refundorder.OrderID(o.ID), refundorder.StatusEQ(refundorder.StatusCreated), refundorder.ChannelEQ(refundorder.ChannelUpstream)).SetStatus(refundorder.StatusFailed).SetReason("舊自動退款未執行，管理員已選擇人工補發").Save(ctx); err != nil {
 			return err
 		}
 		return r.updateDeliveryProgress(ctx, o, "admin", adminID, remark)

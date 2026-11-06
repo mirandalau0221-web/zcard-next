@@ -10,7 +10,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/refundorder"
 )
 
-var ErrOrderNotPurchasable = errors.New("订单已关闭或商品已取消，不能采购")
+var ErrOrderNotPurchasable = errors.New("訂單已關閉或商品已取消，不能採購")
 
 // Persist the in-flight claim under the same order lock used by refunds. The
 // remote call happens after commit; an ambiguous claim must be reconciled first.
@@ -50,7 +50,7 @@ func (r *ProcureRepo) claimPurchase(ctx context.Context, itemID, connectionID ui
 			return e
 		}
 		if busy {
-			return fmt.Errorf("退款待核对，不能采购")
+			return fmt.Errorf("退款待核對，不能採購")
 		}
 		out, e = r.CreatePending(ctx, itemID, connectionID, code, qty, strategy, trace)
 		return e

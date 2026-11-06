@@ -17,11 +17,11 @@ type RiskLockKey struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// 锁定键哈希（IP/订单维度，命名空间前缀）
+	// 鎖定鍵哈希（IP/訂單維度，命名空間前綴）
 	KeyHash string `json:"key_hash,omitempty"`
-	// 连续失败次数；默认5保留升级前已有锁定
+	// 連續失敗次數；默認5保留升級前已有鎖定
 	FailureCount int `json:"failure_count,omitempty"`
-	// TTL 过期自动失效
+	// TTL 過期自動失效
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt    time.Time `json:"created_at,omitempty"`

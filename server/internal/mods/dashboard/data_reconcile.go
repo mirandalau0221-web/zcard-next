@@ -1,12 +1,12 @@
 package dashboard
 
-// 货源对账引擎（ 验收项）：
-// 任务生命周期 pending → processing → done/failed（可查可告警）；
-// 时间窗内本地 procurement_orders vs 上游订单清单（数据源端口注入）；
-// 四态比对 matched / mismatched（金额·状态差异进 diff_json）/ local_only /
-// upstream_only；job 汇总计数；mismatch>0 → notify 管理员告警。
-// 数据源：上游支持列表（zcard ListOrders）走完整四态；不支持（dujiao/acg-faka）
-// 置 failed「上游不支持列表对账」（fail-closed，不静默跳过）。
+// 貨源對賬引擎（ 驗收項）：
+// 任務生命週期 pending → processing → done/failed（可查可告警）；
+// 時間窗內本地 procurement_orders vs 上游訂單清單（數據源端口注入）；
+// 四態比對 matched / mismatched（金額·狀態差異進 diff_json）/ local_only /
+// upstream_only；job 彙總計數；mismatch>0 → notify 管理員告警。
+// 數據源：上游支持列表（zcard ListOrders）走完整四態；不支持（dujiao/acg-faka）
+// 置 failed「上游不支持列表對賬」（fail-closed，不靜默跳過）。
 
 import (
 	"context"
@@ -23,19 +23,19 @@ import (
 	notifyport "github.com/NovaWorks/zcard-next/server/internal/mods/notify/port"
 )
 
-// Reconciler 对账引擎。
+// Reconciler 對賬引擎。
 type Reconciler struct {
 	data   *data.Data
 	source dashboardport.UpstreamOrderSource
-	sender notifyport.Sender // mismatch 告警（nil = 未装配跳过）
+	sender notifyport.Sender // mismatch 告警（nil = 未裝配跳過）
 }
 
-// NewReconciler 构造。
+// NewReconciler 構造。
 func NewReconciler(d *data.Data, source dashboardport.UpstreamOrderSource, sender notifyport.Sender) *Reconciler {
 	return &Reconciler{data: d, source: source, sender: sender}
 }
 
-// CreateJob 创建对账任务（pending；时间窗 ≤31 天）。
+// CreateJob 創建對賬任務（pending；時間窗 ≤31 天）。
 func (rc *Reconciler) CreateJob(ctx context.Context, connectionID uint64, start, end time.Time) (*ent.ReconciliationJob, error) {
 	if end.Before(start) || end.Sub(start) > 31*24*time.Hour {
 		return nil, errors.New("reconciliation.RANGE_INVALID")
@@ -49,7 +49,7 @@ func (rc *Reconciler) CreateJob(ctx context.Context, connectionID uint64, start,
 		Save(ctx)
 }
 
-// RunJob 执行任务（幂等：非 pending 直接返回；处理中/已完成不重跑）。
+// RunJob 執行任務（冪等：非 pending 直接返回；處理中/已完成不重跑）。
 func (rc *Reconciler) RunJob(ctx context.Context, jobID uint64) error {
 	client := data.Client(ctx, rc.data)
 	job, err := client.ReconciliationJob.Get(ctx, jobID)
@@ -57,7 +57,7 @@ func (rc *Reconciler) RunJob(ctx context.Context, jobID uint64) error {
 		return err
 	}
 	if job.Status != reconciliationjob.StatusPending {
-		return nil // 幂等
+		return nil // 冪等
 	}
 	// 置 processing（CAS）
 	if _, err := client.ReconciliationJob.UpdateOneID(jobID).
@@ -67,19 +67,19 @@ func (rc *Reconciler) RunJob(ctx context.Context, jobID uint64) error {
 		return err
 	}
 
-	// 上游清单（不支持 → failed 可查）
+	// 上游清單（不支持 → failed 可查）
 	if rc.source == nil {
-		return rc.failJob(ctx, jobID, "对账数据源未装配")
+		return rc.failJob(ctx, jobID, "對賬數據源未裝配")
 	}
 	upstream, err := rc.source.ListOrders(ctx, job.ConnectionID, job.TimeRangeStart, job.TimeRangeEnd)
 	if errors.Is(err, dashboardport.ErrUpstreamListUnsupported) {
-		return rc.failJob(ctx, jobID, "上游不支持订单列表对账")
+		return rc.failJob(ctx, jobID, "上游不支持訂單列表對賬")
 	}
 	if err != nil {
-		return rc.failJob(ctx, jobID, "拉取上游订单失败: "+err.Error())
+		return rc.failJob(ctx, jobID, "拉取上游訂單失敗: "+err.Error())
 	}
 
-	// 本地采购单（时间窗 + 已提交上游的）
+	// 本地採購單（時間窗 + 已提交上游的）
 	locals, err := client.ProcurementOrder.Query().
 		Where(
 			procurementorder.ConnectionID(job.ConnectionID),
@@ -89,7 +89,7 @@ func (rc *Reconciler) RunJob(ctx context.Context, jobID uint64) error {
 		).
 		All(ctx)
 	if err != nil {
-		return rc.failJob(ctx, jobID, "读取本地采购单失败: "+err.Error())
+		return rc.failJob(ctx, jobID, "讀取本地採購單失敗: "+err.Error())
 	}
 
 	upByID := map[string]dashboardport.UpstreamOrder{}
@@ -98,19 +98,19 @@ func (rc *Reconciler) RunJob(ctx context.Context, jobID uint64) error {
 	}
 	localByID := map[string]localSide{}
 	for _, l := range locals {
-		// 本地口径：订单子项金额 + 父单号（快照链：procurement → order_item → order）
+		// 本地口徑：訂單子項金額 + 父單號（快照鏈：procurement → order_item → order）
 		no, amt := rc.localRef(ctx, l)
 		localByID[l.UpstreamOrderID] = localSide{procure: l, orderNo: no, amount: amt}
 	}
 
 	var matched, mismatched, localOnly, upstreamOnly int32
-	// 本地侧比对
+	// 本地側比對
 	for _, l := range localByID {
 		u, ok := upByID[l.procure.UpstreamOrderID]
 		if !ok {
 			localOnly++
 			if err := rc.item(ctx, jobID, l.procure.ID, l.orderNo, "", reconciliationitem.StatusLocalOnly, nil); err != nil {
-				return rc.failJob(ctx, jobID, "落对账明细失败: "+err.Error())
+				return rc.failJob(ctx, jobID, "落對賬明細失敗: "+err.Error())
 			}
 			continue
 		}
@@ -121,26 +121,26 @@ func (rc *Reconciler) RunJob(ctx context.Context, jobID uint64) error {
 		if len(diff) > 0 {
 			mismatched++
 			if err := rc.item(ctx, jobID, l.procure.ID, l.orderNo, u.UpstreamOrderID, reconciliationitem.StatusMismatched, diff); err != nil {
-				return rc.failJob(ctx, jobID, "落对账明细失败: "+err.Error())
+				return rc.failJob(ctx, jobID, "落對賬明細失敗: "+err.Error())
 			}
 			continue
 		}
 		matched++
 		if err := rc.item(ctx, jobID, l.procure.ID, l.orderNo, u.UpstreamOrderID, reconciliationitem.StatusMatched, nil); err != nil {
-			return rc.failJob(ctx, jobID, "落对账明细失败: "+err.Error())
+			return rc.failJob(ctx, jobID, "落對賬明細失敗: "+err.Error())
 		}
 	}
-	// 上游侧多余
+	// 上游側多餘
 	for _, u := range upstream {
 		if _, ok := localByID[u.UpstreamOrderID]; !ok {
 			upstreamOnly++
 			if err := rc.item(ctx, jobID, 0, "", u.UpstreamOrderID, reconciliationitem.StatusUpstreamOnly, nil); err != nil {
-				return rc.failJob(ctx, jobID, "落对账明细失败: "+err.Error())
+				return rc.failJob(ctx, jobID, "落對賬明細失敗: "+err.Error())
 			}
 		}
 	}
 
-	// 汇总落 job done
+	// 彙總落 job done
 	resultMap := map[string]any{
 		"local_total": len(locals), "upstream_total": len(upstream),
 		"matched": matched, "mismatched": mismatched,
@@ -155,27 +155,27 @@ func (rc *Reconciler) RunJob(ctx context.Context, jobID uint64) error {
 		Save(ctx); err != nil {
 		return err
 	}
-	// mismatch 告警（管理员通道；一次一告）
+	// mismatch 告警（管理員通道；一次一告）
 	if mismatched+localOnly+upstreamOnly > 0 && rc.sender != nil {
 		_ = rc.sender.Send(ctx, notifyport.Message{
 			EventType: "reconciliation.mismatch",
 			Channel:   "inbox",
-			Subject:   "货源对账差异告警",
-			Body:      "对账任务 #" + strconv.FormatUint(jobID, 10) + " 发现差异：mismatched=" + strconv.Itoa(int(mismatched)) + " local_only=" + strconv.Itoa(int(localOnly)) + " upstream_only=" + strconv.Itoa(int(upstreamOnly)),
-			UserID:    0, // 管理员广播由 notify 通道处理（admin 收件方由通道配置决定）
+			Subject:   "貨源對賬差異告警",
+			Body:      "對賬任務 #" + strconv.FormatUint(jobID, 10) + " 發現差異：mismatched=" + strconv.Itoa(int(mismatched)) + " local_only=" + strconv.Itoa(int(localOnly)) + " upstream_only=" + strconv.Itoa(int(upstreamOnly)),
+			UserID:    0, // 管理員廣播由 notify 通道處理（admin 收件方由通道配置決定）
 		})
 	}
 	return nil
 }
 
-// localSide 本地侧对账口径（采购单 + 父单号 + 订单子项金额）。
+// localSide 本地側對賬口徑（採購單 + 父單號 + 訂單子項金額）。
 type localSide struct {
 	procure *ent.ProcurementOrder
 	orderNo string
 	amount  int64
 }
 
-// localRef 解析本地口径（子项金额 + 父单号；解析失败降级零值——金额差异进 diff）。
+// localRef 解析本地口徑（子項金額 + 父單號；解析失敗降級零值——金額差異進 diff）。
 func (rc *Reconciler) localRef(ctx context.Context, p *ent.ProcurementOrder) (string, int64) {
 	client := data.Client(ctx, rc.data)
 	it, err := client.OrderItem.Get(ctx, p.OrderItemID)
@@ -189,7 +189,7 @@ func (rc *Reconciler) localRef(ctx context.Context, p *ent.ProcurementOrder) (st
 	return no, it.Amount
 }
 
-// item 落对账明细行。
+// item 落對賬明細行。
 func (rc *Reconciler) item(ctx context.Context, jobID uint64, procureID uint64, localNo, upstreamNo string, status reconciliationitem.Status, diff map[string]any) error {
 	create := data.Client(ctx, rc.data).ReconciliationItem.Create().
 		SetJobID(jobID).
@@ -209,7 +209,7 @@ func (rc *Reconciler) item(ctx context.Context, jobID uint64, procureID uint64, 
 	return create.Exec(ctx)
 }
 
-// failJob 失败收尾（可查原因）。
+// failJob 失敗收尾（可查原因）。
 func (rc *Reconciler) failJob(ctx context.Context, jobID uint64, reason string) error {
 	res := map[string]any{"error": reason}
 	_, err := data.Client(ctx, rc.data).ReconciliationJob.UpdateOneID(jobID).
@@ -219,12 +219,12 @@ func (rc *Reconciler) failJob(ctx context.Context, jobID uint64, reason string) 
 	return err
 }
 
-// GetJob 任务详情。
+// GetJob 任務詳情。
 func (rc *Reconciler) GetJob(ctx context.Context, jobID uint64) (*ent.ReconciliationJob, error) {
 	return data.Client(ctx, rc.data).ReconciliationJob.Get(ctx, jobID)
 }
 
-// ListItems 明细分页（mismatch 等状态筛选）。
+// ListItems 明細分頁（mismatch 等狀態篩選）。
 func (rc *Reconciler) ListItems(ctx context.Context, jobID uint64, status string, page, size int) ([]*ent.ReconciliationItem, int64, error) {
 	q := data.Client(ctx, rc.data).ReconciliationItem.Query().
 		Where(reconciliationitem.JobID(jobID)).

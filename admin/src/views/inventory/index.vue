@@ -21,7 +21,7 @@ defineOptions({ name: "InventoryManagement" });
 const route = useRoute();
 const authStore = useAuthStore();
 const selectedProduct = ref<number | null>(null);
-const selectedSku = ref<number | null>(null); // null=全部，0=默认池
+const selectedSku = ref<number | null>(null); // null=全部，0=默認池
 const filterCatId = ref<number | null>(null);
 const products = ref<any[]>([]), categories = ref<any[]>([]);
 const productsLoading = ref(false), productsLoadFailed = ref(false);
@@ -46,7 +46,7 @@ function queryID(value: unknown, zero = false): number | null {
 }
 function validateTargets(data: InventoryTargets, productId: number): InventoryTargets {
   if (data.product_id !== productId || !Array.isArray(data.targets) || !data.targets.length ||
-      data.targets.some(t => !safeID(t.sku_id ?? 0, true)) || !safeID(data.revision ?? 0, true)) throw new Error("规格数据异常，请刷新后重试");
+      data.targets.some(t => !safeID(t.sku_id ?? 0, true)) || !safeID(data.revision ?? 0, true)) throw new Error("規格數據異常，請刷新後重試");
   return { ...data, targets: data.targets.map(t => ({ ...t, sku_id: t.sku_id ?? 0 })) };
 }
 const categoryOptions = computed(() => {
@@ -57,7 +57,7 @@ const categoryOptions = computed(() => {
     const parent = byId.get(node.parent_id);
     if (parent) parent.children.push(node); else roots.push(node);
   }
-  const out = [{ label: "全部分类", value: 0 }];
+  const out = [{ label: "全部分類", value: 0 }];
   const walk = (nodes: any[], depth = 0) => {
     for (const node of nodes) { out.push({ label: `${"　".repeat(depth)}${node.name}`, value: node.id }); walk(node.children, depth + 1); }
   };
@@ -67,19 +67,19 @@ const categoryOptions = computed(() => {
 function productOptions(cat: number | null) {
   return products.value.filter(p => !cat || p.category_id === cat).map(p => ({ label: `${p.name}（${formatMoney(p.price_cents)}）`, value: p.id }));
 }
-const skuOptions = computed(() => (targets.value?.targets || []).map(t => ({ label: t.sku_name || (t.sku_id ? `规格 #${t.sku_id}` : "商品默认池"), value: t.sku_id! })));
-const batchSkuOptions = computed(() => [{ label: "全部导入目标", value: "all" }, { label: "历史未记录", value: "legacy" }, ...skuOptions.value]);
+const skuOptions = computed(() => (targets.value?.targets || []).map(t => ({ label: t.sku_name || (t.sku_id ? `規格 #${t.sku_id}` : "商品默認池"), value: t.sku_id! })));
+const batchSkuOptions = computed(() => [{ label: "全部導入目標", value: "all" }, { label: "歷史未記錄", value: "legacy" }, ...skuOptions.value]);
 function skuName(row: { sku_id?: number | null; sku_name?: string }) {
-  return row.sku_name || (row.sku_id ? `已删除或未知规格 #${row.sku_id}` : "商品默认池");
+  return row.sku_name || (row.sku_id ? `已刪除或未知規格 #${row.sku_id}` : "商品默認池");
 }
 function importSkuName(row: InventoryBatch) {
-  return row.sku_id == null ? "历史未记录" : skuName(row);
+  return row.sku_id == null ? "歷史未記錄" : skuName(row);
 }
 function distribution(rows: InventorySkuCount[] = []) {
-  return rows.map(r => `${skuName(r)}：可用 ${r.available || 0} / 预占 ${r.reserved || 0} / 已售 ${r.used || 0} / 禁用 ${r.disabled || 0}`).join("；") || "无剩余卡密记录";
+  return rows.map(r => `${skuName(r)}：可用 ${r.available || 0} / 預佔 ${r.reserved || 0} / 已售 ${r.used || 0} / 禁用 ${r.disabled || 0}`).join("；") || "無剩餘卡密記錄";
 }
 function batchStatus(status = "") {
-  return ({ pending: "待处理", processing: "处理中", done: "已完成", failed: "失败", canceled: "已撤销" } as Record<string, string>)[status] || status || "-";
+  return ({ pending: "待處理", processing: "處理中", done: "已完成", failed: "失敗", canceled: "已撤銷" } as Record<string, string>)[status] || status || "-";
 }
 async function loadTargets() {
   const seq = ++targetRequest, id = selectedProduct.value;
@@ -89,12 +89,12 @@ async function loadTargets() {
   try {
     const { data, error } = await fetchInventoryTargets(id);
     if (seq !== targetRequest) return;
-    if (error || !data) throw new Error("规格加载失败，请重试");
+    if (error || !data) throw new Error("規格加載失敗，請重試");
     targets.value = validateTargets(data, id);
     if (routeSku !== null && targets.value.targets.some(t => t.sku_id === routeSku)) selectedSku.value = routeSku;
     routeSku = null;
   } catch (err) {
-    if (seq === targetRequest) targetsError.value = err instanceof Error ? err.message : "规格加载失败，请重试";
+    if (seq === targetRequest) targetsError.value = err instanceof Error ? err.message : "規格加載失敗，請重試";
   } finally { if (seq === targetRequest) targetsLoading.value = false; }
 }
 async function loadCards() {
@@ -105,7 +105,7 @@ async function loadCards() {
     const { data, error } = await fetchCards({ product_id: id, sku_id: selectedSku.value ?? undefined, page: cardPage.value, page_size: pageSize.value });
     if (seq !== cardRequest) return;
     if (!error && data) {
-      if ((data.cards || []).some(c => !safeID(c.id))) { window.$message?.error("卡密标识超出安全范围，无法操作"); cards.value = []; return; }
+      if ((data.cards || []).some(c => !safeID(c.id))) { window.$message?.error("卡密標識超出安全範圍，無法操作"); cards.value = []; return; }
       cards.value = data.cards || []; cardTotal.value = data.total || 0;
     }
   } finally { if (seq === cardRequest) loading.value = false; }
@@ -119,7 +119,7 @@ async function loadBatches() {
     if (seq === batchRequest && !error && data) {
       const rows = data.batches || [];
       if (rows.some(r => !safeID(r.id) || !safeID(r.product_id) || (r.sku_id != null && !safeID(r.sku_id, true)))) {
-        window.$message?.error("批次标识超出安全范围，无法操作"); return;
+        window.$message?.error("批次標識超出安全範圍，無法操作"); return;
       }
       batches.value = rows;
     }
@@ -182,13 +182,13 @@ async function handleExport() {
     if (!error && data?.lines?.length) {
       const url = URL.createObjectURL(new Blob([data.lines.join("\n")], { type: "text/csv;charset=utf-8" }));
       const a = document.createElement("a"); a.href = url; a.download = `cards-product-${id}${skuId === null ? "" : `-sku-${skuId}`}.csv`; a.click(); URL.revokeObjectURL(url);
-      window.$message?.success(`已导出 ${data.lines.length} 行`);
-    } else if (!error) window.$message?.warning("当前筛选没有可导出的卡密");
+      window.$message?.success(`已導出 ${data.lines.length} 行`);
+    } else if (!error) window.$message?.warning("當前篩選沒有可導出的卡密");
   } finally { exporting.value = false; }
 }
 async function handleToggle(row: any) {
   const { error } = await toggleCard(row.id, row.status === "disabled");
-  if (!error) { window.$message?.success("卡密状态已更新"); await refreshInventory(); }
+  if (!error) { window.$message?.success("卡密狀態已更新"); await refreshInventory(); }
 }
 
 // Full credentials live only in this dialog after an explicit confirmed read.
@@ -211,25 +211,25 @@ async function revealCard(row: any) {
     const { data, error } = await viewCardContent(row.id);
     if (seq !== contentRequest || !showCardContent.value) return;
     if (error || !data || data.id !== row.id || !safeID(data.version ?? 0, true)) {
-      cardContentError.value = "读取卡密失败，请关闭后重新查看"; return;
+      cardContentError.value = "讀取卡密失敗，請關閉後重新查看"; return;
     }
     contentDetails.value = data; cardPlain.value = data.content;
   } finally { if (seq === contentRequest) cardRevealing.value = false; }
 }
 async function saveCardContent() {
   if (!checkAuth("card:edit_content") || !contentDetails.value?.can_edit || !cardEditing.value || cardSaving.value) return;
-  if (!cardPlain.value.trim()) { cardContentError.value = "卡密不可为空"; return; }
+  if (!cardPlain.value.trim()) { cardContentError.value = "卡密不可為空"; return; }
   const seq = contentRequest, id = contentDetails.value.id;
   cardSaving.value = true; cardContentError.value = "";
   try {
     const { error } = await updateCardContent(id, cardPlain.value, contentDetails.value.version ?? 0);
     if (seq !== contentRequest) return;
     if (!error) { clearCardContent(); window.$message?.success("卡密已更新"); await refreshInventory(); }
-    else cardContentError.value = "未保存修改。卡密可能已被更新或占用，请核对提示后重试；当前输入已保留。";
+    else cardContentError.value = "未保存修改。卡密可能已被更新或佔用，請核對提示後重試；當前輸入已保留。";
   } finally { if (seq === contentRequest) cardSaving.value = false; }
 }
 
-// 一次导入只对应一个规格；请求序号与输入快照共同隔离过期预览。
+// 一次導入只對應一個規格；請求序號與輸入快照共同隔離過期預覽。
 const showImport = ref(false), importing = ref(false), previewLoading = ref(false);
 const importProductId = ref<number | null>(null), importSkuId = ref<number | null>(null), importCatId = ref<number | null>(null);
 const importFormat = ref<"line" | "premium">("line");
@@ -241,7 +241,7 @@ let previewTimer: ReturnType<typeof setTimeout> | null = null;
 const chosenImportTarget = computed(() => importTargets.value?.targets.find(t => t.sku_id === importSkuId.value));
 const importAllowed = computed(() => !!chosenImportTarget.value?.can_import && !importTargetsLoading.value && !importTargetsError.value);
 const importSkuOptions = computed(() => (importTargets.value?.targets || []).map(t => ({
-  label: `${skuName(t)}${t.can_import ? "" : `（${t.reason || "不可导入"}）`}`, value: t.sku_id!, disabled: !t.can_import,
+  label: `${skuName(t)}${t.can_import ? "" : `（${t.reason || "不可導入"}）`}`, value: t.sku_id!, disabled: !t.can_import,
 })));
 const importKey = computed(() => JSON.stringify([importProductId.value, importSkuId.value, importContent.value, importFormat.value]));
 const previewImportable = computed(() => Math.max(0, (previewResult.value?.total || 0) - (previewResult.value?.dup_in_file || 0) - (previewResult.value?.dup_in_db || 0) - (previewResult.value?.invalid || 0)));
@@ -258,13 +258,13 @@ async function loadImportTargets() {
   try {
     const { data, error } = await fetchInventoryTargets(id);
     if (seq !== importTargetRequest || !showImport.value) return;
-    if (error || !data) throw new Error("规格加载失败，请重试；未加载前不能导入");
+    if (error || !data) throw new Error("規格加載失敗，請重試；未加載前不能導入");
     importTargets.value = validateTargets(data, id);
     const requested = pendingImportSku; pendingImportSku = null;
     if (requested !== null && importTargets.value.targets.some(t => t.sku_id === requested && t.can_import)) importSkuId.value = requested;
     else if (!importTargets.value.has_skus && importTargets.value.targets.some(t => t.sku_id === 0 && t.can_import)) importSkuId.value = 0;
   } catch (err) {
-    if (seq === importTargetRequest) importTargetsError.value = err instanceof Error ? err.message : "规格加载失败，请重试";
+    if (seq === importTargetRequest) importTargetsError.value = err instanceof Error ? err.message : "規格加載失敗，請重試";
   } finally { if (seq === importTargetRequest) importTargetsLoading.value = false; }
 }
 function openImport(productId = selectedProduct.value, skuId = selectedSku.value) {
@@ -294,7 +294,7 @@ async function handlePreview() {
     if (seq !== previewRequest || key !== importKey.value || !showImport.value) return;
     if (!error && data) {
       if ((data.sku_id ?? 0) !== input.sku_id || !safeID(data.revision ?? 0, true)) {
-        window.$message?.error("预览目标已变化，请重新加载规格"); return;
+        window.$message?.error("預覽目標已變化，請重新加載規格"); return;
       }
       previewResult.value = data; previewKey.value = key;
     }
@@ -307,13 +307,13 @@ async function handleImport() {
   try {
     const { data, error } = await importConfirm(input);
     if (!error && data) {
-      window.$message?.success(`导入完成：新增 ${data.imported || 0} 条，重复跳过 ${data.skipped || 0} 条，失败 ${data.failed || 0} 条`);
+      window.$message?.success(`導入完成：新增 ${data.imported || 0} 條，重複跳過 ${data.skipped || 0} 條，失敗 ${data.failed || 0} 條`);
       showImport.value = false; importContent.value = ""; invalidatePreview(); await refreshInventory();
     } else { invalidatePreview(); void loadImportTargets(); }
   } finally { importing.value = false; }
 }
 
-// 历史分配只修改当前归属，原导入批次保持不变。
+// 歷史分配只修改當前歸屬，原導入批次保持不變。
 const showAssign = ref(false), assignProductId = ref<number | null>(null), assignSkuId = ref<number | null>(null);
 const assignTargets = ref<InventoryTargets | null>(null), assignTargetsLoading = ref(false), assignError = ref("");
 const assignBusy = ref(false), assignPreviewLoading = ref(false), assignPreview = ref<InventoryAssignPreview | null>(null);
@@ -330,10 +330,10 @@ async function openAssign(batch?: InventoryBatch) {
   try {
     const { data, error } = await fetchInventoryTargets(productId);
     if (seq !== assignTargetRequest || !showAssign.value) return;
-    if (error || !data) throw new Error("目标规格加载失败，请重试");
+    if (error || !data) throw new Error("目標規格加載失敗，請重試");
     assignTargets.value = validateTargets(data, productId);
-    if (!assignOptions.value.length) assignError.value = "该商品没有可接收卡密的本地规格，请先保存规格及发货来源";
-  } catch (err) { if (seq === assignTargetRequest) assignError.value = err instanceof Error ? err.message : "加载失败"; }
+    if (!assignOptions.value.length) assignError.value = "該商品沒有可接收卡密的本地規格，請先保存規格及發貨來源";
+  } catch (err) { if (seq === assignTargetRequest) assignError.value = err instanceof Error ? err.message : "加載失敗"; }
   finally { if (seq === assignTargetRequest) assignTargetsLoading.value = false; }
 }
 watch(assignSkuId, () => { assignRequest++; assignPreview.value = null; assignPreviewLoading.value = false; });
@@ -346,7 +346,7 @@ async function handleAssignPreview() {
       ...(assignBatchId.value ? { import_id: assignBatchId.value } : { card_ids: assignCardIds.value }) });
     if (seq !== assignRequest || !showAssign.value) return;
     if (!error && data && Array.isArray(data.card_ids) && data.card_ids.every(id => safeID(id)) && safeID(data.revision ?? 0, true)) assignPreview.value = { ...data, card_ids: [...data.card_ids] };
-    else { assignPreview.value = null; assignError.value = "归属预览失败，请核对库存后重试"; }
+    else { assignPreview.value = null; assignError.value = "歸屬預覽失敗，請核對庫存後重試"; }
   } finally { if (seq === assignRequest) assignPreviewLoading.value = false; }
 }
 async function handleAssign() {
@@ -356,8 +356,8 @@ async function handleAssign() {
   assignBusy.value = true;
   try {
     const { data, error } = await assignCards(input);
-    if (!error && data) { window.$message?.success(`已分配 ${data.assigned || 0} 张卡密，原导入批次保留`); showAssign.value = false; await refreshInventory(); }
-    else { assignPreview.value = null; assignError.value = "库存或设置可能已变化，请重新预览后确认"; }
+    if (!error && data) { window.$message?.success(`已分配 ${data.assigned || 0} 張卡密，原導入批次保留`); showAssign.value = false; await refreshInventory(); }
+    else { assignPreview.value = null; assignError.value = "庫存或設置可能已變化，請重新預覽後確認"; }
   } finally { assignBusy.value = false; }
 }
 
@@ -372,7 +372,7 @@ async function loadCancelPreview() {
     const { data, error } = await previewCancelImport(cancelId.value);
     if (seq !== cancelRequest || !showCancel.value) return;
     if (!error && data?.batch?.id === cancelId.value && data.revision) cancelData.value = data;
-    else cancelError.value = "撤销预览失败，请重试";
+    else cancelError.value = "撤銷預覽失敗，請重試";
   } finally { if (seq === cancelRequest) cancelLoading.value = false; }
 }
 watch(showCancel, value => { if (!value) { cancelRequest++; cancelData.value = null; } });
@@ -382,50 +382,50 @@ async function handleCancel() {
   cancelBusy.value = true;
   try {
     const { error } = await cancelImport(id, revision);
-    if (!error) { window.$message?.success("批次剩余可用卡已撤销"); showCancel.value = false; await refreshInventory(); }
-    else { cancelData.value = null; cancelError.value = "批次库存可能已变化，请重新预览后确认"; }
+    if (!error) { window.$message?.success("批次剩餘可用卡已撤銷"); showCancel.value = false; await refreshInventory(); }
+    else { cancelData.value = null; cancelError.value = "批次庫存可能已變化，請重新預覽後確認"; }
   } finally { cancelBusy.value = false; }
 }
 
 const cardColumns = computed<DataTableColumns<any>>(() => [
   ...(checkAuth("inventory:write") ? [{ type: "selection" as const, disabled: (r: any) => r.status !== "available" || (r.sku_id || 0) !== 0 || !!r.lottery_draw_no }] : []),
-  { title: "ID", key: "id", width: 75 }, { title: "规格", key: "sku_name", minWidth: 150, render: skuName },
+  { title: "ID", key: "id", width: 75 }, { title: "規格", key: "sku_name", minWidth: 150, render: skuName },
   { title: "原批次", key: "import_id", width: 90, render: r => r.import_id || "-" },
-  { title: "内容", key: "masked_content", minWidth: 120, render: r => r.masked_content || "****" },
-  { title: "状态", key: "status", width: 90, render: r => h(NTag, { size: "small", type: r.status === "available" ? "success" : "default" }, { default: () => r.lottery_draw_no ? "已发奖" : cardStatusText(r.status) }) },
-  { title: "备注", key: "note", minWidth: 120, ellipsis: { tooltip: true } },
-  { title: "创建时间", key: "created_at", width: 165, render: r => r.created_at ? new Date(r.created_at * 1000).toLocaleString() : "-" },
+  { title: "內容", key: "masked_content", minWidth: 120, render: r => r.masked_content || "****" },
+  { title: "狀態", key: "status", width: 90, render: r => h(NTag, { size: "small", type: r.status === "available" ? "success" : "default" }, { default: () => r.lottery_draw_no ? "已發獎" : cardStatusText(r.status) }) },
+  { title: "備註", key: "note", minWidth: 120, ellipsis: { tooltip: true } },
+  { title: "創建時間", key: "created_at", width: 165, render: r => r.created_at ? new Date(r.created_at * 1000).toLocaleString() : "-" },
   { title: "操作", key: "actions", width: 132, fixed: "right", render: r => h(NSpace, { size: "small" }, { default: () => [
-    checkAuth("card:view_content") ? h(NPopconfirm, { onPositiveClick: () => revealCard(r), positiveText: "确认查看", negativeText: "取消" }, {
-      trigger: () => h(NButton, { size: "small", "aria-label": `查看卡密 ${r.id}` }, { default: () => checkAuth("card:edit_content") ? "查看 / 编辑" : "查看卡密" }),
-      default: () => "将解密单张完整卡密并记录安全日志，确认查看？",
+    checkAuth("card:view_content") ? h(NPopconfirm, { onPositiveClick: () => revealCard(r), positiveText: "確認查看", negativeText: "取消" }, {
+      trigger: () => h(NButton, { size: "small", "aria-label": `查看卡密 ${r.id}` }, { default: () => checkAuth("card:edit_content") ? "查看 / 編輯" : "查看卡密" }),
+      default: () => "將解密單張完整卡密並記錄安全日誌，確認查看？",
     }) : null,
-    checkAuth("inventory:write") && ["available", "disabled"].includes(r.status) ? h(NPopconfirm, { onPositiveClick: () => handleToggle(r) }, { trigger: () => h(NButton, { size: "small", quaternary: true }, { default: () => r.status === "available" ? "禁用" : "启用" }), default: () => "确认更改该卡状态？" }) : null,
+    checkAuth("inventory:write") && ["available", "disabled"].includes(r.status) ? h(NPopconfirm, { onPositiveClick: () => handleToggle(r) }, { trigger: () => h(NButton, { size: "small", quaternary: true }, { default: () => r.status === "available" ? "禁用" : "啓用" }), default: () => "確認更改該卡狀態？" }) : null,
   ] }) },
 ]);
 const batchColumns: DataTableColumns<InventoryBatch> = [
   { title: "ID", key: "id", width: 75 }, { title: "商品", key: "product_name", minWidth: 120, render: r => r.product_name || `商品 #${r.product_id}` },
-  { title: "导入目标（原始记录）", key: "sku_name", minWidth: 170, render: importSkuName },
-  { title: "当前卡密分布", key: "remaining", minWidth: 340, render: r => distribution(r.remaining) },
-  { title: "总数 / 导入 / 跳过 / 失败", key: "imported", width: 180, render: r => `${r.total || 0} / ${r.imported || 0} / ${r.skipped || 0} / ${r.failed || 0}` },
-  { title: "状态", key: "status", width: 90, render: r => batchStatus(r.status) },
+  { title: "導入目標（原始記錄）", key: "sku_name", minWidth: 170, render: importSkuName },
+  { title: "當前卡密分佈", key: "remaining", minWidth: 340, render: r => distribution(r.remaining) },
+  { title: "總數 / 導入 / 跳過 / 失敗", key: "imported", width: 180, render: r => `${r.total || 0} / ${r.imported || 0} / ${r.skipped || 0} / ${r.failed || 0}` },
+  { title: "狀態", key: "status", width: 90, render: r => batchStatus(r.status) },
   { title: "操作", key: "actions", width: 180, render: r => h(NSpace, { size: "small" }, { default: () => [
-    checkAuth("inventory:write") ? h(NButton, { size: "small", onClick: () => openAssign(r) }, { default: () => "分配默认池" }) : null,
-    r.status === "done" && checkAuth("inventory:import") ? h(NButton, { size: "small", type: "warning", onClick: () => openCancel(r.id) }, { default: () => "撤销批次" }) : null,
+    checkAuth("inventory:write") ? h(NButton, { size: "small", onClick: () => openAssign(r) }, { default: () => "分配默認池" }) : null,
+    r.status === "done" && checkAuth("inventory:import") ? h(NButton, { size: "small", type: "warning", onClick: () => openCancel(r.id) }, { default: () => "撤銷批次" }) : null,
   ] }) },
 ];
 const premiumColumns: DataTableColumns<any> = [
-  { title: "ID", key: "id", width: 75 }, { title: "规格", key: "sku_name", minWidth: 150, render: skuName },
-  { title: "号码", key: "masked_content", minWidth: 120, render: r => r.masked_content || "****" },
-  { title: "预选加价", key: "draft_premium", width: 100, render: r => formatMoney(r.draft_premium || 0) },
-  { title: "预选成本", key: "draft_cost", width: 100, render: r => formatMoney(r.draft_cost || 0) },
-  { title: "靓号价", key: "price_cents", width: 100, render: r => r.price_cents ? formatMoney(r.price_cents) : "商品价+加价" },
-  { title: "状态", key: "status", width: 90, render: r => r.lottery_draw_no ? "已发奖" : cardStatusText(r.status) },
+  { title: "ID", key: "id", width: 75 }, { title: "規格", key: "sku_name", minWidth: 150, render: skuName },
+  { title: "號碼", key: "masked_content", minWidth: 120, render: r => r.masked_content || "****" },
+  { title: "預選加價", key: "draft_premium", width: 100, render: r => formatMoney(r.draft_premium || 0) },
+  { title: "預選成本", key: "draft_cost", width: 100, render: r => formatMoney(r.draft_cost || 0) },
+  { title: "靚號價", key: "price_cents", width: 100, render: r => r.price_cents ? formatMoney(r.price_cents) : "商品價+加價" },
+  { title: "狀態", key: "status", width: 90, render: r => r.lottery_draw_no ? "已發獎" : cardStatusText(r.status) },
 ];
 onMounted(() => {
   void loadProducts(); void loadCategories(); void loadBatches();
   const id = queryID(route.query.product_id), sku = queryID(route.query.sku_id, true);
-  if (route.query.product_id != null && id === null) window.$message?.error("商品标识无效或超出安全范围");
+  if (route.query.product_id != null && id === null) window.$message?.error("商品標識無效或超出安全範圍");
   routeSku = sku;
   if (id !== null) { selectedProduct.value = id; if (route.query.open_import === "1" && checkAuth("inventory:import")) openImport(id, sku); }
 });
@@ -434,95 +434,95 @@ onBeforeUnmount(() => { clearCardContent(); if (previewTimer) clearTimeout(previ
 
 <template>
   <div class="min-h-500px flex-col gap-16px overflow-hidden">
-    <NCard title="卡密库存" class="min-w-0 flex-1">
+    <NCard title="卡密庫存" class="min-w-0 flex-1">
       <div class="mb-16px flex flex-wrap items-center gap-12px">
-        <NButton v-auth="'inventory:import'" type="primary" @click="openImport()">导入卡密</NButton>
-        <NButton v-auth="'card:export'" :disabled="!selectedProduct" :loading="exporting" @click="handleExport">导出当前规格</NButton>
+        <NButton v-auth="'inventory:import'" type="primary" @click="openImport()">導入卡密</NButton>
+        <NButton v-auth="'card:export'" :disabled="!selectedProduct" :loading="exporting" @click="handleExport">導出當前規格</NButton>
         <template v-if="checkAuth('catalog:read')">
-          <NSelect v-model:value="filterCatId" :options="categoryOptions" placeholder="全部分类" aria-label="库存分类" class="w-150px" @update:value="onFilterCatChange" />
-          <NSelect v-model:value="selectedProduct" :options="productOptions(filterCatId)" :loading="productsLoading" placeholder="搜索/选择商品" aria-label="库存商品" class="w-full sm:w-260px" filterable clearable />
+          <NSelect v-model:value="filterCatId" :options="categoryOptions" placeholder="全部分類" aria-label="庫存分類" class="w-150px" @update:value="onFilterCatChange" />
+          <NSelect v-model:value="selectedProduct" :options="productOptions(filterCatId)" :loading="productsLoading" placeholder="搜索/選擇商品" aria-label="庫存商品" class="w-full sm:w-260px" filterable clearable />
         </template>
-        <NInputNumber v-else v-model:value="selectedProduct" :min="1" :max="Number.MAX_SAFE_INTEGER" :precision="0" placeholder="输入商品 ID 查询" :input-props="{ 'aria-label': '库存商品 ID' }" class="w-full sm:w-230px" />
-        <NSelect v-model:value="selectedSku" :options="skuOptions" :disabled="!selectedProduct || targetsLoading || !!targetsError" :loading="targetsLoading" placeholder="全部规格" aria-label="库存规格" class="w-full sm:w-230px" clearable />
+        <NInputNumber v-else v-model:value="selectedProduct" :min="1" :max="Number.MAX_SAFE_INTEGER" :precision="0" placeholder="輸入商品 ID 查詢" :input-props="{ 'aria-label': '庫存商品 ID' }" class="w-full sm:w-230px" />
+        <NSelect v-model:value="selectedSku" :options="skuOptions" :disabled="!selectedProduct || targetsLoading || !!targetsError" :loading="targetsLoading" placeholder="全部規格" aria-label="庫存規格" class="w-full sm:w-230px" clearable />
       </div>
-      <NAlert v-if="productsLoadFailed" type="error" class="mb-12px">商品选项加载失败或标识超出安全范围。<NButton text @click="loadProducts">重新加载</NButton></NAlert>
-      <NAlert v-if="targetsError" type="error" class="mb-12px">{{ targetsError }} <NButton text @click="loadTargets">重试规格</NButton></NAlert>
-      <p v-if="targets" class="mb-12px text-13px">{{ targets.product_name }} · 默认池与每个规格独立管理，选择具体规格不会使用其他规格的卡密。</p>
+      <NAlert v-if="productsLoadFailed" type="error" class="mb-12px">商品選項加載失敗或標識超出安全範圍。<NButton text @click="loadProducts">重新加載</NButton></NAlert>
+      <NAlert v-if="targetsError" type="error" class="mb-12px">{{ targetsError }} <NButton text @click="loadTargets">重試規格</NButton></NAlert>
+      <p v-if="targets" class="mb-12px text-13px">{{ targets.product_name }} · 默認池與每個規格獨立管理，選擇具體規格不會使用其他規格的卡密。</p>
       <NTabs v-model:value="inventoryTab" type="line">
         <NTabPane name="cards" tab="卡密列表">
-          <NEmpty v-if="!selectedProduct" class="my-24px" description="先选择商品或输入商品 ID 查看卡密" />
+          <NEmpty v-if="!selectedProduct" class="my-24px" description="先選擇商品或輸入商品 ID 查看卡密" />
           <template v-else>
-            <NButton v-if="checkAuth('inventory:write')" class="mb-12px" :disabled="!checkedKeys.length" @click="openAssign()">分配选中的默认池卡密</NButton>
+            <NButton v-if="checkAuth('inventory:write')" class="mb-12px" :disabled="!checkedKeys.length" @click="openAssign()">分配選中的默認池卡密</NButton>
             <NDataTable v-model:checked-row-keys="checkedKeys" :row-key="(r: any) => r.id" :columns="cardColumns" :data="cards" :loading="loading" :scroll-x="900" :max-height="540" />
             <TablePager v-model:page="cardPage" v-model:page-size="pageSize" :total="cardTotal" @change="loadCards" />
           </template>
         </NTabPane>
-        <NTabPane name="batches" tab="导入批次">
-          <NSelect v-model:value="batchSku" :options="batchSkuOptions" aria-label="批次导入目标" class="mb-12px w-full sm:w-250px" />
-          <p class="mb-12px text-13px">按原始导入目标筛选；当前卡密可能已分配到其他规格，原批次来源保持不变。</p>
+        <NTabPane name="batches" tab="導入批次">
+          <NSelect v-model:value="batchSku" :options="batchSkuOptions" aria-label="批次導入目標" class="mb-12px w-full sm:w-250px" />
+          <p class="mb-12px text-13px">按原始導入目標篩選；當前卡密可能已分配到其他規格，原批次來源保持不變。</p>
           <NDataTable :columns="batchColumns" :data="batches" :loading="batchLoading" :scroll-x="1150" :max-height="540" />
         </NTabPane>
-        <NTabPane v-if="checkAuth('card:premium')" name="premium" tab="靓号库">
-          <NEmpty v-if="!selectedProduct" class="my-24px" description="先选择商品查看靓号卡" />
-          <template v-else><NDataTable :columns="premiumColumns" :data="premiumCards" :loading="premiumLoading" :scroll-x="720" :max-height="540" /><p class="mt-8px">共 {{ premiumTotal }} 张</p></template>
+        <NTabPane v-if="checkAuth('card:premium')" name="premium" tab="靚號庫">
+          <NEmpty v-if="!selectedProduct" class="my-24px" description="先選擇商品查看靚號卡" />
+          <template v-else><NDataTable :columns="premiumColumns" :data="premiumCards" :loading="premiumLoading" :scroll-x="720" :max-height="540" /><p class="mt-8px">共 {{ premiumTotal }} 張</p></template>
         </NTabPane>
       </NTabs>
     </NCard>
-    <NModal :show="showCardContent" @update:show="!$event && !cardSaving && clearCardContent()" preset="card" title="卡密详情" style="width: min(620px, calc(100vw - 32px))" :closable="!cardSaving" :mask-closable="!cardSaving" :close-on-esc="!cardSaving">
+    <NModal :show="showCardContent" @update:show="!$event && !cardSaving && clearCardContent()" preset="card" title="卡密詳情" style="width: min(620px, calc(100vw - 32px))" :closable="!cardSaving" :mask-closable="!cardSaving" :close-on-esc="!cardSaving">
       <p class="mb-12px">卡密 #{{ contentCard?.id }} · {{ contentCard ? skuName(contentCard) : '' }}</p>
       <NSpin :show="cardRevealing">
         <template v-if="contentDetails">
           <NAlert v-if="contentDetails.edit_block_reason" type="info" class="mb-12px">{{ contentDetails.edit_block_reason }}</NAlert>
-          <NFormItem v-if="cardEditing" label="完整卡密"><NInput v-model:value="cardPlain" type="textarea" :rows="5" :disabled="cardSaving" :input-props="{ 'aria-label': '编辑完整卡密', autocomplete: 'off' }" /></NFormItem>
+          <NFormItem v-if="cardEditing" label="完整卡密"><NInput v-model:value="cardPlain" type="textarea" :rows="5" :disabled="cardSaving" :input-props="{ 'aria-label': '編輯完整卡密', autocomplete: 'off' }" /></NFormItem>
           <pre v-else class="whitespace-pre-wrap break-all rounded-4px border p-12px" aria-label="完整卡密">{{ cardPlain }}</pre>
-          <p class="mt-12px text-12px text-gray-500">只修改此张卡密内容，不改变商品、规格和状态。预占、已售、已发奖或锁定卡密不能编辑。关闭后清除本次明文。</p>
+          <p class="mt-12px text-12px text-gray-500">只修改此張卡密內容，不改變商品、規格和狀態。預佔、已售、已發獎或鎖定卡密不能編輯。關閉後清除本次明文。</p>
         </template>
         <NAlert v-if="cardContentError" type="error" class="mt-12px">{{ cardContentError }}</NAlert>
       </NSpin>
       <template #footer><NSpace justify="end">
-        <NButton :disabled="cardSaving" @click="clearCardContent">关闭</NButton>
-        <NButton v-if="contentDetails?.can_edit && checkAuth('card:edit_content') && !cardEditing" @click="cardEditing = true">编辑卡密</NButton>
+        <NButton :disabled="cardSaving" @click="clearCardContent">關閉</NButton>
+        <NButton v-if="contentDetails?.can_edit && checkAuth('card:edit_content') && !cardEditing" @click="cardEditing = true">編輯卡密</NButton>
         <NButton v-if="cardEditing" type="primary" :loading="cardSaving" :disabled="!cardPlain.trim()" @click="saveCardContent">保存卡密</NButton>
       </NSpace></template>
     </NModal>
-    <NModal v-model:show="showImport" preset="dialog" title="按规格导入卡密" style="width: min(680px, calc(100vw - 32px))" :mask-closable="!importing" :close-on-esc="!importing" :closable="!importing">
+    <NModal v-model:show="showImport" preset="dialog" title="按規格導入卡密" style="width: min(680px, calc(100vw - 32px))" :mask-closable="!importing" :close-on-esc="!importing" :closable="!importing">
       <NForm label-placement="top">
         <NFormItem label="商品">
           <div v-if="checkAuth('catalog:read')" class="flex w-full flex-wrap gap-8px">
-            <NSelect v-model:value="importCatId" :options="categoryOptions" :disabled="importing" aria-label="导入分类" class="w-full sm:w-140px" @update:value="onImportCatChange" />
-            <NSelect v-model:value="importProductId" :options="productOptions(importCatId)" :disabled="importing" :loading="productsLoading" placeholder="选择商品" aria-label="导入商品" class="min-w-0 flex-1" filterable clearable />
+            <NSelect v-model:value="importCatId" :options="categoryOptions" :disabled="importing" aria-label="導入分類" class="w-full sm:w-140px" @update:value="onImportCatChange" />
+            <NSelect v-model:value="importProductId" :options="productOptions(importCatId)" :disabled="importing" :loading="productsLoading" placeholder="選擇商品" aria-label="導入商品" class="min-w-0 flex-1" filterable clearable />
           </div>
-          <NInputNumber v-else v-model:value="importProductId" :min="1" :max="Number.MAX_SAFE_INTEGER" :precision="0" :disabled="importing" :input-props="{ 'aria-label': '导入商品 ID' }" placeholder="商品 ID" class="w-full" />
+          <NInputNumber v-else v-model:value="importProductId" :min="1" :max="Number.MAX_SAFE_INTEGER" :precision="0" :disabled="importing" :input-props="{ 'aria-label': '導入商品 ID' }" placeholder="商品 ID" class="w-full" />
         </NFormItem>
-        <NFormItem label="目标规格">
-          <NSelect v-model:value="importSkuId" :options="importSkuOptions" :disabled="importing || importTargetsLoading || !!importTargetsError" :loading="importTargetsLoading" placeholder="请选择本次导入的规格" aria-label="导入规格" />
+        <NFormItem label="目標規格">
+          <NSelect v-model:value="importSkuId" :options="importSkuOptions" :disabled="importing || importTargetsLoading || !!importTargetsError" :loading="importTargetsLoading" placeholder="請選擇本次導入的規格" aria-label="導入規格" />
         </NFormItem>
-        <NAlert v-if="importTargetsError" type="error" class="mb-12px">{{ importTargetsError }} <NButton text :disabled="importing" @click="loadImportTargets">重试</NButton></NAlert>
-        <NAlert v-else-if="importTargets && !importAllowed" type="info" class="mb-12px">{{ chosenImportTarget?.reason || '请选择可导入的本地卡密规格；每批只能对应一个规格。' }}</NAlert>
-        <NFormItem label="导入格式"><NSelect v-model:value="importFormat" aria-label="导入格式" :disabled="importing" :options="[{ label: '每行完整卡密（保留全部分隔符）', value: 'line' }, { label: '靓号号码（仅取 --- 前的号码）', value: 'premium' }]" /></NFormItem>
-        <NAlert v-if="importFormat === 'premium'" type="warning" class="mb-12px">仅导入 --- 前的号码。后续字段不会作为卡密交付，价格和备注不导入；账号或序列号含分隔符时，请选择「每行完整卡密」。</NAlert>
-        <NFormItem label="卡密内容（每行一条）"><NInput v-model:value="importContent" type="textarea" :input-props="{ 'aria-label': '导入卡密内容' }" :disabled="importing" :rows="8" placeholder="每行一张完整卡密，例如 HYDYG6666----666666" /></NFormItem>
+        <NAlert v-if="importTargetsError" type="error" class="mb-12px">{{ importTargetsError }} <NButton text :disabled="importing" @click="loadImportTargets">重試</NButton></NAlert>
+        <NAlert v-else-if="importTargets && !importAllowed" type="info" class="mb-12px">{{ chosenImportTarget?.reason || '請選擇可導入的本地卡密規格；每批只能對應一個規格。' }}</NAlert>
+        <NFormItem label="導入格式"><NSelect v-model:value="importFormat" aria-label="導入格式" :disabled="importing" :options="[{ label: '每行完整卡密（保留全部分隔符）', value: 'line' }, { label: '靚號號碼（僅取 --- 前的號碼）', value: 'premium' }]" /></NFormItem>
+        <NAlert v-if="importFormat === 'premium'" type="warning" class="mb-12px">僅導入 --- 前的號碼。後續字段不會作為卡密交付，價格和備註不導入；賬號或序列號含分隔符時，請選擇「每行完整卡密」。</NAlert>
+        <NFormItem label="卡密內容（每行一條）"><NInput v-model:value="importContent" type="textarea" :input-props="{ 'aria-label': '導入卡密內容' }" :disabled="importing" :rows="8" placeholder="每行一張完整卡密，例如 HYDYG6666----666666" /></NFormItem>
       </NForm>
-      <NAlert v-if="validPreview" type="info" class="mb-12px">目标：{{ importTargets?.product_name }} / {{ chosenImportTarget ? skuName(chosenImportTarget) : '' }}；总计 {{ previewResult?.total || 0 }} 条，重复 {{ (previewResult?.dup_in_file || 0) + (previewResult?.dup_in_db || 0) }} 条，无效 {{ previewResult?.invalid || 0 }} 条，可导入 {{ previewImportable }} 条。</NAlert>
+      <NAlert v-if="validPreview" type="info" class="mb-12px">目標：{{ importTargets?.product_name }} / {{ chosenImportTarget ? skuName(chosenImportTarget) : '' }}；總計 {{ previewResult?.total || 0 }} 條，重複 {{ (previewResult?.dup_in_file || 0) + (previewResult?.dup_in_db || 0) }} 條，無效 {{ previewResult?.invalid || 0 }} 條，可導入 {{ previewImportable }} 條。</NAlert>
       <template #action>
         <NButton :disabled="importing" @click="showImport = false">取消</NButton>
-        <NButton :disabled="!importAllowed || !importContent.trim() || importing" :loading="previewLoading" @click="handlePreview">预览</NButton>
-        <NButton type="primary" :disabled="!validPreview || !importAllowed || previewImportable <= 0" :loading="importing" @click="handleImport">确认导入</NButton>
+        <NButton :disabled="!importAllowed || !importContent.trim() || importing" :loading="previewLoading" @click="handlePreview">預覽</NButton>
+        <NButton type="primary" :disabled="!validPreview || !importAllowed || previewImportable <= 0" :loading="importing" @click="handleImport">確認導入</NButton>
       </template>
     </NModal>
-    <NModal v-model:show="showAssign" preset="dialog" title="分配默认池卡密到规格" style="width: min(680px, calc(100vw - 32px))" :mask-closable="!assignBusy" :close-on-esc="!assignBusy" :closable="!assignBusy">
-      <p class="mb-12px">只分配同商品默认池中可用、未被占用的卡密。已售、预占及其他规格的卡不移动；原导入批次保持不变。</p>
-      <NFormItem label="目标规格"><NSelect v-model:value="assignSkuId" :options="assignOptions" :disabled="assignBusy || assignTargetsLoading" :loading="assignTargetsLoading" placeholder="选择接收卡密的本地规格" aria-label="归属目标规格" /></NFormItem>
+    <NModal v-model:show="showAssign" preset="dialog" title="分配默認池卡密到規格" style="width: min(680px, calc(100vw - 32px))" :mask-closable="!assignBusy" :close-on-esc="!assignBusy" :closable="!assignBusy">
+      <p class="mb-12px">只分配同商品默認池中可用、未被佔用的卡密。已售、預佔及其他規格的卡不移動；原導入批次保持不變。</p>
+      <NFormItem label="目標規格"><NSelect v-model:value="assignSkuId" :options="assignOptions" :disabled="assignBusy || assignTargetsLoading" :loading="assignTargetsLoading" placeholder="選擇接收卡密的本地規格" aria-label="歸屬目標規格" /></NFormItem>
       <NAlert v-if="assignError" type="error" class="mb-12px">{{ assignError }}</NAlert>
-      <NAlert v-if="assignPreview" type="info" class="mb-12px">将分配 {{ assignPreview.eligible_count || 0 }} 张到「{{ assignPreview.sku_name }}」，排除 {{ assignPreview.excluded_count || 0 }} 张；确认时将重新校验库存状态。</NAlert>
-      <template #action><NButton :disabled="assignBusy" @click="showAssign = false">取消</NButton><NButton :disabled="!assignSkuId || assignBusy" :loading="assignPreviewLoading" @click="handleAssignPreview">预览归属</NButton><NButton type="primary" :disabled="!assignPreview?.card_ids.length" :loading="assignBusy" @click="handleAssign">确认分配</NButton></template>
+      <NAlert v-if="assignPreview" type="info" class="mb-12px">將分配 {{ assignPreview.eligible_count || 0 }} 張到「{{ assignPreview.sku_name }}」，排除 {{ assignPreview.excluded_count || 0 }} 張；確認時將重新校驗庫存狀態。</NAlert>
+      <template #action><NButton :disabled="assignBusy" @click="showAssign = false">取消</NButton><NButton :disabled="!assignSkuId || assignBusy" :loading="assignPreviewLoading" @click="handleAssignPreview">預覽歸屬</NButton><NButton type="primary" :disabled="!assignPreview?.card_ids.length" :loading="assignBusy" @click="handleAssign">確認分配</NButton></template>
     </NModal>
-    <NModal v-model:show="showCancel" preset="dialog" title="撤销原始导入批次" style="width: min(680px, calc(100vw - 32px))" :mask-closable="!cancelBusy" :close-on-esc="!cancelBusy" :closable="!cancelBusy">
-      <NSpin :show="cancelLoading"><NAlert type="warning" class="mb-12px">此操作会删除原批次在所有当前规格中的剩余可用卡，范围不受当前页面的规格筛选限制。已预占、已售和禁用卡保留。</NAlert>
-        <template v-if="cancelData"><p>原导入目标：{{ importSkuName(cancelData.batch) }}</p><p class="mt-12px">{{ distribution(cancelData.batch.remaining) }}</p></template>
-        <NAlert v-if="cancelError" type="error" class="mt-12px">{{ cancelError }} <NButton text @click="loadCancelPreview">重新预览</NButton></NAlert>
+    <NModal v-model:show="showCancel" preset="dialog" title="撤銷原始導入批次" style="width: min(680px, calc(100vw - 32px))" :mask-closable="!cancelBusy" :close-on-esc="!cancelBusy" :closable="!cancelBusy">
+      <NSpin :show="cancelLoading"><NAlert type="warning" class="mb-12px">此操作會刪除原批次在所有當前規格中的剩餘可用卡，範圍不受當前頁面的規格篩選限制。已預佔、已售和禁用卡保留。</NAlert>
+        <template v-if="cancelData"><p>原導入目標：{{ importSkuName(cancelData.batch) }}</p><p class="mt-12px">{{ distribution(cancelData.batch.remaining) }}</p></template>
+        <NAlert v-if="cancelError" type="error" class="mt-12px">{{ cancelError }} <NButton text @click="loadCancelPreview">重新預覽</NButton></NAlert>
       </NSpin>
-      <template #action><NButton :disabled="cancelBusy" @click="showCancel = false">取消</NButton><NButton type="warning" :disabled="!cancelData || cancelLoading" :loading="cancelBusy" @click="handleCancel">确认撤销整批可用卡</NButton></template>
+      <template #action><NButton :disabled="cancelBusy" @click="showCancel = false">取消</NButton><NButton type="warning" :disabled="!cancelData || cancelLoading" :loading="cancelBusy" @click="handleCancel">確認撤銷整批可用卡</NButton></template>
     </NModal>
   </div>
 </template>

@@ -25,19 +25,19 @@ type AffiliateCommission struct {
 	OrderID uint64 `json:"order_id,omitempty"`
 	// BuyerID holds the value of the "buyer_id" field.
 	BuyerID uint64 `json:"buyer_id,omitempty"`
-	// 收佣人
+	// 收傭人
 	ReferrerID uint64 `json:"referrer_id,omitempty"`
-	// 层级 1/2/3
+	// 層級 1/2/3
 	Tier int8 `json:"tier,omitempty"`
-	// 费率快照（万分比）
+	// 費率快照（萬分比）
 	Rate float64 `json:"rate,omitempty"`
-	// 计算基数（分：订单金额或毛利，settings 口径）
+	// 計算基數（分：訂單金額或毛利，settings 口徑）
 	BaseAmount int64 `json:"base_amount,omitempty"`
 	// 佣金（分）
 	Amount int64 `json:"amount,omitempty"`
 	// Status holds the value of the "status" field.
 	Status affiliatecommission.Status `json:"status,omitempty"`
-	// 冻结到期
+	// 凍結到期
 	AvailableAt  time.Time `json:"available_at,omitempty"`
 	selectValues sql.SelectValues
 }

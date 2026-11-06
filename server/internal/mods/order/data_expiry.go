@@ -15,8 +15,8 @@ import (
 	paymentport "github.com/NovaWorks/zcard-next/server/internal/mods/payment/port"
 )
 
-const slowPaymentWaitingReason = "慢支付确认等待，支付截止后最多顺延15分钟"
-const legacySlowPaymentReviewReason = "慢支付尚未确认，请核对到账状态"
+const slowPaymentWaitingReason = "慢支付確認等待，支付截止後最多順延15分鐘"
+const legacySlowPaymentReviewReason = "慢支付尚未確認，請核對到賬狀態"
 
 // Recover only the old pending-slow-payment hold. Other review causes remain manual.
 func (uc *OrderUsecase) expiryReviewFilter(now time.Time) predicate.Order {
@@ -135,11 +135,11 @@ func (uc *OrderUsecase) ExpireOrder(ctx context.Context) (int, error) {
 			candidates++
 			reason, review := "", false
 			if o.ExpiredAt.IsZero() {
-				reason, review = "缺少支付截止时间，请核对历史订单", true
+				reason, review = "缺少支付截止時間，請核對歷史訂單", true
 			} else if uc.SlowPay != nil {
 				slow, checkErr := uc.SlowPay.HasPendingSlowPayment(ctx, o.ID)
 				if checkErr != nil {
-					reason = "支付状态查询失败，请核对支付流水"
+					reason = "支付狀態查詢失敗，請核對支付流水"
 					failed++
 					errs = append(errs, fmt.Errorf("order %s payment check: %w", o.OrderNo, checkErr))
 				} else if slow {
@@ -155,10 +155,10 @@ func (uc *OrderUsecase) ExpireOrder(ctx context.Context) (int, error) {
 				}
 				continue
 			}
-			if err := uc.cancelOrder(ctx, o.OrderNo, "超时未支付", "system", 0, true); err != nil {
+			if err := uc.cancelOrder(ctx, o.OrderNo, "超時未支付", "system", 0, true); err != nil {
 				failed++
 				errs = append(errs, fmt.Errorf("order %s cancel: %w", o.OrderNo, err))
-				if e := uc.deferExpiry(ctx, o, "取消失败，请检查库存释放和数据库日志", false); e != nil {
+				if e := uc.deferExpiry(ctx, o, "取消失敗，請檢查庫存釋放和數據庫日誌", false); e != nil {
 					errs = append(errs, e)
 				}
 			} else {

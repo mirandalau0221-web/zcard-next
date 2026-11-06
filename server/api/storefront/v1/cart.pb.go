@@ -26,7 +26,7 @@ const (
 type AddCartItemRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ProductId     uint64                 `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
-	SkuId         uint64                 `protobuf:"varint,2,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"` // 0=默认规格
+	SkuId         uint64                 `protobuf:"varint,2,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"` // 0=默認規格
 	Quantity      int32                  `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`        // 1-99
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -185,17 +185,17 @@ type CartItem struct {
 	ProductId uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	SkuId     uint64                 `protobuf:"varint,3,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
 	Quantity  int32                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	// 商品快照（联查现值——结算前端展示用）
+	// 商品快照（聯查現值——結算前端展示用）
 	ProductName    string      `protobuf:"bytes,5,opt,name=product_name,json=productName,proto3" json:"product_name,omitempty"`
-	PriceCents     int64       `protobuf:"varint,6,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`     // 现价（SKU 解析后）
-	MaxQuantity    int32       `protobuf:"varint,14,opt,name=max_quantity,json=maxQuantity,proto3" json:"max_quantity,omitempty"` // 单次购买上限，0 使用默认上限
-	Stock          int64       `protobuf:"varint,7,opt,name=stock,proto3" json:"stock,omitempty"`                                 // 可用库存（-1 不限）
-	PointsOnly     bool        `protobuf:"varint,8,opt,name=points_only,json=pointsOnly,proto3" json:"points_only,omitempty"`     // 积分兑换商品（不可混合结算）
+	PriceCents     int64       `protobuf:"varint,6,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`     // 現價（SKU 解析後）
+	MaxQuantity    int32       `protobuf:"varint,14,opt,name=max_quantity,json=maxQuantity,proto3" json:"max_quantity,omitempty"` // 單次購買上限，0 使用默認上限
+	Stock          int64       `protobuf:"varint,7,opt,name=stock,proto3" json:"stock,omitempty"`                                 // 可用庫存（-1 不限）
+	PointsOnly     bool        `protobuf:"varint,8,opt,name=points_only,json=pointsOnly,proto3" json:"points_only,omitempty"`     // 積分兑換商品（不可混合結算）
 	PointsRequired int64       `protobuf:"varint,9,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
-	Valid          bool        `protobuf:"varint,10,opt,name=valid,proto3" json:"valid,omitempty"` // false=已下架/隐藏（列表打标不可选）
+	Valid          bool        `protobuf:"varint,10,opt,name=valid,proto3" json:"valid,omitempty"` // false=已下架/隱藏（列表打標不可選）
 	FlashSale      *FlashOffer `protobuf:"bytes,13,opt,name=flash_sale,json=flashSale,proto3" json:"flash_sale,omitempty"`
 	AddedAt        int64       `protobuf:"varint,11,opt,name=added_at,json=addedAt,proto3" json:"added_at,omitempty"`
-	ProductCover   string      `protobuf:"bytes,12,opt,name=product_cover,json=productCover,proto3" json:"product_cover,omitempty"` // 商品封面（无图时前端显示默认占位）
+	ProductCover   string      `protobuf:"bytes,12,opt,name=product_cover,json=productCover,proto3" json:"product_cover,omitempty"` // 商品封面（無圖時前端顯示默認佔位）
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -331,7 +331,7 @@ func (x *CartItem) GetProductCover() string {
 type ListCartReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Items         []*CartItem            `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"` // 有效项数
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"` // 有效項數
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

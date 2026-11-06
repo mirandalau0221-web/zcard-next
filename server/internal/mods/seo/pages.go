@@ -16,10 +16,10 @@ import (
 )
 
 var privateTitles = map[string]string{
-	"lottery": "幸运抽奖",
-	"member":  "个人中心", "order": "订单详情", "payment": "订单支付", "fetch": "订单查询",
-	"tickets": "售后工单", "withdraw": "申请提现", "affiliate": "推广中心", "cart": "购物车",
-	"coupons": "优惠券", "install": "安装向导", "login": "登录", "register": "注册", "forgot-password": "找回密码",
+	"lottery": "幸運抽獎",
+	"member":  "個人中心", "order": "訂單詳情", "payment": "訂單支付", "fetch": "訂單查詢",
+	"tickets": "售後工單", "withdraw": "申請提現", "affiliate": "推廣中心", "cart": "購物車",
+	"coupons": "優惠券", "install": "安裝嚮導", "login": "登錄", "register": "註冊", "forgot-password": "找回密碼",
 }
 
 func (s *SeoService) publicProduct(ctx context.Context, id uint64) (*ProductSEO, error) {
@@ -65,7 +65,7 @@ func basicPage(site siteInfo, host, path, title string) seoPageData {
 	base := site.base(host)
 	d := seoPageData{Site: site, Base: base, Canonical: base + path, OGType: "website", OGImage: absoluteURL(site.Logo, base),
 		Keywords: strings.Join(nonEmpty(site.SeoKeywords, site.Name), ","), Robots: "index,follow",
-		Description: truncateStr(stripTags(orDefaultStr(site.SeoDesc, site.Name+site.text("数字商品商店。浏览商品、查看使用说明与交付信息。", " digital goods store. Browse products, guides, and delivery details."))), 150),
+		Description: truncateStr(stripTags(orDefaultStr(site.SeoDesc, site.Name+site.text("數字商品商店。瀏覽商品、查看使用説明與交付信息。", " digital goods store. Browse products, guides, and delivery details."))), 150),
 	}
 	d.Title = title + " - " + site.Name
 	if title == "" {
@@ -101,11 +101,11 @@ func (s *SeoService) pageData(r *http.Request) (seoPageData, int, error) {
 	if path == "" || path == "/index.html" {
 		path = "/"
 	}
-	fail := func() (seoPageData, int, error) { return noindexPage(site, r.Host, path, "页面不存在"), 404, nil }
+	fail := func() (seoPageData, int, error) { return noindexPage(site, r.Host, path, "頁面不存在"), 404, nil }
 	segment := strings.Split(strings.TrimPrefix(path, "/"), "/")[0]
 	if title, ok := privateTitles[segment]; ok {
 		if segment == "lottery" && r.URL.Query().Get("tab") == "prizes" {
-			title = "我的奖品"
+			title = "我的獎品"
 		}
 		return noindexPage(site, r.Host, path, title), 200, nil
 	}
@@ -138,7 +138,7 @@ func (s *SeoService) pageData(r *http.Request) (seoPageData, int, error) {
 		}
 		return postPageData(site, r.Host, p), 200, nil
 	}
-	title, ok := map[string]string{"/": "", "/products": "全部商品", "/posts": "文章公告", "/points": "积分商城"}[path]
+	title, ok := map[string]string{"/": "", "/products": "全部商品", "/posts": "文章公告", "/points": "積分商城"}[path]
 	if !ok {
 		return fail()
 	}
@@ -193,7 +193,7 @@ func (s *SeoService) listBody(r *http.Request, path string, site siteInfo) (stri
 	size := positiveInt(q.Get("page_size"), 20, 60)
 	base := site.base(r.Host)
 	var body strings.Builder
-	body.WriteString(`<nav><a href="` + base + `/products">` + site.translate("全部商品") + `</a> · <a href="` + base + `/posts">` + site.translate("文章公告") + `</a> · <a href="` + base + `/points">` + site.translate("积分商城") + `</a></nav><ul>`)
+	body.WriteString(`<nav><a href="` + base + `/products">` + site.translate("全部商品") + `</a> · <a href="` + base + `/posts">` + site.translate("文章公告") + `</a> · <a href="` + base + `/points">` + site.translate("積分商城") + `</a></nav><ul>`)
 	var total int64
 	if path == "/posts" {
 		category, _ := strconv.ParseUint(q.Get("category_id"), 10, 64)
@@ -215,7 +215,7 @@ func (s *SeoService) listBody(r *http.Request, path string, site siteInfo) (stri
 		for _, p := range rows.Items {
 			price := orDefaultStr(site.Currency, "CNY") + " " + priceYuan(storefrontProductSEO(p, time.Now().Unix()).PriceCents)
 			if path == "/points" {
-				price = strconv.FormatInt(p.PointsRequired, 10) + site.text(" 积分", " points")
+				price = strconv.FormatInt(p.PointsRequired, 10) + site.text(" 積分", " points")
 			}
 			body.WriteString(`<li><a href="` + base + "/product/" + u64str(p.Id) + `">` + template.HTMLEscapeString(p.Name) + `</a> ` + template.HTMLEscapeString(price) + `</li>`)
 		}
@@ -223,7 +223,7 @@ func (s *SeoService) listBody(r *http.Request, path string, site siteInfo) (stri
 	body.WriteString("</ul>")
 	if int64(page*size) < total {
 		q.Set("page", strconv.Itoa(page+1))
-		body.WriteString(`<a href="` + template.HTMLEscapeString(path+"?"+q.Encode()) + `">` + site.text("下一页", "Next Page") + `</a>`)
+		body.WriteString(`<a href="` + template.HTMLEscapeString(path+"?"+q.Encode()) + `">` + site.text("下一頁", "Next Page") + `</a>`)
 	}
 	return body.String(), nil
 }

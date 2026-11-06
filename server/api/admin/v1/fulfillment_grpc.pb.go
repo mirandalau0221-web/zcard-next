@@ -33,17 +33,17 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminFulfillmentService 履约管理：待发货列表 + 手动交付。
+// AdminFulfillmentService 履約管理：待發貨列表 + 手動交付。
 type AdminFulfillmentServiceClient interface {
 	ShipOrder(ctx context.Context, in *ShipOrderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateShipping(ctx context.Context, in *UpdateShippingRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RestockReturn(ctx context.Context, in *RestockReturnRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	StartService(ctx context.Context, in *StartServiceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListPending 待发货列表（实体快递配送及人工交付）。
+	// ListPending 待發貨列表（實體快遞配送及人工交付）。
 	ListPending(ctx context.Context, in *ListPendingRequest, opts ...grpc.CallOption) (*ListPendingReply, error)
-	// ManualDeliver 手动交付（卡密内容或物流单号）。
+	// ManualDeliver 手動交付（卡密內容或物流單號）。
 	ManualDeliver(ctx context.Context, in *ManualDeliverRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListDeliveries 交付记录列表（掩码默认）。
+	// ListDeliveries 交付記錄列表（掩碼默認）。
 	ListDeliveries(ctx context.Context, in *ListDeliveriesRequest, opts ...grpc.CallOption) (*ListDeliveriesReply, error)
 }
 
@@ -129,17 +129,17 @@ func (c *adminFulfillmentServiceClient) ListDeliveries(ctx context.Context, in *
 // All implementations must embed UnimplementedAdminFulfillmentServiceServer
 // for forward compatibility.
 //
-// AdminFulfillmentService 履约管理：待发货列表 + 手动交付。
+// AdminFulfillmentService 履約管理：待發貨列表 + 手動交付。
 type AdminFulfillmentServiceServer interface {
 	ShipOrder(context.Context, *ShipOrderRequest) (*emptypb.Empty, error)
 	UpdateShipping(context.Context, *UpdateShippingRequest) (*emptypb.Empty, error)
 	RestockReturn(context.Context, *RestockReturnRequest) (*emptypb.Empty, error)
 	StartService(context.Context, *StartServiceRequest) (*emptypb.Empty, error)
-	// ListPending 待发货列表（实体快递配送及人工交付）。
+	// ListPending 待發貨列表（實體快遞配送及人工交付）。
 	ListPending(context.Context, *ListPendingRequest) (*ListPendingReply, error)
-	// ManualDeliver 手动交付（卡密内容或物流单号）。
+	// ManualDeliver 手動交付（卡密內容或物流單號）。
 	ManualDeliver(context.Context, *ManualDeliverRequest) (*emptypb.Empty, error)
-	// ListDeliveries 交付记录列表（掩码默认）。
+	// ListDeliveries 交付記錄列表（掩碼默認）。
 	ListDeliveries(context.Context, *ListDeliveriesRequest) (*ListDeliveriesReply, error)
 	mustEmbedUnimplementedAdminFulfillmentServiceServer()
 }

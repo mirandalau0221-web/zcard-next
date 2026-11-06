@@ -1,63 +1,63 @@
 package order
 
-// PriceCalculator 价格管线（ ，规划 ）。
+// PriceCalculator 價格管線（ ，規劃 ）。
 //
-// 顺序钉死：基础价 → 会员折扣 → 商品组折扣 → 秒杀 → 优惠券 → 积分抵扣 → 分站定价 → 数量×单价 → rounding
-// 每一步产出一条 order_amount_lines 行（有符号分；折扣为负、加价为正）。
-// 管线为纯函数——M1a 中 member/coupon/points/reseller 四 port 返回中性值，/ 接真实现。
+// 順序釘死：基礎價 → 會員折扣 → 商品組折扣 → 秒殺 → 優惠券 → 積分抵扣 → 分站定價 → 數量×單價 → rounding
+// 每一步產出一條 order_amount_lines 行（有符號分；折扣為負、加價為正）。
+// 管線為純函數——M1a 中 member/coupon/points/reseller 四 port 返回中性值，/ 接真實現。
 //
-// 不变量：total == SUM(lines.amount) × quantity；行金额在下单落库时乘数量。
+// 不變量：total == SUM(lines.amount) × quantity；行金額在下單落庫時乘數量。
 
 import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/money"
 )
 
-// AmountLine 价格管线明细行（对应 ent order_amount_lines）。
+// AmountLine 價格管線明細行（對應 ent order_amount_lines）。
 type AmountLine struct {
 	Type       string // base_price / member_discount / group_discount / promo_discount / coupon_discount / points_discount / subsite_markup / fee / rounding_adjust
-	Amount     int64  // 有符号分（折扣为负、加价为正）
+	Amount     int64  // 有符號分（折扣為負、加價為正）
 	SourceType string // member_level / coupon / flash_sale / points / subsite / manual
 	SourceID   uint64
 	Seq        int32
 	Meta       map[string]any
 }
 
-// PriceInput 管线输入。
+// PriceInput 管線輸入。
 type PriceInput struct {
-	BasePrice     money.Cents // 基础价（SKU > 商品）
+	BasePrice     money.Cents // 基礎價（SKU > 商品）
 	Quantity      int32
-	MemberRate    int32       // 会员应付比例（万分比；9800=98%；0/10000=不折扣）
-	GroupRate     int32       // 商品组应付比例（万分比；同会员口径）
-	FlashPrice    money.Cents // 秒杀价（0=无秒杀）
-	PromoDiscount money.Cents // 促销折让（分；0=无促销——会员折扣后、券前）
-	PromoName     string      // 促销名（金额行 meta）
-	CouponValue   money.Cents // 优惠券面额（分；0=无券）
-	PointsValue   money.Cents // 积分抵扣额（分）
-	SubsiteMarkup money.Cents // 分站加价（分）
-	DisplayRate   float64     // 展示币汇率（换算 rounding 用， 接入）
+	MemberRate    int32       // 會員應付比例（萬分比；9800=98%；0/10000=不折扣）
+	GroupRate     int32       // 商品組應付比例（萬分比；同會員口徑）
+	FlashPrice    money.Cents // 秒殺價（0=無秒殺）
+	PromoDiscount money.Cents // 促銷折讓（分；0=無促銷——會員折扣後、券前）
+	PromoName     string      // 促銷名（金額行 meta）
+	CouponValue   money.Cents // 優惠券面額（分；0=無券）
+	PointsValue   money.Cents // 積分抵扣額（分）
+	SubsiteMarkup money.Cents // 分站加價（分）
+	DisplayRate   float64     // 展示幣匯率（換算 rounding 用， 接入）
 }
 
-// PriceResult 管线输出。
+// PriceResult 管線輸出。
 type PriceResult struct {
 	Lines []AmountLine
-	Total money.Cents // 应付 = SUM(单件 lines) × quantity
+	Total money.Cents // 應付 = SUM(單件 lines) × quantity
 }
 
-// PriceCalculator 价格管线（纯函数，无副作用）。
+// PriceCalculator 價格管線（純函數，無副作用）。
 func PriceCalculator(in PriceInput) PriceResult {
 	var lines []AmountLine
 	seq := int32(0)
 	current := in.BasePrice
 
-	// 1) 基础价
+	// 1) 基礎價
 	lines = append(lines, AmountLine{
 		Type: "base_price", Amount: int64(in.BasePrice), Seq: seq,
 	})
 	seq++
 
-	// 2) 会员等级折扣
+	// 2) 會員等級折扣
 	if in.MemberRate > 0 && in.MemberRate < 10000 {
-		// 配置是应付比例，折让取其补数；保留整数分向下取整的折让规则。
+		// 配置是應付比例，折讓取其補數；保留整數分向下取整的折讓規則。
 		discount := int64(in.BasePrice) * int64(10000-in.MemberRate) / 10000
 		lines = append(lines, AmountLine{
 			Type: "member_discount", Amount: -discount, SourceType: "member_level",
@@ -67,7 +67,7 @@ func PriceCalculator(in PriceInput) PriceResult {
 		seq++
 	}
 
-	// 3) 会员商品组折扣（叠加规则判定 ）
+	// 3) 會員商品組折扣（疊加規則判定 ）
 	if in.GroupRate > 0 && in.GroupRate < 10000 {
 		discount := int64(current) * int64(10000-in.GroupRate) / 10000
 		lines = append(lines, AmountLine{
@@ -78,7 +78,7 @@ func PriceCalculator(in PriceInput) PriceResult {
 		seq++
 	}
 
-	// 4) 限时秒杀价（时间窗内覆盖基础价——折扣 = flash - current）
+	// 4) 限時秒殺價（時間窗內覆蓋基礎價——折扣 = flash - current）
 	if in.FlashPrice > 0 && in.FlashPrice < current {
 		diff := int64(current - in.FlashPrice)
 		lines = append(lines, AmountLine{
@@ -89,8 +89,8 @@ func PriceCalculator(in PriceInput) PriceResult {
 		seq++
 	}
 
-	// 4.5) 通用促销（会员折扣后、券前；多促最优已由解析器裁定；
-	// 秒杀互斥：flash 生效时调用方不填 PromoDiscount——口径写死并测试）
+	// 4.5) 通用促銷（會員折扣後、券前；多促最優已由解析器裁定；
+	// 秒殺互斥：flash 生效時調用方不填 PromoDiscount——口徑寫死並測試）
 	if in.PromoDiscount > 0 && in.PromoDiscount < current {
 		lines = append(lines, AmountLine{
 			Type: "promo_discount", Amount: -int64(in.PromoDiscount), SourceType: "promotion",
@@ -100,7 +100,7 @@ func PriceCalculator(in PriceInput) PriceResult {
 		seq++
 	}
 
-	// 5) 优惠券
+	// 5) 優惠券
 	if in.CouponValue > 0 {
 		discount := int64(in.CouponValue)
 		if discount > int64(current) {
@@ -114,11 +114,11 @@ func PriceCalculator(in PriceInput) PriceResult {
 		seq++
 	}
 
-	// 6) 积分抵扣
+	// 6) 積分抵扣
 	if in.PointsValue > 0 {
 		discount := int64(in.PointsValue)
 		if discount > int64(current) {
-			discount = int64(current) // 不超应付
+			discount = int64(current) // 不超應付
 		}
 		lines = append(lines, AmountLine{
 			Type: "points_discount", Amount: -discount, SourceType: "points",
@@ -128,7 +128,7 @@ func PriceCalculator(in PriceInput) PriceResult {
 		seq++
 	}
 
-	// 7) 分站定价（加价）
+	// 7) 分站定價（加價）
 	if in.SubsiteMarkup > 0 {
 		lines = append(lines, AmountLine{
 			Type: "subsite_markup", Amount: int64(in.SubsiteMarkup), SourceType: "subsite",
@@ -138,17 +138,17 @@ func PriceCalculator(in PriceInput) PriceResult {
 		seq++
 	}
 
-	// 8) 金额行保持单件口径，调用方落库时乘数量；总额包含数量。
+	// 8) 金額行保持單件口徑，調用方落庫時乘數量；總額包含數量。
 	unitTotal := current
 	total := unitTotal.Mul(in.Quantity)
 
-	// 9) rounding_adjust（多币种快照， 接入）
-	// M1a：基础货币直通，rounding 恒 0
+	// 9) rounding_adjust（多幣種快照， 接入）
+	// M1a：基礎貨幣直通，rounding 恆 0
 
 	return PriceResult{Lines: lines, Total: total}
 }
 
-// ValidateTotal 不变量断言：unit SUM(lines) == unit price（不含数量倍增）。
+// ValidateTotal 不變量斷言：unit SUM(lines) == unit price（不含數量倍增）。
 func ValidateTotal(lines []AmountLine) money.Cents {
 	var sum money.Cents
 	for _, l := range lines {

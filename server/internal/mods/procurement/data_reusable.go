@@ -60,13 +60,13 @@ func (s *ProcureService) processReusable(ctx context.Context, id uint64) error {
 		return s.deliverReusable(ctx, src)
 	}
 	if src.Status == "paused" || src.Status == "failed" || src.Status == "uncertain" {
-		return s.failReusableItems(ctx, src.ID, "复用内容需要商家处理")
+		return s.failReusableItems(ctx, src.ID, "複用內容需要商家處理")
 	}
 	if src.NextCheckAt > time.Now().Unix() {
 		return nil
 	}
 	if src.Status == "submitting" {
-		_, err = c.ProductDeliverySource.Update().Where(productdeliverysource.ID(id), productdeliverysource.Status("submitting"), productdeliverysource.NextCheckAtLTE(time.Now().Unix())).SetStatus("uncertain").SetLastError("首次采购结果不明确，请核实原上游订单；不会重新采购").Save(ctx)
+		_, err = c.ProductDeliverySource.Update().Where(productdeliverysource.ID(id), productdeliverysource.Status("submitting"), productdeliverysource.NextCheckAtLTE(time.Now().Unix())).SetStatus("uncertain").SetLastError("首次採購結果不明確，請核實原上游訂單；不會重新採購").Save(ctx)
 		return err
 	}
 	conn, err := c.SupplyConnection.Get(ctx, src.ConnectionID)
@@ -78,11 +78,11 @@ func (s *ProcureService) processReusable(ctx context.Context, id uint64) error {
 		if src.Status == "polling" {
 			state = "uncertain"
 		}
-		return s.markReusable(ctx, id, state, "货源账号或配置已变化，请核实原采购结果", src.Status)
+		return s.markReusable(ctx, id, state, "貨源賬號或配置已變化，請核實原採購結果", src.Status)
 	}
 	if src.Status == "empty" {
 		if src.ExpiresAt > 0 && src.ExpiresAt <= time.Now().Unix() {
-			return s.markReusable(ctx, id, "failed", "内容有效期已过，未发起采购", "empty")
+			return s.markReusable(ctx, id, "failed", "內容有效期已過，未發起採購", "empty")
 		}
 
 		claimed := false
@@ -130,7 +130,7 @@ func (s *ProcureService) processReusable(ctx context.Context, id uint64) error {
 		defer cancel()
 		res, e := s.gw.Submit(bounded, supplyport.PurchaseRequest{ConnectionID: src.ConnectionID, ProductCode: src.UpstreamProduct, UpstreamSKU: src.UpstreamSku, Quantity: 1, DownstreamOrderNo: *src.PurchaseKey, TraceID: *src.PurchaseKey})
 		if e != nil || res == nil {
-			_, err = c.ProductDeliverySource.Update().Where(productdeliverysource.ID(id), productdeliverysource.Status("submitting")).SetStatus("uncertain").SetLastError("采购响应未确认，请核实原上游订单；不会再次扣款采购").Save(context.WithoutCancel(ctx))
+			_, err = c.ProductDeliverySource.Update().Where(productdeliverysource.ID(id), productdeliverysource.Status("submitting")).SetStatus("uncertain").SetLastError("採購響應未確認，請核實原上游訂單；不會再次扣款採購").Save(context.WithoutCancel(ctx))
 			return err
 		}
 		if e := s.recordReusablePurchase(context.WithoutCancel(ctx), src, res.Amount, res.UpstreamOrderID); e != nil {
@@ -140,7 +140,7 @@ func (s *ProcureService) processReusable(ctx context.Context, id uint64) error {
 			return s.confirmReusable(context.WithoutCancel(ctx), id, res.Cards, res.Amount, res.UpstreamOrderID)
 		}
 		if res.UpstreamOrderID == "" {
-			return s.markReusable(context.WithoutCancel(ctx), id, "uncertain", "上游未返回订单号，请核实扣款和出货结果", "submitting")
+			return s.markReusable(context.WithoutCancel(ctx), id, "uncertain", "上游未返回訂單號，請核實扣款和出貨結果", "submitting")
 		}
 		_, err = c.ProductDeliverySource.Update().Where(productdeliverysource.ID(id), productdeliverysource.Status("submitting")).SetStatus("polling").SetNextCheckAt(time.Now().Add(15 * time.Second).Unix()).Save(context.WithoutCancel(ctx))
 		return err
@@ -151,7 +151,7 @@ func (s *ProcureService) processReusable(ctx context.Context, id uint64) error {
 			return e
 		}
 		if src.UpstreamOrderID == "" {
-			return s.markReusable(ctx, id, "uncertain", "缺少原上游订单号，请核实", "polling")
+			return s.markReusable(ctx, id, "uncertain", "缺少原上游訂單號，請核實", "polling")
 		}
 		bounded, cancel := context.WithTimeout(ctx, 20*time.Second)
 		defer cancel()
@@ -163,10 +163,10 @@ func (s *ProcureService) processReusable(ctx context.Context, id uint64) error {
 		case "delivered":
 			return s.confirmReusable(ctx, id, res.Cards, res.Amount, src.UpstreamOrderID)
 		case "failed", "rejected", "canceled", "refunded":
-			return s.markReusable(ctx, id, "failed", "上游采购未完成，相关订单待处理；不会自动退整单", "polling")
+			return s.markReusable(ctx, id, "failed", "上游採購未完成，相關訂單待處理；不會自動退整單", "polling")
 		}
 		if src.SubmittedAt > 0 && time.Now().Unix()-src.SubmittedAt > 86400 {
-			return s.markReusable(ctx, id, "uncertain", "采购长时间未完成，请核实原订单", "polling")
+			return s.markReusable(ctx, id, "uncertain", "採購長時間未完成，請核實原訂單", "polling")
 		}
 	}
 	return nil
@@ -187,7 +187,7 @@ func (s *ProcureService) confirmReusable(ctx context.Context, id uint64, cards [
 		return nil
 	}
 	if len(cards) != 1 || strings.TrimSpace(cards[0]) == "" || len(cards[0]) > 60000 {
-		return s.markReusable(ctx, id, "uncertain", "上游返回内容不是单份，请核实后选择可复用的内容", "submitting", "polling", "uncertain")
+		return s.markReusable(ctx, id, "uncertain", "上游返回內容不是單份，請核實後選擇可複用的內容", "submitting", "polling", "uncertain")
 	}
 	sealed, err := s.cipher.Seal(cards[0], src.ProductID, src.SubsiteID)
 	if err != nil {
@@ -211,7 +211,7 @@ func (s *ProcureService) deliverReusable(ctx context.Context, src *ent.ProductDe
 	}
 	delivery, ok := s.attach.(fulfillmentport.ReusableDelivery)
 	if !ok {
-		return fmt.Errorf("共享交付组件未配置")
+		return fmt.Errorf("共享交付組件未配置")
 	}
 	var firstErr error
 	for _, it := range items {

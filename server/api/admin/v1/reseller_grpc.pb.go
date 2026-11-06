@@ -36,28 +36,28 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminResellerService 分站管理(主站面核心）：申请审核/列表/定价/账本/余额。
-// 域名验证与分站后台完整面随 storefront 用户登录体系接续（核心引擎已就绪）。
+// AdminResellerService 分站管理(主站面核心）：申請審核/列表/定價/賬本/餘額。
+// 域名驗證與分站後台完整面隨 storefront 用户登錄體系接續（核心引擎已就緒）。
 type AdminResellerServiceClient interface {
 	// MySites 分站主：名下域名列表。
 	MySites(ctx context.Context, in *MySitesRequest, opts ...grpc.CallOption) (*MySitesReply, error)
-	// AddSite 分站主：登记域名（生成验证 token）。
+	// AddSite 分站主：登記域名（生成驗證 token）。
 	AddSite(ctx context.Context, in *AddSiteRequest, opts ...grpc.CallOption) (*ResellerSiteItem, error)
-	// VerifySite 分站主：触发域名验证（DNS TXT / HTTP well-known 双方案）。
+	// VerifySite 分站主：觸發域名驗證（DNS TXT / HTTP well-known 雙方案）。
 	VerifySite(ctx context.Context, in *VerifySiteRequest, opts ...grpc.CallOption) (*VerifySiteReply, error)
-	// SetWhitelabel 分站主：白标设置（站名/LOGO/favicon）。
+	// SetWhitelabel 分站主：白標設置（站名/LOGO/favicon）。
 	SetWhitelabel(ctx context.Context, in *SetWhitelabelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// CreateProduct 分站主：自营商品上架（subsite_id = 本人分站；等级权限位自助上架）。
+	// CreateProduct 分站主：自營商品上架（subsite_id = 本人分站；等級權限位自助上架）。
 	CreateProduct(ctx context.Context, in *CreateResellerProductRequest, opts ...grpc.CallOption) (*ResellerProduct, error)
-	// ReviewApply 审核申请（通过设加价率区间与冻结天数）。
+	// ReviewApply 審核申請（通過設加價率區間與凍結天數）。
 	ReviewApply(ctx context.Context, in *ReviewApplyRequest, opts ...grpc.CallOption) (*ResellerProfile, error)
-	// ListProfiles 申请/分站列表。
+	// ListProfiles 申請/分站列表。
 	ListProfiles(ctx context.Context, in *ListProfilesRequest, opts ...grpc.CallOption) (*ListProfilesReply, error)
-	// UpsertPricing 分站定价规则（SKU>商品>默认）。
+	// UpsertPricing 分站定價規則（SKU>商品>默認）。
 	UpsertPricing(ctx context.Context, in *UpsertPricingRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Ledger 分站账本流水。
+	// Ledger 分站賬本流水。
 	Ledger(ctx context.Context, in *LedgerRequest, opts ...grpc.CallOption) (*LedgerReply, error)
-	// Balance 分站余额（缓存 + 重算对账）。
+	// Balance 分站餘額（緩存 + 重算對賬）。
 	Balance(ctx context.Context, in *BalanceRequest, opts ...grpc.CallOption) (*BalanceReply, error)
 }
 
@@ -173,28 +173,28 @@ func (c *adminResellerServiceClient) Balance(ctx context.Context, in *BalanceReq
 // All implementations must embed UnimplementedAdminResellerServiceServer
 // for forward compatibility.
 //
-// AdminResellerService 分站管理(主站面核心）：申请审核/列表/定价/账本/余额。
-// 域名验证与分站后台完整面随 storefront 用户登录体系接续（核心引擎已就绪）。
+// AdminResellerService 分站管理(主站面核心）：申請審核/列表/定價/賬本/餘額。
+// 域名驗證與分站後台完整面隨 storefront 用户登錄體系接續（核心引擎已就緒）。
 type AdminResellerServiceServer interface {
 	// MySites 分站主：名下域名列表。
 	MySites(context.Context, *MySitesRequest) (*MySitesReply, error)
-	// AddSite 分站主：登记域名（生成验证 token）。
+	// AddSite 分站主：登記域名（生成驗證 token）。
 	AddSite(context.Context, *AddSiteRequest) (*ResellerSiteItem, error)
-	// VerifySite 分站主：触发域名验证（DNS TXT / HTTP well-known 双方案）。
+	// VerifySite 分站主：觸發域名驗證（DNS TXT / HTTP well-known 雙方案）。
 	VerifySite(context.Context, *VerifySiteRequest) (*VerifySiteReply, error)
-	// SetWhitelabel 分站主：白标设置（站名/LOGO/favicon）。
+	// SetWhitelabel 分站主：白標設置（站名/LOGO/favicon）。
 	SetWhitelabel(context.Context, *SetWhitelabelRequest) (*emptypb.Empty, error)
-	// CreateProduct 分站主：自营商品上架（subsite_id = 本人分站；等级权限位自助上架）。
+	// CreateProduct 分站主：自營商品上架（subsite_id = 本人分站；等級權限位自助上架）。
 	CreateProduct(context.Context, *CreateResellerProductRequest) (*ResellerProduct, error)
-	// ReviewApply 审核申请（通过设加价率区间与冻结天数）。
+	// ReviewApply 審核申請（通過設加價率區間與凍結天數）。
 	ReviewApply(context.Context, *ReviewApplyRequest) (*ResellerProfile, error)
-	// ListProfiles 申请/分站列表。
+	// ListProfiles 申請/分站列表。
 	ListProfiles(context.Context, *ListProfilesRequest) (*ListProfilesReply, error)
-	// UpsertPricing 分站定价规则（SKU>商品>默认）。
+	// UpsertPricing 分站定價規則（SKU>商品>默認）。
 	UpsertPricing(context.Context, *UpsertPricingRequest) (*emptypb.Empty, error)
-	// Ledger 分站账本流水。
+	// Ledger 分站賬本流水。
 	Ledger(context.Context, *LedgerRequest) (*LedgerReply, error)
-	// Balance 分站余额（缓存 + 重算对账）。
+	// Balance 分站餘額（緩存 + 重算對賬）。
 	Balance(context.Context, *BalanceRequest) (*BalanceReply, error)
 	mustEmbedUnimplementedAdminResellerServiceServer()
 }

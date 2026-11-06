@@ -1,6 +1,6 @@
 package catalog
 
-// 自定义控件 admin CRUD 数据层（；ent import 收口：data 前缀文件）。
+// 自定義控件 admin CRUD 數據層（；ent import 收口：data 前綴文件）。
 
 import (
 	"context"
@@ -21,7 +21,7 @@ func (r *ProductRepoImpl) ListProductControls(ctx context.Context, productID uin
 		All(ctx)
 }
 
-// CreateProductControl 创建控件。
+// CreateProductControl 創建控件。
 func (r *ProductRepoImpl) createProductControl(ctx context.Context, productID, subsiteID uint64, name, typ string, required bool, options []string, sort int32, settings ...ControlSettings) (*ent.ProductControl, error) {
 	c := data.Client(ctx, r.data)
 	p, e := c.Product.Get(ctx, productID)
@@ -29,14 +29,14 @@ func (r *ProductRepoImpl) createProductControl(ctx context.Context, productID, s
 		return nil, e
 	}
 	if p.ProductKind == "sms_channel" || p.DeliveryKind == "social_service" {
-		return nil, fmt.Errorf("渠道接码不能添加普通下单控件")
+		return nil, fmt.Errorf("渠道接碼不能添加普通下單控件")
 	}
 	reuse, e := c.ProductSku.Query().Where(productsku.ProductID(productID), productsku.FulfillmentMode("reuse")).Exist(ctx)
 	if e != nil {
 		return nil, e
 	}
 	if p.FulfillmentMode == "reuse" || reuse {
-		return nil, fmt.Errorf("商品正在重复发货，不能添加客户专属填写字段；请先更改发货来源")
+		return nil, fmt.Errorf("商品正在重複發貨，不能添加客户專屬填寫字段；請先更改發貨來源")
 	}
 
 	if subsiteID == 0 {
@@ -96,7 +96,7 @@ func (r *ProductRepoImpl) updateProductControl(ctx context.Context, id uint64, n
 	return q.Save(ctx)
 }
 
-// DeleteProductControl 删除控件。
+// DeleteProductControl 刪除控件。
 func (r *ProductRepoImpl) deleteProductControl(ctx context.Context, id uint64) error {
 	return data.Client(ctx, r.data).ProductControl.DeleteOneID(id).Exec(ctx)
 }
@@ -111,10 +111,10 @@ func (v ControlSettings) validate() error {
 	switch v.Validation {
 	case "", "text", "url", "username", "tron":
 	default:
-		return fmt.Errorf("无效的校验类型")
+		return fmt.Errorf("無效的校驗類型")
 	}
 	if v.MaxLength != nil && (*v.MaxLength < 1 || *v.MaxLength > 4000) {
-		return fmt.Errorf("长度限制须为1至4000")
+		return fmt.Errorf("長度限制須為1至4000")
 	}
 	return nil
 }

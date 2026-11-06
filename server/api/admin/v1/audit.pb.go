@@ -95,7 +95,7 @@ type OpLogItem struct {
 	AfterJson       string                 `protobuf:"bytes,8,opt,name=after_json,json=afterJson,proto3" json:"after_json,omitempty"`
 	Ip              string                 `protobuf:"bytes,9,opt,name=ip,proto3" json:"ip,omitempty"`
 	CreatedAt       int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	OperatorName    string                 `protobuf:"bytes,11,opt,name=operator_name,json=operatorName,proto3" json:"operator_name,omitempty"` // 读取时富化的操作者账号（已删除/未知为空）
+	OperatorName    string                 `protobuf:"bytes,11,opt,name=operator_name,json=operatorName,proto3" json:"operator_name,omitempty"` // 讀取時富化的操作者賬號（已刪除/未知為空）
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -344,7 +344,7 @@ type SecurityLogItem struct {
 	Ip            string                 `protobuf:"bytes,5,opt,name=ip,proto3" json:"ip,omitempty"`
 	MetadataJson  string                 `protobuf:"bytes,6,opt,name=metadata_json,json=metadataJson,proto3" json:"metadata_json,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	ActorName     string                 `protobuf:"bytes,8,opt,name=actor_name,json=actorName,proto3" json:"actor_name,omitempty"` // 读取时富化的主体账号（guest/system/未知为空）
+	ActorName     string                 `protobuf:"bytes,8,opt,name=actor_name,json=actorName,proto3" json:"actor_name,omitempty"` // 讀取時富化的主體賬號（guest/system/未知為空）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -753,7 +753,7 @@ func (x *GetBlacklistReply) GetEntries() []string {
 
 type SetBlacklistRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Entries       string                 `protobuf:"bytes,1,opt,name=entries,proto3" json:"entries,omitempty"` // 逗号分隔
+	Entries       string                 `protobuf:"bytes,1,opt,name=entries,proto3" json:"entries,omitempty"` // 逗號分隔
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

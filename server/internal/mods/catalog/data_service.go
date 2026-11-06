@@ -1,6 +1,6 @@
 package catalog
 
-// 管理面商品目录 API（；薄 transport——校验+sanitize+DTO 映射，业务在 data_crud.go）。
+// 管理面商品目錄 API（；薄 transport——校驗+sanitize+DTO 映射，業務在 data_crud.go）。
 
 import (
 	"context"
@@ -24,28 +24,28 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminCatalogService 管理面目录服务。
+// AdminCatalogService 管理面目錄服務。
 type AdminCatalogService struct {
 	adminv1.UnimplementedAdminCatalogServiceServer
 	repo     *ProductRepoImpl
-	sold     orderport.SoldCounter // 批量已售数量（nil 容错降级 0）
-	settings port.SettingsReader   // 低库存阈值等（通道 A；nil = 默认值）
-	cipher   *inventory.CardCipher // 直发内容加密（url/code 商品；nil = 直发不可用）
+	sold     orderport.SoldCounter // 批量已售數量（nil 容錯降級 0）
+	settings port.SettingsReader   // 低庫存閾值等（通道 A；nil = 默認值）
+	cipher   *inventory.CardCipher // 直髮內容加密（url/code 商品；nil = 直髮不可用）
 	authz    authzport.Authorizer
 }
 
-// NewAdminCatalogService 构造。
+// NewAdminCatalogService 構造。
 func NewAdminCatalogService(repo *ProductRepoImpl, sold orderport.SoldCounter, settings port.SettingsReader, cipher *inventory.CardCipher, authz authzport.Authorizer) *AdminCatalogService {
 	return &AdminCatalogService{repo: repo, sold: sold, settings: settings, cipher: cipher, authz: authz}
 }
 
-// sealDirect 直发内容加密（AAD 绑定 product+subsite）。
+// sealDirect 直髮內容加密（AAD 綁定 product+subsite）。
 func (s *AdminCatalogService) sealDirect(ctx context.Context, plain string, productID uint64) ([]byte, error) {
 	tc := tenancy.FromContext(ctx)
 	return s.cipher.Seal(plain, productID, tc.SubsiteID)
 }
 
-// lowStockThresholdFor 低库存筛选阈值（未开启筛选返回 0=不过滤）。
+// lowStockThresholdFor 低庫存篩選閾值（未開啓篩選返回 0=不過濾）。
 func (s *AdminCatalogService) lowStockThresholdFor(ctx context.Context, enabled bool) int {
 	if !enabled {
 		return 0
@@ -53,7 +53,7 @@ func (s *AdminCatalogService) lowStockThresholdFor(ctx context.Context, enabled 
 	return s.lowStockThreshold(ctx)
 }
 
-// lowStockThreshold 库存预警阈值（settings.supply.low_stock_threshold；默认 5）。
+// lowStockThreshold 庫存預警閾值（settings.supply.low_stock_threshold；默認 5）。
 func (s *AdminCatalogService) lowStockThreshold(ctx context.Context) int {
 	if s.settings == nil {
 		return 5
@@ -69,7 +69,7 @@ func (s *AdminCatalogService) lowStockThreshold(ctx context.Context) int {
 	return v
 }
 
-// fillStats 批量填充库存/已售（列表与详情共用；库存查询失败标记待确认，不冒充缺货或充足）。
+// fillStats 批量填充庫存/已售（列表與詳情共用；庫存查詢失敗標記待確認，不冒充缺貨或充足）。
 func (s *AdminCatalogService) fillStats(ctx context.Context, items []*adminv1.AdminProduct) {
 	if len(items) == 0 {
 		return
@@ -137,9 +137,9 @@ func (s *AdminCatalogService) lowStockMessages(ctx context.Context, ids []uint64
 		}
 		if count > 0 {
 			if count > len(labels) {
-				labels = append(labels, fmt.Sprintf("另有 %d 个规格", count-len(labels)))
+				labels = append(labels, fmt.Sprintf("另有 %d 個規格", count-len(labels)))
 			}
-			out[p.ID] = strings.Join(labels, "；") + fmt.Sprintf("（低于 %d 件）", threshold)
+			out[p.ID] = strings.Join(labels, "；") + fmt.Sprintf("（低於 %d 件）", threshold)
 		}
 	}
 	return out
@@ -159,7 +159,7 @@ func (s *AdminCatalogService) ListProducts(ctx context.Context, req *adminv1.Lis
 	}
 	rows, total, err := s.repo.ListAdmin(ctx, s.adminFilter(ctx, req))
 	if err != nil {
-		return nil, errors.InternalServer("catalog.LIST_FAILED", "读取商品失败")
+		return nil, errors.InternalServer("catalog.LIST_FAILED", "讀取商品失敗")
 	}
 	reply := &adminv1.ListProductsReply{Products: make([]*adminv1.AdminProduct, 0, len(rows))}
 	for _, p := range rows {
@@ -201,25 +201,25 @@ func (s *AdminCatalogService) adminFilter(ctx context.Context, req *adminv1.List
 	}
 }
 
-// GetProduct 商品详情。
+// GetProduct 商品詳情。
 func (s *AdminCatalogService) GetProduct(ctx context.Context, req *adminv1.GetProductRequest) (*adminv1.AdminProduct, error) {
 	p, err := s.repo.GetAdmin(ctx, 0, req.GetId()) // TODO: tenant context
 	if ent.IsNotFound(err) {
 		return nil, errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("catalog.GET_FAILED", "读取失败")
+		return nil, errors.InternalServer("catalog.GET_FAILED", "讀取失敗")
 	}
 	out := ToAdminPB(p)
 	s.fillStats(ctx, []*adminv1.AdminProduct{out})
 	return out, nil
 }
 
-// CreateProduct 创建商品（description sanitize）。
+// CreateProduct 創建商品（description sanitize）。
 func (s *AdminCatalogService) CreateProduct(ctx context.Context, req *adminv1.CreateProductRequest) (*adminv1.AdminProduct, error) {
-	// 铁律 16：管理面提交金额必须过服务端边界校验（非负 + 上限）——抓包改金额拦截点
+	// 鐵律 16：管理面提交金額必須過服務端邊界校驗（非負 + 上限）——抓包改金額攔截點
 	if req.GetName() == "" || !money.ValidCents(req.GetPriceCents()) || !money.ValidCents(req.GetFactoryPriceCents()) {
-		return nil, errors.BadRequest("catalog.INVALID_INPUT", "名称必填、价格与成本须为非负且不超上限")
+		return nil, errors.BadRequest("catalog.INVALID_INPUT", "名稱必填、價格與成本須為非負且不超上限")
 	}
 	in := port.ProductInput{
 		ProductProperty: req.ProductProperty, SalesVisible: req.SalesVisible, TrackInventory: req.TrackInventory,
@@ -240,19 +240,19 @@ func (s *AdminCatalogService) CreateProduct(ctx context.Context, req *adminv1.Cr
 		return nil, errors.BadRequest("catalog.INVALID_INPUT", err.Error())
 	}
 	if *in.GoodsType == "physical" && req.GetDirectContent() != "" {
-		return nil, errors.BadRequest("catalog.INVALID_INPUT", "实体商品不能配置虚拟直发内容")
+		return nil, errors.BadRequest("catalog.INVALID_INPUT", "實體商品不能配置虛擬直髮內容")
 	}
 	copyFrom := req.GetCopyFromProductId()
 	var copySKUs, copyControls bool
 	if copyFrom != 0 {
 		claims := identity.ClaimsFromContext(ctx)
 		if claims == nil || s.authz == nil || !s.authz.Allowed(ctx, claims.RoleID, "catalog:read_detail") {
-			return nil, errors.Forbidden("authz.PERMISSION_DENIED", "没有读取原商品的权限")
+			return nil, errors.Forbidden("authz.PERMISSION_DENIED", "沒有讀取原商品的權限")
 		}
 		copySKUs = s.authz.Allowed(ctx, claims.RoleID, "catalog:sku_read") && s.authz.Allowed(ctx, claims.RoleID, "catalog:sku_write")
 		copyControls = s.authz.Allowed(ctx, claims.RoleID, "catalog:control_read") && s.authz.Allowed(ctx, claims.RoleID, "catalog:control_write")
 		if !copySKUs && !copyControls {
-			return nil, errors.Forbidden("authz.PERMISSION_DENIED", "没有复制规格或下单控件的权限")
+			return nil, errors.Forbidden("authz.PERMISSION_DENIED", "沒有複製規格或下單控件的權限")
 		}
 	}
 
@@ -261,27 +261,27 @@ func (s *AdminCatalogService) CreateProduct(ctx context.Context, req *adminv1.Cr
 		var err error
 		p, err = s.repo.CreateProduct(ctx, in)
 		if err != nil {
-			return errors.InternalServer("catalog.CREATE_FAILED", "创建失败: "+err.Error())
+			return errors.InternalServer("catalog.CREATE_FAILED", "創建失敗: "+err.Error())
 		}
 		if copyFrom != 0 {
 			if err := s.repo.copyProductConfiguration(ctx, p, copyFrom, copySKUs, copyControls); err != nil {
 				if e := errors.FromError(err); e.Code < 500 {
 					return e
 				}
-				return errors.InternalServer("catalog.COPY_CONFIGURATION_FAILED", "复制规格或下单控件失败，请重试")
+				return errors.InternalServer("catalog.COPY_CONFIGURATION_FAILED", "複製規格或下單控件失敗，請重試")
 			}
 		}
-		// 直发内容使用新商品 ID 加密，与商品及复制的配置一起提交。
+		// 直髮內容使用新商品 ID 加密，與商品及複製的配置一起提交。
 		if req.GetStockType() != "card" && req.GetDirectContent() != "" {
 			if s.cipher == nil {
-				return errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直发加密不可用")
+				return errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直髮加密不可用")
 			}
 			ciphered, err := s.sealDirect(ctx, req.GetDirectContent(), p.ID)
 			if err != nil {
-				return errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直发内容加密失败")
+				return errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直髮內容加密失敗")
 			}
 			if err := s.repo.SetDirectContent(ctx, p.ID, ciphered); err != nil {
-				return errors.InternalServer("catalog.DIRECT_SAVE_FAILED", "直发内容保存失败")
+				return errors.InternalServer("catalog.DIRECT_SAVE_FAILED", "直髮內容保存失敗")
 			}
 			p.DirectContent = ciphered
 		}
@@ -291,7 +291,7 @@ func (s *AdminCatalogService) CreateProduct(ctx context.Context, req *adminv1.Cr
 		if e := errors.FromError(err); e.Reason != "" {
 			return nil, e
 		}
-		return nil, errors.InternalServer("catalog.CREATE_FAILED", "创建商品失败，请重试")
+		return nil, errors.InternalServer("catalog.CREATE_FAILED", "創建商品失敗，請重試")
 	}
 	return ToAdminPB(p), nil
 }
@@ -299,7 +299,7 @@ func (s *AdminCatalogService) CreateProduct(ctx context.Context, req *adminv1.Cr
 // UpdateProduct 更新商品。
 func (s *AdminCatalogService) UpdateProduct(ctx context.Context, req *adminv1.UpdateProductRequest) (*adminv1.AdminProduct, error) {
 	if req.GetPriceCents() > money.MaxCents || req.GetFactoryPriceCents() > money.MaxCents {
-		return nil, errors.BadRequest("catalog.INVALID_INPUT", "价格与成本不得超出上限")
+		return nil, errors.BadRequest("catalog.INVALID_INPUT", "價格與成本不得超出上限")
 	}
 	in := port.ProductInput{
 		ProductProperty: req.ProductProperty, SalesVisible: req.SalesVisible, TrackInventory: req.TrackInventory,
@@ -325,33 +325,33 @@ func (s *AdminCatalogService) UpdateProduct(ctx context.Context, req *adminv1.Up
 		if data.IsProductLocked(err) {
 			return nil, err
 		}
-		return nil, errors.InternalServer("catalog.GET_FAILED", "读取商品失败")
+		return nil, errors.InternalServer("catalog.GET_FAILED", "讀取商品失敗")
 	}
 	if err := s.repo.validatePhysicalProduct(ctx, old, &in); err != nil {
 		return nil, errors.BadRequest("catalog.INVALID_INPUT", err.Error())
 	}
 	if *in.GoodsType == "physical" && req.GetDirectContent() != "" {
-		return nil, errors.BadRequest("catalog.INVALID_INPUT", "实体商品不能配置虚拟直发内容")
+		return nil, errors.BadRequest("catalog.INVALID_INPUT", "實體商品不能配置虛擬直髮內容")
 	}
 	stockType := in.StockType
 	if stockType == "" {
 		stockType = string(old.StockType)
 	}
 	if stockType != "card" && stockType != "url" && stockType != "code" {
-		return nil, errors.BadRequest("catalog.INVALID_STOCK_TYPE", "请选择有效的发货类型")
+		return nil, errors.BadRequest("catalog.INVALID_STOCK_TYPE", "請選擇有效的發貨類型")
 	}
-	// 切换直发类型时必须重新提供内容，防止旧链接被当作新兑换码发送。
+	// 切換直髮類型時必須重新提供內容，防止舊鏈接被當作新兑換碼發送。
 	if stockType != "card" && stockType != string(old.StockType) && strings.TrimSpace(req.GetDirectContent()) == "" {
-		return nil, errors.BadRequest("catalog.DIRECT_CONTENT_REQUIRED", "切换为链接或兑换码时，请填写对应的直发内容")
+		return nil, errors.BadRequest("catalog.DIRECT_CONTENT_REQUIRED", "切換為鏈接或兑換碼時，請填寫對應的直髮內容")
 	}
-	// 直发内容（url/code）：空=保持不变；非空且商品非卡密类 → 加密更新
+	// 直髮內容（url/code）：空=保持不變；非空且商品非卡密類 → 加密更新
 	if stockType != "card" && req.GetDirectContent() != "" {
 		if s.cipher == nil {
-			return nil, errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直发加密不可用")
+			return nil, errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直髮加密不可用")
 		}
 		ciphered, serr := s.sealDirect(ctx, req.GetDirectContent(), req.GetId())
 		if serr != nil {
-			return nil, errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直发内容加密失败")
+			return nil, errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直髮內容加密失敗")
 		}
 		in.DirectContent = ciphered
 	}
@@ -360,15 +360,15 @@ func (s *AdminCatalogService) UpdateProduct(ctx context.Context, req *adminv1.Up
 		if data.IsProductLocked(err) {
 			return nil, err
 		}
-		return nil, errors.InternalServer("catalog.UPDATE_FAILED", "更新失败")
+		return nil, errors.InternalServer("catalog.UPDATE_FAILED", "更新失敗")
 	}
 	return ToAdminPB(p), nil
 }
 
-// BatchUpdateProductStatus 批量上下架（列表多选）。
+// BatchUpdateProductStatus 批量上下架（列表多選）。
 func (s *AdminCatalogService) BatchUpdateProductStatus(ctx context.Context, req *adminv1.BatchUpdateProductStatusRequest) (*adminv1.BatchUpdateProductStatusReply, error) {
 	if req.Status < 0 || req.Status > 2 {
-		return nil, errors.BadRequest("catalog.STATUS_INVALID", "请选择有效的上下架状态")
+		return nil, errors.BadRequest("catalog.STATUS_INVALID", "請選擇有效的上下架狀態")
 	}
 	n, skipped, err := s.repo.batchStatus(ctx, req.GetIds(), int8(req.GetStatus()))
 	if err != nil {
@@ -377,17 +377,17 @@ func (s *AdminCatalogService) BatchUpdateProductStatus(ctx context.Context, req 
 	return &adminv1.BatchUpdateProductStatusReply{Updated: int32(n), SkippedLocked: skipped}, nil
 }
 
-// ── 分类 ──
+// ── 分類 ──
 
-// ListCategories 分类列表。
+// ListCategories 分類列表。
 func (s *AdminCatalogService) ListCategories(ctx context.Context, _ *emptypb.Empty) (*adminv1.CategoryList, error) {
 	rows, err := s.repo.ListCategories(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("catalog.CATEGORY_LIST_FAILED", "读取分类失败")
+		return nil, errors.InternalServer("catalog.CATEGORY_LIST_FAILED", "讀取分類失敗")
 	}
 	counts, err := s.repo.CategoryProductCounts(ctx, rows)
 	if err != nil {
-		return nil, errors.InternalServer("catalog.CATEGORY_LIST_FAILED", "读取分类商品数量失败")
+		return nil, errors.InternalServer("catalog.CATEGORY_LIST_FAILED", "讀取分類商品數量失敗")
 	}
 	reply := &adminv1.CategoryList{}
 	for _, c := range rows {
@@ -398,16 +398,16 @@ func (s *AdminCatalogService) ListCategories(ctx context.Context, _ *emptypb.Emp
 	return reply, nil
 }
 
-// CreateCategory 创建分类。
+// CreateCategory 創建分類。
 func (s *AdminCatalogService) CreateCategory(ctx context.Context, req *adminv1.CreateCategoryRequest) (*adminv1.Category, error) {
 	c, err := s.repo.CreateCategory(ctx, req.GetName(), req.GetParentId(), req.GetIcon(), req.GetSort())
 	if err != nil {
-		return nil, errors.BadRequest("catalog.CATEGORY_CREATE_FAILED", "创建失败（可能存在环）")
+		return nil, errors.BadRequest("catalog.CATEGORY_CREATE_FAILED", "創建失敗（可能存在環）")
 	}
 	return toCategoryPB(c), nil
 }
 
-// UpdateCategory 更新分类。
+// UpdateCategory 更新分類。
 func (s *AdminCatalogService) UpdateCategory(ctx context.Context, req *adminv1.UpdateCategoryRequest) (*adminv1.Category, error) {
 	c, err := s.repo.UpdateCategory(ctx, req.GetId(), req.GetName(), req.Icon, req.Hide, req.Sort, req.ParentId)
 	if err != nil {
@@ -415,50 +415,50 @@ func (s *AdminCatalogService) UpdateCategory(ctx context.Context, req *adminv1.U
 			return nil, err
 		}
 		if strings.Contains(err.Error(), "CATEGORY_CYCLE") {
-			return nil, errors.BadRequest("catalog.CATEGORY_CYCLE", "不能把分类移到自身或它的子分类下")
+			return nil, errors.BadRequest("catalog.CATEGORY_CYCLE", "不能把分類移到自身或它的子分類下")
 		}
 		if strings.Contains(err.Error(), "CATEGORY_CANNOT_PARENT_SELF") {
-			return nil, errors.BadRequest("catalog.CATEGORY_CANNOT_PARENT_SELF", "分类不能设为自身的子级")
+			return nil, errors.BadRequest("catalog.CATEGORY_CANNOT_PARENT_SELF", "分類不能設為自身的子級")
 		}
-		return nil, errors.InternalServer("catalog.CATEGORY_UPDATE_FAILED", "更新失败")
+		return nil, errors.InternalServer("catalog.CATEGORY_UPDATE_FAILED", "更新失敗")
 	}
 	return toCategoryPB(c), nil
 }
 
-// ReorderCategories 分类排序（拖拽重排：某层级兄弟按 ids 顺序归一化 sort）。
+// ReorderCategories 分類排序（拖拽重排：某層級兄弟按 ids 順序歸一化 sort）。
 func (s *AdminCatalogService) ReorderCategories(ctx context.Context, req *adminv1.ReorderCategoriesRequest) (*emptypb.Empty, error) {
 	if err := s.repo.ReorderCategories(ctx, req.GetParentId(), req.GetIds()); err != nil {
 		if data.IsProductLocked(err) {
 			return nil, err
 		}
 		if strings.Contains(err.Error(), "CATEGORY_CYCLE") {
-			return nil, errors.BadRequest("catalog.CATEGORY_CYCLE", "不能把分类移到自身或它的子分类下")
+			return nil, errors.BadRequest("catalog.CATEGORY_CYCLE", "不能把分類移到自身或它的子分類下")
 		}
-		return nil, errors.InternalServer("catalog.CATEGORY_REORDER_FAILED", "排序失败")
+		return nil, errors.InternalServer("catalog.CATEGORY_REORDER_FAILED", "排序失敗")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// DeleteCategory 删除分类。
+// DeleteCategory 刪除分類。
 func (s *AdminCatalogService) DeleteCategory(ctx context.Context, req *adminv1.DeleteCategoryRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteCategory(ctx, req.GetId()); err != nil {
 		switch err.Error() {
 		case "catalog.CATEGORY_NOT_FOUND":
-			return nil, errors.NotFound("catalog.CATEGORY_NOT_FOUND", "分类不存在或已删除")
+			return nil, errors.NotFound("catalog.CATEGORY_NOT_FOUND", "分類不存在或已刪除")
 		default:
-			return nil, errors.InternalServer("catalog.CATEGORY_DELETE_FAILED", "删除分类失败，请稍后重试")
+			return nil, errors.InternalServer("catalog.CATEGORY_DELETE_FAILED", "刪除分類失敗，請稍後重試")
 		}
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// ── 标签 ──
+// ── 標籤 ──
 
-// ListTags 标签列表。
+// ListTags 標籤列表。
 func (s *AdminCatalogService) ListTags(ctx context.Context, _ *emptypb.Empty) (*adminv1.TagList, error) {
 	rows, err := s.repo.ListTags(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("catalog.TAG_LIST_FAILED", "读取标签失败")
+		return nil, errors.InternalServer("catalog.TAG_LIST_FAILED", "讀取標籤失敗")
 	}
 	reply := &adminv1.TagList{}
 	for _, t := range rows {
@@ -470,30 +470,30 @@ func (s *AdminCatalogService) ListTags(ctx context.Context, _ *emptypb.Empty) (*
 	return reply, nil
 }
 
-// CreateTag 创建标签。
+// CreateTag 創建標籤。
 func (s *AdminCatalogService) CreateTag(ctx context.Context, req *adminv1.CreateTagRequest) (*adminv1.Tag, error) {
 	t, err := s.repo.CreateTag(ctx, req.GetName(), req.GetSlug(), req.GetIcon(), req.GetColor(), req.GetPosition())
 	if err != nil {
-		return nil, errors.InternalServer("catalog.TAG_CREATE_FAILED", "创建失败（slug 可能重复）")
+		return nil, errors.InternalServer("catalog.TAG_CREATE_FAILED", "創建失敗（slug 可能重複）")
 	}
 	return &adminv1.Tag{Id: t.ID, Name: t.Name, Slug: t.Slug}, nil
 }
 
-// DeleteTag 删除标签。
+// DeleteTag 刪除標籤。
 func (s *AdminCatalogService) DeleteTag(ctx context.Context, req *adminv1.DeleteTagRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteTag(ctx, req.GetId()); err != nil {
-		return nil, errors.NotFound("catalog.TAG_NOT_FOUND", "标签不存在")
+		return nil, errors.NotFound("catalog.TAG_NOT_FOUND", "標籤不存在")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// ── 自定义控件 ──
+// ── 自定義控件 ──
 
 // ListControls 控件列表。
 func (s *AdminCatalogService) ListControls(ctx context.Context, req *adminv1.ListControlsRequest) (*adminv1.ControlList, error) {
 	rows, err := s.repo.ListProductControls(ctx, req.GetProductId())
 	if err != nil {
-		return nil, errors.InternalServer("catalog.CONTROL_LIST_FAILED", "读取控件失败")
+		return nil, errors.InternalServer("catalog.CONTROL_LIST_FAILED", "讀取控件失敗")
 	}
 	reply := &adminv1.ControlList{}
 	for _, c := range rows {
@@ -502,17 +502,17 @@ func (s *AdminCatalogService) ListControls(ctx context.Context, req *adminv1.Lis
 	return reply, nil
 }
 
-// CreateControl 创建控件。
+// CreateControl 創建控件。
 func (s *AdminCatalogService) CreateControl(ctx context.Context, req *adminv1.CreateControlRequest) (*adminv1.AdminControl, error) {
 	if req.GetProductId() == 0 || req.GetName() == "" || req.GetType() == "" {
-		return nil, errors.BadRequest("catalog.CONTROL_INVALID", "商品/名称/类型必填")
+		return nil, errors.BadRequest("catalog.CONTROL_INVALID", "商品/名稱/類型必填")
 	}
 	c, err := s.repo.CreateProductControl(ctx, req.GetProductId(), 0, req.GetName(), req.GetType(), req.GetRequired(), req.GetOptions(), req.GetSort(), ControlSettings{Placeholder: req.GetPlaceholder(), Validation: req.GetValidation(), MaxLength: req.MaxLength})
 	if err != nil {
 		if data.IsProductLocked(err) {
 			return nil, err
 		}
-		return nil, errors.InternalServer("catalog.CONTROL_CREATE_FAILED", "创建失败")
+		return nil, errors.InternalServer("catalog.CONTROL_CREATE_FAILED", "創建失敗")
 	}
 	return toControlPB(c), nil
 }
@@ -529,7 +529,7 @@ func (s *AdminCatalogService) UpdateControl(ctx context.Context, req *adminv1.Up
 	return toControlPB(c), nil
 }
 
-// DeleteControl 删除控件。
+// DeleteControl 刪除控件。
 func (s *AdminCatalogService) DeleteControl(ctx context.Context, req *adminv1.DeleteControlRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteProductControl(ctx, req.GetId()); err != nil {
 		if data.IsProductLocked(err) {
@@ -540,13 +540,13 @@ func (s *AdminCatalogService) DeleteControl(ctx context.Context, req *adminv1.De
 	return &emptypb.Empty{}, nil
 }
 
-// ── 评价 ──
+// ── 評價 ──
 
-// ListReviews 评价列表。
+// ListReviews 評價列表。
 func (s *AdminCatalogService) ListReviews(ctx context.Context, req *adminv1.ListReviewsRequest) (*adminv1.ListReviewsReply, error) {
 	rows, total, err := s.repo.ListReviews(ctx, req.GetStatus(), req.GetPage(), req.GetPageSize())
 	if err != nil {
-		return nil, errors.InternalServer("catalog.REVIEW_LIST_FAILED", "读取评价失败")
+		return nil, errors.InternalServer("catalog.REVIEW_LIST_FAILED", "讀取評價失敗")
 	}
 	reply := &adminv1.ListReviewsReply{Total: total}
 	for _, v := range rows {
@@ -555,34 +555,34 @@ func (s *AdminCatalogService) ListReviews(ctx context.Context, req *adminv1.List
 	return reply, nil
 }
 
-// ApproveReview 审核通过。
+// ApproveReview 審核通過。
 func (s *AdminCatalogService) ApproveReview(ctx context.Context, req *adminv1.ApproveReviewRequest) (*adminv1.ReviewItem, error) {
 	v, err := s.repo.ApproveReview(ctx, req.GetId())
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("catalog.REVIEW_NOT_FOUND", "评价不存在")
+		return nil, errors.NotFound("catalog.REVIEW_NOT_FOUND", "評價不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("catalog.REVIEW_APPROVE_FAILED", "审核失败")
+		return nil, errors.InternalServer("catalog.REVIEW_APPROVE_FAILED", "審核失敗")
 	}
 	return toReviewPB(v), nil
 }
 
-// RejectReview 审核拒绝。
+// RejectReview 審核拒絕。
 func (s *AdminCatalogService) RejectReview(ctx context.Context, req *adminv1.RejectReviewRequest) (*adminv1.ReviewItem, error) {
 	v, err := s.repo.RejectReview(ctx, req.GetId())
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("catalog.REVIEW_NOT_FOUND", "评价不存在")
+		return nil, errors.NotFound("catalog.REVIEW_NOT_FOUND", "評價不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("catalog.REVIEW_REJECT_FAILED", "审核失败")
+		return nil, errors.InternalServer("catalog.REVIEW_REJECT_FAILED", "審核失敗")
 	}
 	return toReviewPB(v), nil
 }
 
-// CreateVirtualReview 创建虚拟评价（content sanitize）。
+// CreateVirtualReview 創建虛擬評價（content sanitize）。
 func (s *AdminCatalogService) CreateVirtualReview(ctx context.Context, req *adminv1.CreateVirtualReviewRequest) (*adminv1.VirtualReviewItem, error) {
 	if req.GetProductId() == 0 || req.GetContent() == "" {
-		return nil, errors.BadRequest("catalog.VIRTUAL_REVIEW_INVALID", "商品 ID 与内容必填")
+		return nil, errors.BadRequest("catalog.VIRTUAL_REVIEW_INVALID", "商品 ID 與內容必填")
 	}
 	v, err := s.repo.CreateVirtualReview(ctx, req.GetProductId(),
 		sanitize.Text(req.GetNickname()), sanitize.HTML(req.GetContent()),
@@ -591,7 +591,7 @@ func (s *AdminCatalogService) CreateVirtualReview(ctx context.Context, req *admi
 		if data.IsProductLocked(err) {
 			return nil, err
 		}
-		return nil, errors.InternalServer("catalog.VIRTUAL_REVIEW_CREATE_FAILED", "创建失败")
+		return nil, errors.InternalServer("catalog.VIRTUAL_REVIEW_CREATE_FAILED", "創建失敗")
 	}
 	return toVirtualReviewPB(v), nil
 }
@@ -602,7 +602,7 @@ func (s *AdminCatalogService) CreateVirtualReview(ctx context.Context, req *admi
 func (s *AdminCatalogService) ListSkus(ctx context.Context, req *adminv1.ListSkusRequest) (*adminv1.SkuList, error) {
 	rows, err := s.repo.ListProductSkus(ctx, req.GetProductId())
 	if err != nil {
-		return nil, errors.InternalServer("catalog.SKU_LIST_FAILED", "读取 SKU 失败")
+		return nil, errors.InternalServer("catalog.SKU_LIST_FAILED", "讀取 SKU 失敗")
 	}
 	reply := &adminv1.SkuList{}
 	for _, sku := range rows {
@@ -611,10 +611,10 @@ func (s *AdminCatalogService) ListSkus(ctx context.Context, req *adminv1.ListSku
 	return reply, nil
 }
 
-// CreateSku 创建 SKU。
+// CreateSku 創建 SKU。
 func (s *AdminCatalogService) CreateSku(ctx context.Context, req *adminv1.CreateSkuRequest) (*adminv1.Sku, error) {
 	if req.GetProductId() == 0 || req.GetName() == "" {
-		return nil, errors.BadRequest("catalog.SKU_INVALID", "商品 ID 与规格名必填")
+		return nil, errors.BadRequest("catalog.SKU_INVALID", "商品 ID 與規格名必填")
 	}
 	sku, err := s.repo.CreateSku(ctx, SkuInput{
 		PhysicalStock: req.PhysicalStock, ProductID: req.GetProductId(), Name: req.GetName(), SpecValues: req.GetSpecValues(),
@@ -626,9 +626,9 @@ func (s *AdminCatalogService) CreateSku(ctx context.Context, req *adminv1.Create
 			return nil, e
 		}
 		if ent.IsValidationError(err) {
-			return nil, errors.BadRequest("catalog.SKU_INVALID", "规格名称或设置无效")
+			return nil, errors.BadRequest("catalog.SKU_INVALID", "規格名稱或設置無效")
 		}
-		return nil, errors.InternalServer("catalog.SKU_CREATE_FAILED", "创建规格失败，请重试")
+		return nil, errors.InternalServer("catalog.SKU_CREATE_FAILED", "創建規格失敗，請重試")
 	}
 	return toSkuPB(sku), nil
 }
@@ -648,12 +648,12 @@ func (s *AdminCatalogService) UpdateSku(ctx context.Context, req *adminv1.Update
 		if e := errors.FromError(err); e.Code < 500 {
 			return nil, e
 		}
-		return nil, errors.InternalServer("catalog.SKU_UPDATE_FAILED", "更新失败")
+		return nil, errors.InternalServer("catalog.SKU_UPDATE_FAILED", "更新失敗")
 	}
 	return toSkuPB(sku), nil
 }
 
-// DeleteSku 删除 SKU。
+// DeleteSku 刪除 SKU。
 func (s *AdminCatalogService) DeleteSku(ctx context.Context, req *adminv1.DeleteSkuRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteSku(ctx, req.GetId()); err != nil {
 		if data.IsProductLocked(err) {
@@ -664,13 +664,13 @@ func (s *AdminCatalogService) DeleteSku(ctx context.Context, req *adminv1.Delete
 	return &emptypb.Empty{}, nil
 }
 
-// ── 会员商品组 ──
+// ── 會員商品組 ──
 
-// ListMemberGroups 商品组列表。
+// ListMemberGroups 商品組列表。
 func (s *AdminCatalogService) ListMemberGroups(ctx context.Context, _ *emptypb.Empty) (*adminv1.MemberGroupList, error) {
 	rows, err := s.repo.ListMemberGroups(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("catalog.GROUP_LIST_FAILED", "读取商品组失败")
+		return nil, errors.InternalServer("catalog.GROUP_LIST_FAILED", "讀取商品組失敗")
 	}
 	reply := &adminv1.MemberGroupList{}
 	for _, g := range rows {
@@ -679,10 +679,10 @@ func (s *AdminCatalogService) ListMemberGroups(ctx context.Context, _ *emptypb.E
 	return reply, nil
 }
 
-// CreateMemberGroup 创建商品组。
+// CreateMemberGroup 創建商品組。
 func (s *AdminCatalogService) CreateMemberGroup(ctx context.Context, req *adminv1.CreateMemberGroupRequest) (*adminv1.MemberGroup, error) {
 	if req.GetName() == "" || req.GetDiscount() <= 0 || req.GetDiscount() >= 10000 {
-		return nil, errors.BadRequest("catalog.GROUP_INVALID", "名称必填，折扣需在 (0,10000) 万分比区间")
+		return nil, errors.BadRequest("catalog.GROUP_INVALID", "名稱必填，折扣需在 (0,10000) 萬分比區間")
 	}
 	g, err := s.repo.CreateMemberGroup(ctx, GroupInput{
 		Name: req.GetName(), ProductIDs: req.GetProductIds(), Discount: req.GetDiscount(),
@@ -690,12 +690,12 @@ func (s *AdminCatalogService) CreateMemberGroup(ctx context.Context, req *adminv
 		BadgeStyle: req.GetBadgeStyle(),
 	})
 	if err != nil {
-		return nil, errors.InternalServer("catalog.GROUP_CREATE_FAILED", "创建失败")
+		return nil, errors.InternalServer("catalog.GROUP_CREATE_FAILED", "創建失敗")
 	}
 	return toMemberGroupPB(g), nil
 }
 
-// UpdateMemberGroup 更新商品组。
+// UpdateMemberGroup 更新商品組。
 func (s *AdminCatalogService) UpdateMemberGroup(ctx context.Context, req *adminv1.UpdateMemberGroupRequest) (*adminv1.MemberGroup, error) {
 	g, err := s.repo.UpdateMemberGroup(ctx, req.GetId(), GroupInput{
 		Name: req.GetName(), ProductIDs: req.GetProductIds(), Discount: req.GetDiscount(),
@@ -703,23 +703,23 @@ func (s *AdminCatalogService) UpdateMemberGroup(ctx context.Context, req *adminv
 		BadgeStyle: req.GetBadgeStyle(),
 	})
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("catalog.GROUP_NOT_FOUND", "商品组不存在")
+		return nil, errors.NotFound("catalog.GROUP_NOT_FOUND", "商品組不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("catalog.GROUP_UPDATE_FAILED", "更新失败")
+		return nil, errors.InternalServer("catalog.GROUP_UPDATE_FAILED", "更新失敗")
 	}
 	return toMemberGroupPB(g), nil
 }
 
-// DeleteMemberGroup 删除商品组。
+// DeleteMemberGroup 刪除商品組。
 func (s *AdminCatalogService) DeleteMemberGroup(ctx context.Context, req *adminv1.DeleteMemberGroupRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteMemberGroup(ctx, req.GetId()); err != nil {
-		return nil, errors.NotFound("catalog.GROUP_NOT_FOUND", "商品组不存在")
+		return nil, errors.NotFound("catalog.GROUP_NOT_FOUND", "商品組不存在")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// ── 转换 ──
+// ── 轉換 ──
 
 func toMemberGroupPB(g *ent.MemberProductGroup) *adminv1.MemberGroup {
 	return &adminv1.MemberGroup{

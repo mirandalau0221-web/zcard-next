@@ -10,7 +10,7 @@ paths:
         post:
             tags:
                 - SupplyService
-            description: ListCategories 商品分类（下游建目录）。
+            description: ListCategories 商品分類（下游建目錄）。
             operationId: SupplyService_ListCategories
             responses:
                 "200":
@@ -23,7 +23,7 @@ paths:
         get:
             tags:
                 - SupplyService
-            description: ListOrders 时间窗内订单列表（对账数据源；按创建时间过滤）。
+            description: ListOrders 時間窗內訂單列表（對賬數據源；按創建時間過濾）。
             operationId: SupplyService_ListOrders
             parameters:
                 - name: start
@@ -45,8 +45,8 @@ paths:
             tags:
                 - SupplyService
             description: |-
-                CreateOrder 下游下单（downstream_order_no 幂等；复用本地锁卡防超卖；
-                 同步交付：响应 fulfillment.delivered + cards）。
+                CreateOrder 下游下單（downstream_order_no 冪等；複用本地鎖卡防超賣；
+                 同步交付：響應 fulfillment.delivered + cards）。
             operationId: SupplyService_CreateOrder
             requestBody:
                 content:
@@ -65,7 +65,7 @@ paths:
         get:
             tags:
                 - SupplyService
-            description: GetOrder 订单查询（轮询/巡检兜底）。
+            description: GetOrder 訂單查詢（輪詢/巡檢兜底）。
             operationId: SupplyService_GetOrder
             parameters:
                 - name: id
@@ -84,7 +84,7 @@ paths:
         post:
             tags:
                 - SupplyService
-            description: CancelOrder 取消（未交付订单释放锁卡）。
+            description: CancelOrder 取消（未交付訂單釋放鎖卡）。
             operationId: SupplyService_CancelOrder
             parameters:
                 - name: id
@@ -103,7 +103,7 @@ paths:
         post:
             tags:
                 - SupplyService
-            description: RefundOrder 退款（已交付转人工；未交付释放）。
+            description: RefundOrder 退款（已交付轉人工；未交付釋放）。
             operationId: SupplyService_RefundOrder
             parameters:
                 - name: id
@@ -122,7 +122,7 @@ paths:
         get:
             tags:
                 - SupplyService
-            description: Ping 连通性与协议版本探测（免签名）。
+            description: Ping 連通性與協議版本探測（免簽名）。
             operationId: SupplyService_Ping
             responses:
                 "200":
@@ -135,7 +135,7 @@ paths:
         get:
             tags:
                 - SupplyService
-            description: ListProducts 商品列表（分页；include_inactive 回声字段防旧版误判）。
+            description: ListProducts 商品列表（分頁；include_inactive 回聲字段防舊版誤判）。
             operationId: SupplyService_ListProducts
             parameters:
                 - name: page
@@ -163,7 +163,7 @@ paths:
         get:
             tags:
                 - SupplyService
-            description: GetProduct 商品详情。
+            description: GetProduct 商品詳情。
             operationId: SupplyService_GetProduct
             parameters:
                 - name: id
@@ -182,7 +182,7 @@ paths:
         get:
             tags:
                 - SupplyService
-            description: GetStock 实时库存（-1=无限）。
+            description: GetStock 實時庫存（-1=無限）。
             operationId: SupplyService_GetStock
             parameters:
                 - name: id
@@ -201,7 +201,7 @@ paths:
         get:
             tags:
                 - AdminUserService
-            description: ListAdmins 员工列表。
+            description: ListAdmins 員工列表。
             operationId: AdminUserService_ListAdmins
             responses:
                 "200":
@@ -213,7 +213,7 @@ paths:
         post:
             tags:
                 - AdminUserService
-            description: CreateAdmin 创建员工（密码 bcrypt）。
+            description: CreateAdmin 創建員工（密碼 bcrypt）。
             operationId: AdminUserService_CreateAdmin
             requestBody:
                 content:
@@ -232,7 +232,7 @@ paths:
         put:
             tags:
                 - AdminUserService
-            description: UpdateAdmin 修改员工（昵称/头像/角色）。
+            description: UpdateAdmin 修改員工（暱稱/頭像/角色）。
             operationId: AdminUserService_UpdateAdmin
             parameters:
                 - name: id
@@ -256,7 +256,7 @@ paths:
         delete:
             tags:
                 - AdminUserService
-            description: DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话一并清除）。
+            description: DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話一併清除）。
             operationId: AdminUserService_DeleteAdmin
             parameters:
                 - name: id
@@ -272,7 +272,7 @@ paths:
         put:
             tags:
                 - AdminUserService
-            description: ResetAdminPassword 重置员工密码（≥8 位 bcrypt；吊销其全部管理面会话强制重登）。
+            description: ResetAdminPassword 重置員工密碼（≥8 位 bcrypt；吊銷其全部管理面會話強制重登）。
             operationId: AdminUserService_ResetAdminPassword
             parameters:
                 - name: id
@@ -297,7 +297,7 @@ paths:
         put:
             tags:
                 - AdminUserService
-            description: ToggleAdmin 启用/禁用员工。
+            description: ToggleAdmin 啓用/禁用員工。
             operationId: AdminUserService_ToggleAdmin
             parameters:
                 - name: id
@@ -322,7 +322,7 @@ paths:
         put:
             tags:
                 - AdminUserService
-            description: ResetAdminTOTP 解绑员工 TOTP（吊销其全部管理面会话强制重登）。
+            description: ResetAdminTOTP 解綁員工 TOTP（吊銷其全部管理面會話強制重登）。
             operationId: AdminUserService_ResetAdminTOTP
             parameters:
                 - name: id
@@ -375,7 +375,7 @@ paths:
         get:
             tags:
                 - AdminAuditService
-            description: GetBlacklist IP 黑名单。
+            description: GetBlacklist IP 黑名單。
             operationId: AdminAuditService_GetBlacklist
             responses:
                 "200":
@@ -387,7 +387,7 @@ paths:
         put:
             tags:
                 - AdminAuditService
-            description: SetBlacklist 设置黑名单（精确 IP 或 CIDR 段，逗号分隔）。
+            description: SetBlacklist 設置黑名單（精確 IP 或 CIDR 段，逗號分隔）。
             operationId: AdminAuditService_SetBlacklist
             requestBody:
                 content:
@@ -403,7 +403,7 @@ paths:
         get:
             tags:
                 - AdminAuditService
-            description: ListOpLogs 操作审计。
+            description: ListOpLogs 操作審計。
             operationId: AdminAuditService_ListOpLogs
             parameters:
                 - name: operatorId
@@ -431,7 +431,7 @@ paths:
         get:
             tags:
                 - AdminAuditService
-            description: ListSecurityLogs 安全审计。
+            description: ListSecurityLogs 安全審計。
             operationId: AdminAuditService_ListSecurityLogs
             parameters:
                 - name: action
@@ -459,7 +459,7 @@ paths:
         get:
             tags:
                 - AdminAuditService
-            description: ListVisitStats 访问统计。
+            description: ListVisitStats 訪問統計。
             operationId: AdminAuditService_ListVisitStats
             parameters:
                 - name: statDate
@@ -487,7 +487,7 @@ paths:
         get:
             tags:
                 - AdminAuthService
-            description: GetCaptchaConfig 登录验证码开关（免鉴权；登录页据此条件渲染验证码区）。
+            description: GetCaptchaConfig 登錄驗證碼開關（免鑑權；登錄頁據此條件渲染驗證碼區）。
             operationId: AdminAuthService_GetCaptchaConfig
             responses:
                 "200":
@@ -500,7 +500,7 @@ paths:
         get:
             tags:
                 - AdminAuthService
-            description: GetCaptchaImage 登录图形验证码（免鉴权；captcha_admin_login 开启时登录页使用）。
+            description: GetCaptchaImage 登錄圖形驗證碼（免鑑權；captcha_admin_login 開啓時登錄頁使用）。
             operationId: AdminAuthService_GetCaptchaImage
             responses:
                 "200":
@@ -513,7 +513,7 @@ paths:
         post:
             tags:
                 - AdminAuthService
-            description: Login 管理员登录。密码 bcrypt 校验；TOTP 校验；captcha_admin_login 开启时图形验证码必填。
+            description: Login 管理員登錄。密碼 bcrypt 校驗；TOTP 校驗；captcha_admin_login 開啓時圖形驗證碼必填。
             operationId: AdminAuthService_Login
             requestBody:
                 content:
@@ -532,7 +532,7 @@ paths:
         post:
             tags:
                 - AdminAuthService
-            description: Logout 登出（JWT 无状态，前端弃用令牌即可；接入 refresh 轮换后落 sessions）。
+            description: Logout 登出（JWT 無狀態，前端棄用令牌即可；接入 refresh 輪換後落 sessions）。
             operationId: AdminAuthService_Logout
             requestBody:
                 content:
@@ -548,7 +548,7 @@ paths:
         post:
             tags:
                 - AdminAuthService
-            description: ChangePassword 修改当前账号密码，并使全部旧会话失效。
+            description: ChangePassword 修改當前賬號密碼，並使全部舊會話失效。
             operationId: AdminAuthService_ChangePassword
             requestBody:
                 content:
@@ -564,7 +564,7 @@ paths:
         get:
             tags:
                 - AdminAuthService
-            description: GetProfile 当前管理员信息与权限点清单（前端动态路由数据源，规划)。
+            description: GetProfile 當前管理員信息與權限點清單（前端動態路由數據源，規劃)。
             operationId: AdminAuthService_GetProfile
             responses:
                 "200":
@@ -577,7 +577,7 @@ paths:
         post:
             tags:
                 - AdminAuthService
-            description: RefreshToken 用 refresh token 换新令牌对（一次性轮换）。
+            description: RefreshToken 用 refresh token 換新令牌對（一次性輪換）。
             operationId: AdminAuthService_RefreshToken
             requestBody:
                 content:
@@ -609,7 +609,7 @@ paths:
         post:
             tags:
                 - AdminAuthService
-            description: ConfirmTOTP 验证一次确认绑定。
+            description: ConfirmTOTP 驗證一次確認綁定。
             operationId: AdminAuthService_ConfirmTOTP
             requestBody:
                 content:
@@ -628,7 +628,7 @@ paths:
         post:
             tags:
                 - AdminAuthService
-            description: DisableTOTP 解绑。
+            description: DisableTOTP 解綁。
             operationId: AdminAuthService_DisableTOTP
             requestBody:
                 content:
@@ -644,7 +644,7 @@ paths:
         post:
             tags:
                 - AdminAuthService
-            description: EnableTOTP 生成 TOTP 密钥（返回 otpauth URL 供二维码）。
+            description: EnableTOTP 生成 TOTP 密鑰（返回 otpauth URL 供二維碼）。
             operationId: AdminAuthService_EnableTOTP
             requestBody:
                 content:
@@ -678,7 +678,7 @@ paths:
         get:
             tags:
                 - RoleService
-            description: GetPermissionTree 权限目录树（域分组 + 中文描述；前端勾选与菜单数据源）。
+            description: GetPermissionTree 權限目錄樹（域分組 + 中文描述；前端勾選與菜單數據源）。
             operationId: RoleService_GetPermissionTree
             responses:
                 "200":
@@ -691,7 +691,7 @@ paths:
         get:
             tags:
                 - RoleService
-            description: ListRoles 角色列表（含权限点数量）。
+            description: ListRoles 角色列表（含權限點數量）。
             operationId: RoleService_ListRoles
             responses:
                 "200":
@@ -703,7 +703,7 @@ paths:
         post:
             tags:
                 - RoleService
-            description: CreateRole 创建角色。
+            description: CreateRole 創建角色。
             operationId: RoleService_CreateRole
             requestBody:
                 content:
@@ -722,7 +722,7 @@ paths:
         get:
             tags:
                 - RoleService
-            description: GetRole 角色详情（含权限点清单）。
+            description: GetRole 角色詳情（含權限點清單）。
             operationId: RoleService_GetRole
             parameters:
                 - name: id
@@ -740,7 +740,7 @@ paths:
         put:
             tags:
                 - RoleService
-            description: UpdateRole 修改角色（名称/描述；内置角色 code 不可改）。
+            description: UpdateRole 修改角色（名稱/描述；內置角色 code 不可改）。
             operationId: RoleService_UpdateRole
             parameters:
                 - name: id
@@ -764,7 +764,7 @@ paths:
         delete:
             tags:
                 - RoleService
-            description: DeleteRole 删除角色（内置角色拒绝；仍有员工挂载拒绝）。
+            description: DeleteRole 刪除角色（內置角色拒絕；仍有員工掛載拒絕）。
             operationId: RoleService_DeleteRole
             parameters:
                 - name: id
@@ -780,7 +780,7 @@ paths:
         put:
             tags:
                 - RoleService
-            description: UpdateRolePermissions 全量替换角色权限点集（变更实时生效）。
+            description: UpdateRolePermissions 全量替換角色權限點集（變更實時生效）。
             operationId: RoleService_UpdateRolePermissions
             parameters:
                 - name: id
@@ -805,7 +805,7 @@ paths:
         get:
             tags:
                 - AdminCatalogService
-            description: ── 分类 ──
+            description: ── 分類 ──
             operationId: AdminCatalogService_ListCategories
             responses:
                 "200":
@@ -853,7 +853,7 @@ paths:
         post:
             tags:
                 - AdminCatalogService
-            description: ReorderCategories 分类排序（拖拽重排：把某层级全部兄弟按 ids 顺序重排并归一化 sort）。
+            description: ReorderCategories 分類排序（拖拽重排：把某層級全部兄弟按 ids 順序重排並歸一化 sort）。
             operationId: AdminCatalogService_ReorderCategories
             requestBody:
                 content:
@@ -948,7 +948,7 @@ paths:
         get:
             tags:
                 - AdminContentService
-            description: ListBanners 横幅列表（全量含停用）。
+            description: ListBanners 橫幅列表（全量含停用）。
             operationId: AdminContentService_ListBanners
             parameters:
                 - name: position
@@ -975,7 +975,7 @@ paths:
         post:
             tags:
                 - AdminContentService
-            description: CreateBanner 创建横幅（时间窗/跳转类型）。
+            description: CreateBanner 創建橫幅（時間窗/跳轉類型）。
             operationId: AdminContentService_CreateBanner
             requestBody:
                 content:
@@ -994,7 +994,7 @@ paths:
         put:
             tags:
                 - AdminContentService
-            description: UpdateBanner 更新横幅。
+            description: UpdateBanner 更新橫幅。
             operationId: AdminContentService_UpdateBanner
             parameters:
                 - name: id
@@ -1018,7 +1018,7 @@ paths:
         delete:
             tags:
                 - AdminContentService
-            description: DeleteBanner 删除横幅。
+            description: DeleteBanner 刪除橫幅。
             operationId: AdminContentService_DeleteBanner
             parameters:
                 - name: id
@@ -1034,7 +1034,7 @@ paths:
         get:
             tags:
                 - AdminContentService
-            description: ListCategories 分类列表。
+            description: ListCategories 分類列表。
             operationId: AdminContentService_ListCategories
             responses:
                 "200":
@@ -1046,7 +1046,7 @@ paths:
         post:
             tags:
                 - AdminContentService
-            description: CreateCategory 创建文章分类。
+            description: CreateCategory 創建文章分類。
             operationId: AdminContentService_CreateCategory
             requestBody:
                 content:
@@ -1065,7 +1065,7 @@ paths:
         put:
             tags:
                 - AdminContentService
-            description: UpdateCategory 更新分类。
+            description: UpdateCategory 更新分類。
             operationId: AdminContentService_UpdateCategory
             parameters:
                 - name: id
@@ -1089,7 +1089,7 @@ paths:
         delete:
             tags:
                 - AdminContentService
-            description: DeleteCategory 删除分类（存在文章时拒绝）。
+            description: DeleteCategory 刪除分類（存在文章時拒絕）。
             operationId: AdminContentService_DeleteCategory
             parameters:
                 - name: id
@@ -1132,7 +1132,7 @@ paths:
         post:
             tags:
                 - AdminContentService
-            description: CreatePost 创建文章（草稿/发布）。
+            description: CreatePost 創建文章（草稿/發佈）。
             operationId: AdminContentService_CreatePost
             requestBody:
                 content:
@@ -1175,7 +1175,7 @@ paths:
         delete:
             tags:
                 - AdminContentService
-            description: DeletePost 删除文章。
+            description: DeletePost 刪除文章。
             operationId: AdminContentService_DeletePost
             parameters:
                 - name: id
@@ -1191,7 +1191,7 @@ paths:
         post:
             tags:
                 - AdminContentService
-            description: PublishPost 发布/取消发布（首发回填 published_at）。
+            description: PublishPost 發佈/取消發佈（首發回填 published_at）。
             operationId: AdminContentService_PublishPost
             parameters:
                 - name: id
@@ -1303,7 +1303,7 @@ paths:
         post:
             tags:
                 - AdminCouponService
-            description: DeleteCoupons 批量删除券（仅未使用；可按 id 列表或整批未使用）。
+            description: DeleteCoupons 批量刪除券（僅未使用；可按 id 列表或整批未使用）。
             operationId: AdminCouponService_DeleteCoupons
             requestBody:
                 content:
@@ -1337,7 +1337,7 @@ paths:
         get:
             tags:
                 - AdminCouponService
-            description: ExportCoupons 导出券码 CSV（按状态/批次，含表头）。
+            description: ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
             operationId: AdminCouponService_ExportCoupons
             parameters:
                 - name: status
@@ -1359,7 +1359,7 @@ paths:
         post:
             tags:
                 - AdminCouponService
-            description: GrantCoupon 批次赠送指定用户。
+            description: GrantCoupon 批次贈送指定用户。
             operationId: AdminCouponService_GrantCoupon
             requestBody:
                 content:
@@ -1378,7 +1378,7 @@ paths:
         get:
             tags:
                 - AdminCurrencyService
-            description: ListCurrencies 全部货币（含停用）。
+            description: ListCurrencies 全部貨幣（含停用）。
             operationId: AdminCurrencyService_ListCurrencies
             responses:
                 "200":
@@ -1390,7 +1390,7 @@ paths:
         post:
             tags:
                 - AdminCurrencyService
-            description: CreateCurrency 新增货币（code 唯一）。
+            description: CreateCurrency 新增貨幣（code 唯一）。
             operationId: AdminCurrencyService_CreateCurrency
             requestBody:
                 content:
@@ -1409,7 +1409,7 @@ paths:
         put:
             tags:
                 - AdminCurrencyService
-            description: UpdateCurrency 修改货币（rate/precision/symbol/启停）。
+            description: UpdateCurrency 修改貨幣（rate/precision/symbol/啓停）。
             operationId: AdminCurrencyService_UpdateCurrency
             parameters:
                 - name: code
@@ -1433,7 +1433,7 @@ paths:
         delete:
             tags:
                 - AdminCurrencyService
-            description: DeleteCurrency 删除货币（无引用时）。
+            description: DeleteCurrency 刪除貨幣（無引用時）。
             operationId: AdminCurrencyService_DeleteCurrency
             parameters:
                 - name: code
@@ -1467,7 +1467,7 @@ paths:
         get:
             tags:
                 - AdminDashboardService
-            description: GetDailyStats 历史日结查询（只扫 daily_stats；分站视角自动隔离）。
+            description: GetDailyStats 歷史日結查詢（只掃 daily_stats；分站視角自動隔離）。
             operationId: AdminDashboardService_GetDailyStats
             parameters:
                 - name: startDate
@@ -1489,7 +1489,7 @@ paths:
         get:
             tags:
                 - AdminDashboardService
-            description: GetReconciliation 对账总览。
+            description: GetReconciliation 對賬總覽。
             operationId: AdminDashboardService_GetReconciliation
             parameters:
                 - name: date
@@ -1507,7 +1507,7 @@ paths:
         post:
             tags:
                 - AdminDashboardService
-            description: CreateReconciliationJob 创建货源对账任务（时间窗 ≤31 天）。
+            description: CreateReconciliationJob 創建貨源對賬任務（時間窗 ≤31 天）。
             operationId: AdminDashboardService_CreateReconciliationJob
             requestBody:
                 content:
@@ -1526,7 +1526,7 @@ paths:
         get:
             tags:
                 - AdminDashboardService
-            description: GetReconciliationJob 对账任务详情（四态计数 + 状态可查）。
+            description: GetReconciliationJob 對賬任務詳情（四態計數 + 狀態可查）。
             operationId: AdminDashboardService_GetReconciliationJob
             parameters:
                 - name: id
@@ -1545,7 +1545,7 @@ paths:
         get:
             tags:
                 - AdminDashboardService
-            description: ListReconciliationItems 对账明细分页（四态筛选）。
+            description: ListReconciliationItems 對賬明細分頁（四態篩選）。
             operationId: AdminDashboardService_ListReconciliationItems
             parameters:
                 - name: id
@@ -1578,7 +1578,7 @@ paths:
         post:
             tags:
                 - AdminDashboardService
-            description: RunReconciliationJob 执行任务（pending → processing → done/failed）。
+            description: RunReconciliationJob 執行任務（pending → processing → done/failed）。
             operationId: AdminDashboardService_RunReconciliationJob
             parameters:
                 - name: id
@@ -1603,7 +1603,7 @@ paths:
         get:
             tags:
                 - AdminDashboardService
-            description: GetTraffic 流量统计（PV/UV 按天；page_views 明细表）。
+            description: GetTraffic 流量統計（PV/UV 按天；page_views 明細表）。
             operationId: AdminDashboardService_GetTraffic
             parameters:
                 - name: days
@@ -1622,7 +1622,7 @@ paths:
         get:
             tags:
                 - AdminCouponService
-            description: ListFlashSales 秒杀列表。
+            description: ListFlashSales 秒殺列表。
             operationId: AdminCouponService_ListFlashSales
             parameters:
                 - name: page
@@ -1645,7 +1645,7 @@ paths:
         post:
             tags:
                 - AdminCouponService
-            description: CreateFlashSale 创建秒杀。
+            description: CreateFlashSale 創建秒殺。
             operationId: AdminCouponService_CreateFlashSale
             requestBody:
                 content:
@@ -1664,7 +1664,7 @@ paths:
         delete:
             tags:
                 - AdminCouponService
-            description: DeleteFlashSale 删除秒杀。
+            description: DeleteFlashSale 刪除秒殺。
             operationId: AdminCouponService_DeleteFlashSale
             parameters:
                 - name: id
@@ -1680,7 +1680,7 @@ paths:
         get:
             tags:
                 - AdminFulfillmentService
-            description: ListDeliveries 交付记录列表（掩码默认）。
+            description: ListDeliveries 交付記錄列表（掩碼默認）。
             operationId: AdminFulfillmentService_ListDeliveries
             parameters:
                 - name: orderNo
@@ -1712,7 +1712,7 @@ paths:
         get:
             tags:
                 - AdminFulfillmentService
-            description: ListPending 待发货列表（实体快递配送及人工交付）。
+            description: ListPending 待發貨列表（實體快遞配送及人工交付）。
             operationId: AdminFulfillmentService_ListPending
             parameters:
                 - name: page
@@ -1736,7 +1736,7 @@ paths:
         post:
             tags:
                 - AdminFulfillmentService
-            description: ManualDeliver 手动交付（卡密内容或物流单号）。
+            description: ManualDeliver 手動交付（卡密內容或物流單號）。
             operationId: AdminFulfillmentService_ManualDeliver
             parameters:
                 - name: orderNo
@@ -1843,9 +1843,9 @@ paths:
             tags:
                 - AdminInstallService
             description: |-
-                PerformInstall 执行安装（公开；写管理员 + 站点信息 + 种子；已安装返回 409）。
-                 dialect=sqlite → 当前库直接装；mysql/postgres → 校验连接后写库切换覆盖配置
-                 + 待安装凭据文件，响应 restart_required 并自重启（新库上补装完成）。
+                PerformInstall 執行安裝（公開；寫管理員 + 站點信息 + 種子；已安裝返回 409）。
+                 dialect=sqlite → 當前庫直接裝；mysql/postgres → 校驗連接後寫庫切換覆蓋配置
+                 + 待安裝憑據文件，響應 restart_required 並自重啓（新庫上補裝完成）。
             operationId: AdminInstallService_PerformInstall
             requestBody:
                 content:
@@ -1864,7 +1864,7 @@ paths:
         get:
             tags:
                 - AdminInstallService
-            description: GetInstallStatus 安装状态 + 环境自检（公开）。
+            description: GetInstallStatus 安裝狀態 + 環境自檢（公開）。
             operationId: AdminInstallService_GetInstallStatus
             responses:
                 "200":
@@ -1877,7 +1877,7 @@ paths:
         post:
             tags:
                 - AdminInstallService
-            description: TestInstallConnection 测试数据库/Redis 连接（公开；库不存在时自动创建）。
+            description: TestInstallConnection 測試數據庫/Redis 連接（公開；庫不存在時自動創建）。
             operationId: AdminInstallService_TestInstallConnection
             requestBody:
                 content:
@@ -1932,7 +1932,7 @@ paths:
         get:
             tags:
                 - AdminInventoryService
-            description: ListCards 卡密列表（掩码默认；card:view_content 权限才可见完整内容）。
+            description: ListCards 卡密列表（掩碼默認；card:view_content 權限才可見完整內容）。
             operationId: AdminInventoryService_ListCards
             parameters:
                 - name: productId
@@ -1972,7 +1972,7 @@ paths:
         get:
             tags:
                 - AdminInventoryService
-            description: ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限）。
+            description: ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限）。
             operationId: AdminInventoryService_ListPremiumCards
             parameters:
                 - name: productId
@@ -1994,7 +1994,7 @@ paths:
         get:
             tags:
                 - AdminInventoryService
-            description: ViewCardContent 查看完整卡密（card:view_content 权限 + 安全审计）。
+            description: ViewCardContent 查看完整卡密（card:view_content 權限 + 安全審計）。
             operationId: AdminInventoryService_ViewCardContent
             parameters:
                 - name: id
@@ -2012,7 +2012,7 @@ paths:
         put:
             tags:
                 - AdminInventoryService
-            description: UpdateCardContent 编辑未使用的单张卡密（独立敏感权限；版本冲突时不覆盖）。
+            description: UpdateCardContent 編輯未使用的單張卡密（獨立敏感權限；版本衝突時不覆蓋）。
             operationId: AdminInventoryService_UpdateCardContent
             parameters:
                 - name: id
@@ -2037,7 +2037,7 @@ paths:
         put:
             tags:
                 - AdminInventoryService
-            description: ToggleCard 禁用/启用单张卡。
+            description: ToggleCard 禁用/啓用單張卡。
             operationId: AdminInventoryService_ToggleCard
             parameters:
                 - name: id
@@ -2059,7 +2059,7 @@ paths:
         post:
             tags:
                 - AdminInventoryService
-            description: ExportCards 导出卡密（card:export 权限 + 审计 + 限流 + CsvSafe）。
+            description: ExportCards 導出卡密（card:export 權限 + 審計 + 限流 + CsvSafe）。
             operationId: AdminInventoryService_ExportCards
             requestBody:
                 content:
@@ -2078,7 +2078,7 @@ paths:
         post:
             tags:
                 - AdminInventoryService
-            description: ImportConfirm 确认导入（分片写入 + 批次追踪）。
+            description: ImportConfirm 確認導入（分片寫入 + 批次追蹤）。
             operationId: AdminInventoryService_ImportConfirm
             requestBody:
                 content:
@@ -2097,7 +2097,7 @@ paths:
         get:
             tags:
                 - AdminInventoryService
-            description: ListImports 导入批次列表。
+            description: ListImports 導入批次列表。
             operationId: AdminInventoryService_ListImports
             parameters:
                 - name: productId
@@ -2123,7 +2123,7 @@ paths:
         post:
             tags:
                 - AdminInventoryService
-            description: CancelImport 撤销批次（删除本批 available 卡）。
+            description: CancelImport 撤銷批次（刪除本批 available 卡）。
             operationId: AdminInventoryService_CancelImport
             parameters:
                 - name: id
@@ -2167,7 +2167,7 @@ paths:
         post:
             tags:
                 - AdminInventoryService
-            description: ImportPreview 上传预览（去重统计 + 样本预览）。
+            description: ImportPreview 上傳預覽（去重統計 + 樣本預覽）。
             operationId: AdminInventoryService_ImportPreview
             requestBody:
                 content:
@@ -2203,7 +2203,7 @@ paths:
         get:
             tags:
                 - AdminLicenseService
-            description: GetLicenseStatus 许可证状态（安装/有效性/特性清单/到期）。
+            description: GetLicenseStatus 許可證狀態（安裝/有效性/特性清單/到期）。
             operationId: AdminLicenseService_GetLicenseStatus
             responses:
                 "200":
@@ -2215,7 +2215,7 @@ paths:
         post:
             tags:
                 - AdminLicenseService
-            description: InstallLicense 安装许可证（校验通过才落库；绑定当前实例）。
+            description: InstallLicense 安裝許可證（校驗通過才落庫；綁定當前實例）。
             operationId: AdminLicenseService_InstallLicense
             requestBody:
                 content:
@@ -2233,7 +2233,7 @@ paths:
         delete:
             tags:
                 - AdminLicenseService
-            description: ClearLicense 清除许可证（回到社区版）。
+            description: ClearLicense 清除許可證（回到社區版）。
             operationId: AdminLicenseService_ClearLicense
             responses:
                 "200":
@@ -2519,7 +2519,7 @@ paths:
                     format: int32
                 - name: uncategorized
                   in: query
-                  description: 仅未分类素材（category_id 为空；与 category_id=0「不过滤」区分）
+                  description: 僅未分類素材（category_id 為空；與 category_id=0「不過濾」區分）
                   schema:
                     type: boolean
                 - name: kind
@@ -2537,7 +2537,7 @@ paths:
         get:
             tags:
                 - AdminMediaService
-            description: ListCategories 分类列表。
+            description: ListCategories 分類列表。
             operationId: AdminMediaService_ListCategories
             responses:
                 "200":
@@ -2549,7 +2549,7 @@ paths:
         post:
             tags:
                 - AdminMediaService
-            description: CreateCategory 创建分类。
+            description: CreateCategory 創建分類。
             operationId: AdminMediaService_CreateCategory
             requestBody:
                 content:
@@ -2568,7 +2568,7 @@ paths:
         delete:
             tags:
                 - AdminMediaService
-            description: DeleteCategory 删除分类（有内容拒绝）。
+            description: DeleteCategory 刪除分類（有內容拒絕）。
             operationId: AdminMediaService_DeleteCategory
             parameters:
                 - name: id
@@ -2584,7 +2584,7 @@ paths:
         post:
             tags:
                 - AdminMediaService
-            description: MoveCategory 分类移动。
+            description: MoveCategory 分類移動。
             operationId: AdminMediaService_MoveCategory
             parameters:
                 - name: id
@@ -2606,7 +2606,7 @@ paths:
         post:
             tags:
                 - AdminMediaService
-            description: RenameCategory 分类改名。
+            description: RenameCategory 分類改名。
             operationId: AdminMediaService_RenameCategory
             parameters:
                 - name: id
@@ -2631,7 +2631,7 @@ paths:
         post:
             tags:
                 - AdminMediaService
-            description: DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+            description: DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
             operationId: AdminMediaService_DeleteMedia
             requestBody:
                 content:
@@ -2650,7 +2650,7 @@ paths:
         post:
             tags:
                 - AdminMediaService
-            description: ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+            description: ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
             operationId: AdminMediaService_ImportFromURL
             requestBody:
                 content:
@@ -2669,7 +2669,7 @@ paths:
         post:
             tags:
                 - AdminMediaService
-            description: MoveMedia 素材批量移动。
+            description: MoveMedia 素材批量移動。
             operationId: AdminMediaService_MoveMedia
             requestBody:
                 content:
@@ -2685,7 +2685,7 @@ paths:
         post:
             tags:
                 - AdminMediaService
-            description: Upload 上传（安全三件套：三重校验+重编码+10MB）。
+            description: Upload 上傳（安全三件套：三重校驗+重編碼+10MB）。
             operationId: AdminMediaService_Upload
             requestBody:
                 content:
@@ -2729,7 +2729,7 @@ paths:
         get:
             tags:
                 - AdminCatalogService
-            description: ── 会员商品组 ──
+            description: ── 會員商品組 ──
             operationId: AdminCatalogService_ListMemberGroups
             responses:
                 "200":
@@ -2864,7 +2864,7 @@ paths:
         get:
             tags:
                 - AdminNotifyService
-            description: ListBroadcasts 群发任务列表。
+            description: ListBroadcasts 羣發任務列表。
             operationId: AdminNotifyService_ListBroadcasts
             parameters:
                 - name: page
@@ -2887,7 +2887,7 @@ paths:
         post:
             tags:
                 - AdminNotifyService
-            description: CreateBroadcast 创建群发任务。
+            description: CreateBroadcast 創建羣發任務。
             operationId: AdminNotifyService_CreateBroadcast
             requestBody:
                 content:
@@ -2906,7 +2906,7 @@ paths:
         post:
             tags:
                 - AdminNotifyService
-            description: EstimateBroadcast 覆盖人数预估。
+            description: EstimateBroadcast 覆蓋人數預估。
             operationId: AdminNotifyService_EstimateBroadcast
             requestBody:
                 content:
@@ -2925,7 +2925,7 @@ paths:
         post:
             tags:
                 - AdminNotifyService
-            description: CancelBroadcast 取消群发（仅 pending）。
+            description: CancelBroadcast 取消羣發（僅 pending）。
             operationId: AdminNotifyService_CancelBroadcast
             parameters:
                 - name: id
@@ -2966,7 +2966,7 @@ paths:
         get:
             tags:
                 - AdminNotifyService
-            description: ListLogs 发送日志（按状态/事件筛选）。
+            description: ListLogs 發送日誌（按狀態/事件篩選）。
             operationId: AdminNotifyService_ListLogs
             parameters:
                 - name: channel
@@ -3002,7 +3002,7 @@ paths:
         post:
             tags:
                 - AdminNotifyService
-            description: ResendLog 重发失败日志（原变量重投）。
+            description: ResendLog 重發失敗日誌（原變量重投）。
             operationId: AdminNotifyService_ResendLog
             parameters:
                 - name: id
@@ -3054,7 +3054,7 @@ paths:
         post:
             tags:
                 - AdminNotifyService
-            description: UpsertTemplate 创建/更新模板（事件 × 通道 × 语言）。
+            description: UpsertTemplate 創建/更新模板（事件 × 通道 × 語言）。
             operationId: AdminNotifyService_UpsertTemplate
             requestBody:
                 content:
@@ -3073,7 +3073,7 @@ paths:
         post:
             tags:
                 - AdminNotifyService
-            description: PreviewTemplate 模板预览（变量样例渲染；不发送）。
+            description: PreviewTemplate 模板預覽（變量樣例渲染；不發送）。
             operationId: AdminNotifyService_PreviewTemplate
             requestBody:
                 content:
@@ -3092,7 +3092,7 @@ paths:
         get:
             tags:
                 - AdminOrderService
-            description: ListOrders 订单列表（游标分页）。
+            description: ListOrders 訂單列表（遊標分頁）。
             operationId: AdminOrderService_ListOrders
             parameters:
                 - name: shippingStatus
@@ -3151,7 +3151,7 @@ paths:
         post:
             tags:
                 - AdminOrderService
-            description: DeleteOrders 从管理列表移除已取消或已过期的未付款订单，保留关联记录。
+            description: DeleteOrders 從管理列表移除已取消或已過期的未付款訂單，保留關聯記錄。
             operationId: AdminOrderService_DeleteOrders
             requestBody:
                 content:
@@ -3167,7 +3167,7 @@ paths:
         get:
             tags:
                 - AdminOrderService
-            description: GetOrder 订单详情（含金额行+状态事件时间线）。
+            description: GetOrder 訂單詳情（含金額行+狀態事件時間線）。
             operationId: AdminOrderService_GetOrder
             parameters:
                 - name: orderNo
@@ -3186,7 +3186,7 @@ paths:
         post:
             tags:
                 - AdminOrderService
-            description: CancelOrder 取消订单（pending 可取消）。
+            description: CancelOrder 取消訂單（pending 可取消）。
             operationId: AdminOrderService_CancelOrder
             parameters:
                 - name: orderNo
@@ -3276,7 +3276,7 @@ paths:
         get:
             tags:
                 - AdminPaymentService
-            description: ListDrivers 驱动元数据（含配置字段 schema——admin 配置面动态表单渲染）。
+            description: ListDrivers 驅動元數據（含配置字段 schema——admin 配置面動態表單渲染）。
             operationId: AdminPaymentService_ListDrivers
             responses:
                 "200":
@@ -3290,8 +3290,8 @@ paths:
             tags:
                 - AdminPaymentService
             description: |-
-                FieldOptions 驱动字段选项动态加载（epusdt network/token 以网关 supported_assets
-                 为准；网关不可达时后端回落静态矩阵并标记 fallback）。
+                FieldOptions 驅動字段選項動態加載（epusdt network/token 以網關 supported_assets
+                 為準；網關不可達時後端回落靜態矩陣並標記 fallback）。
             operationId: AdminPaymentService_FieldOptions
             parameters:
                 - name: code
@@ -3318,7 +3318,7 @@ paths:
         get:
             tags:
                 - AdminPaymentService
-            description: ── 支付单 ──
+            description: ── 支付單 ──
             operationId: AdminPaymentService_ListPayments
             parameters:
                 - name: status
@@ -3371,7 +3371,7 @@ paths:
         post:
             tags:
                 - AdminPaymentService
-            description: CapturePayment 补单（主动拉网关状态复走回调管线）。
+            description: CapturePayment 補單（主動拉網關狀態復走回調管線）。
             operationId: AdminPaymentService_CapturePayment
             parameters:
                 - name: id
@@ -3396,7 +3396,7 @@ paths:
         get:
             tags:
                 - AdminProcurementService
-            description: ListProcurements 采购单列表（按状态过滤）。
+            description: ListProcurements 採購單列表（按狀態過濾）。
             operationId: AdminProcurementService_ListProcurements
             parameters:
                 - name: status
@@ -3428,7 +3428,7 @@ paths:
         get:
             tags:
                 - AdminProcurementService
-            description: GetProcurement 采购单详情（含采购项/密文行数）。
+            description: GetProcurement 採購單詳情（含採購項/密文行數）。
             operationId: AdminProcurementService_GetProcurement
             parameters:
                 - name: id
@@ -3447,7 +3447,7 @@ paths:
         post:
             tags:
                 - AdminProcurementService
-            description: MarkProcurementManual 手动标记完成/转人工（人工拿货后回填）。
+            description: MarkProcurementManual 手動標記完成/轉人工（人工拿貨後回填）。
             operationId: AdminProcurementService_MarkProcurementManual
             parameters:
                 - name: id
@@ -3472,7 +3472,7 @@ paths:
         post:
             tags:
                 - AdminProcurementService
-            description: RetryProcurement 手动重试（pending/submitted/polling 均可重新提交或推进轮询）。
+            description: RetryProcurement 手動重試（pending/submitted/polling 均可重新提交或推進輪詢）。
             operationId: AdminProcurementService_RetryProcurement
             parameters:
                 - name: id
@@ -3663,7 +3663,7 @@ paths:
         post:
             tags:
                 - AdminCatalogService
-            description: BatchUpdateProductStatus 批量上下架（列表多选操作；status 1=上架 0=下架 2=隐藏）。
+            description: BatchUpdateProductStatus 批量上下架（列表多選操作；status 1=上架 0=下架 2=隱藏）。
             operationId: AdminCatalogService_BatchUpdateProductStatus
             requestBody:
                 content:
@@ -3827,7 +3827,7 @@ paths:
         get:
             tags:
                 - AdminCatalogService
-            description: ── 自定义控件 ──
+            description: ── 自定義控件 ──
             operationId: AdminCatalogService_ListControls
             parameters:
                 - name: productId
@@ -3914,7 +3914,7 @@ paths:
         get:
             tags:
                 - AdminCatalogService
-            description: ── SKU 多规格 ──
+            description: ── SKU 多規格 ──
             operationId: AdminCatalogService_ListSkus
             parameters:
                 - name: productId
@@ -3956,7 +3956,7 @@ paths:
         get:
             tags:
                 - AdminCouponService
-            description: ListPromotions 促销列表。
+            description: ListPromotions 促銷列表。
             operationId: AdminCouponService_ListPromotions
             parameters:
                 - name: page
@@ -3979,7 +3979,7 @@ paths:
         post:
             tags:
                 - AdminCouponService
-            description: UpsertPromotion 创建/更新促销。
+            description: UpsertPromotion 創建/更新促銷。
             operationId: AdminCouponService_UpsertPromotion
             requestBody:
                 content:
@@ -4041,7 +4041,7 @@ paths:
         post:
             tags:
                 - AdminResellerService
-            description: ReviewApply 审核申请（通过设加价率区间与冻结天数）。
+            description: ReviewApply 審核申請（通過設加價率區間與凍結天數）。
             operationId: AdminResellerService_ReviewApply
             parameters:
                 - name: id
@@ -4066,7 +4066,7 @@ paths:
         get:
             tags:
                 - AdminResellerService
-            description: Balance 分站余额（缓存 + 重算对账）。
+            description: Balance 分站餘額（緩存 + 重算對賬）。
             operationId: AdminResellerService_Balance
             parameters:
                 - name: subsiteId
@@ -4084,7 +4084,7 @@ paths:
         get:
             tags:
                 - AdminResellerService
-            description: Ledger 分站账本流水。
+            description: Ledger 分站賬本流水。
             operationId: AdminResellerService_Ledger
             parameters:
                 - name: subsiteId
@@ -4128,7 +4128,7 @@ paths:
         post:
             tags:
                 - AdminResellerService
-            description: AddSite 分站主：登记域名（生成验证 token）。
+            description: AddSite 分站主：登記域名（生成驗證 token）。
             operationId: AdminResellerService_AddSite
             requestBody:
                 content:
@@ -4147,7 +4147,7 @@ paths:
         post:
             tags:
                 - AdminResellerService
-            description: VerifySite 分站主：触发域名验证（DNS TXT / HTTP well-known 双方案）。
+            description: VerifySite 分站主：觸發域名驗證（DNS TXT / HTTP well-known 雙方案）。
             operationId: AdminResellerService_VerifySite
             parameters:
                 - name: siteId
@@ -4172,7 +4172,7 @@ paths:
         post:
             tags:
                 - AdminResellerService
-            description: SetWhitelabel 分站主：白标设置（站名/LOGO/favicon）。
+            description: SetWhitelabel 分站主：白標設置（站名/LOGO/favicon）。
             operationId: AdminResellerService_SetWhitelabel
             parameters:
                 - name: siteId
@@ -4194,7 +4194,7 @@ paths:
         post:
             tags:
                 - AdminResellerService
-            description: UpsertPricing 分站定价规则（SKU>商品>默认）。
+            description: UpsertPricing 分站定價規則（SKU>商品>默認）。
             operationId: AdminResellerService_UpsertPricing
             requestBody:
                 content:
@@ -4210,7 +4210,7 @@ paths:
         post:
             tags:
                 - AdminResellerService
-            description: CreateProduct 分站主：自营商品上架（subsite_id = 本人分站；等级权限位自助上架）。
+            description: CreateProduct 分站主：自營商品上架（subsite_id = 本人分站；等級權限位自助上架）。
             operationId: AdminResellerService_CreateProduct
             requestBody:
                 content:
@@ -4229,7 +4229,7 @@ paths:
         get:
             tags:
                 - AdminResellerService
-            description: ListProfiles 申请/分站列表。
+            description: ListProfiles 申請/分站列表。
             operationId: AdminResellerService_ListProfiles
             parameters:
                 - name: status
@@ -4257,7 +4257,7 @@ paths:
         get:
             tags:
                 - AdminCatalogService
-            description: ── 评价（真实一单一评审核 + 虚拟评价）──
+            description: ── 評價（真實一單一評審核 + 虛擬評價）──
             operationId: AdminCatalogService_ListReviews
             parameters:
                 - name: status
@@ -4333,12 +4333,12 @@ paths:
         get:
             tags:
                 - AdminSettingsService
-            description: ListSettings 按分组列出设置项。
+            description: ListSettings 按分組列出設置項。
             operationId: AdminSettingsService_ListSettings
             parameters:
                 - name: group
                   in: query
-                  description: 可选分组过滤（site/template/trade/security/ops/notify/...）
+                  description: 可選分組過濾（site/template/trade/security/ops/notify/...）
                   schema:
                     type: string
             responses:
@@ -4351,7 +4351,7 @@ paths:
         put:
             tags:
                 - AdminSettingsService
-            description: UpdateSettings 批量更新（表单级保存；单事务原子写入）。
+            description: UpdateSettings 批量更新（表單級保存；單事務原子寫入）。
             operationId: AdminSettingsService_UpdateSettings
             requestBody:
                 content:
@@ -4371,8 +4371,8 @@ paths:
             tags:
                 - AdminSettingsService
             description: |-
-                ListTemplates 可用模板清单（扫描 web/storefront/templates/*/theme.json；
-                 目录缺失回退内置 classic 清单）。
+                ListTemplates 可用模板清單（掃描 web/storefront/templates/*/theme.json；
+                 目錄缺失回退內置 classic 清單）。
             operationId: AdminSettingsService_ListTemplates
             responses:
                 "200":
@@ -4385,7 +4385,7 @@ paths:
         post:
             tags:
                 - AdminSettingsService
-            description: InstallTemplate 安装主题（zip base64；解压校验后原子落盘到模板目录）。
+            description: InstallTemplate 安裝主題（zip base64；解壓校驗後原子落盤到模板目錄）。
             operationId: AdminSettingsService_InstallTemplate
             requestBody:
                 content:
@@ -4473,7 +4473,7 @@ paths:
         get:
             tags:
                 - AdminSettingsService
-            description: GetSetting 读取单个设置项。
+            description: GetSetting 讀取單個設置項。
             operationId: AdminSettingsService_GetSetting
             parameters:
                 - name: group
@@ -4496,7 +4496,7 @@ paths:
         put:
             tags:
                 - AdminSettingsService
-            description: UpdateSetting 更新单个设置项（value 为任意 JSON 文档）。
+            description: UpdateSetting 更新單個設置項（value 為任意 JSON 文檔）。
             operationId: AdminSettingsService_UpdateSetting
             parameters:
                 - name: group
@@ -4616,7 +4616,7 @@ paths:
         get:
             tags:
                 - AdminSupplierService
-            description: ListAccounts 账户列表（secret 零回显）。
+            description: ListAccounts 賬户列表（secret 零回顯）。
             operationId: AdminSupplierService_ListAccounts
             parameters:
                 - name: page
@@ -4639,7 +4639,7 @@ paths:
         post:
             tags:
                 - AdminSupplierService
-            description: CreateAccount 下游申请（secret 明文只在此响应出现一次）。
+            description: CreateAccount 下游申請（secret 明文只在此響應出現一次）。
             operationId: AdminSupplierService_CreateAccount
             requestBody:
                 content:
@@ -4658,7 +4658,7 @@ paths:
         put:
             tags:
                 - AdminSupplierService
-            description: SetSupplierIPWhitelist 设置 IP 白名单（空 = 所有 IP 放行；接口鉴权层强制）。
+            description: SetSupplierIPWhitelist 設置 IP 白名單（空 = 所有 IP 放行；接口鑑權層強制）。
             operationId: AdminSupplierService_SetSupplierIPWhitelist
             parameters:
                 - name: id
@@ -4683,7 +4683,7 @@ paths:
         put:
             tags:
                 - AdminSupplierService
-            description: SetNotifyURL 配置回调地址。
+            description: SetNotifyURL 配置回調地址。
             operationId: AdminSupplierService_SetNotifyURL
             parameters:
                 - name: id
@@ -4708,7 +4708,7 @@ paths:
         post:
             tags:
                 - AdminSupplierService
-            description: Recharge 账户充值（账本入账）。
+            description: Recharge 賬户充值（賬本入賬）。
             operationId: AdminSupplierService_Recharge
             parameters:
                 - name: id
@@ -4730,7 +4730,7 @@ paths:
         post:
             tags:
                 - AdminSupplierService
-            description: ResetSecret 重置密钥（返回明文一次）。
+            description: ResetSecret 重置密鑰（返回明文一次）。
             operationId: AdminSupplierService_ResetSecret
             parameters:
                 - name: id
@@ -4755,7 +4755,7 @@ paths:
         post:
             tags:
                 - AdminSupplierService
-            description: ReviewAccount 审核（applying → approved/rejected；驳回可带意见）。
+            description: ReviewAccount 審核（applying → approved/rejected；駁回可帶意見）。
             operationId: AdminSupplierService_ReviewAccount
             parameters:
                 - name: id
@@ -4780,7 +4780,7 @@ paths:
         post:
             tags:
                 - AdminSupplierService
-            description: ToggleAccount 启停。
+            description: ToggleAccount 啓停。
             operationId: AdminSupplierService_ToggleAccount
             parameters:
                 - name: id
@@ -4805,7 +4805,7 @@ paths:
         get:
             tags:
                 - AdminSupplierService
-            description: ListCallbacks 回调记录（含死信）。
+            description: ListCallbacks 回調記錄（含死信）。
             operationId: AdminSupplierService_ListCallbacks
             parameters:
                 - name: status
@@ -4833,7 +4833,7 @@ paths:
         post:
             tags:
                 - AdminSupplierService
-            description: ResendCallback 手动重发回调（死信恢复）。
+            description: ResendCallback 手動重發回調（死信恢復）。
             operationId: AdminSupplierService_ResendCallback
             parameters:
                 - name: id
@@ -4855,7 +4855,7 @@ paths:
         get:
             tags:
                 - AdminSupplierService
-            description: ListLedger 账本流水（下游自助对账数据源）。
+            description: ListLedger 賬本流水（下游自助對賬數據源）。
             operationId: AdminSupplierService_ListLedger
             parameters:
                 - name: accountId
@@ -4883,7 +4883,7 @@ paths:
         get:
             tags:
                 - AdminSupplierService
-            description: ListPrices 账号的专属价列表(补齐：浏览/管理覆盖价）。
+            description: ListPrices 賬號的專屬價列表(補齊：瀏覽/管理覆蓋價）。
             operationId: AdminSupplierService_ListPrices
             parameters:
                 - name: accountId
@@ -4900,7 +4900,7 @@ paths:
         post:
             tags:
                 - AdminSupplierService
-            description: UpsertPrice 供货定价（覆盖价）。
+            description: UpsertPrice 供貨定價（覆蓋價）。
             operationId: AdminSupplierService_UpsertPrice
             requestBody:
                 content:
@@ -4916,7 +4916,7 @@ paths:
         delete:
             tags:
                 - AdminSupplierService
-            description: DeletePrice 删除专属价（恢复基础供货价）。
+            description: DeletePrice 刪除專屬價（恢復基礎供貨價）。
             operationId: AdminSupplierService_DeletePrice
             parameters:
                 - name: id
@@ -4932,7 +4932,7 @@ paths:
         get:
             tags:
                 - AdminSupplyService
-            description: ListConnections 连接列表（凭据零回显）。
+            description: ListConnections 連接列表（憑據零回顯）。
             operationId: AdminSupplyService_ListConnections
             parameters:
                 - name: page
@@ -4955,7 +4955,7 @@ paths:
         post:
             tags:
                 - AdminSupplyService
-            description: CreateConnection 创建上游连接（凭据 AES-GCM 加密入库；base_url SSRF 校验）。
+            description: CreateConnection 創建上游連接（憑據 AES-GCM 加密入庫；base_url SSRF 校驗）。
             operationId: AdminSupplyService_CreateConnection
             requestBody:
                 content:
@@ -4974,7 +4974,7 @@ paths:
         post:
             tags:
                 - AdminSupplyService
-            description: ImportProducts 勾选导入（定价策略 + 类目映射 + 存为连接默认； D）。
+            description: ImportProducts 勾選導入（定價策略 + 類目映射 + 存為連接默認； D）。
             operationId: AdminSupplyService_ImportProducts
             parameters:
                 - name: connectionId
@@ -5000,8 +5000,8 @@ paths:
             tags:
                 - AdminSupplyService
             description: |-
-                ListHealth 连接健康列表（探活结果 + 最近错误 + 同步时间）。
-                 PreviewProducts 轻量目录预览；quote_code 按需查询一个商品的账号报价。
+                ListHealth 連接健康列表（探活結果 + 最近錯誤 + 同步時間）。
+                 PreviewProducts 輕量目錄預覽；quote_code 按需查詢一個商品的賬號報價。
             operationId: AdminSupplyService_PreviewProducts
             parameters:
                 - name: connectionId
@@ -5046,7 +5046,7 @@ paths:
         put:
             tags:
                 - AdminSupplyService
-            description: UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+            description: UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
             operationId: AdminSupplyService_UpdateConnection
             parameters:
                 - name: id
@@ -5070,7 +5070,7 @@ paths:
         delete:
             tags:
                 - AdminSupplyService
-            description: DeleteConnection 删除连接（存在映射时拒绝）。
+            description: DeleteConnection 刪除連接（存在映射時拒絕）。
             operationId: AdminSupplyService_DeleteConnection
             parameters:
                 - name: id
@@ -5123,7 +5123,7 @@ paths:
         get:
             tags:
                 - AdminSupplyService
-            description: ListMappings 商品映射列表（按连接过滤）。
+            description: ListMappings 商品映射列表（按連接過濾）。
             operationId: AdminSupplyService_ListMappings
             parameters:
                 - name: connectionId
@@ -5150,7 +5150,7 @@ paths:
         post:
             tags:
                 - AdminSupplyService
-            description: UpsertMapping 创建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
+            description: UpsertMapping 創建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
             operationId: AdminSupplyService_UpsertMapping
             requestBody:
                 content:
@@ -5169,7 +5169,7 @@ paths:
         delete:
             tags:
                 - AdminSupplyService
-            description: DeleteMapping 删除映射。
+            description: DeleteMapping 刪除映射。
             operationId: AdminSupplyService_DeleteMapping
             parameters:
                 - name: id
@@ -5185,7 +5185,7 @@ paths:
         get:
             tags:
                 - AdminSupplyService
-            description: ListSyncTasks 同步任务列表。
+            description: ListSyncTasks 同步任務列表。
             operationId: AdminSupplyService_ListSyncTasks
             parameters:
                 - name: connectionId
@@ -5212,7 +5212,7 @@ paths:
         post:
             tags:
                 - AdminSupplyService
-            description: CreateSyncTask 创建同步任务（full=全量 / incremental=增量；low 队列执行）。
+            description: CreateSyncTask 創建同步任務（full=全量 / incremental=增量；low 隊列執行）。
             operationId: AdminSupplyService_CreateSyncTask
             requestBody:
                 content:
@@ -5231,7 +5231,7 @@ paths:
         get:
             tags:
                 - AdminSupplyService
-            description: GetSyncTask 任务详情（心跳/统计/错误上下文）。
+            description: GetSyncTask 任務詳情（心跳/統計/錯誤上下文）。
             operationId: AdminSupplyService_GetSyncTask
             parameters:
                 - name: id
@@ -5250,7 +5250,7 @@ paths:
         post:
             tags:
                 - AdminSupplyService
-            description: CancelSyncTask 请求取消（分批间检查标志）。
+            description: CancelSyncTask 請求取消（分批間檢查標誌）。
             operationId: AdminSupplyService_CancelSyncTask
             parameters:
                 - name: id
@@ -5331,7 +5331,7 @@ paths:
         get:
             tags:
                 - AdminCatalogService
-            description: ── 标签 ──
+            description: ── 標籤 ──
             operationId: AdminCatalogService_ListTags
             responses:
                 "200":
@@ -5376,7 +5376,7 @@ paths:
         get:
             tags:
                 - AdminTicketService
-            description: ListTickets 工作台列表（urgent_paid 置顶 → 高 → 中 → 低；状态/类型/订单筛选）。
+            description: ListTickets 工作台列表（urgent_paid 置頂 → 高 → 中 → 低；狀態/類型/訂單篩選）。
             operationId: AdminTicketService_ListTickets
             parameters:
                 - name: status
@@ -5412,7 +5412,7 @@ paths:
         get:
             tags:
                 - AdminTicketService
-            description: GetTicket 详情（含内部备注——客服侧全量）。
+            description: GetTicket 詳情（含內部備註——客服側全量）。
             operationId: AdminTicketService_GetTicket
             parameters:
                 - name: ticketNo
@@ -5431,7 +5431,7 @@ paths:
         post:
             tags:
                 - AdminTicketService
-            description: CloseTicket 关闭。
+            description: CloseTicket 關閉。
             operationId: AdminTicketService_CloseTicket
             parameters:
                 - name: ticketNo
@@ -5453,7 +5453,7 @@ paths:
         post:
             tags:
                 - AdminTicketService
-            description: ReplyTicket 客服回复（可内部备注）。
+            description: ReplyTicket 客服回覆（可內部備註）。
             operationId: AdminTicketService_ReplyTicket
             parameters:
                 - name: ticketNo
@@ -5475,7 +5475,7 @@ paths:
         post:
             tags:
                 - AdminTicketService
-            description: ResolveTicket 解决。
+            description: ResolveTicket 解決。
             operationId: AdminTicketService_ResolveTicket
             parameters:
                 - name: ticketNo
@@ -5497,7 +5497,7 @@ paths:
         post:
             tags:
                 - AdminUpdateService
-            description: ApplyUpdate 触发更新（单飞；进行中重复调用返回当前态）。
+            description: ApplyUpdate 觸發更新（單飛；進行中重複調用返回當前態）。
             operationId: AdminUpdateService_ApplyUpdate
             requestBody:
                 content:
@@ -5516,7 +5516,7 @@ paths:
         post:
             tags:
                 - AdminUpdateService
-            description: CheckUpdate 手动检查更新（源解析+manifest 验签；结果缓存于 status）。
+            description: CheckUpdate 手動檢查更新（源解析+manifest 驗籤；結果緩存於 status）。
             operationId: AdminUpdateService_CheckUpdate
             requestBody:
                 content:
@@ -5533,7 +5533,7 @@ paths:
         post:
             tags:
                 - AdminUpdateService
-            description: RollbackUpdate 回滚上一版本（zcard.prev）并重启。
+            description: RollbackUpdate 回滾上一版本（zcard.prev）並重啓。
             operationId: AdminUpdateService_RollbackUpdate
             requestBody:
                 content:
@@ -5550,7 +5550,7 @@ paths:
         get:
             tags:
                 - AdminUpdateService
-            description: GetUpdateStatus 当前状态（幂等轮询；含生效源/supervisor 探测/最近 check 结果）。
+            description: GetUpdateStatus 當前狀態（冪等輪詢；含生效源/supervisor 探測/最近 check 結果）。
             operationId: AdminUpdateService_GetUpdateStatus
             responses:
                 "200":
@@ -5563,7 +5563,7 @@ paths:
         get:
             tags:
                 - AdminUserManageService
-            description: ListUsers 用户列表（关键词/状态筛选，分页）。
+            description: ListUsers 用户列表（關鍵詞/狀態篩選，分頁）。
             operationId: AdminUserManageService_ListUsers
             parameters:
                 - name: keyword
@@ -5602,7 +5602,7 @@ paths:
         post:
             tags:
                 - AdminUserManageService
-            description: CreateUser 后台新增用户（用户名/邮箱/初始密码；复用注册管线含推广码生成）。
+            description: CreateUser 後台新增用户（用户名/郵箱/初始密碼；複用註冊管線含推廣碼生成）。
             operationId: AdminUserManageService_CreateUser
             requestBody:
                 content:
@@ -5621,7 +5621,7 @@ paths:
         get:
             tags:
                 - AdminUserManageService
-            description: GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+            description: GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
             operationId: AdminUserManageService_GetUser
             parameters:
                 - name: id
@@ -5640,7 +5640,7 @@ paths:
         put:
             tags:
                 - AdminUserManageService
-            description: ResetUserPassword 重置用户密码（超管专属）。
+            description: ResetUserPassword 重置用户密碼（超管專屬）。
             operationId: AdminUserManageService_ResetUserPassword
             parameters:
                 - name: id
@@ -5662,7 +5662,7 @@ paths:
         post:
             tags:
                 - AdminUserManageService
-            description: 'SetUserStatus 封禁/解封（status: active | banned；deleted 不可经此设置）。'
+            description: 'SetUserStatus 封禁/解封（status: active | banned；deleted 不可經此設置）。'
             operationId: AdminUserManageService_SetUserStatus
             parameters:
                 - name: id
@@ -5770,7 +5770,7 @@ paths:
         post:
             tags:
                 - AdminWalletService
-            description: CreateGiftcardBatch 礼品卡批次创建（批量生成密文 code；giftcard:write）。
+            description: CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
             operationId: AdminWalletService_CreateGiftcardBatch
             requestBody:
                 content:
@@ -5789,7 +5789,7 @@ paths:
         delete:
             tags:
                 - AdminWalletService
-            description: DeleteGiftcardBatch 删除批次并作废未兑换卡，保留已兑换记录。
+            description: DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
             operationId: AdminWalletService_DeleteGiftcardBatch
             parameters:
                 - name: id
@@ -5805,7 +5805,7 @@ paths:
         get:
             tags:
                 - AdminWalletService
-            description: ListWithdrawals 提现单列表（状态筛选）。
+            description: ListWithdrawals 提現單列表（狀態篩選）。
             operationId: AdminWalletService_ListWithdrawals
             parameters:
                 - name: status
@@ -5833,7 +5833,7 @@ paths:
         post:
             tags:
                 - AdminWalletService
-            description: PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣减 + 流水）。
+            description: PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣減 + 流水）。
             operationId: AdminWalletService_PayWithdrawal
             parameters:
                 - name: id
@@ -5858,7 +5858,7 @@ paths:
         post:
             tags:
                 - AdminWalletService
-            description: ReviewWithdrawal 审核（通过→approved 保持锁定；驳回→rejected 解锁回余额）。
+            description: ReviewWithdrawal 審核（通過→approved 保持鎖定；駁回→rejected 解鎖回餘額）。
             operationId: AdminWalletService_ReviewWithdrawal
             parameters:
                 - name: id
@@ -5883,7 +5883,7 @@ paths:
         get:
             tags:
                 - AdminWalletService
-            description: GetBalance 指定用户余额。
+            description: GetBalance 指定用户餘額。
             operationId: AdminWalletService_GetBalance
             parameters:
                 - name: userId
@@ -5902,7 +5902,7 @@ paths:
         post:
             tags:
                 - AdminWalletService
-            description: Adjust 手动调账（需 wallet:adjust 权限 + 原因必填 + 审计）。
+            description: Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
             operationId: AdminWalletService_Adjust
             parameters:
                 - name: userId
@@ -5927,7 +5927,7 @@ paths:
         post:
             tags:
                 - AdminWalletService
-            description: AdjustPoints 积分调整（正=增加 负=扣减；复用积分账本与审计）。
+            description: AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
             operationId: AdminWalletService_AdjustPoints
             parameters:
                 - name: userId
@@ -5957,7 +5957,7 @@ paths:
             parameters:
                 - name: userId
                   in: path
-                  description: 指定用户流水；0 = 全站流水（账单管理）。不能标 REQUIRED——proto3 零值 0 会被网关判缺失。
+                  description: 指定用户流水；0 = 全站流水（賬單管理）。不能標 REQUIRED——proto3 零值 0 會被網關判缺失。
                   required: true
                   schema:
                     type: string
@@ -5982,7 +5982,7 @@ paths:
         get:
             tags:
                 - StoreAffiliateService
-            description: ListCommissions 佣金流水（正 + 负债行）。
+            description: ListCommissions 佣金流水（正 + 負債行）。
             operationId: StoreAffiliateService_ListCommissions
             parameters:
                 - name: page
@@ -6006,7 +6006,7 @@ paths:
         get:
             tags:
                 - StoreAffiliateService
-            description: MyAffiliate 推广码 + 统计（登录用户）。
+            description: MyAffiliate 推廣碼 + 統計（登錄用户）。
             operationId: StoreAffiliateService_MyAffiliate
             responses:
                 "200":
@@ -6019,7 +6019,7 @@ paths:
         get:
             tags:
                 - StoreAffiliateService
-            description: ListTeam 下级列表（脱敏用户名）。
+            description: ListTeam 下級列表（脱敏用户名）。
             operationId: StoreAffiliateService_ListTeam
             parameters:
                 - name: tier
@@ -6048,7 +6048,7 @@ paths:
         get:
             tags:
                 - StoreContentService
-            description: ListBanners 生效中横幅（position 过滤 + sort 排序 + 时间窗过滤）。
+            description: ListBanners 生效中橫幅（position 過濾 + sort 排序 + 時間窗過濾）。
             operationId: StoreContentService_ListBanners
             parameters:
                 - name: position
@@ -6070,7 +6070,7 @@ paths:
         get:
             tags:
                 - StoreCaptchaService
-            description: GetImage 生成验证码和本次输入格式（一次性消费）。
+            description: GetImage 生成驗證碼和本次輸入格式（一次性消費）。
             operationId: StoreCaptchaService_GetImage
             responses:
                 "200":
@@ -6083,7 +6083,7 @@ paths:
         get:
             tags:
                 - StoreCartService
-            description: ListCart 我的购物车（商品快照联查；失效商品打标）。
+            description: ListCart 我的購物車（商品快照聯查；失效商品打標）。
             operationId: StoreCartService_ListCart
             responses:
                 "200":
@@ -6096,7 +6096,7 @@ paths:
         post:
             tags:
                 - StoreCartService
-            description: AddCartItem 加购（同 user+product+sku 合并数量；商品须上架）。
+            description: AddCartItem 加購（同 user+product+sku 合併數量；商品須上架）。
             operationId: StoreCartService_AddCartItem
             requestBody:
                 content:
@@ -6115,7 +6115,7 @@ paths:
         post:
             tags:
                 - StoreCartService
-            description: UpdateCartItem 改量（quantity=0 即删除）。
+            description: UpdateCartItem 改量（quantity=0 即刪除）。
             operationId: StoreCartService_UpdateCartItem
             parameters:
                 - name: id
@@ -6155,7 +6155,7 @@ paths:
         get:
             tags:
                 - StoreCatalogService
-            description: ListCategories 可见分类列表（hide=false + 分站白名单；导航/筛选用）。
+            description: ListCategories 可見分類列表（hide=false + 分站白名單；導航/篩選用）。
             operationId: StoreCatalogService_ListCategories
             responses:
                 "200":
@@ -6168,7 +6168,7 @@ paths:
         get:
             tags:
                 - StorefrontConfigService
-            description: GetPublicConfig 前台公开配置（全部分组白名单键合并下发，稳定排序）。
+            description: GetPublicConfig 前台公開配置（全部分組白名單鍵合併下發，穩定排序）。
             operationId: StorefrontConfigService_GetPublicConfig
             responses:
                 "200":
@@ -6181,7 +6181,7 @@ paths:
         get:
             tags:
                 - StoreCouponService
-            description: ListMyCoupons 我的可用券（登录用户）。
+            description: ListMyCoupons 我的可用券（登錄用户）。
             operationId: StoreCouponService_ListMyCoupons
             responses:
                 "200":
@@ -6194,7 +6194,7 @@ paths:
         post:
             tags:
                 - StoreCouponService
-            description: RedeemCoupon 兑换码领券。
+            description: RedeemCoupon 兑換碼領券。
             operationId: StoreCouponService_RedeemCoupon
             requestBody:
                 content:
@@ -6210,7 +6210,7 @@ paths:
         get:
             tags:
                 - StorefrontConfigService
-            description: ListCurrencies 启用货币列表（展示换算用）。
+            description: ListCurrencies 啓用貨幣列表（展示換算用）。
             operationId: StorefrontConfigService_ListCurrencies
             responses:
                 "200":
@@ -6223,7 +6223,7 @@ paths:
         get:
             tags:
                 - StoreDeliveryService
-            description: MaskedDeliveries 我的订单掩码列表。
+            description: MaskedDeliveries 我的訂單掩碼列表。
             operationId: StoreDeliveryService_MaskedDeliveries
             parameters:
                 - name: page
@@ -6247,7 +6247,7 @@ paths:
         post:
             tags:
                 - StoreDeliveryService
-            description: 'FetchDelivery 取货（一次性明文；默认 1 次后掩码；Cache-Control: no-store）。'
+            description: 'FetchDelivery 取貨（一次性明文；默認 1 次後掩碼；Cache-Control: no-store）。'
             operationId: StoreDeliveryService_FetchDelivery
             requestBody:
                 content:
@@ -6266,7 +6266,7 @@ paths:
         get:
             tags:
                 - StoreCouponService
-            description: ListFlashSales 秒杀列表（upcoming=false 进行中 / true 即将开始）。
+            description: ListFlashSales 秒殺列表（upcoming=false 進行中 / true 即將開始）。
             operationId: StoreCouponService_ListFlashSales
             parameters:
                 - name: upcoming
@@ -6285,8 +6285,8 @@ paths:
             tags:
                 - StoreOrderService
             description: |-
-                ListGuestOrders 游客按下单联系方式查订单列表（邮箱/手机号；精简信息——
-                 卡密仍需逐单查询密码，防枚举：查不到返回空）。
+                ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號；精簡信息——
+                 卡密仍需逐單查詢密碼，防枚舉：查不到返回空）。
             operationId: StoreOrderService_ListGuestOrders
             parameters:
                 - name: contact
@@ -6304,7 +6304,7 @@ paths:
         get:
             tags:
                 - StoreLicenseService
-            description: GetLicenseOffer 套餐报价（价格服务端裁决；instance_id 供目标实例绑定预览）。
+            description: GetLicenseOffer 套餐報價（價格服務端裁決；instance_id 供目標實例綁定預覽）。
             operationId: StoreLicenseService_GetLicenseOffer
             responses:
                 "200":
@@ -6317,7 +6317,7 @@ paths:
         get:
             tags:
                 - StoreLicenseService
-            description: ListLicenseOrders 购买记录（含许可证文件可重新下载）。
+            description: ListLicenseOrders 購買記錄（含許可證文件可重新下載）。
             operationId: StoreLicenseService_ListLicenseOrders
             parameters:
                 - name: page
@@ -6341,7 +6341,7 @@ paths:
         post:
             tags:
                 - StoreLicenseService
-            description: PurchaseLicense 购买（钱包扣款 → ed25519 签发 → 返回许可证文件）。
+            description: PurchaseLicense 購買（錢包扣款 → ed25519 簽發 → 返回許可證文件）。
             operationId: StoreLicenseService_PurchaseLicense
             requestBody:
                 content:
@@ -6479,7 +6479,7 @@ paths:
         post:
             tags:
                 - StoreMediaService
-            description: Upload base64 上传（图片白名单/魔数/重编码；≤2MB）。
+            description: Upload base64 上傳（圖片白名單/魔數/重編碼；≤2MB）。
             operationId: StoreMediaService_Upload
             requestBody:
                 content:
@@ -6498,7 +6498,7 @@ paths:
         get:
             tags:
                 - StoreMemberLevelService
-            description: GetMyLevel 我的等级（当前等级 + 下一等级 + 升级进度 + 积分余额与产生规则）。
+            description: GetMyLevel 我的等級（當前等級 + 下一等級 + 升級進度 + 積分餘額與產生規則）。
             operationId: StoreMemberLevelService_GetMyLevel
             responses:
                 "200":
@@ -6528,7 +6528,7 @@ paths:
         get:
             tags:
                 - StoreOrderService
-            description: ListMyOrders 我的订单（登录态；offset 分页）。
+            description: ListMyOrders 我的訂單（登錄態；offset 分頁）。
             operationId: StoreOrderService_ListMyOrders
             parameters:
                 - name: page
@@ -6543,7 +6543,7 @@ paths:
                     format: int32
                 - name: status
                   in: query
-                  description: 状态筛选（可选：pending_payment/paid/delivered/completed/canceled/expired/refunded）
+                  description: 狀態篩選（可選：pending_payment/paid/delivered/completed/canceled/expired/refunded）
                   schema:
                     type: string
             responses:
@@ -6557,7 +6557,7 @@ paths:
         get:
             tags:
                 - StoreNotificationService
-            description: ListNotifications 站内信列表。
+            description: ListNotifications 站內信列表。
             operationId: StoreNotificationService_ListNotifications
             parameters:
                 - name: unreadOnly
@@ -6585,7 +6585,7 @@ paths:
         post:
             tags:
                 - StoreNotificationService
-            description: MarkRead 标记已读（id=0 全部）。
+            description: MarkRead 標記已讀（id=0 全部）。
             operationId: StoreNotificationService_MarkRead
             requestBody:
                 content:
@@ -6601,7 +6601,7 @@ paths:
         get:
             tags:
                 - StoreNotificationService
-            description: UnreadCount 未读数。
+            description: UnreadCount 未讀數。
             operationId: StoreNotificationService_UnreadCount
             responses:
                 "200":
@@ -6614,7 +6614,7 @@ paths:
         post:
             tags:
                 - StoreOrderService
-            description: CreateOrder 下单（锁卡→算价→快照→事件；Idempotency-Key 头防重）。
+            description: CreateOrder 下單（鎖卡→算價→快照→事件；Idempotency-Key 頭防重）。
             operationId: StoreOrderService_CreateOrder
             requestBody:
                 content:
@@ -6651,7 +6651,7 @@ paths:
         get:
             tags:
                 - StoreOrderService
-            description: GetOrder 凭单号+查询密码查单（三重门之一二：查询密码/登录态本人）。
+            description: GetOrder 憑單號+查詢密碼查單（三重門之一二：查詢密碼/登錄態本人）。
             operationId: StoreOrderService_GetOrder
             parameters:
                 - name: orderNo
@@ -6723,7 +6723,7 @@ paths:
         post:
             tags:
                 - StoreOrderService
-            description: CancelMyOrder 取消本人待支付订单（pending 可取消；锁卡释放+返券）。
+            description: CancelMyOrder 取消本人待支付訂單（pending 可取消；鎖卡釋放+返券）。
             operationId: StoreOrderService_CancelMyOrder
             parameters:
                 - name: orderNo
@@ -6901,7 +6901,7 @@ paths:
         get:
             tags:
                 - StorePaymentService
-            description: ListChannels 启用渠道列表（支付页渠道下拉数据源—— 替代前端硬编码枚举）。
+            description: ListChannels 啓用渠道列表（支付頁渠道下拉數據源—— 替代前端硬編碼枚舉）。
             operationId: StorePaymentService_ListChannels
             parameters:
                 - name: scene
@@ -6937,7 +6937,7 @@ paths:
         post:
             tags:
                 - StorePaymentService
-            description: CreatePayment 创建支付（返回收银台/二维码跳转信息）。
+            description: CreatePayment 創建支付（返回收銀台/二維碼跳轉信息）。
             operationId: StorePaymentService_CreatePayment
             requestBody:
                 content:
@@ -6956,7 +6956,7 @@ paths:
         get:
             tags:
                 - StoreContentService
-            description: ListPostCategories 分类列表。
+            description: ListPostCategories 分類列表。
             operationId: StoreContentService_ListPostCategories
             responses:
                 "200":
@@ -6969,7 +6969,7 @@ paths:
         get:
             tags:
                 - StoreContentService
-            description: ListPosts 已发布文章分页（type 过滤）。
+            description: ListPosts 已發佈文章分頁（type 過濾）。
             operationId: StoreContentService_ListPosts
             parameters:
                 - name: type
@@ -7005,7 +7005,7 @@ paths:
         get:
             tags:
                 - StoreContentService
-            description: GetPost 文章详情（slug；未发布返回 404 语义）。
+            description: GetPost 文章詳情（slug；未發佈返回 404 語義）。
             operationId: StoreContentService_GetPost
             parameters:
                 - name: slug
@@ -7028,22 +7028,22 @@ paths:
         get:
             tags:
                 - StoreCatalogService
-            description: ListProducts 商品列表（上架 + 按排序；库存数用于购买校验，stock_visible 仅控制展示）。
+            description: ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
             operationId: StoreCatalogService_ListProducts
             parameters:
                 - name: categoryId
                   in: query
-                  description: 分类过滤（可选）
+                  description: 分類過濾（可選）
                   schema:
                     type: string
                 - name: keyword
                   in: query
-                  description: 搜索关键词（可选，仅商品名等值/前缀匹配；全文搜索 走外置）
+                  description: 搜索關鍵詞（可選，僅商品名等值/前綴匹配；全文搜索 走外置）
                   schema:
                     type: string
                 - name: page
                   in: query
-                  description: 扁平分页（query 绑定：?page=1&page_size=20）
+                  description: 扁平分頁（query 綁定：?page=1&page_size=20）
                   schema:
                     type: integer
                     format: int32
@@ -7054,17 +7054,17 @@ paths:
                     format: int32
                 - name: pointsOnly
                   in: query
-                  description: 积分商城视图（true=仅积分兑换商品 points_required>0；）
+                  description: 積分商城視圖（true=僅積分兑換商品 points_required>0；）
                   schema:
                     type: boolean
                 - name: sort
                   in: query
-                  description: 排序：newest（默认）| price_asc | price_desc | sales
+                  description: 排序：newest（默認）| price_asc | price_desc | sales
                   schema:
                     type: string
                 - name: recommendOnly
                   in: query
-                  description: 推荐位视图（true=仅运营推荐商品 is_recommend；首页「推荐商品」区块）
+                  description: 推薦位視圖（true=僅運營推薦商品 is_recommend；首頁「推薦商品」區塊）
                   schema:
                     type: boolean
             responses:
@@ -7078,7 +7078,7 @@ paths:
         get:
             tags:
                 - StoreCatalogService
-            description: GetProduct 商品详情（下架/隐藏商品返回 NOT_FOUND）。
+            description: GetProduct 商品詳情（下架/隱藏商品返回 NOT_FOUND）。
             operationId: StoreCatalogService_GetProduct
             parameters:
                 - name: id
@@ -7307,7 +7307,7 @@ paths:
         get:
             tags:
                 - StoreSupplierService
-            description: ListMySupplierAccounts 我的对接账户（申请中/已通过/已驳回/已禁用全量）。
+            description: ListMySupplierAccounts 我的對接賬户（申請中/已通過/已駁回/已禁用全量）。
             operationId: StoreSupplierService_ListMySupplierAccounts
             responses:
                 "200":
@@ -7320,7 +7320,7 @@ paths:
         post:
             tags:
                 - StoreSupplierService
-            description: CancelSupplierApplication 撤销申请（仅 applying 状态可撤销）。
+            description: CancelSupplierApplication 撤銷申請（僅 applying 狀態可撤銷）。
             operationId: StoreSupplierService_CancelSupplierApplication
             parameters:
                 - name: id
@@ -7336,7 +7336,7 @@ paths:
         get:
             tags:
                 - StoreSupplierService
-            description: GetSupplierCredentials 查看凭据（仅 approved 且归属本人；返回明文 api_secret）。
+            description: GetSupplierCredentials 查看憑據（僅 approved 且歸屬本人；返回明文 api_secret）。
             operationId: StoreSupplierService_GetSupplierCredentials
             parameters:
                 - name: id
@@ -7355,7 +7355,7 @@ paths:
         post:
             tags:
                 - StoreSupplierService
-            description: SetSupplierIPWhitelist 设置 IP 白名单（仅 approved 且归属本人；空 = 所有 IP 放行）。
+            description: SetSupplierIPWhitelist 設置 IP 白名單（僅 approved 且歸屬本人；空 = 所有 IP 放行）。
             operationId: StoreSupplierService_SetSupplierIPWhitelist
             parameters:
                 - name: id
@@ -7381,8 +7381,8 @@ paths:
             tags:
                 - StoreSupplierService
             description: |-
-                CreateSupplierRecharge 对接账户自助充值（金额服务端档位裁决；
-                 支付确认前不入账——回调成功后入账到供货余额，reference 幂等）。
+                CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；
+                 支付確認前不入賬——回調成功後入賬到供貨餘額，reference 冪等）。
             operationId: StoreSupplierService_CreateSupplierRecharge
             parameters:
                 - name: id
@@ -7407,7 +7407,7 @@ paths:
         post:
             tags:
                 - StoreSupplierService
-            description: RegenerateSupplierSecret 重置密钥（旧 secret 立即失效；新明文仅此一次返回）。
+            description: RegenerateSupplierSecret 重置密鑰（舊 secret 立即失效；新明文僅此一次返回）。
             operationId: StoreSupplierService_RegenerateSupplierSecret
             parameters:
                 - name: id
@@ -7427,8 +7427,8 @@ paths:
             tags:
                 - StoreSupplierService
             description: |-
-                SubmitSupplierApplication 提交对接申请（服务端生成 api_key/api_secret；
-                 api_secret 不在本响应返回——审核通过后在凭据接口查看）。
+                SubmitSupplierApplication 提交對接申請（服務端生成 api_key/api_secret；
+                 api_secret 不在本響應返回——審核通過後在憑據接口查看）。
             operationId: StoreSupplierService_SubmitSupplierApplication
             requestBody:
                 content:
@@ -7447,7 +7447,7 @@ paths:
         get:
             tags:
                 - StoreTicketService
-            description: ListMyTickets 我的工单列表。
+            description: ListMyTickets 我的工單列表。
             operationId: StoreTicketService_ListMyTickets
             parameters:
                 - name: page
@@ -7470,7 +7470,7 @@ paths:
         post:
             tags:
                 - StoreTicketService
-            description: CreateTicket 创建工单（登录用户或游客）。
+            description: CreateTicket 創建工單（登錄用户或遊客）。
             operationId: StoreTicketService_CreateTicket
             requestBody:
                 content:
@@ -7489,7 +7489,7 @@ paths:
         get:
             tags:
                 - StoreTicketService
-            description: GetTicket 工单详情（消息流；内部备注过滤）。
+            description: GetTicket 工單詳情（消息流；內部備註過濾）。
             operationId: StoreTicketService_GetTicket
             parameters:
                 - name: ticketNo
@@ -7508,7 +7508,7 @@ paths:
         post:
             tags:
                 - StoreTicketService
-            description: RateTicket 评价（resolved 后 1-5）。
+            description: RateTicket 評價（resolved 後 1-5）。
             operationId: StoreTicketService_RateTicket
             parameters:
                 - name: ticketNo
@@ -7530,7 +7530,7 @@ paths:
         post:
             tags:
                 - StoreTicketService
-            description: ReplyTicket 追加回复。
+            description: ReplyTicket 追加回復。
             operationId: StoreTicketService_ReplyTicket
             parameters:
                 - name: ticketNo
@@ -7552,7 +7552,7 @@ paths:
         post:
             tags:
                 - StoreTicketService
-            description: PayUrgent 付费加急（余额支付 urgent_fee；成功即 priority=urgent_paid）。
+            description: PayUrgent 付費加急（餘額支付 urgent_fee；成功即 priority=urgent_paid）。
             operationId: StoreTicketService_PayUrgent
             parameters:
                 - name: ticketNo
@@ -7577,7 +7577,7 @@ paths:
         post:
             tags:
                 - StoreUserService
-            description: Login 登录（返回 user realm JWT；username 混输：用户名/邮箱/手机号）。
+            description: Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
             operationId: StoreUserService_Login
             requestBody:
                 content:
@@ -7596,7 +7596,7 @@ paths:
         get:
             tags:
                 - StoreUserService
-            description: Me 我的信息（需登录）。
+            description: Me 我的信息（需登錄）。
             operationId: StoreUserService_Me
             responses:
                 "200":
@@ -7609,7 +7609,7 @@ paths:
         post:
             tags:
                 - StoreUserService
-            description: ChangePassword 登录态改密（旧密码校验；吊销全部 session、响应携带新 token 保当前会话）。
+            description: ChangePassword 登錄態改密（舊密碼校驗；吊銷全部 session、響應攜帶新 token 保當前會話）。
             operationId: StoreUserService_ChangePassword
             requestBody:
                 content:
@@ -7628,7 +7628,7 @@ paths:
         post:
             tags:
                 - StoreUserService
-            description: ForgotPassword 发送找回密码验证码（：邮箱不存在同样成功——防枚举）。
+            description: ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
             operationId: StoreUserService_ForgotPassword
             requestBody:
                 content:
@@ -7647,7 +7647,7 @@ paths:
         post:
             tags:
                 - StoreUserService
-            description: ResetPassword 验码重置密码（重置即登录——返回新 token；吊销全部 session）。
+            description: ResetPassword 驗碼重置密碼（重置即登錄——返回新 token；吊銷全部 session）。
             operationId: StoreUserService_ResetPassword
             requestBody:
                 content:
@@ -7666,7 +7666,7 @@ paths:
         post:
             tags:
                 - StoreUserService
-            description: UpdateProfile 修改资料（邮箱；唯一性校验）。
+            description: UpdateProfile 修改資料（郵箱；唯一性校驗）。
             operationId: StoreUserService_UpdateProfile
             requestBody:
                 content:
@@ -7685,7 +7685,7 @@ paths:
         post:
             tags:
                 - StoreUserService
-            description: Register 注册（username+password；invite_code 可选=上级 user_id）。
+            description: Register 註冊（username+password；invite_code 可選=上級 user_id）。
             operationId: StoreUserService_Register
             requestBody:
                 content:
@@ -7704,7 +7704,7 @@ paths:
         post:
             tags:
                 - StoreUserService
-            description: SendRegisterCode 发送注册验证码（通道：email|phone——按 security.register_method 校验）。
+            description: SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
             operationId: StoreUserService_SendRegisterCode
             requestBody:
                 content:
@@ -7723,7 +7723,7 @@ paths:
         get:
             tags:
                 - StoreWalletService
-            description: GetBalance 余额+积分。
+            description: GetBalance 餘額+積分。
             operationId: StoreWalletService_GetBalance
             responses:
                 "200":
@@ -7736,7 +7736,7 @@ paths:
         post:
             tags:
                 - StoreWalletService
-            description: RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破；余额入账幂等键 giftcard:<id>）。
+            description: RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
             operationId: StoreWalletService_RedeemGiftcard
             requestBody:
                 content:
@@ -7755,7 +7755,7 @@ paths:
         post:
             tags:
                 - StoreWalletService
-            description: CreateRecharge 充值（走支付管线）。
+            description: CreateRecharge 充值（走支付管線）。
             operationId: StoreWalletService_CreateRecharge
             requestBody:
                 content:
@@ -7774,7 +7774,7 @@ paths:
         get:
             tags:
                 - StoreWalletService
-            description: ListTransactions 流水（余额）。
+            description: ListTransactions 流水（餘額）。
             operationId: StoreWalletService_ListTransactions
             parameters:
                 - name: page
@@ -7798,7 +7798,7 @@ paths:
         post:
             tags:
                 - StoreWalletService
-            description: CreateWithdrawal 提现申请（佣金提现：冻结口径+白名单+USDT 校验； 执行）。
+            description: CreateWithdrawal 提現申請（佣金提現：凍結口徑+白名單+USDT 校驗； 執行）。
             operationId: StoreWalletService_CreateWithdrawal
             requestBody:
                 content:
@@ -7817,7 +7817,7 @@ paths:
         get:
             tags:
                 - StoreWalletService
-            description: ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+            description: ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
             operationId: StoreWalletService_ListMyWithdrawals
             parameters:
                 - name: page
@@ -7897,7 +7897,7 @@ components:
                     type: boolean
                 remark:
                     type: string
-            description: Admin 员工（不含密码哈希等敏感字段）。
+            description: Admin 員工（不含密碼哈希等敏感字段）。
         zcard.api.admin.v1.AdminCommission:
             type: object
             properties:
@@ -8021,7 +8021,7 @@ components:
                     type: boolean
                 expiryReason:
                     type: string
-            description: AdminOrder 管理面订单（含成本；StripCostPrice 由 service 判权限）。
+            description: AdminOrder 管理面訂單（含成本；StripCostPrice 由 service 判權限）。
         zcard.api.admin.v1.AdminOrderItem:
             type: object
             properties:
@@ -8163,16 +8163,16 @@ components:
                     type: string
                 pointsRequired:
                     type: string
-                    description: 积分兑换价（0=不参与积分商城；）
+                    description: 積分兑換價（0=不參與積分商城；）
                 soldCount:
                     type: string
-                    description: 已售数量（paid 及之后状态订单的 quantity 聚合；列表计算字段）
+                    description: 已售數量（paid 及之後狀態訂單的 quantity 聚合；列表計算字段）
                 hasDirectContent:
                     type: boolean
-                    description: 直发内容已设置（url/code 商品；明文永不回传）
+                    description: 直髮內容已設置（url/code 商品；明文永不回傳）
                 isRecommend:
                     type: boolean
-                    description: 运营推荐（storefront 首页推荐位）
+                    description: 運營推薦（storefront 首頁推薦位）
                 stockStatus:
                     type: string
                 stockReference:
@@ -8203,7 +8203,7 @@ components:
                     type: string
                 lowStockMessage:
                     type: string
-            description: AdminProduct 管理面商品（含成本价等敏感字段）。
+            description: AdminProduct 管理面商品（含成本價等敏感字段）。
         zcard.api.admin.v1.AdminProfile:
             type: object
             properties:
@@ -8554,8 +8554,8 @@ components:
                 status:
                     type: integer
                     description: |-
-                        status 不标 REQUIRED:0=下架是合法值,REQUIRED 校验把零值当未传拒绝
-                         (missing required field: status——下架必炸;值域 0/1/2 由业务层校验)。
+                        status 不標 REQUIRED:0=下架是合法值,REQUIRED 校驗把零值當未傳拒絕
+                         (missing required field: status——下架必炸;值域 0/1/2 由業務層校驗)。
                     format: int32
         zcard.api.admin.v1.Broadcast:
             type: object
@@ -8683,7 +8683,7 @@ components:
                     type: string
                 importId:
                     type: string
-            description: CardInfo 卡密信息（内容默认掩码 ****尾4位）。
+            description: CardInfo 卡密信息（內容默認掩碼 ****尾4位）。
         zcard.api.admin.v1.Category:
             type: object
             properties:
@@ -8706,7 +8706,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.admin.v1.Category'
-            description: Category 分类（树形，含子分类计数）。
+            description: Category 分類（樹形，含子分類計數）。
         zcard.api.admin.v1.CategoryList:
             type: object
             properties:
@@ -8801,7 +8801,7 @@ components:
                     type: string
                 recommendDescription:
                     type: string
-            description: Channel 渠道（config 为 AES-GCM 加密凭据，列表返回 ****）。
+            description: Channel 渠道（config 為 AES-GCM 加密憑據，列表返回 ****）。
         zcard.api.admin.v1.ChannelList:
             type: object
             properties:
@@ -8891,7 +8891,7 @@ components:
                         $ref: '#/components/schemas/zcard.api.admin.v1.Option'
                 default:
                     type: string
-            description: ConfigField 配置字段 schema（前端按 type 动态渲染表单）。
+            description: ConfigField 配置字段 schema（前端按 type 動態渲染表單）。
         zcard.api.admin.v1.ConfigureInviteLevelRequest:
             type: object
             properties:
@@ -9024,7 +9024,7 @@ components:
                         type: string
                 scheduledAt:
                     type: string
-            description: CreateBroadcast 创建群发（定时 scheduled_at；空 = 立即）。
+            description: CreateBroadcast 創建羣發（定時 scheduled_at；空 = 立即）。
         zcard.api.admin.v1.CreateCategoryRequest:
             required:
                 - name
@@ -9213,7 +9213,7 @@ components:
                 perUserLimit:
                     type: integer
                     format: int32
-            description: CreateFlashSale 创建秒杀（限量与卡密同锁）。
+            description: CreateFlashSale 創建秒殺（限量與卡密同鎖）。
         zcard.api.admin.v1.CreateGiftcardBatchReply:
             type: object
             properties:
@@ -9224,8 +9224,8 @@ components:
                     items:
                         type: string
             description: |-
-                CreateGiftcardBatchReply 批次 + 明文码（仅创建响应一次性返回；此后任何端点
-                 不可再取——库内无明文，铁律 11；同 一次性明文交付纪律）。
+                CreateGiftcardBatchReply 批次 + 明文碼（僅創建響應一次性返回；此後任何端點
+                 不可再取——庫內無明文，鐵律 11；同 一次性明文交付紀律）。
         zcard.api.admin.v1.CreateGiftcardBatchRequest:
             required:
                 - batchNo
@@ -9404,13 +9404,13 @@ components:
                     format: int32
                 pointsRequired:
                     type: string
-                    description: 积分兑换价（0=不参与积分商城；）
+                    description: 積分兑換價（0=不參與積分商城；）
                 directContent:
                     type: string
-                    description: 直发内容明文（url/code 商品：网盘链接/兑换码，加密存储；同一内容发给每个买家）
+                    description: 直髮內容明文（url/code 商品：網盤鏈接/兑換碼，加密存儲；同一內容發給每個買家）
                 isRecommend:
                     type: boolean
-                    description: 运营推荐（storefront 首页推荐位）
+                    description: 運營推薦（storefront 首頁推薦位）
         zcard.api.admin.v1.CreateReconciliationJobRequest:
             required:
                 - connectionId
@@ -9481,7 +9481,7 @@ components:
                     format: int32
                 stockVisible:
                     type: boolean
-            description: CreateResellerProductRequest 分站自营商品上架入参（名称必填；价格/成本分）。
+            description: CreateResellerProductRequest 分站自營商品上架入參（名稱必填；價格/成本分）。
         zcard.api.admin.v1.CreateRoleRequest:
             required:
                 - name
@@ -9622,7 +9622,7 @@ components:
                 sort:
                     type: integer
                     format: int32
-            description: Currency 货币（rate 为 decimal 字符串）。
+            description: Currency 貨幣（rate 為 decimal 字符串）。
         zcard.api.admin.v1.CurrencyList:
             type: object
             properties:
@@ -9786,7 +9786,7 @@ components:
                         type: string
                 batchId:
                     type: string
-            description: DeleteCoupons：ids 非空按 id 删；batch_id 非空删该批次全部未使用。两者只生效其一（ids 优先）。
+            description: DeleteCoupons：ids 非空按 id 刪；batch_id 非空刪該批次全部未使用。兩者只生效其一（ids 優先）。
         zcard.api.admin.v1.DeleteMediaReply:
             type: object
             properties:
@@ -9873,8 +9873,8 @@ components:
                 content:
                     type: string
             description: |-
-                DeliveryRecord 交付记录（content=完整卡密，服务端现场解密；路由受
-                 order:view_delivery 权限门控 + 查看审计留痕）。
+                DeliveryRecord 交付記錄（content=完整卡密，服務端現場解密；路由受
+                 order:view_delivery 權限門控 + 查看審計留痕）。
         zcard.api.admin.v1.DeliverySourceInfo:
             type: object
             properties:
@@ -9937,7 +9937,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.admin.v1.ConfigField'
-            description: Driver 渠道驱动元数据（ListDrivers）。
+            description: Driver 渠道驅動元數據（ListDrivers）。
         zcard.api.admin.v1.DriverList:
             type: object
             properties:
@@ -9945,7 +9945,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.admin.v1.Driver'
-            description: DriverList 驱动元数据列表。
+            description: DriverList 驅動元數據列表。
         zcard.api.admin.v1.EnableTOTPReply:
             type: object
             properties:
@@ -9969,7 +9969,7 @@ components:
                     type: array
                     items:
                         type: string
-            description: EstimateBroadcast 覆盖人数预估（创建前预览）。
+            description: EstimateBroadcast 覆蓋人數預估（創建前預覽）。
         zcard.api.admin.v1.ExportCardsReply:
             type: object
             properties:
@@ -10052,7 +10052,7 @@ components:
                     type: array
                     items:
                         type: string
-                    description: 权限点清单（如 order:list / card:view_content），前端据此生成菜单与按钮
+                    description: 權限點清單（如 order:list / card:view_content），前端據此生成菜單與按鈕
         zcard.api.admin.v1.GetReconciliationReply:
             type: object
             properties:
@@ -10110,7 +10110,7 @@ components:
                 count:
                     type: integer
                     format: int32
-            description: GrantCoupon 批次赠送指定用户（领取）。
+            description: GrantCoupon 批次贈送指定用户（領取）。
         zcard.api.admin.v1.Group:
             type: object
             properties:
@@ -10122,7 +10122,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.admin.v1.Perm'
-            description: Group 域分组。
+            description: Group 域分組。
         zcard.api.admin.v1.HealthItem:
             type: object
             properties:
@@ -10362,7 +10362,7 @@ components:
             properties:
                 dataBase64:
                     type: string
-            description: InstallTemplateRequest 主题安装（zip base64，对齐 media 上传模式）。
+            description: InstallTemplateRequest 主題安裝（zip base64，對齊 media 上傳模式）。
         zcard.api.admin.v1.InventorySkuCount:
             type: object
             properties:
@@ -11014,18 +11014,18 @@ components:
                     type: string
                 accessToken:
                     type: string
-                    description: admin realm 访问令牌（2h）
+                    description: admin realm 訪問令牌（2h）
                 tokenType:
                     type: string
-                    description: 令牌类型，固定 Bearer
+                    description: 令牌類型，固定 Bearer
                 expiresAt:
                     type: string
-                    description: 过期时间（unix 秒）
+                    description: 過期時間（unix 秒）
                 admin:
                     $ref: '#/components/schemas/zcard.api.admin.v1.AdminProfile'
                 refreshToken:
                     type: string
-                    description: refresh 令牌（14d，一次性轮换）
+                    description: refresh 令牌（14d，一次性輪換）
         zcard.api.admin.v1.LoginRequest:
             type: object
             properties:
@@ -11037,10 +11037,10 @@ components:
                     type: string
                 totpCode:
                     type: string
-                    description: TOTP 六位动态码（员工开启二步验证时必填）
+                    description: TOTP 六位動態碼（員工開啓二步驗證時必填）
                 captchaId:
                     type: string
-                    description: 图形验证码 ID/验证码（captcha_admin_login 开启时必填）
+                    description: 圖形驗證碼 ID/驗證碼（captcha_admin_login 開啓時必填）
                 captchaCode:
                     type: string
         zcard.api.admin.v1.LogoutRequest:
@@ -11343,7 +11343,7 @@ components:
                     type: boolean
                 badgeStyle:
                     type: string
-            description: MemberGroup 会员商品组（命中商品的订单按 discount 万分比打折）。
+            description: MemberGroup 會員商品組（命中商品的訂單按 discount 萬分比打折）。
         zcard.api.admin.v1.MemberGroupList:
             type: object
             properties:
@@ -11378,7 +11378,7 @@ components:
                     type: boolean
                 pointsRuleJson:
                     type: string
-                    description: '积分产生规则 JSON：{"spend_cents": 每消费多少分, "points": 产出积分数}'
+                    description: '積分產生規則 JSON：{"spend_cents": 每消費多少分, "points": 產出積分數}'
         zcard.api.admin.v1.MemberLevelList:
             type: object
             properties:
@@ -11409,7 +11409,7 @@ components:
                     type: string
                 preview:
                     type: boolean
-            description: 仅合并明确选中的分类；未选中的子分类移到目标下，不递归删除。
+            description: 僅合併明確選中的分類；未選中的子分類移到目標下，不遞歸刪除。
         zcard.api.admin.v1.MoveMediaCategoryRequest:
             required:
                 - id
@@ -11531,7 +11531,7 @@ components:
                     type: string
                 label:
                     type: string
-            description: OptionItem 枚举选项（value 入库值，label 展示名）。
+            description: OptionItem 枚舉選項（value 入庫值，label 展示名）。
         zcard.api.admin.v1.PayWithdrawalRequest:
             required:
                 - id
@@ -11572,7 +11572,7 @@ components:
                     type: string
                 driverSnapshot:
                     type: string
-            description: Payment 支付单。
+            description: Payment 支付單。
         zcard.api.admin.v1.PendingOrder:
             type: object
             properties:
@@ -11617,7 +11617,7 @@ components:
                     type: string
                 dialect:
                     type: string
-                    description: ── 数据库选择（在线安装库切换）──
+                    description: ── 數據庫選擇（在線安裝庫切換）──
                 dbHost:
                     type: string
                 dbPort:
@@ -11644,7 +11644,7 @@ components:
                     type: boolean
                 public:
                     type: boolean
-            description: Perm 权限点。
+            description: Perm 權限點。
         zcard.api.admin.v1.PermissionTree:
             type: object
             properties:
@@ -11652,7 +11652,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.admin.v1.Group'
-            description: PermissionTree 权限目录树。
+            description: PermissionTree 權限目錄樹。
         zcard.api.admin.v1.PingConnectionReply:
             type: object
             properties:
@@ -11747,7 +11747,7 @@ components:
                     type: string
                 importId:
                     type: string
-            description: PremiumCardInfo 靓号卡（内容掩码；draft_premium 预选加价）。
+            description: PremiumCardInfo 靚號卡（內容掩碼；draft_premium 預選加價）。
         zcard.api.admin.v1.PreviewBatchProductContentRequest:
             type: object
             properties:
@@ -12047,7 +12047,7 @@ components:
                     type: string
                 reference:
                     type: string
-                    description: 一次充值使用一个幂等键；重试沿用原键，下一笔充值使用新键。
+                    description: 一次充值使用一個冪等鍵；重試沿用原鍵，下一筆充值使用新鍵。
         zcard.api.admin.v1.ReconciliationItemDetail:
             type: object
             properties:
@@ -12151,7 +12151,7 @@ components:
                     type: string
                 operatorId:
                     type: string
-            description: RefundOrder 退款单。
+            description: RefundOrder 退款單。
         zcard.api.admin.v1.RejectReviewRequest:
             required:
                 - id
@@ -12170,7 +12170,7 @@ components:
                     type: string
                 issuedAt:
                     type: string
-            description: ReleaseNoteEntry 历史版本变更记录（manifest history 段透传）。
+            description: ReleaseNoteEntry 歷史版本變更記錄（manifest history 段透傳）。
         zcard.api.admin.v1.RenameMediaCategoryRequest:
             required:
                 - id
@@ -12201,8 +12201,8 @@ components:
                     items:
                         type: string
             description: |-
-                ReorderCategoriesRequest 分类排序：把 parent_id 层级下的分类按 ids 顺序重排，
-                 sort 归一化为 0..n-1；ids 需包含该层级的全部兄弟（拖拽跨层级时含被移动分类）。
+                ReorderCategoriesRequest 分類排序：把 parent_id 層級下的分類按 ids 順序重排，
+                 sort 歸一化為 0..n-1；ids 需包含該層級的全部兄弟（拖拽跨層級時含被移動分類）。
         zcard.api.admin.v1.ResellerProduct:
             type: object
             properties:
@@ -12221,7 +12221,7 @@ components:
                     format: int32
                 createdAt:
                     type: string
-            description: ResellerProduct 分站自营商品（上架结果回执）。
+            description: ResellerProduct 分站自營商品（上架結果回執）。
         zcard.api.admin.v1.ResellerProfile:
             type: object
             properties:
@@ -12414,7 +12414,7 @@ components:
                     type: string
                 createdAt:
                     type: string
-            description: ReviewItem 真实评价（审核流：pending→approved/rejected）。
+            description: ReviewItem 真實評價（審核流：pending→approved/rejected）。
         zcard.api.admin.v1.ReviewSupplierAccountRequest:
             required:
                 - id
@@ -12454,7 +12454,7 @@ components:
                     type: array
                     items:
                         type: string
-            description: Role 角色详情。
+            description: Role 角色詳情。
         zcard.api.admin.v1.RunReconciliationJobRequest:
             required:
                 - id
@@ -12637,16 +12637,16 @@ components:
                     type: string
                 label:
                     type: string
-                    description: 业务显示名称（目录裁决；缺失回落 key 本身）
+                    description: 業務顯示名稱（目錄裁決；缺失回落 key 本身）
                 options:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.admin.v1.OptionItem'
-                    description: '枚举选项（如 category_nav_style: list/grid）；非枚举键为空'
+                    description: '枚舉選項（如 category_nav_style: list/grid）；非枚舉鍵為空'
                 secret:
                     type: boolean
-                    description: 敏感键（值已脱敏 ****；前端渲染密码框）
-            description: Setting 设置项（value_json 为 JSON 文档字符串）。
+                    description: 敏感鍵（值已脱敏 ****；前端渲染密碼框）
+            description: Setting 設置項（value_json 為 JSON 文檔字符串）。
         zcard.api.admin.v1.SettingUpdate:
             required:
                 - group
@@ -12701,7 +12701,7 @@ components:
                     format: int32
                 upstreamSkuId:
                     type: string
-            description: Sku 管理面多规格（含成本价）。
+            description: Sku 管理面多規格（含成本價）。
         zcard.api.admin.v1.SkuList:
             type: object
             properties:
@@ -12895,7 +12895,7 @@ components:
                     type: string
                 lastCollectAt:
                     type: string
-                    description: S2/S3：调度锚点与限流状态（界面展示/倒计时）
+                    description: S2/S3：調度錨點與限流狀態（界面展示/倒計時）
                 lastPriceSyncAt:
                     type: string
                 lastStatusSyncAt:
@@ -13250,17 +13250,17 @@ components:
                     type: string
                 icon:
                     type: string
-                    description: 图标（optional：缺省=不变；显式空串=清除）
+                    description: 圖標（optional：缺省=不變；顯式空串=清除）
                 hide:
                     type: boolean
-                    description: 隐藏状态（optional：未传保持不变，避免只改排序/名称时误取消隐藏）
+                    description: 隱藏狀態（optional：未傳保持不變，避免只改排序/名稱時誤取消隱藏）
                 sort:
                     type: integer
-                    description: 排序（optional：缺省不变——曾用 int32「>=0 即更新」把只改名的请求重置排序）
+                    description: 排序（optional：缺省不變——曾用 int32「>=0 即更新」把只改名的請求重置排序）
                     format: int32
                 parentId:
                     type: string
-                    description: 父分类（optional：缺省不变；0 = 顶级；>0 = 指定父，防环校验）
+                    description: 父分類（optional：缺省不變；0 = 頂級；>0 = 指定父，防環校驗）
         zcard.api.admin.v1.UpdateChannelRequest:
             required:
                 - id
@@ -13516,7 +13516,7 @@ components:
                     type: string
                 description:
                     type: string
-                    description: 省略保留原值，显式空串清除。
+                    description: 省略保留原值，顯式空串清除。
                 cover:
                     type: string
                 images:
@@ -13525,7 +13525,7 @@ components:
                         type: string
                 imagesSet:
                     type: boolean
-                    description: true 时以 images 替换图集（包括空数组）；省略且 images 非空时兼容旧客户端。
+                    description: true 時以 images 替換圖集（包括空數組）；省略且 images 非空時兼容舊客户端。
                 priceCents:
                     type: string
                 factoryPriceCents:
@@ -13542,16 +13542,16 @@ components:
                     format: int32
                 pointsRequired:
                     type: string
-                    description: 积分兑换价（0=不参与积分商城；）
+                    description: 積分兑換價（0=不參與積分商城；）
                 directContent:
                     type: string
-                    description: 直发内容明文（空=保持不变；url/code 商品加密存储）
+                    description: 直髮內容明文（空=保持不變；url/code 商品加密存儲）
                 isRecommend:
                     type: boolean
-                    description: 运营推荐（省略保留原值；false=取消推荐）。
+                    description: 運營推薦（省略保留原值；false=取消推薦）。
                 stockType:
                     type: string
-                    description: 空值保留原类型；card | url | code
+                    description: 空值保留原類型；card | url | code
         zcard.api.admin.v1.UpdateRolePermissionsRequest:
             required:
                 - id
@@ -13588,7 +13588,7 @@ components:
                     type: string
                 valueJson:
                     type: string
-                    description: 任意 JSON 文档（对象/数组/标量均可），服务端原样存储
+                    description: 任意 JSON 文檔（對象/數組/標量均可），服務端原樣存儲
         zcard.api.admin.v1.UpdateSettingsReply:
             type: object
             properties:
@@ -13605,7 +13605,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.admin.v1.SettingUpdate'
-            description: UpdateSettingsRequest 批量更新项。
+            description: UpdateSettingsRequest 批量更新項。
         zcard.api.admin.v1.UpdateShippingRequest:
             type: object
             properties:
@@ -13803,7 +13803,7 @@ components:
                     type: string
                 enabled:
                     type: boolean
-            description: UpsertPromotion 创建/更新促销。
+            description: UpsertPromotion 創建/更新促銷。
         zcard.api.admin.v1.UpsertSupplierPriceRequest:
             required:
                 - accountId
@@ -13835,7 +13835,7 @@ components:
                     type: string
                 expiresAt:
                     type: string
-            description: UserCouponItem 用户持有优惠券。
+            description: UserCouponItem 用户持有優惠券。
         zcard.api.admin.v1.UserDetail:
             type: object
             properties:
@@ -13853,7 +13853,7 @@ components:
                     type: string
                 inviteesCount:
                     type: string
-            description: UserDetail 用户详情（聚合视图）。
+            description: UserDetail 用户詳情（聚合視圖）。
         zcard.api.admin.v1.UserItem:
             type: object
             properties:
@@ -13885,7 +13885,7 @@ components:
                     type: string
                 levelId:
                     type: string
-                    description: 聚合展示（列表/详情同源）
+                    description: 聚合展示（列表/詳情同源）
                 levelName:
                     type: string
                 balanceCents:
@@ -13901,7 +13901,7 @@ components:
                     type: boolean
                 supplierStatus:
                     type: string
-            description: UserItem 前台用户（敏感字段如密码哈希绝不外发）。
+            description: UserItem 前台用户（敏感字段如密碼哈希絕不外發）。
         zcard.api.admin.v1.UserRecentOrder:
             type: object
             properties:
@@ -13917,7 +13917,7 @@ components:
                     type: string
                 createdAt:
                     type: string
-            description: UserRecentOrder 最近订单（用户详情聚合，默认 10 条）。
+            description: UserRecentOrder 最近訂單（用户詳情聚合，默認 10 條）。
         zcard.api.admin.v1.VerifySiteReply:
             type: object
             properties:
@@ -13965,7 +13965,7 @@ components:
                     format: int32
                 createdAt:
                     type: string
-            description: VirtualReviewItem 虚拟评价（与真实 approved 合并展示）。
+            description: VirtualReviewItem 虛擬評價（與真實 approved 合併展示）。
         zcard.api.admin.v1.VisitStatItem:
             type: object
             properties:
@@ -14097,7 +14097,7 @@ components:
                     format: int32
                 productName:
                     type: string
-                    description: 商品快照（联查现值——结算前端展示用）
+                    description: 商品快照（聯查現值——結算前端展示用）
                 priceCents:
                     type: string
                 maxQuantity:
@@ -14179,7 +14179,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.storefront.v1.ChannelItem'
-            description: ChannelListReply 启用渠道列表。
+            description: ChannelListReply 啓用渠道列表。
         zcard.api.storefront.v1.CommissionItem:
             type: object
             properties:
@@ -14247,16 +14247,16 @@ components:
                     type: object
                     additionalProperties:
                         type: string
-                    description: 控件答案（key=控件 ID 字符串，value=答案；多选用逗号分隔）
+                    description: 控件答案（key=控件 ID 字符串，value=答案；多選用逗號分隔）
                 usePoints:
                     type: boolean
-                    description: 积分兑换下单（：全部商品须为积分商品；积分同事务扣款，订单直落 paid）
+                    description: 積分兑換下單（：全部商品須為積分商品；積分同事務扣款，訂單直落 paid）
                 refCode:
                     type: string
-                    description: 推广归因码（可空）：游客/无链用户下单时实时解析推广者 → 订单级归因快照
+                    description: 推廣歸因碼（可空）：遊客/無鏈用户下單時實時解析推廣者 → 訂單級歸因快照
                 captchaId:
                     type: string
-                    description: 图形验证码（captcha_order 开启时游客必填）
+                    description: 圖形驗證碼（captcha_order 開啓時遊客必填）
                 captchaCode:
                     type: string
         zcard.api.storefront.v1.CreatePaymentReply:
@@ -14313,7 +14313,7 @@ components:
                     type: string
                 method:
                     type: string
-                    description: 方式标识（多方式渠道必填：易支付 alipay/wxpay、USDT 选链；单方式渠道留空）
+                    description: 方式標識（多方式渠道必填：易支付 alipay/wxpay、USDT 選鏈；單方式渠道留空）
                 quoteKey:
                     type: string
         zcard.api.storefront.v1.CreateSupplierRechargeReply:
@@ -14344,7 +14344,7 @@ components:
                     type: string
                 method:
                     type: string
-                    description: 方式标识（多方式渠道必填：易支付 alipay/wxpay、USDT 选链；单方式渠道留空）
+                    description: 方式標識（多方式渠道必填：易支付 alipay/wxpay、USDT 選鏈；單方式渠道留空）
                 quoteKey:
                     type: string
         zcard.api.storefront.v1.CreateTicketRequest:
@@ -14393,7 +14393,7 @@ components:
                     type: string
                 qrCodeUrl:
                     type: string
-            description: CreateWithdrawalRequest 提现申请（金额/收款方式；method_type 须在白名单内）。
+            description: CreateWithdrawalRequest 提現申請（金額/收款方式；method_type 須在白名單內）。
         zcard.api.storefront.v1.Currencies:
             type: object
             properties:
@@ -14401,7 +14401,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.storefront.v1.Currency'
-            description: Currencies 货币列表。
+            description: Currencies 貨幣列表。
         zcard.api.storefront.v1.Currency:
             type: object
             properties:
@@ -14416,7 +14416,7 @@ components:
                     format: int32
                 rateJson:
                     type: string
-            description: Currency 货币（rate 为 decimal 字符串——前端 decimal 换算，杜绝浮点误差入口）。
+            description: Currency 貨幣（rate 為 decimal 字符串——前端 decimal 換算，杜絕浮點誤差入口）。
         zcard.api.storefront.v1.DeliveryItem:
             type: object
             properties:
@@ -14436,7 +14436,7 @@ components:
                     type: string
                 masked:
                     type: boolean
-            description: DeliveryItem 交付项（明文只在首次取货返回；之后掩码）。
+            description: DeliveryItem 交付項（明文只在首次取貨返回；之後掩碼）。
         zcard.api.storefront.v1.FetchDeliveryReply:
             type: object
             properties:
@@ -14475,7 +14475,7 @@ components:
                 perUserLimit:
                     type: integer
                     format: int32
-            description: Product 顾客视角商品（管理字段与成本价绝不下发）。
+            description: Product 顧客視角商品（管理字段與成本價絕不下發）。
         zcard.api.storefront.v1.ForgotPasswordReply:
             type: object
             properties: {}
@@ -14596,37 +14596,37 @@ components:
                     type: string
                 pointsRuleJson:
                     type: string
-            description: LevelBrief 等级摘要。
+            description: LevelBrief 等級摘要。
         zcard.api.storefront.v1.LevelProgress:
             type: object
             properties:
                 rechargeGapCents:
                     type: string
-                    description: 充值口径差额（0 = 已达标；下一等级不含充值条件时为 -1）
+                    description: 充值口徑差額（0 = 已達標；下一等級不含充值條件時為 -1）
                 consumeGapCents:
                     type: string
-                    description: 消费口径差额（0 = 已达标；下一等级不含消费条件时为 -1）
+                    description: 消費口徑差額（0 = 已達標；下一等級不含消費條件時為 -1）
                 percent:
                     type: integer
-                    description: 综合进度百分比 0-100（按已达标口径均值粗算；both_and 取较小值）
+                    description: 綜合進度百分比 0-100（按已達標口徑均值粗算；both_and 取較小值）
                     format: int32
-            description: LevelProgress 距下一等级进度。
+            description: LevelProgress 距下一等級進度。
         zcard.api.storefront.v1.LicenseOfferReply:
             type: object
             properties:
                 monthlyCents:
                     type: string
-                    description: 月付价（分；默认 300 = 3U）
+                    description: 月付價（分；默認 300 = 3U）
                 yearlyCents:
                     type: string
-                    description: 年付价（分；默认 3000 = 30U）
+                    description: 年付價（分；默認 3000 = 30U）
                 purchasable:
                     type: boolean
-                    description: 发行侧是否配置签发私钥（false = 本部署不开通在线购买）
+                    description: 發行側是否配置簽發私鑰（false = 本部署不開通在線購買）
                 instanceId:
                     type: string
-                    description: 本部署实例 ID（自购场景绑定预览；购买其他实例时填对方实例 ID）
-            description: LicenseOfferReply 套餐报价与购买前置状态。
+                    description: 本部署實例 ID（自購場景綁定預覽；購買其他實例時填對方實例 ID）
+            description: LicenseOfferReply 套餐報價與購買前置狀態。
         zcard.api.storefront.v1.LicenseOrderItem:
             type: object
             properties:
@@ -15017,7 +15017,7 @@ components:
                     type: string
                 icon:
                     type: string
-            description: MethodItem 支付方式（收银台顾客看到的选项：支付宝/微信/USDT-TRC20…）。
+            description: MethodItem 支付方式（收銀台顧客看到的選項：支付寶/微信/USDT-TRC20…）。
         zcard.api.storefront.v1.MyAffiliateReply:
             type: object
             properties:
@@ -15071,30 +15071,30 @@ components:
                     type: boolean
                 rechargedCents:
                     type: string
-                    description: 累计充值（countAsRecharge 口径：仅真实充值入账，互转/调账不计）
+                    description: 累計充值（countAsRecharge 口徑：僅真實充值入賬，互轉/調賬不計）
                 consumedCents:
                     type: string
-                    description: 累计消费（已支付及之后状态订单额）
+                    description: 累計消費（已支付及之後狀態訂單額）
                 points:
                     type: string
-                    description: 积分余额
+                    description: 積分餘額
                 current:
                     allOf:
                         - $ref: '#/components/schemas/zcard.api.storefront.v1.LevelBrief'
-                    description: 当前等级（未命中任何等级为 null）
+                    description: 當前等級（未命中任何等級為 null）
                 next:
                     allOf:
                         - $ref: '#/components/schemas/zcard.api.storefront.v1.LevelBrief'
-                    description: 下一等级（已满级为 null）
+                    description: 下一等級（已滿級為 null）
                 progress:
                     allOf:
                         - $ref: '#/components/schemas/zcard.api.storefront.v1.LevelProgress'
-                    description: 升级进度（距下一等级差额）
+                    description: 升級進度（距下一等級差額）
                 levels:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.storefront.v1.LevelBrief'
-            description: MyLevelReply 等级进度（阈值即时评估口径：只升不降随累计值单调）。
+            description: MyLevelReply 等級進度（閾值即時評估口徑：只升不降隨累計值單調）。
         zcard.api.storefront.v1.MyOrderItem:
             type: object
             properties:
@@ -15118,7 +15118,7 @@ components:
                 manualPendingCount:
                     type: integer
                     format: int32
-            description: MyOrderItem 我的订单行（金额/状态/时间；卡密取回走 GetOrder）。
+            description: MyOrderItem 我的訂單行（金額/狀態/時間；卡密取回走 GetOrder）。
         zcard.api.storefront.v1.MyWithdrawalItem:
             type: object
             properties:
@@ -15387,42 +15387,42 @@ components:
                     type: string
                 priceCents:
                     type: string
-                    description: 售价（分，基础货币）
+                    description: 售價（分，基礎貨幣）
                 stockType:
                     type: string
-                    description: 库存类型 card/url/code
+                    description: 庫存類型 card/url/code
                 stock:
                     type: string
-                    description: 按货源返回库存（>=0 数量，-1 不限，-2 待确认），stock_visible 仅控制展示
+                    description: 按貨源返回庫存（>=0 數量，-1 不限，-2 待確認），stock_visible 僅控制展示
                 stockVisible:
                     type: boolean
-                    description: 库存是否对外可见
+                    description: 庫存是否對外可見
                 categoryId:
                     type: string
                 salesCount:
                     type: string
-                    description: 展示销量 = 真实 + 虚拟
+                    description: 展示銷量 = 真實 + 虛擬
                 controls:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.storefront.v1.ProductControl'
-                    description: 自定义控件（下单收集：文本/密码/下拉/数字/多选/单选）
+                    description: 自定義控件（下單收集：文本/密碼/下拉/數字/多選/單選）
                 reviews:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.storefront.v1.ReviewItem'
-                    description: 评价（真实 approved + 虚拟合并，按时间/排序）
+                    description: 評價（真實 approved + 虛擬合併，按時間/排序）
                 skus:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.storefront.v1.Sku'
-                    description: 多规格 SKU（下单可选；Sku.price_cents > 商品价时下单按 SKU 价）
+                    description: 多規格 SKU（下單可選；Sku.price_cents > 商品價時下單按 SKU 價）
                 pointsRequired:
                     type: string
-                    description: 积分兑换价（0=常规商品；>0=积分商城商品，下单走积分兑换分支；）
+                    description: 積分兑換價（0=常規商品；>0=積分商城商品，下單走積分兑換分支；）
                 isRecommend:
                     type: boolean
-                    description: 运营推荐（首页推荐位标记）
+                    description: 運營推薦（首頁推薦位標記）
                 stockStatus:
                     type: string
                 stockReference:
@@ -15462,7 +15462,7 @@ components:
                 sort:
                     type: integer
                     format: int32
-            description: ProductControl 自定义控件定义（下单表单渲染）。
+            description: ProductControl 自定義控件定義（下單表單渲染）。
         zcard.api.storefront.v1.PublicConfig:
             type: object
             properties:
@@ -15470,7 +15470,7 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/zcard.api.storefront.v1.PublicConfigEntry'
-            description: PublicConfig 公开配置条目列表。
+            description: PublicConfig 公開配置條目列表。
         zcard.api.storefront.v1.PublicConfigEntry:
             type: object
             properties:
@@ -15478,7 +15478,7 @@ components:
                     type: string
                 valueJson:
                     type: string
-            description: PublicConfigEntry 单键（key 形如 "site.name"；value 为 JSON 文档字符串）。
+            description: PublicConfigEntry 單鍵（key 形如 "site.name"；value 為 JSON 文檔字符串）。
         zcard.api.storefront.v1.PurchaseLicenseReply:
             type: object
             properties:
@@ -15486,7 +15486,7 @@ components:
                     type: string
                 licenseFile:
                     type: string
-                    description: 许可证文件内容（JSON：license + signature；目标实例后台安装激活）
+                    description: 許可證文件內容（JSON：license + signature；目標實例後台安裝激活）
                 expiresAt:
                     type: string
                 paidCents:
@@ -15501,10 +15501,10 @@ components:
                     description: monthly | yearly
                 instanceId:
                     type: string
-                    description: 目标实例 ID（空 = 绑定本部署实例——发行侧自测/内部发行场景）
+                    description: 目標實例 ID（空 = 綁定本部署實例——發行側自測/內部發行場景）
                 domain:
                     type: string
-                    description: 目标域名（可选；空 = 不限域名）
+                    description: 目標域名（可選；空 = 不限域名）
         zcard.api.storefront.v1.RateTicketRequest:
             required:
                 - ticketNo
@@ -15548,7 +15548,7 @@ components:
             properties:
                 code:
                     type: string
-            description: RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破限流；余额入账幂等键 giftcard:<id>）。
+            description: RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破限流；餘額入賬冪等鍵 giftcard:<id>）。
         zcard.api.storefront.v1.RegisterReply:
             type: object
             properties:
@@ -15632,7 +15632,7 @@ components:
                     type: string
                 isVirtual:
                     type: boolean
-            description: ReviewItem 顾客视角评价（真实 approved + 虚拟合并）。
+            description: ReviewItem 顧客視角評價（真實 approved + 虛擬合併）。
         zcard.api.storefront.v1.ReviewProduct:
             type: object
             properties:
@@ -15816,7 +15816,7 @@ components:
                     type: string
                 flashSale:
                     $ref: '#/components/schemas/zcard.api.storefront.v1.FlashOffer'
-            description: Sku 顾客视角多规格（只下发 id/名称/价格）。
+            description: Sku 顧客視角多規格（只下發 id/名稱/價格）。
         zcard.api.storefront.v1.SocialRetailActionRequest:
             type: object
             properties:
@@ -15982,7 +15982,7 @@ components:
             properties:
                 protocol:
                     type: string
-                    description: 下游面板协议：zcard | dujiao_next | acg_faka
+                    description: 下游面板協議：zcard | dujiao_next | acg_faka
                 displayName:
                     type: string
                 contact:
@@ -16317,133 +16317,133 @@ components:
                     type: boolean
 tags:
     - name: AdminAuditService
-      description: AdminAuditService 审计与风控管理：三类日志查询、黑名单管理。
+      description: AdminAuditService 審計與風控管理：三類日誌查詢、黑名單管理。
     - name: AdminAuthService
       description: |-
-        AdminAuthService 管理后台认证（admin realm JWT，双 realm 防提权串用）。
-         登录 / 登出 / 当前身份（含权限点，供前端动态路由）。
+        AdminAuthService 管理後台認證（admin realm JWT，雙 realm 防提權串用）。
+         登錄 / 登出 / 當前身份（含權限點，供前端動態路由）。
     - name: AdminCatalogService
-      description: AdminCatalogService 商品目录管理：商品/分类/标签/控件/商品组/评价。
+      description: AdminCatalogService 商品目錄管理：商品/分類/標籤/控件/商品組/評價。
     - name: AdminContentService
       description: |-
-        AdminContentService 内容管理：横幅/文章/分类 CRUD。
-         content_json 入库前经 sanitize（与商品描述同一策略）；slug 唯一。
+        AdminContentService 內容管理：橫幅/文章/分類 CRUD。
+         content_json 入庫前經 sanitize（與商品描述同一策略）；slug 唯一。
     - name: AdminCouponService
-      description: AdminCouponService 优惠券管理(基础版：批量生成/列表/作废）。
+      description: AdminCouponService 優惠券管理(基礎版：批量生成/列表/作廢）。
     - name: AdminCurrencyService
-      description: AdminCurrencyService 货币管理（；多币种展示，记账永远基础货币）。
+      description: AdminCurrencyService 貨幣管理（；多幣種展示，記賬永遠基礎貨幣）。
     - name: AdminDashboardService
-      description: AdminDashboardService 工作台指标(v1）。
+      description: AdminDashboardService 工作台指標(v1）。
     - name: AdminFulfillmentService
-      description: AdminFulfillmentService 履约管理：待发货列表 + 手动交付。
+      description: AdminFulfillmentService 履約管理：待發貨列表 + 手動交付。
     - name: AdminInstallService
       description: |-
-        AdminInstallService 在线安装（Public——仅未安装时可用；已安装后 status 只读、install 拒绝）。
-         部署形态：SQLite 零依赖起步（无需数据库/Redis 配置），浏览器打开 → 设管理员 → 完成。
-         数据库/Redis 属部署层配置（config.yaml / env），不进安装向导。
+        AdminInstallService 在線安裝（Public——僅未安裝時可用；已安裝後 status 只讀、install 拒絕）。
+         部署形態：SQLite 零依賴起步（無需數據庫/Redis 配置），瀏覽器打開 → 設管理員 → 完成。
+         數據庫/Redis 屬部署層配置（config.yaml / env），不進安裝嚮導。
     - name: AdminInventoryService
-      description: AdminInventoryService 卡密库存管理：导入/导出/列表/操作。
+      description: AdminInventoryService 卡密庫存管理：導入/導出/列表/操作。
     - name: AdminLicenseService
       description: |-
-        AdminLicenseService 订阅许可证管理：安装/查询/清除。
-         校验引擎 ed25519 签名 + 实例 ID/域名绑定 + 到期（fail-closed）。
+        AdminLicenseService 訂閲許可證管理：安裝/查詢/清除。
+         校驗引擎 ed25519 簽名 + 實例 ID/域名綁定 + 到期（fail-closed）。
     - name: AdminLotteryService
     - name: AdminMediaService
       description: |-
-        AdminMediaService 素材库管理：分类/上传/列表/改名/移动/批量删除
-         （ref_count>0 需 confirm）/外链导入/复制链接。
-         上传走 base64（10MB 图 ~13.7MB JSON；管理面可接受，走统一中间件栈）。
+        AdminMediaService 素材庫管理：分類/上傳/列表/改名/移動/批量刪除
+         （ref_count>0 需 confirm）/外鏈導入/複製鏈接。
+         上傳走 base64（10MB 圖 ~13.7MB JSON；管理面可接受，走統一中間件棧）。
     - name: AdminMemberLevelService
-      description: AdminMemberLevelService 会员等级管理。
+      description: AdminMemberLevelService 會員等級管理。
     - name: AdminNotifyService
-      description: AdminNotifyService 通知管理：模板 CRUD/测试发送、发送日志查询/重发。
+      description: AdminNotifyService 通知管理：模板 CRUD/測試發送、發送日誌查詢/重發。
     - name: AdminOrderService
-      description: AdminOrderService 订单管理。
+      description: AdminOrderService 訂單管理。
     - name: AdminPaymentService
-      description: AdminPaymentService 支付管理：渠道 CRUD + 支付单 + 退款。
+      description: AdminPaymentService 支付管理：渠道 CRUD + 支付單 + 退款。
     - name: AdminProcurementService
-      description: AdminProcurementService 采购管理：采购单列表/详情/手动重试/手动标记完成。
+      description: AdminProcurementService 採購管理：採購單列表/詳情/手動重試/手動標記完成。
     - name: AdminResellerService
       description: |-
-        AdminResellerService 分站管理(主站面核心）：申请审核/列表/定价/账本/余额。
-         域名验证与分站后台完整面随 storefront 用户登录体系接续（核心引擎已就绪）。
+        AdminResellerService 分站管理(主站面核心）：申請審核/列表/定價/賬本/餘額。
+         域名驗證與分站後台完整面隨 storefront 用户登錄體系接續（核心引擎已就緒）。
     - name: AdminSettingsService
       description: |-
-        AdminSettingsService 设置中心（settings 表 = 运行时业务开关真理源，铁律 7）。
-         读写 API；起补齐安装向导状态与分组目录。
+        AdminSettingsService 設置中心（settings 表 = 運行時業務開關真理源，鐵律 7）。
+         讀寫 API；起補齊安裝嚮導狀態與分組目錄。
     - name: AdminSupplierService
       description: |-
-        AdminSupplierService 对外供货管理：下游账户申请/审核/启停/重置密钥、
-         供货定价 CRUD、账本流水、回调记录查询与手动重发。
+        AdminSupplierService 對外供貨管理：下游賬户申請/審核/啓停/重置密鑰、
+         供貨定價 CRUD、賬本流水、回調記錄查詢與手動重發。
     - name: AdminSupplyService
       description: |-
-        AdminSupplyService 货源连接管理：上游连接 CRUD + Ping 探活、
-         商品映射规则、同步任务（创建/列表/详情/取消）、连接健康。
-         凭据纪律：credentials 仅创建时明文传入，任何响应都不回显密文
-         （列表/详情只给 credentials_set 布尔，铁律 11）。
+        AdminSupplyService 貨源連接管理：上游連接 CRUD + Ping 探活、
+         商品映射規則、同步任務（創建/列表/詳情/取消）、連接健康。
+         憑據紀律：credentials 僅創建時明文傳入，任何響應都不回顯密文
+         （列表/詳情只給 credentials_set 布爾，鐵律 11）。
     - name: AdminTicketService
       description: |-
-        AdminTicketService 客服工单工作台：urgent_paid 置顶持续高亮、
-         认领/回复/内部备注/解决/关闭、筛选。
+        AdminTicketService 客服工單工作台：urgent_paid 置頂持續高亮、
+         認領/回覆/內部備註/解決/關閉、篩選。
     - name: AdminUpdateService
       description: |-
-        AdminUpdateService 在线更新（doc/在线更新方案.md ；system:update 超管专属）。
-         更新链：备份 DB → 落盘下载（流式哈希+进度）→ 原子替换 → 重启三分支；
-         重启后本接口随新进程复活——前端轮询 status 直到 current==target 即成功。
+        AdminUpdateService 在線更新（doc/在線更新方案.md ；system:update 超管專屬）。
+         更新鏈：備份 DB → 落盤下載（流式哈希+進度）→ 原子替換 → 重啓三分支；
+         重啓後本接口隨新進程復活——前端輪詢 status 直到 current==target 即成功。
     - name: AdminUserManageService
       description: |-
-        AdminUserManageService 前台用户管理（storefront 注册用户；员工管理见
-         AdminUserService——两者数据域独立，勿混）。
+        AdminUserManageService 前台用户管理（storefront 註冊用户；員工管理見
+         AdminUserService——兩者數據域獨立，勿混）。
     - name: AdminUserService
-      description: AdminUserService 员工管理（数据层归 identity，API 面在此；）。
+      description: AdminUserService 員工管理（數據層歸 identity，API 面在此；）。
     - name: AdminWalletService
       description: |-
-        AdminWalletService 钱包管理：调账/充值单/流水查询。
+        AdminWalletService 錢包管理：調賬/充值單/流水查詢。
 
-         路由注册顺序注意：protoc-gen-go-http 按方法声明顺序注册路由，而
-         gorilla/mux 按注册顺序匹配（先注册先命中），因此所有静态路径方法必须
-         声明在含 {user_id} 通配段的方法之前，否则 /wallet/withdrawals 等会被
-         /wallet/{user_id} 吞掉并误解析为 CODEC 400。
+         路由註冊順序注意：protoc-gen-go-http 按方法聲明順序註冊路由，而
+         gorilla/mux 按註冊順序匹配（先註冊先命中），因此所有靜態路徑方法必須
+         聲明在含 {user_id} 通配段的方法之前，否則 /wallet/withdrawals 等會被
+         /wallet/{user_id} 吞掉並誤解析為 CODEC 400。
     - name: RoleService
       description: |-
-        RoleService 角色与权限管理（自建 RBAC，规划 ；）。
-         权限目录由模块声明式生成（authz.Declare），本服务只读下发供前端勾选与动态路由。
+        RoleService 角色與權限管理（自建 RBAC，規劃 ；）。
+         權限目錄由模塊聲明式生成（authz.Declare），本服務只讀下發供前端勾選與動態路由。
     - name: StoreAffiliateService
-      description: StoreAffiliateService 我的分销：推广码/团队/佣金流水/统计。
+      description: StoreAffiliateService 我的分銷：推廣碼/團隊/佣金流水/統計。
     - name: StoreCaptchaService
-      description: StoreCaptchaService 图形验证码（免鉴权；settings.security.captcha_* 控制场景和格式）。
+      description: StoreCaptchaService 圖形驗證碼（免鑑權；settings.security.captcha_* 控制場景和格式）。
     - name: StoreCartService
       description: |-
-        StoreCartService 购物车(销账）：登录态专属 CRUD；
-         结算复用 StoreOrderService.CreateOrder（多商品一单支付，零下单改动）。
+        StoreCartService 購物車(銷賬）：登錄態專屬 CRUD；
+         結算複用 StoreOrderService.CreateOrder（多商品一單支付，零下單改動）。
     - name: StoreCatalogService
       description: |-
-        StoreCatalogService 顾客前台商品目录（游客可访问；隐藏商品对游客 404，规划)。
-         ； 骨架先打通「租户上下文 → Ent 查询 → 薄 service」链路。
+        StoreCatalogService 顧客前台商品目錄（遊客可訪問；隱藏商品對遊客 404，規劃)。
+         ； 骨架先打通「租户上下文 → Ent 查詢 → 薄 service」鏈路。
     - name: StoreContentService
       description: |-
-        StoreContentService 前台内容：横幅（生效时间窗）、文章（公告/博客）、分类。
-         多语言字段按请求语言回落（zh_CN 默认）。
+        StoreContentService 前台內容：橫幅（生效時間窗）、文章（公告/博客）、分類。
+         多語言字段按請求語言回落（zh_CN 默認）。
     - name: StoreCouponService
-      description: StoreCouponService 前台营销：我的券/兑换码领券/秒杀营销位。
+      description: StoreCouponService 前台營銷：我的券/兑換碼領券/秒殺營銷位。
     - name: StoreDeliveryService
-      description: StoreDeliveryService 顾客取货(三重门：单号+密码+限流）。
+      description: StoreDeliveryService 顧客取貨(三重門：單號+密碼+限流）。
     - name: StoreLicenseService
       description: |-
-        StoreLicenseService 专业套餐在线购买(：发行侧部署配置签发私钥后开放；
-         支付 = 钱包余额扣款（充值管线入账的钱），签发与扣款同事务；购买人下载许可证
-         文件后在目标实例后台安装激活）。
+        StoreLicenseService 專業套餐在線購買(：發行側部署配置簽發私鑰後開放；
+         支付 = 錢包餘額扣款（充值管線入賬的錢），簽發與扣款同事務；購買人下載許可證
+         文件後在目標實例後台安裝激活）。
     - name: StoreLotteryService
     - name: StoreMediaService
-      description: StoreMediaService 前台媒体（登录态；收款码上传——复用 media 安全三件套）。
+      description: StoreMediaService 前台媒體（登錄態；收款碼上傳——複用 media 安全三件套）。
     - name: StoreMemberLevelService
-      description: StoreMemberLevelService 会员等级(：等级进度 + 积分产生）。
+      description: StoreMemberLevelService 會員等級(：等級進度 + 積分產生）。
     - name: StoreNotificationService
-      description: StoreNotificationService 站内信铃铛：未读数/列表/已读。
+      description: StoreNotificationService 站內信鈴鐺：未讀數/列表/已讀。
     - name: StoreOrderService
-      description: StoreOrderService 顾客下单。
+      description: StoreOrderService 顧客下單。
     - name: StorePaymentService
-      description: StorePaymentService 顾客支付。
+      description: StorePaymentService 顧客支付。
     - name: StoreReviewService
     - name: StoreSMSChannelService
     - name: StoreSMSService
@@ -16452,28 +16452,28 @@ tags:
       description: Retail endpoints always derive the buyer from the authenticated user realm.
     - name: StoreSupplierService
       description: |-
-        StoreSupplierService 前台对接申请（个人中心）：申请成为供货商户 →
-         后台审核 → 凭据管理（app_id + api_secret）。
-         通过后凭据可直接填入 acg-faka/dujiao-next/zcard 三面板（协议由申请时选定）。
+        StoreSupplierService 前台對接申請（個人中心）：申請成為供貨商户 →
+         後台審核 → 憑據管理（app_id + api_secret）。
+         通過後憑據可直接填入 acg-faka/dujiao-next/zcard 三面板（協議由申請時選定）。
     - name: StoreTicketService
       description: |-
-        StoreTicketService 用户工单：创建/列表/详情/回复/评价/付费加急。
-         游客可创建（guest_contact 必填）；内部备注用户侧自动过滤。
+        StoreTicketService 用户工單：創建/列表/詳情/回覆/評價/付費加急。
+         遊客可創建（guest_contact 必填）；內部備註用户側自動過濾。
     - name: StoreUserService
       description: |-
-        StoreUserService 用户中心(前置）：注册/登录（user realm JWT）/我的信息。
-         注册可带邀请码（ref=<user_id>）——三级分销归因链写入（环状拒绝）。
+        StoreUserService 用户中心(前置）：註冊/登錄（user realm JWT）/我的信息。
+         註冊可帶邀請碼（ref=<user_id>）——三級分銷歸因鏈寫入（環狀拒絕）。
     - name: StoreWalletService
-      description: StoreWalletService 顾客钱包：余额/积分/流水/充值。
+      description: StoreWalletService 顧客錢包：餘額/積分/流水/充值。
     - name: StorefrontConfigService
       description: |-
-        StorefrontConfigService 前台公开配置。
-         输出经 PUBLIC_KEYS 白名单过滤（SECRET 键绝不外泄——快照测试守护）；
-         storefront 前端模板参数、交易开关、启用语言/货币由此驱动。
+        StorefrontConfigService 前台公開配置。
+         輸出經 PUBLIC_KEYS 白名單過濾（SECRET 鍵絕不外泄——快照測試守護）；
+         storefront 前端模板參數、交易開關、啓用語言/貨幣由此驅動。
     - name: SupplyService
       description: |-
-        SupplyService 对外供货 API（本站作上游，ZCard Supply v2 协议）。
-         里程碑 完整落地：HMAC 四头鉴权（X-Supply-Key/Timestamp/Nonce/Signature）、
-         ±300s 时间窗、Nonce 防重放、按 key 限流（规划)。
-         Ping 免签名（连通性探测）；其余端点全部需要签名。
-         金额口径：一律「分」（int64）——与 zcard 适配器对偶。
+        SupplyService 對外供貨 API（本站作上游，ZCard Supply v2 協議）。
+         里程碑 完整落地：HMAC 四頭鑑權（X-Supply-Key/Timestamp/Nonce/Signature）、
+         ±300s 時間窗、Nonce 防重放、按 key 限流（規劃)。
+         Ping 免簽名（連通性探測）；其餘端點全部需要簽名。
+         金額口徑：一律「分」（int64）——與 zcard 適配器對偶。

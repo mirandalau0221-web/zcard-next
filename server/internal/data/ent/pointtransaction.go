@@ -23,13 +23,13 @@ type PointTransaction struct {
 	Direction string `json:"direction,omitempty"`
 	// earn_consume/earn_recharge/redeem/adjust...
 	Type string `json:"type,omitempty"`
-	// 积分（正数）
+	// 積分（正數）
 	Amount int64 `json:"amount,omitempty"`
 	// BalanceBefore holds the value of the "balance_before" field.
 	BalanceBefore int64 `json:"balance_before,omitempty"`
 	// BalanceAfter holds the value of the "balance_after" field.
 	BalanceAfter int64 `json:"balance_after,omitempty"`
-	// 幂等键（points:<orderID> 等）
+	// 冪等鍵（points:<orderID> 等）
 	Reference string `json:"reference,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uint64 `json:"order_id,omitempty"`

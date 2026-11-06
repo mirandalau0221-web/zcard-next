@@ -2,7 +2,7 @@ package procurement
 
 // wire providers（）。
 //
-// 跨模块绑定（通道 A，装配集中在 bootstrap）：
+// 跨模塊綁定（通道 A，裝配集中在 bootstrap）：
 // - svc.gw ← supplyport.UpstreamGateway（supply.Gateway）
 // - svc.reader ← catalogport.ProductReader（catalog.ProductRepoImpl）
 // - svc.attach ← fulfillmentport.AttachUpstreamDelivery（fulfillment.DeliveryRepoImpl）

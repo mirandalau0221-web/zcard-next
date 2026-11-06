@@ -1,46 +1,46 @@
 <template>
   <div class="wd-page">
-    <!-- 个人中心共用导航（提现高亮；可切回其他区块） -->
+    <!-- 個人中心共用導航（提現高亮；可切回其他區塊） -->
     <MemberTabs active="withdraw" />
-    <h2 class="wd-title">{{ $t('佣金提现') }}</h2>
+    <h2 class="wd-title">{{ $t('佣金提現') }}</h2>
 
-    <!-- 未开放 -->
+    <!-- 未開放 -->
     <div v-if="!cfg.enabled && cfgLoaded" class="card wd-center">
       <div class="wd-state-icon gray">🔒</div>
-      <div>{{ $t('提现功能暂未开放') }}</div>
-      <div class="muted">{{ $t('有疑问请联系客服') }}</div>
+      <div>{{ $t('提現功能暫未開放') }}</div>
+      <div class="muted">{{ $t('有疑問請聯繫客服') }}</div>
     </div>
 
     <template v-else>
-      <!-- 余额区 -->
+      <!-- 餘額區 -->
       <div class="wd-balance-card">
         <div class="wd-balance-main">
           <div class="wd-balance-label">{{ $t('可提佣金（{0}）', [getBaseCurrency().code]) }}</div>
           <div class="wd-balance-num">{{ formatBaseMoney(withdrawable) }}</div>
-          <div class="wd-balance-sub muted">{{ $t('冻结中') }} {{ formatBaseMoney(frozen) }} {{ $t('· 累计已提') }} {{ formatBaseMoney(my?.withdrawn_cents || 0) }}</div>
+          <div class="wd-balance-sub muted">{{ $t('凍結中') }} {{ formatBaseMoney(frozen) }} {{ $t('· 累計已提') }} {{ formatBaseMoney(my?.withdrawn_cents || 0) }}</div>
         </div>
         <div class="wd-balance-side">
-          <div class="wd-rule">{{ $t('最低提现') }} {{ formatBaseMoney(cfg.minAmountCents) }}</div>
-          <div class="wd-rule">{{ $t('手续费') }} {{ feeDesc }}</div>
+          <div class="wd-rule">{{ $t('最低提現') }} {{ formatBaseMoney(cfg.minAmountCents) }}</div>
+          <div class="wd-rule">{{ $t('手續費') }} {{ feeDesc }}</div>
         </div>
       </div>
 
       <div class="wd-layout">
-        <!-- 左：申请表单 -->
+        <!-- 左：申請表單 -->
         <div class="card wd-form-card">
-          <h3 class="wd-section-title">{{ $t('申请提现') }}</h3>
+          <h3 class="wd-section-title">{{ $t('申請提現') }}</h3>
 
           <div class="wd-field">
-            <label class="wd-label">{{ $t('提现金额（{0}）', [getBaseCurrency().code]) }}</label>
+            <label class="wd-label">{{ $t('提現金額（{0}）', [getBaseCurrency().code]) }}</label>
             <div class="wd-amount-row">
-              <input v-model.number="amountYuan" type="number" min="0" :step="0.01" class="input" :placeholder="$t('提现金额')" />
-              <button class="btn secondary" @click="allIn">{{ $t('全部提现') }}</button>
+              <input v-model.number="amountYuan" type="number" min="0" :step="0.01" class="input" :placeholder="$t('提現金額')" />
+              <button class="btn secondary" @click="allIn">{{ $t('全部提現') }}</button>
             </div>
-            <!-- 实时到账试算 -->
+            <!-- 實時到賬試算 -->
             <div class="wd-preview">
-              <span class="muted">{{ $t('预计到账') }}</span>
+              <span class="muted">{{ $t('預計到賬') }}</span>
               <b class="wd-preview-num">{{ formatBaseMoney(credited) }}</b>
-              <span class="muted" v-if="feeCents > 0">{{ $t('（手续费') }} {{ formatBaseMoney(feeCents) }}）</span>
+              <span class="muted" v-if="feeCents > 0">{{ $t('（手續費') }} {{ formatBaseMoney(feeCents) }}）</span>
             </div>
           </div>
 
@@ -61,26 +61,26 @@
           </div>
 
           <div class="wd-field">
-            <label class="wd-label">{{ methodType === 'usdt_trc20' ? $t('TRC20 钱包地址') : $t('收款账号') }}</label>
+            <label class="wd-label">{{ methodType === 'usdt_trc20' ? $t('TRC20 錢包地址') : $t('收款賬號') }}</label>
             <input
               v-model="account"
               type="text"
               class="input"
-              :placeholder="methodType === 'usdt_trc20' ? $t('T 开头 34 位 TRC20 地址') : $t('支付宝账号 / 微信号 / 银行卡号')"
+              :placeholder="methodType === 'usdt_trc20' ? $t('T 開頭 34 位 TRC20 地址') : $t('支付寶賬號 / 微信號 / 銀行卡號')"
             />
-            <div v-if="methodType === 'usdt_trc20'" class="muted" style="margin-top: 4px;">{{ $t('仅支持 TRC20 网络，请核对地址无误') }}</div>
+            <div v-if="methodType === 'usdt_trc20'" class="muted" style="margin-top: 4px;">{{ $t('僅支持 TRC20 網絡，請核對地址無誤') }}</div>
           </div>
 
-          <!-- 收款码上传（微信/支付宝） -->
+          <!-- 收款碼上傳（微信/支付寶） -->
           <div v-if="methodType === 'wechat' || methodType === 'alipay'" class="wd-field">
-            <label class="wd-label">{{ $t('收款二维码（选填，加快打款）') }}</label>
+            <label class="wd-label">{{ $t('收款二維碼（選填，加快打款）') }}</label>
             <div class="wd-qr-upload">
-              <img v-if="qrUrl" :src="qrUrl" class="wd-qr-preview" :alt="$t('收款码')" />
+              <img v-if="qrUrl" :src="qrUrl" class="wd-qr-preview" :alt="$t('收款碼')" />
               <label v-else class="wd-qr-placeholder">
-                <span>{{ uploading ? $t('上传中…') : $t('📷 上传收款码') }}</span>
+                <span>{{ uploading ? $t('上傳中…') : $t('📷 上傳收款碼') }}</span>
                 <input type="file" accept="image/*" class="wd-file-hidden" @change="onQrPick" />
               </label>
-              <button v-if="qrUrl" class="btn secondary wd-qr-repick" @click="qrUrl = ''">{{ $t('重新上传') }}</button>
+              <button v-if="qrUrl" class="btn secondary wd-qr-repick" @click="qrUrl = ''">{{ $t('重新上傳') }}</button>
             </div>
           </div>
 
@@ -88,14 +88,14 @@
           <div v-if="okMsg" class="success" style="margin-bottom: 10px;">{{ uiText(okMsg) }}</div>
 
           <button class="wd-submit" :disabled="submitting || !withdrawable" @click="submit">
-            {{ submitting ? $t('提交中…') : $t('提交提现申请') }}
+            {{ submitting ? $t('提交中…') : $t('提交提現申請') }}
           </button>
-          <div class="muted" style="margin-top: 8px; text-align: center;">{{ $t('提交后进入人工审核；打款 1-3 个工作日到账') }}</div>
+          <div class="muted" style="margin-top: 8px; text-align: center;">{{ $t('提交後進入人工審核；打款 1-3 個工作日到賬') }}</div>
         </div>
 
-        <!-- 右：提现记录 -->
+        <!-- 右：提現記錄 -->
         <div class="card wd-record-card">
-          <h3 class="wd-section-title">{{ $t('提现记录') }}</h3>
+          <h3 class="wd-section-title">{{ $t('提現記錄') }}</h3>
           <div v-if="records.length" class="wd-records">
             <div v-for="r in records" :key="r.withdrawal_id" class="wd-record">
               <div class="wd-record-head">
@@ -105,27 +105,27 @@
               <div class="wd-record-meta muted">
                 {{ r.method_name || r.method_type }} · {{ maskAccount(r.account) }}
               </div>
-              <div class="wd-record-meta muted">{{ $t('手续费') }} {{ formatBaseMoney(r.fee_cents) }} · {{ fmtTime(r.created_at) }}</div>
-              <div v-if="r.receipt" class="wd-record-receipt">{{ $t('打款回执：') }}{{ r.receipt }}</div>
-              <div v-if="r.reject_reason" class="wd-record-reject">{{ $t('驳回原因：') }}{{ r.reject_reason }}</div>
+              <div class="wd-record-meta muted">{{ $t('手續費') }} {{ formatBaseMoney(r.fee_cents) }} · {{ fmtTime(r.created_at) }}</div>
+              <div v-if="r.receipt" class="wd-record-receipt">{{ $t('打款回執：') }}{{ r.receipt }}</div>
+              <div v-if="r.reject_reason" class="wd-record-reject">{{ $t('駁回原因：') }}{{ r.reject_reason }}</div>
             </div>
           </div>
-          <div v-else class="wd-empty muted">{{ $t('暂无提现记录') }}</div>
+          <div v-else class="wd-empty muted">{{ $t('暫無提現記錄') }}</div>
           <div v-if="recordTotal > recordPageSize" class="wd-pager">
-            <button class="btn secondary" :disabled="recordPage <= 1" @click="loadRecords(recordPage - 1)">{{ $t('上一页') }}</button>
+            <button class="btn secondary" :disabled="recordPage <= 1" @click="loadRecords(recordPage - 1)">{{ $t('上一頁') }}</button>
             <span class="muted">{{ recordPage }} / {{ Math.ceil(recordTotal / recordPageSize) }}</span>
-            <button class="btn secondary" :disabled="recordPage >= Math.ceil(recordTotal / recordPageSize)" @click="loadRecords(recordPage + 1)">{{ $t('下一页') }}</button>
+            <button class="btn secondary" :disabled="recordPage >= Math.ceil(recordTotal / recordPageSize)" @click="loadRecords(recordPage + 1)">{{ $t('下一頁') }}</button>
           </div>
         </div>
       </div>
 
-      <!-- 工单入口 -->
+      <!-- 工單入口 -->
       <div class="wd-ticket card">
         <div>
-          <b>{{ $t('遇到提现问题？') }}</b>
-          <span class="muted">{{ $t('审核超时 / 打款未到账 / 金额疑问，提交工单快速处理') }}</span>
+          <b>{{ $t('遇到提現問題？') }}</b>
+          <span class="muted">{{ $t('審核超時 / 打款未到賬 / 金額疑問，提交工單快速處理') }}</span>
         </div>
-        <router-link class="btn secondary" :to="{ path: '/tickets', query: { type: 'withdraw' } }">{{ $t('提交工单') }}</router-link>
+        <router-link class="btn secondary" :to="{ path: '/tickets', query: { type: 'withdraw' } }">{{ $t('提交工單') }}</router-link>
       </div>
     </template>
   </div>
@@ -161,7 +161,7 @@ const recordPage = ref(1);
 const recordTotal = ref(0);
 const recordPageSize = 8;
 
-// 可提 = available − 冻结（服务端同口径）
+// 可提 = available − 凍結（服務端同口徑）
 const frozen = ref(0);
 const withdrawable = computed(() => Math.max(0, (my.value?.available_cents || 0) - frozen.value));
 
@@ -169,7 +169,7 @@ const amountCents = computed(() => {
   try { return yuanToFen(amountYuan.value || 0); } catch { return null; }
 });
 
-// 手续费试算
+// 手續費試算
 const feeCents = computed(() => {
   const amount = amountCents.value ?? 0;
   if (amount <= 0) return 0;
@@ -189,7 +189,7 @@ async function onQrPick(e: Event) {
   (e.target as HTMLInputElement).value = '';
   if (!file) return;
   if (file.size > 2 * 1024 * 1024) {
-    error.value = $t("收款码图片不能超过 2MB");
+    error.value = $t("收款碼圖片不能超過 2MB");
     return;
   }
   uploading.value = true;
@@ -199,7 +199,7 @@ async function onQrPick(e: Event) {
     const base64 = String(reader.result).split(',')[1] || '';
     const { data, error: err } = await uploadQrCode(base64);
     uploading.value = false;
-    if (err || !data) { error.value = err || $t("上传失败"); return; }
+    if (err || !data) { error.value = err || $t("上傳失敗"); return; }
     qrUrl.value = data.url;
   };
   reader.readAsDataURL(file);
@@ -208,27 +208,27 @@ async function onQrPick(e: Event) {
 async function submit() {
   const amount = amountCents.value;
   if (amount === null || amount <= 0) {
-    error.value = $t("请输入有效金额，最多精确到分（小数点后两位）");
+    error.value = $t("請輸入有效金額，最多精確到分（小數點後兩位）");
     return;
   }
   if (amount < cfg.value.minAmountCents) {
-    error.value = $t("最低提现 {0}", [formatBaseMoney(cfg.value.minAmountCents)]);
+    error.value = $t("最低提現 {0}", [formatBaseMoney(cfg.value.minAmountCents)]);
     return;
   }
   if (amount > withdrawable.value) {
-    error.value = $t("超过可提佣金");
+    error.value = $t("超過可提佣金");
     return;
   }
   if (!methodType.value) {
-    error.value = $t("请选择收款方式");
+    error.value = $t("請選擇收款方式");
     return;
   }
   if (!account.value.trim()) {
-    error.value = $t("请填写收款账号");
+    error.value = $t("請填寫收款賬號");
     return;
   }
   if (methodType.value === 'usdt_trc20' && !/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(account.value.trim())) {
-    error.value = $t("TRC20 地址格式不正确（T 开头 34 位）");
+    error.value = $t("TRC20 地址格式不正確（T 開頭 34 位）");
     return;
   }
   submitting.value = true;
@@ -242,10 +242,10 @@ async function submit() {
   });
   submitting.value = false;
   if (err || !data) {
-    error.value = err || $t("提交失败");
+    error.value = err || $t("提交失敗");
     return;
   }
-  okMsg.value = $t("申请成功 #{0}：{1}，预计到账 {2}（等待审核）", [data.withdrawal_id, formatBaseMoney(data.amount_cents), formatBaseMoney(data.credited_cents)]);
+  okMsg.value = $t("申請成功 #{0}：{1}，預計到賬 {2}（等待審核）", [data.withdrawal_id, formatBaseMoney(data.amount_cents), formatBaseMoney(data.credited_cents)]);
   amountYuan.value = null;
   account.value = '';
   qrUrl.value = '';
@@ -278,7 +278,7 @@ onMounted(async () => {
 });
 
 function statusText(s: string): string {
-  return ({ get pending() { return $t("审核中"); }, get approved() { return $t("已通过"); }, get paid() { return $t("已打款"); }, get rejected() { return $t("已驳回"); } } as Record<string, string>)[s] || s;
+  return ({ get pending() { return $t("審核中"); }, get approved() { return $t("已通過"); }, get paid() { return $t("已打款"); }, get rejected() { return $t("已駁回"); } } as Record<string, string>)[s] || s;
 }
 function statusBadge(s: string): string {
   return ({ pending: 'badge orange', approved: 'badge blue', paid: 'badge green', rejected: 'badge red' } as Record<string, string>)[s] || 'badge gray';
@@ -300,7 +300,7 @@ function fmtTime(ts: number): string {
 .wd-center { text-align: center; padding: 48px 20px; }
 .wd-state-icon { font-size: 40px; margin-bottom: 10px; }
 
-/* 余额区 */
+/* 餘額區 */
 .wd-balance-card {
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   background: linear-gradient(135deg, var(--zc-primary-hover), var(--zc-primary), var(--zc-primary-bright));
@@ -316,12 +316,12 @@ function fmtTime(ts: number): string {
   padding: 5px 14px; font-size: 12px;
 }
 
-/* 布局 */
+/* 佈局 */
 .wd-layout { display: grid; grid-template-columns: 1fr; gap: 16px; }
 @media (min-width: 860px) { .wd-layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
 .wd-section-title { font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 14px; }
 
-/* 表单 */
+/* 表單 */
 .wd-field { margin-bottom: 14px; }
 .wd-label { display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 6px; }
 .wd-amount-row { display: flex; align-items: stretch; gap: 8px; }
@@ -340,7 +340,7 @@ function fmtTime(ts: number): string {
 .wd-method.active { border-color: var(--zc-primary); background: var(--zc-primary-soft); }
 
 
-/* 收款码 */
+/* 收款碼 */
 .wd-qr-upload { display: flex; gap: 12px; align-items: center; }
 .wd-qr-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; border: 1px solid #e5e7eb; }
 .wd-qr-placeholder {
@@ -360,7 +360,7 @@ function fmtTime(ts: number): string {
 .wd-submit:hover:not(:disabled) { transform: translateY(-1px); }
 .wd-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* 记录 */
+/* 記錄 */
 .wd-records { display: flex; flex-direction: column; }
 .wd-record { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
 .wd-record:last-child { border-bottom: none; }
@@ -372,7 +372,7 @@ function fmtTime(ts: number): string {
 .wd-empty { text-align: center; padding: 32px 0; }
 .wd-pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 10px; }
 
-/* 工单入口 */
+/* 工單入口 */
 .wd-ticket {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   background: #fffbeb; border-color: #fde68a;

@@ -9,7 +9,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/product"
 )
 
-// OrderProductSummary 批量展示订单商品，不向用户列表附带成本或上游凭据。
+// OrderProductSummary 批量展示訂單商品，不向用户列表附帶成本或上游憑據。
 type OrderProductSummary struct {
 	ProductID, SkuID uint64
 	Name, SkuName    string

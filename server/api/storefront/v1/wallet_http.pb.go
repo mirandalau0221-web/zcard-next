@@ -26,17 +26,17 @@ const OperationStoreWalletServiceListTransactions = "/zcard.api.storefront.v1.St
 const OperationStoreWalletServiceRedeemGiftcard = "/zcard.api.storefront.v1.StoreWalletService/RedeemGiftcard"
 
 type StoreWalletServiceHTTPServer interface {
-	// CreateRecharge CreateRecharge 充值（走支付管线）。
+	// CreateRecharge CreateRecharge 充值（走支付管線）。
 	CreateRecharge(context.Context, *CreateRechargeRequest) (*CreateRechargeReply, error)
-	// CreateWithdrawal CreateWithdrawal 提现申请（佣金提现：冻结口径+白名单+USDT 校验； 执行）。
+	// CreateWithdrawal CreateWithdrawal 提現申請（佣金提現：凍結口徑+白名單+USDT 校驗； 執行）。
 	CreateWithdrawal(context.Context, *CreateWithdrawalRequest) (*CreateWithdrawalReply, error)
-	// GetBalance GetBalance 余额+积分。
+	// GetBalance GetBalance 餘額+積分。
 	GetBalance(context.Context, *emptypb.Empty) (*BalanceReply, error)
-	// ListMyWithdrawals ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+	// ListMyWithdrawals ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 	ListMyWithdrawals(context.Context, *ListMyWithdrawalsRequest) (*ListMyWithdrawalsReply, error)
-	// ListTransactions ListTransactions 流水（余额）。
+	// ListTransactions ListTransactions 流水（餘額）。
 	ListTransactions(context.Context, *ListTxRequest) (*ListTxReply, error)
-	// RedeemGiftcard RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破；余额入账幂等键 giftcard:<id>）。
+	// RedeemGiftcard RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(context.Context, *RedeemGiftcardRequest) (*RedeemGiftcardReply, error)
 }
 
@@ -165,17 +165,17 @@ func _StoreWalletService_CreateWithdrawal0_HTTP_Handler(srv StoreWalletServiceHT
 }
 
 type StoreWalletServiceHTTPClient interface {
-	// CreateRecharge CreateRecharge 充值（走支付管线）。
+	// CreateRecharge CreateRecharge 充值（走支付管線）。
 	CreateRecharge(ctx context.Context, req *CreateRechargeRequest, opts ...http.CallOption) (rsp *CreateRechargeReply, err error)
-	// CreateWithdrawal CreateWithdrawal 提现申请（佣金提现：冻结口径+白名单+USDT 校验； 执行）。
+	// CreateWithdrawal CreateWithdrawal 提現申請（佣金提現：凍結口徑+白名單+USDT 校驗； 執行）。
 	CreateWithdrawal(ctx context.Context, req *CreateWithdrawalRequest, opts ...http.CallOption) (rsp *CreateWithdrawalReply, err error)
-	// GetBalance GetBalance 余额+积分。
+	// GetBalance GetBalance 餘額+積分。
 	GetBalance(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *BalanceReply, err error)
-	// ListMyWithdrawals ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+	// ListMyWithdrawals ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 	ListMyWithdrawals(ctx context.Context, req *ListMyWithdrawalsRequest, opts ...http.CallOption) (rsp *ListMyWithdrawalsReply, err error)
-	// ListTransactions ListTransactions 流水（余额）。
+	// ListTransactions ListTransactions 流水（餘額）。
 	ListTransactions(ctx context.Context, req *ListTxRequest, opts ...http.CallOption) (rsp *ListTxReply, err error)
-	// RedeemGiftcard RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破；余额入账幂等键 giftcard:<id>）。
+	// RedeemGiftcard RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(ctx context.Context, req *RedeemGiftcardRequest, opts ...http.CallOption) (rsp *RedeemGiftcardReply, err error)
 }
 
@@ -187,7 +187,7 @@ func NewStoreWalletServiceHTTPClient(client *http.Client) StoreWalletServiceHTTP
 	return &StoreWalletServiceHTTPClientImpl{client}
 }
 
-// CreateRecharge CreateRecharge 充值（走支付管线）。
+// CreateRecharge CreateRecharge 充值（走支付管線）。
 func (c *StoreWalletServiceHTTPClientImpl) CreateRecharge(ctx context.Context, in *CreateRechargeRequest, opts ...http.CallOption) (*CreateRechargeReply, error) {
 	var out CreateRechargeReply
 	pattern := "/api/v1/storefront/wallet/recharge"
@@ -205,7 +205,7 @@ func (c *StoreWalletServiceHTTPClientImpl) CreateRecharge(ctx context.Context, i
 	return &out, nil
 }
 
-// CreateWithdrawal CreateWithdrawal 提现申请（佣金提现：冻结口径+白名单+USDT 校验； 执行）。
+// CreateWithdrawal CreateWithdrawal 提現申請（佣金提現：凍結口徑+白名單+USDT 校驗； 執行）。
 func (c *StoreWalletServiceHTTPClientImpl) CreateWithdrawal(ctx context.Context, in *CreateWithdrawalRequest, opts ...http.CallOption) (*CreateWithdrawalReply, error) {
 	var out CreateWithdrawalReply
 	pattern := "/api/v1/storefront/wallet/withdrawals"
@@ -223,7 +223,7 @@ func (c *StoreWalletServiceHTTPClientImpl) CreateWithdrawal(ctx context.Context,
 	return &out, nil
 }
 
-// GetBalance GetBalance 余额+积分。
+// GetBalance GetBalance 餘額+積分。
 func (c *StoreWalletServiceHTTPClientImpl) GetBalance(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*BalanceReply, error) {
 	var out BalanceReply
 	pattern := "/api/v1/storefront/wallet"
@@ -240,7 +240,7 @@ func (c *StoreWalletServiceHTTPClientImpl) GetBalance(ctx context.Context, in *e
 	return &out, nil
 }
 
-// ListMyWithdrawals ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+// ListMyWithdrawals ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 func (c *StoreWalletServiceHTTPClientImpl) ListMyWithdrawals(ctx context.Context, in *ListMyWithdrawalsRequest, opts ...http.CallOption) (*ListMyWithdrawalsReply, error) {
 	var out ListMyWithdrawalsReply
 	pattern := "/api/v1/storefront/wallet/withdrawals/mine"
@@ -257,7 +257,7 @@ func (c *StoreWalletServiceHTTPClientImpl) ListMyWithdrawals(ctx context.Context
 	return &out, nil
 }
 
-// ListTransactions ListTransactions 流水（余额）。
+// ListTransactions ListTransactions 流水（餘額）。
 func (c *StoreWalletServiceHTTPClientImpl) ListTransactions(ctx context.Context, in *ListTxRequest, opts ...http.CallOption) (*ListTxReply, error) {
 	var out ListTxReply
 	pattern := "/api/v1/storefront/wallet/transactions"
@@ -274,7 +274,7 @@ func (c *StoreWalletServiceHTTPClientImpl) ListTransactions(ctx context.Context,
 	return &out, nil
 }
 
-// RedeemGiftcard RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破；余额入账幂等键 giftcard:<id>）。
+// RedeemGiftcard RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 func (c *StoreWalletServiceHTTPClientImpl) RedeemGiftcard(ctx context.Context, in *RedeemGiftcardRequest, opts ...http.CallOption) (*RedeemGiftcardReply, error) {
 	var out RedeemGiftcardReply
 	pattern := "/api/v1/storefront/wallet/giftcards/redeem"

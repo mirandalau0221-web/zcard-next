@@ -57,14 +57,14 @@ func ValidKey(key string) bool   { return keyPattern.MatchString(key) && key != 
 // so an already-open page can still load its original lazy chunks after an upgrade.
 func Install(raw []byte) (*Theme, error) {
 	if len(raw) > MaxZipBytes {
-		return nil, fmt.Errorf("主题包超过 20MB 上限")
+		return nil, fmt.Errorf("主題包超過 20MB 上限")
 	}
 	z, err := zip.NewReader(bytes.NewReader(raw), int64(len(raw)))
 	if err != nil {
-		return nil, fmt.Errorf("主题文件必须是有效 ZIP 压缩包")
+		return nil, fmt.Errorf("主題文件必須是有效 ZIP 壓縮包")
 	}
 	if len(z.File) > maxFiles {
-		return nil, fmt.Errorf("主题包文件数量超过 %d 个", maxFiles)
+		return nil, fmt.Errorf("主題包文件數量超過 %d 個", maxFiles)
 	}
 	if err = os.MkdirAll(Root, 0755); err != nil {
 		return nil, err
@@ -82,32 +82,32 @@ func Install(raw []byte) (*Theme, error) {
 			continue
 		}
 		if strings.Contains(n, "\\") || strings.HasPrefix(n, "/") || strings.Contains(n, "\x00") || len(n) > 512 {
-			return nil, fmt.Errorf("主题包含非法路径")
+			return nil, fmt.Errorf("主題包含非法路徑")
 		}
 		clean := path.Clean(strings.TrimSuffix(n, "/"))
 		if clean == "." || clean != strings.TrimSuffix(n, "/") || strings.HasPrefix(clean, "../") || clean == ".." {
-			return nil, fmt.Errorf("主题包含越界或非规范路径")
+			return nil, fmt.Errorf("主題包含越界或非規範路徑")
 		}
 		for _, part := range strings.Split(clean, "/") {
 			if strings.HasPrefix(part, ".") {
-				return nil, fmt.Errorf("主题不能包含隐藏文件或目录")
+				return nil, fmt.Errorf("主題不能包含隱藏文件或目錄")
 			}
 		}
 		if f.Mode()&os.ModeSymlink != 0 || (!f.FileInfo().IsDir() && !f.Mode().IsRegular()) {
-			return nil, fmt.Errorf("主题包含非法文件类型")
+			return nil, fmt.Errorf("主題包含非法文件類型")
 		}
 		if seen[clean] {
-			return nil, fmt.Errorf("主题包存在重复路径")
+			return nil, fmt.Errorf("主題包存在重複路徑")
 		}
 		seen[clean] = true
 		if f.FileInfo().IsDir() {
 			continue
 		}
 		if !allowedFile(clean) {
-			return nil, fmt.Errorf("主题仅支持编译后的静态文件，不支持 %s", path.Ext(clean))
+			return nil, fmt.Errorf("主題僅支持編譯後的靜態文件，不支持 %s", path.Ext(clean))
 		}
 		if f.UncompressedSize64 > uint64(MaxExtractBytes-total) {
-			return nil, fmt.Errorf("主题解压后超过 100MB 上限")
+			return nil, fmt.Errorf("主題解壓後超過 100MB 上限")
 		}
 		target := filepath.Join(stage, filepath.FromSlash(clean))
 		if err = os.MkdirAll(filepath.Dir(target), 0755); err != nil {
@@ -133,7 +133,7 @@ func Install(raw []byte) (*Theme, error) {
 			return nil, closeErr
 		}
 		if total > MaxExtractBytes {
-			return nil, fmt.Errorf("主题解压后超过 100MB 上限")
+			return nil, fmt.Errorf("主題解壓後超過 100MB 上限")
 		}
 	}
 	base := stage
@@ -193,10 +193,10 @@ func inspect(dir, key string) (*Theme, error) {
 	defer root.Close()
 	meta, err := root.ReadFile("theme.json")
 	if err != nil {
-		return nil, fmt.Errorf("主题根目录缺少 theme.json 清单")
+		return nil, fmt.Errorf("主題根目錄缺少 theme.json 清單")
 	}
 	if len(meta) > 64<<10 {
-		return nil, fmt.Errorf("theme.json 过大")
+		return nil, fmt.Errorf("theme.json 過大")
 	}
 	var m Meta
 	if err = json.Unmarshal(meta, &m); err != nil {
@@ -205,29 +205,29 @@ func inspect(dir, key string) (*Theme, error) {
 	if key == "" {
 		key = m.Key
 	} else if m.Key != "" && m.Key != key {
-		return nil, fmt.Errorf("theme.json 的 key 必须与主题目录名一致")
+		return nil, fmt.Errorf("theme.json 的 key 必須與主題目錄名一致")
 	}
 	if !ValidKey(key) {
-		return nil, fmt.Errorf("主题 key 仅允许小写字母、数字、_-，长度 1–64，classic 为内置保留名称")
+		return nil, fmt.Errorf("主題 key 僅允許小寫字母、數字、_-，長度 1–64，classic 為內置保留名稱")
 	}
 	if strings.TrimSpace(m.Name) == "" || strings.TrimSpace(m.Version) == "" {
-		return nil, fmt.Errorf("theme.json 必须填写 name 和 version")
+		return nil, fmt.Errorf("theme.json 必須填寫 name 和 version")
 	}
 	if m.SettingsSchema != "" {
 		if m.SettingsSchema != "settings.schema.json" {
-			return nil, fmt.Errorf("设置定义文件须为 settings.schema.json")
+			return nil, fmt.Errorf("設置定義文件須為 settings.schema.json")
 		}
 		if _, err := LoadSettings(&Theme{Meta: m, Dir: dir}); err != nil {
 			return nil, err
 		}
 	}
 	if m.SchemaVersion != 0 && m.SchemaVersion != 1 {
-		return nil, fmt.Errorf("不支持的主题 schema_version，请使用 1")
+		return nil, fmt.Errorf("不支持的主題 schema_version，請使用 1")
 	}
 	m.Key = key
 	b, err := root.ReadFile("index.html")
 	if err != nil {
-		return nil, fmt.Errorf("主题根目录缺少编译后的 index.html，请上传构建产物而非源码")
+		return nil, fmt.Errorf("主題根目錄缺少編譯後的 index.html，請上傳構建產物而非源碼")
 	}
 	if _, err = indexHeadEnd(b); err != nil {
 		return nil, err
@@ -237,16 +237,16 @@ func inspect(dir, key string) (*Theme, error) {
 	}
 	if m.Preview != "" {
 		if !fs.ValidPath(m.Preview) || !imageFile(m.Preview) {
-			return nil, fmt.Errorf("preview 必须是包内图片的相对路径")
+			return nil, fmt.Errorf("preview 必須是包內圖片的相對路徑")
 		}
 		f, e := root.Open(m.Preview)
 		if e != nil {
-			return nil, fmt.Errorf("主题预览图不存在")
+			return nil, fmt.Errorf("主題預覽圖不存在")
 		}
 		st, e := f.Stat()
 		f.Close()
 		if e != nil || !st.Mode().IsRegular() {
-			return nil, fmt.Errorf("主题预览图非法")
+			return nil, fmt.Errorf("主題預覽圖非法")
 		}
 	}
 	return &Theme{Meta: m, Dir: dir}, nil
@@ -269,26 +269,26 @@ func validateIndexAssets(root *os.Root, b []byte) error {
 			}
 			u, err := url.Parse(attr.Val)
 			if err != nil {
-				return fmt.Errorf("index.html 包含非法资源地址")
+				return fmt.Errorf("index.html 包含非法資源地址")
 			}
 			if u.IsAbs() || u.Host != "" || u.Path == "" {
 				continue
 			}
 			if strings.HasPrefix(u.Path, "/") {
-				return fmt.Errorf("主题资源必须使用相对路径（Vite base: './'），发现 %s", u.Path)
+				return fmt.Errorf("主題資源必須使用相對路徑（Vite base: './'），發現 %s", u.Path)
 			}
 			name := strings.TrimPrefix(u.Path, "./")
 			if !fs.ValidPath(name) || !allowedFile(name) {
-				return fmt.Errorf("主题资源路径非法：%s", name)
+				return fmt.Errorf("主題資源路徑非法：%s", name)
 			}
 			f, err := root.Open(name)
 			if err != nil {
-				return fmt.Errorf("主题包缺少 index.html 引用的资源：%s", name)
+				return fmt.Errorf("主題包缺少 index.html 引用的資源：%s", name)
 			}
 			st, err := f.Stat()
 			f.Close()
 			if err != nil || !st.Mode().IsRegular() {
-				return fmt.Errorf("主题资源不是普通文件：%s", name)
+				return fmt.Errorf("主題資源不是普通文件：%s", name)
 			}
 		}
 	}
@@ -298,7 +298,7 @@ func validateIndexAssets(root *os.Root, b []byte) error {
 // asset prefix before any scripts or styles. Vite themes must build with base './'.
 func indexHeadEnd(b []byte) (int, error) {
 	if len(b) > 2<<20 {
-		return 0, fmt.Errorf("index.html 超过 2MB 上限")
+		return 0, fmt.Errorf("index.html 超過 2MB 上限")
 	}
 	z := html.NewTokenizer(bytes.NewReader(b))
 	offset, head := 0, 0
@@ -313,14 +313,14 @@ func indexHeadEnd(b []byte) (int, error) {
 		}
 		tok := z.Token()
 		if tok.Data == "base" {
-			return 0, fmt.Errorf("index.html 不可设置 base 标签；构建时请使用相对资源路径")
+			return 0, fmt.Errorf("index.html 不可設置 base 標籤；構建時請使用相對資源路徑")
 		}
 		if tok.Data == "head" && head == 0 {
 			head = offset
 		}
 	}
 	if head == 0 {
-		return 0, fmt.Errorf("index.html 必须包含 head 标签")
+		return 0, fmt.Errorf("index.html 必須包含 head 標籤")
 	}
 	return head, nil
 }

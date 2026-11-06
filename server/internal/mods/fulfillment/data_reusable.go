@@ -20,7 +20,7 @@ func (r *DeliveryRepoImpl) DeliverReusable(ctx context.Context, orderID, itemID,
 		return err
 	}
 	if it.OrderID != orderID || it.DeliverySourceID != sourceID || it.FulfillmentType != orderitem.FulfillmentTypeReuse {
-		return fmt.Errorf("共享交付来源不匹配")
+		return fmt.Errorf("共享交付來源不匹配")
 	}
 	o, err := c.Order.Get(ctx, orderID)
 	if err != nil {
@@ -42,7 +42,7 @@ func (r *DeliveryRepoImpl) fulfillReusable(ctx context.Context, o *ent.Order, it
 		return err
 	}
 	if src.ProductID != it.ProductID || src.SkuID != it.SkuID || src.SubsiteID != o.SubsiteID {
-		return fmt.Errorf("共享交付范围不匹配")
+		return fmt.Errorf("共享交付範圍不匹配")
 	}
 	if src.Status != "ready" || len(src.Content) == 0 || src.ExpiresAt > 0 && src.ExpiresAt <= time.Now().Unix() {
 		if src.Status == "paused" || src.Status == "failed" || src.Status == "uncertain" || src.ExpiresAt > 0 && src.ExpiresAt <= time.Now().Unix() {
@@ -55,7 +55,7 @@ func (r *DeliveryRepoImpl) fulfillReusable(ctx context.Context, o *ent.Order, it
 		return err
 	}
 	if _, err := r.cipher.Open(src.Content, it.ProductID, o.SubsiteID); err != nil {
-		return fmt.Errorf("共享内容不可解密，请联系商家处理")
+		return fmt.Errorf("共享內容不可解密，請聯繫商家處理")
 	}
 	// A late payment may arrive after its reservation was released. Atomically
 	// cap actual deliveries as well as admissions, including across workers.

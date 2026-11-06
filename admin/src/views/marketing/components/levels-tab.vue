@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 会员等级管理：等级 CRUD + 折扣/阈值/积分规则（memberlevel:read / write / delete）。
+// 會員等級管理：等級 CRUD + 折扣/閾值/積分規則（memberlevel:read / write / delete）。
 import { computed, onMounted, ref, h } from "vue";
 import { NButton, NDataTable, NInput, NInputNumber, NModal, NForm, NFormItem, NPopconfirm, NSelect, NSwitch, NTag } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
@@ -15,8 +15,8 @@ const levels = ref<any[]>([]);
 const showForm = ref(false);
 const editing = ref<any>(null);
 const saving = ref(false);
-// discount_percent：UI 层百分比（100=无折扣，95=9.5 折）；提交转万分比（×100）。
-// 积分规则 UI 层为「每消费 X 元得 Y 积分」，提交序列化为 {"spend_cents","points"}。
+// discount_percent：UI 層百分比（100=無折扣，95=9.5 折）；提交轉萬分比（×100）。
+// 積分規則 UI 層為「每消費 X 元得 Y 積分」，提交序列化為 {"spend_cents","points"}。
 const form = ref({
   name: "", acquire_mode:"auto",display_mode:"public",
   threshold_type: "consume",
@@ -30,17 +30,17 @@ const form = ref({
   points_earn: 10,
 });
 
-/** 百分比 → 万分比（≥100 一律归一为无折扣 10000） */
+/** 百分比 → 萬分比（≥100 一律歸一為無折扣 10000） */
 function discountToBp(pct: number) {
   return pct >= 100 ? 10000 : Math.round(pct * 100);
 }
 
-/** 万分比 → 百分比（10000 = 无折扣） */
+/** 萬分比 → 百分比（10000 = 無折扣） */
 function bpToPercent(bp: number) {
   return bp >= 10000 ? 100 : bp / 100;
 }
 
-/** 积分规则 JSON → 表单字段（解析失败/未配置返回关闭态） */
+/** 積分規則 JSON → 表單字段（解析失敗/未配置返回關閉態） */
 function parsePointsRule(json?: string) {
   const empty = { points_enabled: false, points_spend_yuan: 10, points_earn: 10 };
   if (!json) return empty;
@@ -55,7 +55,7 @@ function parsePointsRule(json?: string) {
   }
 }
 
-/** 表单字段 → 积分规则 JSON（未启用返回 undefined 不提交） */
+/** 表單字段 → 積分規則 JSON（未啓用返回 undefined 不提交） */
 function buildPointsRuleJson(): string | undefined {
   if (!form.value.points_enabled) return undefined;
   const spendYuan = form.value.points_spend_yuan;
@@ -64,7 +64,7 @@ function buildPointsRuleJson(): string | undefined {
   return JSON.stringify({ spend_cents: Math.round(spendYuan * 100), points });
 }
 
-/** 积分规则 JSON → 列表友好文本 */
+/** 積分規則 JSON → 列表友好文本 */
 function pointsRuleText(json?: string) {
   if (!json) return "-";
   try {
@@ -72,17 +72,17 @@ function pointsRuleText(json?: string) {
     const spendYuan = Number(rule.spend_cents) / 100;
     const points = Number(rule.points);
     if (!spendYuan || !points) return "-";
-    return `消费 ${spendYuan} ${currencyUnit()} 得 ${points} 积分`;
+    return `消費 ${spendYuan} ${currencyUnit()} 得 ${points} 積分`;
   } catch {
     return json;
   }
 }
 
-// 启用状态快捷筛选（客户端过滤——等级全量加载，带实时计数）
+// 啓用狀態快捷篩選（客户端過濾——等級全量加載，帶實時計數）
 const enabledFilter = ref<"" | "on" | "off">("");
 const enabledTabs = [
   { label: "全部", value: "", type: "default" as const },
-  { label: "已启用", value: "on", type: "success" as const },
+  { label: "已啓用", value: "on", type: "success" as const },
   { label: "已停用", value: "off", type: "default" as const },
 ];
 const enabledCounts = computed(() => ({
@@ -98,14 +98,14 @@ const canWrite = () => checkAuth("memberlevel:write") && checkAuth("memberlevel:
 
 const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 50 },
-  { title: "名称", key: "name", width: 110, ellipsis: { tooltip: true } },
+  { title: "名稱", key: "name", width: 110, ellipsis: { tooltip: true } },
   {
-    title: "升级条件",
+    title: "升級條件",
     key: "threshold",
     width: 200,
     render: (row) => {
-      const t: Record<string, string> = { recharge: "累计充值", consume: "累计消费", both_and: "充值且消费", both_or: "充值或消费" };
-      if(row.acquire_mode === "manual") return "后台指定";
+      const t: Record<string, string> = { recharge: "累計充值", consume: "累計消費", both_and: "充值且消費", both_or: "充值或消費" };
+      if(row.acquire_mode === "manual") return "後台指定";
       const parts: string[] = [t[row.threshold_type] || row.threshold_type];
       if (row.threshold_recharge) parts.push(formatMoney(row.threshold_recharge));
       if (row.threshold_consume) parts.push(formatMoney(row.threshold_consume));
@@ -117,20 +117,20 @@ const columns: DataTableColumns<any> = [
     key: "discount",
     width: 110,
     render: (row) => {
-      if(!checkAuth("memberlevel:view_discount")) return "无查看权限";
-      if (row.discount >= 10000) return "无折扣";
+      if(!checkAuth("memberlevel:view_discount")) return "無查看權限";
+      if (row.discount >= 10000) return "無折扣";
       const pct = row.discount / 100;
       return `${pct}%（${(pct / 10).toFixed(1)}折）`;
     },
   },
-  { title: "积分规则", key: "points_rule_json", width: 160, ellipsis: true, render: (row) => pointsRuleText(row.points_rule_json) },
-  {title:"对外展示",key:"display_mode",width:110,render:(row)=>({public:"公开",contact:"联系客服",hidden:"隐藏"}[String(row.display_mode)] || "公开")},
+  { title: "積分規則", key: "points_rule_json", width: 160, ellipsis: true, render: (row) => pointsRuleText(row.points_rule_json) },
+  {title:"對外展示",key:"display_mode",width:110,render:(row)=>({public:"公開",contact:"聯繫客服",hidden:"隱藏"}[String(row.display_mode)] || "公開")},
   { title: "排序", key: "sort", width: 60 },
   {
-    title: "状态",
+    title: "狀態",
     key: "enabled",
     width: 70,
-    render: (row) => h(NTag, { type: row.enabled ? "success" : "default", size: "small" }, { default: () => (row.enabled ? "启用" : "停用") }),
+    render: (row) => h(NTag, { type: row.enabled ? "success" : "default", size: "small" }, { default: () => (row.enabled ? "啓用" : "停用") }),
   },
   {
     title: "操作",
@@ -139,13 +139,13 @@ const columns: DataTableColumns<any> = [
     render: (row) =>
       h("div", { class: "flex gap-4px" }, [
         canWrite()
-          ? h(NButton, { size: "tiny", onClick: () => openEdit(row) }, { default: () => "编辑" })
+          ? h(NButton, { size: "tiny", onClick: () => openEdit(row) }, { default: () => "編輯" })
           : null,
         canWrite()
-          ? h(NButton, { size: "tiny", type: row.enabled ? "warning" : "success", quaternary: true, onClick: () => toggleEnabled(row) }, { default: () => (row.enabled ? "停用" : "启用") })
+          ? h(NButton, { size: "tiny", type: row.enabled ? "warning" : "success", quaternary: true, onClick: () => toggleEnabled(row) }, { default: () => (row.enabled ? "停用" : "啓用") })
           : null,
         checkAuth("memberlevel:delete")
-          ? h(NPopconfirm, { onPositiveClick: () => handleDelete(row.id) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "删除" }), default: () => "确定删除该等级？" })
+          ? h(NPopconfirm, { onPositiveClick: () => handleDelete(row.id) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "刪除" }), default: () => "確定刪除該等級？" })
           : null,
       ]),
   },
@@ -202,7 +202,7 @@ async function handleSave() {
           threshold_consume: Math.round(form.value.threshold_consume * 100),
         });
     if (!error) {
-      window.$message?.success(editing.value ? "已保存" : "等级已创建");
+      window.$message?.success(editing.value ? "已保存" : "等級已創建");
       showForm.value = false;
       load();
     }
@@ -214,7 +214,7 @@ async function handleSave() {
 async function toggleEnabled(row: any) {
   const { error } = await updateMemberLevel(row.id, { name:row.name,discount:row.discount,sort:row.sort,enabled:!row.enabled,points_rule_json:row.points_rule_json,acquire_mode:row.acquire_mode,display_mode:row.display_mode });
   if (!error) {
-    window.$message?.success(!row.enabled ? "已启用" : "已停用");
+    window.$message?.success(!row.enabled ? "已啓用" : "已停用");
     load();
   }
 }
@@ -222,7 +222,7 @@ async function toggleEnabled(row: any) {
 async function handleDelete(id: number) {
   const { error } = await deleteMemberLevel(id);
   if (!error) {
-    window.$message?.success("已删除");
+    window.$message?.success("已刪除");
     load();
   }
 }
@@ -235,57 +235,57 @@ onMounted(load);
     <div class="mb-8px flex flex-wrap items-center justify-between gap-8px">
       <FilterTabs v-model:value="enabledFilter" :options="enabledTabs" :counts="enabledCounts" size="small" />
       <div>
-        <NButton v-if="canWrite()" size="small" type="primary" @click="openCreate">新增等级</NButton>
-        <span class="ml-8px text-12px text-gray-400">折扣按支付比例百分比填写（100=无折扣，95=9.5 折）；阈值在创建时设定</span>
+        <NButton v-if="canWrite()" size="small" type="primary" @click="openCreate">新增等級</NButton>
+        <span class="ml-8px text-12px text-gray-400">折扣按支付比例百分比填寫（100=無折扣，95=9.5 折）；閾值在創建時設定</span>
       </div>
     </div>
     <NDataTable :columns="columns" :data="filteredLevels" :loading="loading" size="small"  :max-height="540" />
 
-    <NModal v-model:show="showForm" preset="dialog" :title="editing ? `编辑等级：${editing.name}` : '新增等级'" style="width: 480px">
+    <NModal v-model:show="showForm" preset="dialog" :title="editing ? `編輯等級：${editing.name}` : '新增等級'" style="width: 480px">
       <NForm :model="form" label-placement="left" label-width="88">
-        <NFormItem label="名称" required>
+        <NFormItem label="名稱" required>
           <NInput v-model:value="form.name" />
         </NFormItem>
-        <NFormItem v-if="!editing" label="升级条件">
+        <NFormItem v-if="!editing" label="升級條件">
           <NSelect
             v-model:value="form.threshold_type"
             :options="[
-              { label: '累计消费', value: 'consume' },
-              { label: '累计充值', value: 'recharge' },
-              { label: '充值且消费', value: 'both_and' },
-              { label: '充值或消费', value: 'both_or' },
+              { label: '累計消費', value: 'consume' },
+              { label: '累計充值', value: 'recharge' },
+              { label: '充值且消費', value: 'both_and' },
+              { label: '充值或消費', value: 'both_or' },
             ]"
           />
         </NFormItem>
-        <NFormItem v-if="!editing" :label="`充值阈值(${currencyUnit()})`">
+        <NFormItem v-if="!editing" :label="`充值閾值(${currencyUnit()})`">
           <NInputNumber v-model:value="form.threshold_recharge" :min="0" class="w-full" />
         </NFormItem>
-        <NFormItem v-if="!editing" :label="`消费阈值(${currencyUnit()})`">
+        <NFormItem v-if="!editing" :label="`消費閾值(${currencyUnit()})`">
           <NInputNumber v-model:value="form.threshold_consume" :min="0" class="w-full" />
         </NFormItem>
         <NFormItem label="折扣(%)" required>
           <NInputNumber v-model:value="form.discount_percent" :min="0.1" :max="100" :precision="1" :step="1" class="w-full" />
-          <span class="w-full text-12px text-gray-400">支付比例：100 = 无折扣，95 = 打 9.5 折，10 = 打 1 折</span>
+          <span class="w-full text-12px text-gray-400">支付比例：100 = 無折扣，95 = 打 9.5 折，10 = 打 1 折</span>
         </NFormItem>
-        <NFormItem label="获得方式"><NSelect v-model:value="form.acquire_mode" :options="[{label:'自动达标',value:'auto'},{label:'后台指定',value:'manual'}]" /></NFormItem>
-        <NFormItem label="对外展示"><NSelect v-model:value="form.display_mode" :options="[{label:'公开折扣与门槛',value:'public'},{label:'只显示联系客服',value:'contact'},{label:'完全隐藏',value:'hidden'}]" /></NFormItem>
-        <NFormItem label="积分规则">
+        <NFormItem label="獲得方式"><NSelect v-model:value="form.acquire_mode" :options="[{label:'自動達標',value:'auto'},{label:'後台指定',value:'manual'}]" /></NFormItem>
+        <NFormItem label="對外展示"><NSelect v-model:value="form.display_mode" :options="[{label:'公開折扣與門檻',value:'public'},{label:'只顯示聯繫客服',value:'contact'},{label:'完全隱藏',value:'hidden'}]" /></NFormItem>
+        <NFormItem label="積分規則">
           <div class="w-full">
             <div class="flex items-center gap-8px">
               <NSwitch v-model:value="form.points_enabled" />
-              <span class="text-13px">启用积分规则</span>
-              <span v-if="!form.points_enabled" class="text-12px text-gray-400">未配置则消费不产生积分</span>
+              <span class="text-13px">啓用積分規則</span>
+              <span v-if="!form.points_enabled" class="text-12px text-gray-400">未配置則消費不產生積分</span>
             </div>
             <template v-if="form.points_enabled">
               <div class="mt-8px flex items-center gap-8px">
-                <span class="w-64px text-right text-13px">每消费</span>
+                <span class="w-64px text-right text-13px">每消費</span>
                 <NInputNumber v-model:value="form.points_spend_yuan" :min="0.01" :precision="2" class="w-140px" />
                 <span class="text-13px">{{ currencyUnit() }}</span>
               </div>
               <div class="mt-8px flex items-center gap-8px">
                 <span class="w-64px text-right text-13px">可得</span>
                 <NInputNumber v-model:value="form.points_earn" :min="1" class="w-140px" />
-                <span class="text-13px">积分</span>
+                <span class="text-13px">積分</span>
               </div>
             </template>
           </div>
@@ -293,7 +293,7 @@ onMounted(load);
         <NFormItem label="排序">
           <NInputNumber v-model:value="form.sort" class="w-full" />
         </NFormItem>
-        <NFormItem v-if="editing" label="启用">
+        <NFormItem v-if="editing" label="啓用">
           <NSwitch v-model:value="form.enabled" />
         </NFormItem>
       </NForm>

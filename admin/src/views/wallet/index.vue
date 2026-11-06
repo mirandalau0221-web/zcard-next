@@ -33,7 +33,7 @@ const page = ref(1);
 const pageSize = ref(20);
 
 const adjustTab = ref<"balance" | "points" | "coupon">("balance");
-const adjustDir = ref<"add" | "sub">("add"); // 增/扣 单选（免手输正负号）
+const adjustDir = ref<"add" | "sub">("add"); // 增/扣 單選（免手輸正負號）
 const couponBatches = ref<any[]>([]);
 const couponBatchId = ref<string | null>(null);
 const couponCount = ref(1);
@@ -47,16 +47,16 @@ const adjustForm = reactive<{ amount_yuan: number | null; reason: string }>({
 function directionText(d?: string) {
   if (!d) return "-";
   const map: Record<string, string> = {
-    in: "入账",
-    out: "出账",
-    credit: "入账",
-    debit: "出账",
-    income: "入账",
-    expense: "出账",
-    add: "入账",
-    sub: "扣减",
-    adjust_in: "入账",
-    adjust_out: "扣减",
+    in: "入賬",
+    out: "出賬",
+    credit: "入賬",
+    debit: "出賬",
+    income: "入賬",
+    expense: "出賬",
+    add: "入賬",
+    sub: "扣減",
+    adjust_in: "入賬",
+    adjust_out: "扣減",
   };
   return map[d] || d;
 }
@@ -84,31 +84,31 @@ const columns: DataTableColumns<any> = [
         { default: () => directionText(row.direction) },
       ),
   },
-  { title: "类型", key: "type", width: 132, render: (row) => transactionType(row.type) },
+  { title: "類型", key: "type", width: 132, render: (row) => transactionType(row.type) },
   {
-    title: "金额",
+    title: "金額",
     key: "amount_cents",
     width: 120,
     render: (row) => formatSignedMoney(transactionAmount(row)),
   },
   {
-    title: "余额前",
+    title: "餘額前",
     key: "balance_before_cents",
     width: 120,
     render: (row) => formatMoney(row.balance_before_cents),
   },
   {
-    title: "余额后",
+    title: "餘額後",
     key: "balance_after_cents",
     width: 120,
     render: (row) => formatMoney(row.balance_after_cents),
   },
-  { title: "关联单号", key: "reference", render: transactionReference, minWidth: 160 },
-  { title: "备注", key: "remark", render: (row) => transactionRemark(row), minWidth: 140, ellipsis: { tooltip: true } },
-  { title: "时间", key: "created_at", width: 160, render: (row) => formatTime(row.created_at) },
+  { title: "關聯單號", key: "reference", render: transactionReference, minWidth: 160 },
+  { title: "備註", key: "remark", render: (row) => transactionRemark(row), minWidth: 140, ellipsis: { tooltip: true } },
+  { title: "時間", key: "created_at", width: 160, render: (row) => formatTime(row.created_at) },
 ];
 
-/** 远程搜索用户（用户名/注册邮箱模糊匹配），选中后以用户 ID 查余额/流水/调账 */
+/** 遠程搜索用户（用户名/註冊郵箱模糊匹配），選中後以用户 ID 查餘額/流水/調賬 */
 async function onUserSearch(keyword: string) {
   if (!keyword.trim()) {
     userOptions.value = [];
@@ -135,7 +135,7 @@ function onUserChange(_value: number | null, option: any) {
 
 async function loadBalance() {
   if (!userId.value) {
-    window.$message?.warning("请搜索并选择用户（用户名或邮箱）");
+    window.$message?.warning("請搜索並選擇用户（用户名或郵箱）");
     return;
   }
   balanceLoading.value = true;
@@ -202,16 +202,16 @@ async function openAdjust() {
 async function handleAdjust() {
   if (!userId.value) return;
   if (adjustTab.value !== "coupon" && !adjustForm.reason.trim()) {
-    window.$message?.warning("请填写调整原因（用于审计）");
+    window.$message?.warning("請填寫調整原因（用於審計）");
     return;
   }
   if (adjustTab.value === "balance") {
     const amountYuan = adjustForm.amount_yuan;
     if (amountYuan === null || amountYuan <= 0) {
-      window.$message?.warning("请填写金额");
+      window.$message?.warning("請填寫金額");
       return;
     }
-    // 增/扣单选 → 服务端正负语义（铁律 15：元→分防浮点）
+    // 增/扣單選 → 服務端正負語義（鐵律 15：元→分防浮點）
     const cents = yuanToFen(amountYuan) * (adjustDir.value === "sub" ? -1 : 1);
     adjusting.value = true;
     try {
@@ -220,7 +220,7 @@ async function handleAdjust() {
         reason: adjustForm.reason,
       });
       if (!error) {
-        window.$message?.success(adjustDir.value === "add" ? "已增加余额" : "已扣减余额");
+        window.$message?.success(adjustDir.value === "add" ? "已增加餘額" : "已扣減餘額");
         showAdjust.value = false;
         Object.assign(adjustForm, { amount_yuan: null, reason: "" });
         balance.value = data || balance.value;
@@ -235,14 +235,14 @@ async function handleAdjust() {
   if (adjustTab.value === "points") {
     const pts = adjustForm.amount_yuan;
     if (pts === null || pts <= 0 || !Number.isInteger(pts)) {
-      window.$message?.warning("请填写整数积分数量");
+      window.$message?.warning("請填寫整數積分數量");
       return;
     }
     adjusting.value = true;
     try {
       const { error } = await adjustWalletPoints(userId.value, pts * (adjustDir.value === "sub" ? -1 : 1), adjustForm.reason);
       if (!error) {
-        window.$message?.success(adjustDir.value === "add" ? "已增加积分" : "已扣减积分");
+        window.$message?.success(adjustDir.value === "add" ? "已增加積分" : "已扣減積分");
         showAdjust.value = false;
         Object.assign(adjustForm, { amount_yuan: null, reason: "" });
       }
@@ -251,16 +251,16 @@ async function handleAdjust() {
     }
     return;
   }
-  // 优惠券赠送
+  // 優惠券贈送
   if (!couponBatchId.value) {
-    window.$message?.warning("请选择优惠券批次");
+    window.$message?.warning("請選擇優惠券批次");
     return;
   }
   grantingCoupon.value = true;
   try {
     const { data, error } = await grantCoupon(couponBatchId.value, userId.value, couponCount.value || 1);
     if (!error) {
-      window.$message?.success(`已赠送 ${(data as any)?.granted ?? 0} 张券`);
+      window.$message?.success(`已贈送 ${(data as any)?.granted ?? 0} 張券`);
       showAdjust.value = false;
     }
   } finally {
@@ -271,13 +271,13 @@ async function handleAdjust() {
 
 <template>
   <div class="min-h-500px flex-col gap-16px overflow-hidden">
-    <NCard title="钱包管理" class="flex-1">
+    <NCard title="錢包管理" class="flex-1">
       <NTabs v-model:value="activeTab" type="line">
-      <NTabPane name="bills" tab="账单流水">
+      <NTabPane name="bills" tab="賬單流水">
         <BillsTab />
       </NTabPane>
-      <NTabPane name="balance" tab="余额/流水">
-      <!-- 查询 -->
+      <NTabPane name="balance" tab="餘額/流水">
+      <!-- 查詢 -->
       <div class="mb-16px flex items-center gap-12px">
         <NSelect
           v-model:value="userId"
@@ -286,19 +286,19 @@ async function handleAdjust() {
           filterable
           remote
           clearable
-          placeholder="搜索用户名或注册邮箱"
+          placeholder="搜索用户名或註冊郵箱"
           class="w-300px"
           @search="onUserSearch"
           @update:value="onUserChange"
         />
-        <NButton type="primary" :loading="balanceLoading" @click="loadBalance">查询余额</NButton>
-        <NButton v-auth="'wallet:adjust'" :disabled="!balance" @click="openAdjust">调整（余额/积分/券）</NButton>
+        <NButton type="primary" :loading="balanceLoading" @click="loadBalance">查詢餘額</NButton>
+        <NButton v-auth="'wallet:adjust'" :disabled="!balance" @click="openAdjust">調整（餘額/積分/券）</NButton>
         <span v-if="selectedUser" class="text-13px text-gray-500">
-          当前用户：#{{ selectedUser.id }} {{ selectedUser.username }}<template v-if="selectedUser.email">（{{ selectedUser.email }}）</template>
+          當前用户：#{{ selectedUser.id }} {{ selectedUser.username }}<template v-if="selectedUser.email">（{{ selectedUser.email }}）</template>
         </span>
       </div>
 
-      <!-- 余额卡片 -->
+      <!-- 餘額卡片 -->
       <NGrid
         v-if="balance"
         :x-gap="16"
@@ -309,19 +309,19 @@ async function handleAdjust() {
       >
         <NGi>
           <NCard size="small" :bordered="false">
-            <div class="text-14px">可用余额</div>
+            <div class="text-14px">可用餘額</div>
             <div class="mt-8px text-24px font-bold">{{ formatMoney(balance.available_cents) }}</div>
           </NCard>
         </NGi>
         <NGi>
           <NCard size="small" :bordered="false">
-            <div class="text-14px">冻结余额</div>
+            <div class="text-14px">凍結餘額</div>
             <div class="mt-8px text-24px font-bold">{{ formatMoney(balance.locked_cents) }}</div>
           </NCard>
         </NGi>
         <NGi>
           <NCard size="small" :bordered="false">
-            <div class="text-14px">总余额</div>
+            <div class="text-14px">總餘額</div>
             <div class="mt-8px text-24px font-bold">{{ formatMoney(balance.total_cents) }}</div>
           </NCard>
         </NGi>
@@ -337,61 +337,61 @@ async function handleAdjust() {
         @change="loadTransactions"
       />
           </NTabPane>
-      <NTabPane v-if="checkAuth('wallet:withdraw')" name="withdraw" tab="提现审核">
+      <NTabPane v-if="checkAuth('wallet:withdraw')" name="withdraw" tab="提現審核">
         <WithdrawTab />
       </NTabPane>
-      <NTabPane v-if="checkAuth('giftcard:read')" name="giftcard" tab="礼品卡">
+      <NTabPane v-if="checkAuth('giftcard:read')" name="giftcard" tab="禮品卡">
         <GiftcardTab />
       </NTabPane>
       </NTabs>
     </NCard>
 
-    <!-- 调整弹窗：余额 / 积分 / 优惠券（增扣单选，免手输正负号） -->
-    <NModal v-model:show="showAdjust" preset="dialog" title="账户调整" style="width: 520px">
+    <!-- 調整彈窗：餘額 / 積分 / 優惠券（增扣單選，免手輸正負號） -->
+    <NModal v-model:show="showAdjust" preset="dialog" title="賬户調整" style="width: 520px">
       <NRadioGroup v-model:value="adjustTab" size="small" class="mb-16px">
-        <NRadioButton value="balance">余额</NRadioButton>
-        <NRadioButton value="points">积分</NRadioButton>
-        <NRadioButton value="coupon">赠送优惠券</NRadioButton>
+        <NRadioButton value="balance">餘額</NRadioButton>
+        <NRadioButton value="points">積分</NRadioButton>
+        <NRadioButton value="coupon">贈送優惠券</NRadioButton>
       </NRadioGroup>
       <NForm label-placement="left" label-width="90">
         <template v-if="adjustTab !== 'coupon'">
           <NFormItem :label="adjustTab === 'balance' ? '方向' : '方向'">
             <NRadioGroup v-model:value="adjustDir">
               <NRadio value="add">增加</NRadio>
-              <NRadio value="sub">扣减</NRadio>
+              <NRadio value="sub">扣減</NRadio>
             </NRadioGroup>
           </NFormItem>
-          <NFormItem :label="adjustTab === 'balance' ? `金额（${currencyUnit()}）` : '积分数量'" required>
+          <NFormItem :label="adjustTab === 'balance' ? `金額（${currencyUnit()}）` : '積分數量'" required>
             <NInputNumber
               v-model:value="adjustForm.amount_yuan"
               class="w-full"
               :precision="adjustTab === 'balance' ? 2 : 0"
               :step="adjustTab === 'balance' ? 0.01 : 1"
               :min="0"
-              :placeholder="adjustTab === 'balance' ? `要${adjustDir === 'add' ? '增加' : '扣减'}的金额` : `要${adjustDir === 'add' ? '增加' : '扣减'}的积分`"
+              :placeholder="adjustTab === 'balance' ? `要${adjustDir === 'add' ? '增加' : '扣減'}的金額` : `要${adjustDir === 'add' ? '增加' : '扣減'}的積分`"
             />
           </NFormItem>
           <NFormItem label="原因" required>
-            <NInput v-model:value="adjustForm.reason" type="textarea" :rows="3" placeholder="必填，用于审计" />
+            <NInput v-model:value="adjustForm.reason" type="textarea" :rows="3" placeholder="必填，用於審計" />
           </NFormItem>
         </template>
         <template v-else>
-          <NFormItem label="优惠券批次" required>
+          <NFormItem label="優惠券批次" required>
             <NSelect
               v-model:value="couponBatchId"
               :options="couponBatches"
               :loading="couponLoading"
               filterable
-              placeholder="选择批次（仅显示未使用券的批次）"
+              placeholder="選擇批次（僅顯示未使用券的批次）"
             />
             <div v-if="!couponLoading && !couponBatches.length" class="mt-4px text-12px text-gray-400">
-              暂无可赠送的批次——先到 营销管理 → 优惠券 批量生成
+              暫無可贈送的批次——先到 營銷管理 → 優惠券 批量生成
             </div>
           </NFormItem>
-          <NFormItem label="赠送数量" required>
+          <NFormItem label="贈送數量" required>
             <NInputNumber v-model:value="couponCount" :min="1" :max="1000" class="w-full" />
           </NFormItem>
-          <div class="text-12px text-gray-400">赠送后券立即出现在买家「我的优惠券」中</div>
+          <div class="text-12px text-gray-400">贈送後券立即出現在買家「我的優惠券」中</div>
         </template>
       </NForm>
       <template #action>
@@ -402,7 +402,7 @@ async function handleAdjust() {
           :loading="adjustTab === 'coupon' ? grantingCoupon : adjusting"
           @click="handleAdjust"
         >
-          {{ adjustTab === 'coupon' ? '赠送' : `确定${adjustDir === 'add' ? '增加' : '扣减'}` }}
+          {{ adjustTab === 'coupon' ? '贈送' : `確定${adjustDir === 'add' ? '增加' : '扣減'}` }}
         </NButton>
       </template>
     </NModal>

@@ -17,14 +17,14 @@ func (r *DeliveryRepoImpl) lockDeliveryOrder(ctx context.Context, o *ent.Order) 
 	switch o.Status {
 	case order.StatusPaid, order.StatusFulfilling, order.StatusPartiallyDelivered:
 	default:
-		return fmt.Errorf("该订单当前状态不允许发货")
+		return fmt.Errorf("該訂單當前狀態不允許發貨")
 	}
 	n, err := data.Client(ctx, r.data).Order.Update().Where(order.ID(o.ID), order.StatusEQ(o.Status), order.Version(o.Version)).AddVersion(1).Save(ctx)
 	if err != nil {
 		return err
 	}
 	if n != 1 {
-		return fmt.Errorf("订单已变化，请刷新后重试")
+		return fmt.Errorf("訂單已變化，請刷新後重試")
 	}
 	return nil
 }

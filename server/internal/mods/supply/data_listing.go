@@ -72,7 +72,7 @@ func (s *SyncService) listingSKUStock(ctx context.Context, a adapter.Adapter, co
 		}
 		if errors.Is(e, adapter.ErrRateLimited) {
 			p.Stock = -2
-			p.StockError = "货源限流，请稍后重试"
+			p.StockError = "貨源限流，請稍後重試"
 			return e
 		}
 		if e != nil || n < -1 {
@@ -93,7 +93,7 @@ func (s *SyncService) listingSKUStock(ctx context.Context, a adapter.Adapter, co
 		p.Stock = total
 	} else if unknown {
 		p.Stock = -2
-		p.StockError = "本地在售规格库存未完整确认"
+		p.StockError = "本地在售規格庫存未完整確認"
 	} else {
 		p.Stock = 0
 	}
@@ -137,7 +137,7 @@ func (s *SyncService) validateListingSKUs(ctx context.Context, id uint64, p *ada
 	}
 	if listingSKUSignature(current) != expected {
 		p.Stock = -2
-		p.StockError = "规格已变化，等待重新检查库存"
+		p.StockError = "規格已變化，等待重新檢查庫存"
 	}
 	return nil
 }

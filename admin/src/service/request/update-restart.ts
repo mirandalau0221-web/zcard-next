@@ -1,4 +1,4 @@
-/** 仅更新状态轮询可以容忍已知重启期间的连接中断。 */
+/** 僅更新狀態輪詢可以容忍已知重啓期間的連接中斷。 */
 export const UPDATE_STATUS_URL = "/api/v1/admin/update/status";
 export const RESTART_WAIT_TIMEOUT = 5 * 60 * 1000;
 

@@ -34,7 +34,7 @@ func recoveryScope(site uint64, no, email string) string {
 }
 
 func recoveryInvalid(ctx context.Context) error {
-	return errors.BadRequest("order.ACCESS_CODE_INVALID", i18n.Message(ctx, "order.access_code_invalid", "订单或邮箱不匹配，或验证码无效、已使用或已过期"))
+	return errors.BadRequest("order.ACCESS_CODE_INVALID", i18n.Message(ctx, "order.access_code_invalid", "訂單或郵箱不匹配，或驗證碼無效、已使用或已過期"))
 }
 
 func recoveryOrderMatches(o *ent.Order, email string) bool {
@@ -48,16 +48,16 @@ func (s *StoreOrderService) recoveryCodeHash(scope, code string) string {
 func (s *StoreOrderService) SendOrderAccessCode(ctx context.Context, req *storefrontv1.OrderAccessCodeRequest) (*emptypb.Empty, error) {
 	email, err := orderaccess.EmailAddress(req.Email)
 	if err != nil || req.OrderNo == "" || len(req.OrderNo) > 100 {
-		return nil, errors.BadRequest("order.CONTACT_INVALID", i18n.Message(ctx, "order.access_contact_invalid", "请填写订单号和下单邮箱"))
+		return nil, errors.BadRequest("order.CONTACT_INVALID", i18n.Message(ctx, "order.access_contact_invalid", "請填寫訂單號和下單郵箱"))
 	}
 	// Readiness is checked before looking up the order so a configuration failure cannot expose its existence.
 	if s.recoverySender == nil || s.uc.AccessCipher == nil {
-		return nil, errors.InternalServer("order.ACCESS_RECOVERY_UNAVAILABLE", i18n.Message(ctx, "order.access_recovery_unavailable", "订单邮件验证暂时不可用，请稍后重试"))
+		return nil, errors.InternalServer("order.ACCESS_RECOVERY_UNAVAILABLE", i18n.Message(ctx, "order.access_recovery_unavailable", "訂單郵件驗證暫時不可用，請稍後重試"))
 	}
 	if ready, ok := s.recoverySender.(interface {
 		ChannelReady(context.Context, string) bool
 	}); ok && !ready.ChannelReady(ctx, "email") {
-		return nil, errors.BadRequest("order.ACCESS_EMAIL_UNAVAILABLE", i18n.Message(ctx, "order.access_email_unavailable", "邮箱验证通道尚未配置，请联系客服"))
+		return nil, errors.BadRequest("order.ACCESS_EMAIL_UNAVAILABLE", i18n.Message(ctx, "order.access_email_unavailable", "郵箱驗證通道尚未配置，請聯繫客服"))
 	}
 	site := tenancy.FromContext(ctx).SubsiteID
 	scope := recoveryScope(site, req.OrderNo, email)
@@ -99,14 +99,14 @@ func (s *StoreOrderService) SendOrderAccessCode(ctx context.Context, req *storef
 		return e
 	})
 	if err != nil {
-		return nil, errors.InternalServer("order.ACCESS_RECOVERY_UNAVAILABLE", i18n.Message(ctx, "order.access_recovery_unavailable", "订单邮件验证暂时不可用，请稍后重试"))
+		return nil, errors.InternalServer("order.ACCESS_RECOVERY_UNAVAILABLE", i18n.Message(ctx, "order.access_recovery_unavailable", "訂單郵件驗證暫時不可用，請稍後重試"))
 	}
 	if verification == nil {
 		return &emptypb.Empty{}, nil
 	}
 	locale := i18n.FromContext(ctx)
-	subject := "订单查询邮箱验证码"
-	body := fmt.Sprintf("<p>您正在查询订单 <b>%s</b>。</p><p>验证码：<b>%s</b>，10 分钟内有效。</p><p>若非本人操作，请忽略本邮件。</p>", html.EscapeString(req.OrderNo), code)
+	subject := "訂單查詢郵箱驗證碼"
+	body := fmt.Sprintf("<p>您正在查詢訂單 <b>%s</b>。</p><p>驗證碼：<b>%s</b>，10 分鐘內有效。</p><p>若非本人操作，請忽略本郵件。</p>", html.EscapeString(req.OrderNo), code)
 	if locale == i18n.En {
 		subject = "Order lookup verification code"
 		body = fmt.Sprintf("<p>You requested access to order <b>%s</b>.</p><p>Verification code: <b>%s</b>. This code expires in 10 minutes.</p><p>If you did not request this, please ignore this email.</p>", html.EscapeString(req.OrderNo), code)
@@ -117,7 +117,7 @@ func (s *StoreOrderService) SendOrderAccessCode(ctx context.Context, req *storef
 	})
 	if err != nil {
 		_ = data.Client(ctx, s.uc.Data).EmailVerification.UpdateOneID(verification.ID).SetExpiresAt(time.Now()).Exec(ctx)
-		return nil, errors.BadRequest("order.ACCESS_EMAIL_FAILED", i18n.Message(ctx, "order.access_email_failed", "验证码邮件暂未送达，请稍后重试或联系客服"))
+		return nil, errors.BadRequest("order.ACCESS_EMAIL_FAILED", i18n.Message(ctx, "order.access_email_failed", "驗證碼郵件暫未送達，請稍後重試或聯繫客服"))
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -177,7 +177,7 @@ func (s *StoreOrderService) RecoverOrderAccess(ctx context.Context, req *storefr
 		return c.Order.UpdateOneID(o.ID).SetOrderAccessTokenHash(orderaccess.TokenHash(site, o.OrderNo, token)).SetOrderAccessTokenSecret([]byte{}).Exec(txCtx)
 	})
 	if err != nil {
-		return nil, errors.InternalServer("order.ACCESS_RECOVERY_UNAVAILABLE", i18n.Message(ctx, "order.access_recovery_unavailable", "订单邮件验证暂时不可用，请稍后重试"))
+		return nil, errors.InternalServer("order.ACCESS_RECOVERY_UNAVAILABLE", i18n.Message(ctx, "order.access_recovery_unavailable", "訂單郵件驗證暫時不可用，請稍後重試"))
 	}
 	if token == "" {
 		return nil, recoveryInvalid(ctx)

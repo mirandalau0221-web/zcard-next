@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 提现审核/打款（wallet:withdraw 列表 / wallet:withdraw_review 超管专属）。
+// 提現審核/打款（wallet:withdraw 列表 / wallet:withdraw_review 超管專屬）。
 import { useRoute } from "vue-router";
 import { onMounted, ref, h, watch } from "vue";
 import { NButton, NDataTable, NInput, NModal, NForm, NFormItem, NPopconfirm, NTag } from "naive-ui";
@@ -13,7 +13,7 @@ defineOptions({ name: "WithdrawTab" });
 const route = useRoute();
 
 const loading = ref(false);
-const showQr = ref(""); // 收款码大图
+const showQr = ref(""); // 收款碼大圖
 
 function fmtTime(ts?: number) {
   if (!ts) return "-";
@@ -21,7 +21,7 @@ function fmtTime(ts?: number) {
 }
 
 function methodText(t: string) {
-  return ({ alipay: "支付宝", wechat: "微信", usdt_trc20: "USDT TRC20", bank: "银行转账" } as Record<string, string>)[t] || t;
+  return ({ alipay: "支付寶", wechat: "微信", usdt_trc20: "USDT TRC20", bank: "銀行轉賬" } as Record<string, string>)[t] || t;
 }
 const withdrawals = ref<any[]>([]);
 const total = ref(0);
@@ -36,18 +36,18 @@ const rejectReason = ref("");
 
 const canReview = () => checkAuth("wallet:withdraw_review");
 
-// 快捷筛选卡片（与 statusTag 同色系）
+// 快捷篩選卡片（與 statusTag 同色系）
 const statusTabs = [
   { label: "全部", value: "", type: "default" as const },
-  { label: "待审核", value: "pending", type: "warning" as const },
-  { label: "已通过", value: "approved", type: "info" as const },
+  { label: "待審核", value: "pending", type: "warning" as const },
+  { label: "已通過", value: "approved", type: "info" as const },
   { label: "已打款", value: "paid", type: "success" as const },
-  { label: "已驳回", value: "rejected", type: "error" as const },
+  { label: "已駁回", value: "rejected", type: "error" as const },
 ];
 
 function statusTag(s: string) {
   const type = s === "paid" ? "success" : s === "pending" ? "warning" : s === "rejected" ? "error" : "info";
-  const text = ({ pending: "待审核", approved: "已通过", paid: "已打款", rejected: "已驳回" } as any)[s] || s;
+  const text = ({ pending: "待審核", approved: "已通過", paid: "已打款", rejected: "已駁回" } as any)[s] || s;
   return h(NTag, { type, size: "small" }, { default: () => text });
 }
 
@@ -60,12 +60,12 @@ const columns: DataTableColumns<any> = [
     render: (row) => row.username ? `#${row.user_id} ${row.username}` : `#${row.user_id}`,
   },
   {
-    title: "金额",
+    title: "金額",
     key: "amount_cents",
     width: 90,
     render: (row) => formatMoney(row.amount_cents),
   },
-  { title: "手续费", key: "fee_cents", width: 84, render: (row) => formatMoney(row.fee_cents) },
+  { title: "手續費", key: "fee_cents", width: 84, render: (row) => formatMoney(row.fee_cents) },
   {
     title: "方式",
     key: "method_type",
@@ -83,15 +83,15 @@ const columns: DataTableColumns<any> = [
           ? h(
               "a",
               { href: "#", onClick: (e: Event) => { e.preventDefault(); showQr.value = row.qr_code_url; } },
-              [h("img", { src: row.qr_code_url, style: "width: 28px; height: 28px; object-fit: cover; border-radius: 4px; border: 1px solid #e5e7eb", alt: "收款码" })],
+              [h("img", { src: row.qr_code_url, style: "width: 28px; height: 28px; object-fit: cover; border-radius: 4px; border: 1px solid #e5e7eb", alt: "收款碼" })],
             )
           : null,
       ]),
   },
-  { title: "状态", key: "status", width: 84, render: (row) => statusTag(row.status) },
-  { title: "驳回原因", key: "reject_reason", width: 110, ellipsis: true },
-  { title: "申请时间", key: "created_at", width: 140, render: (row) => fmtTime(row.created_at) },
-  { title: "审核时间", key: "reviewed_at", width: 140, render: (row) => fmtTime(row.reviewed_at) },
+  { title: "狀態", key: "status", width: 84, render: (row) => statusTag(row.status) },
+  { title: "駁回原因", key: "reject_reason", width: 110, ellipsis: true },
+  { title: "申請時間", key: "created_at", width: 140, render: (row) => fmtTime(row.created_at) },
+  { title: "審核時間", key: "reviewed_at", width: 140, render: (row) => fmtTime(row.reviewed_at) },
   {
     title: "操作",
     key: "actions",
@@ -99,13 +99,13 @@ const columns: DataTableColumns<any> = [
     render: (row) =>
       h("div", { class: "flex gap-4px" }, [
         row.status === "pending" && canReview()
-          ? h(NPopconfirm, { onPositiveClick: () => handleReview(row, true) }, { trigger: () => h(NButton, { size: "tiny", type: "success", secondary: true }, { default: () => "通过" }), default: () => "通过该提现申请？" })
+          ? h(NPopconfirm, { onPositiveClick: () => handleReview(row, true) }, { trigger: () => h(NButton, { size: "tiny", type: "success", secondary: true }, { default: () => "通過" }), default: () => "通過該提現申請？" })
           : null,
         row.status === "pending" && canReview()
-          ? h(NButton, { size: "tiny", type: "warning", secondary: true, onClick: () => openReject(row) }, { default: () => "驳回" })
+          ? h(NButton, { size: "tiny", type: "warning", secondary: true, onClick: () => openReject(row) }, { default: () => "駁回" })
           : null,
         row.status === "approved" && canReview()
-          ? h(NButton, { size: "tiny", type: "primary", secondary: true, onClick: () => openPay(row) }, { default: () => "确认打款" })
+          ? h(NButton, { size: "tiny", type: "primary", secondary: true, onClick: () => openPay(row) }, { default: () => "確認打款" })
           : null,
       ]),
   },
@@ -127,12 +127,12 @@ async function load() {
 async function handleReview(row: any, approve: boolean) {
   const { error } = await reviewWithdrawal(row.id, approve);
   if (!error) {
-    window.$message?.success(approve ? "已通过（金额保持冻结待打款）" : "已驳回");
+    window.$message?.success(approve ? "已通過（金額保持凍結待打款）" : "已駁回");
     load();
   }
 }
 
-// 打款 Modal（收款信息核对 + 回执填写）
+// 打款 Modal（收款信息核對 + 回執填寫）
 const payTarget = ref<any>(null);
 const payReceipt = ref("");
 const showPay = ref(false);
@@ -150,7 +150,7 @@ async function handlePay() {
   try {
     const { error } = await payWithdrawal(payTarget.value.id, payReceipt.value.trim() || undefined);
     if (!error) {
-      window.$message?.success("已确认打款，回执已记录（客户可见）");
+      window.$message?.success("已確認打款，回執已記錄（客户可見）");
       showPay.value = false;
       load();
     }
@@ -171,7 +171,7 @@ async function handleReject() {
   try {
     const { error } = await reviewWithdrawal(rejectTarget.value.id, false, rejectReason.value.trim());
     if (!error) {
-      window.$message?.success("已驳回（冻结金额解除）");
+      window.$message?.success("已駁回（凍結金額解除）");
       showReject.value = false;
       load();
     }
@@ -187,76 +187,76 @@ onMounted(load);
   <div>
     <div class="mb-8px flex flex-wrap items-center justify-between gap-8px">
       <FilterTabs v-model:value="statusFilter" :options="statusTabs" size="small" @change="(page = 1), load()" />
-      <span class="text-12px text-gray-400">共 {{ total }} 单</span>
+      <span class="text-12px text-gray-400">共 {{ total }} 單</span>
     </div>
     <NDataTable :columns="columns" :data="withdrawals" :loading="loading" size="small"  :max-height="540" />
     <div class="mt-8px flex items-center justify-end gap-8px">
-      <NButton size="small" :disabled="page <= 1" @click="page--, load()">上一页</NButton>
-      <NButton size="small" :disabled="withdrawals.length < 20" @click="page++, load()">下一页</NButton>
+      <NButton size="small" :disabled="page <= 1" @click="page--, load()">上一頁</NButton>
+      <NButton size="small" :disabled="withdrawals.length < 20" @click="page++, load()">下一頁</NButton>
     </div>
 
-    <NModal v-model:show="showReject" preset="dialog" :title="`驳回提现 #${rejectTarget?.id || ''}`" style="width: 420px">
+    <NModal v-model:show="showReject" preset="dialog" :title="`駁回提現 #${rejectTarget?.id || ''}`" style="width: 420px">
       <NForm label-placement="top">
-        <NFormItem label="驳回原因（必填，用户可见）" required>
-          <NInput v-model:value="rejectReason" type="textarea" :rows="2" placeholder="如：账户信息有误" />
+        <NFormItem label="駁回原因（必填，用户可見）" required>
+          <NInput v-model:value="rejectReason" type="textarea" :rows="2" placeholder="如：賬户信息有誤" />
         </NFormItem>
       </NForm>
       <template #action>
         <NButton @click="showReject = false">取消</NButton>
-        <NButton type="warning" :loading="rejecting" :disabled="!rejectReason.trim()" @click="handleReject">驳回</NButton>
+        <NButton type="warning" :loading="rejecting" :disabled="!rejectReason.trim()" @click="handleReject">駁回</NButton>
       
-<!-- 收款码大图 -->
-<NModal :show="!!showQr" preset="card" title="收款二维码" style="width: 360px" @update:show="(v: boolean) => !v && (showQr = '')">
+<!-- 收款碼大圖 -->
+<NModal :show="!!showQr" preset="card" title="收款二維碼" style="width: 360px" @update:show="(v: boolean) => !v && (showQr = '')">
   <div style="text-align: center">
-    <img :src="showQr" style="width: 100%; border-radius: 8px" alt="收款码" />
+    <img :src="showQr" style="width: 100%; border-radius: 8px" alt="收款碼" />
   </div>
 </NModal>
 
-<!-- 确认打款 Modal（收款核对 + 回执） -->
-<NModal :show="showPay" preset="card" :title="`确认打款 #${payTarget?.id || ''}`" style="width: 440px" @update:show="(v: boolean) => (showPay = v)">
+<!-- 確認打款 Modal（收款核對 + 回執） -->
+<NModal :show="showPay" preset="card" :title="`確認打款 #${payTarget?.id || ''}`" style="width: 440px" @update:show="(v: boolean) => (showPay = v)">
   <div v-if="payTarget" class="flex flex-col gap-10px">
     <div class="rounded-8px bg-#f8fafc px-12px py-10px text-13px">
-      <div>提现金额：<b class="text-#ff5722">{{ formatMoney(payTarget.amount_cents) }}</b></div>
+      <div>提現金額：<b class="text-#ff5722">{{ formatMoney(payTarget.amount_cents) }}</b></div>
       <div class="mt-4px">收款方式：{{ payTarget.method_name || methodText(payTarget.method_type) }}</div>
-      <div class="mt-4px break-all">收款账号：{{ payTarget.account }}</div>
-      <div class="mt-4px text-#d03050">请核对已线下转账完成后再确认</div>
+      <div class="mt-4px break-all">收款賬號：{{ payTarget.account }}</div>
+      <div class="mt-4px text-#d03050">請核對已線下轉賬完成後再確認</div>
     </div>
-    <NFormItem label="打款回执" label-placement="top" :show-feedback="false">
-      <NInput v-model:value="payReceipt" placeholder="交易流水号 / 转账备注（客户在提现记录可见）" maxlength="100" />
+    <NFormItem label="打款回執" label-placement="top" :show-feedback="false">
+      <NInput v-model:value="payReceipt" placeholder="交易流水號 / 轉賬備註（客户在提現記錄可見）" maxlength="100" />
     </NFormItem>
   </div>
   <template #action>
     <NButton @click="showPay = false">取消</NButton>
-    <NButton type="primary" :loading="paying" @click="handlePay">确认已打款</NButton>
+    <NButton type="primary" :loading="paying" @click="handlePay">確認已打款</NButton>
   </template>
 </NModal>
 </template>
     </NModal>
   </div>
 
-<!-- 收款码大图 -->
-<NModal :show="!!showQr" preset="card" title="收款二维码" style="width: 360px" @update:show="(v: boolean) => !v && (showQr = '')">
+<!-- 收款碼大圖 -->
+<NModal :show="!!showQr" preset="card" title="收款二維碼" style="width: 360px" @update:show="(v: boolean) => !v && (showQr = '')">
   <div style="text-align: center">
-    <img :src="showQr" style="width: 100%; border-radius: 8px" alt="收款码" />
+    <img :src="showQr" style="width: 100%; border-radius: 8px" alt="收款碼" />
   </div>
 </NModal>
 
-<!-- 确认打款 Modal（收款核对 + 回执） -->
-<NModal :show="showPay" preset="card" :title="`确认打款 #${payTarget?.id || ''}`" style="width: 440px" @update:show="(v: boolean) => (showPay = v)">
+<!-- 確認打款 Modal（收款核對 + 回執） -->
+<NModal :show="showPay" preset="card" :title="`確認打款 #${payTarget?.id || ''}`" style="width: 440px" @update:show="(v: boolean) => (showPay = v)">
   <div v-if="payTarget" class="flex flex-col gap-10px">
     <div class="rounded-8px bg-#f8fafc px-12px py-10px text-13px">
-      <div>提现金额：<b class="text-#ff5722">{{ formatMoney(payTarget.amount_cents) }}</b></div>
+      <div>提現金額：<b class="text-#ff5722">{{ formatMoney(payTarget.amount_cents) }}</b></div>
       <div class="mt-4px">收款方式：{{ payTarget.method_name || methodText(payTarget.method_type) }}</div>
-      <div class="mt-4px break-all">收款账号：{{ payTarget.account }}</div>
-      <div class="mt-4px text-#d03050">请核对已线下转账完成后再确认</div>
+      <div class="mt-4px break-all">收款賬號：{{ payTarget.account }}</div>
+      <div class="mt-4px text-#d03050">請核對已線下轉賬完成後再確認</div>
     </div>
-    <NFormItem label="打款回执" label-placement="top" :show-feedback="false">
-      <NInput v-model:value="payReceipt" placeholder="交易流水号 / 转账备注（客户在提现记录可见）" maxlength="100" />
+    <NFormItem label="打款回執" label-placement="top" :show-feedback="false">
+      <NInput v-model:value="payReceipt" placeholder="交易流水號 / 轉賬備註（客户在提現記錄可見）" maxlength="100" />
     </NFormItem>
   </div>
   <template #action>
     <NButton @click="showPay = false">取消</NButton>
-    <NButton type="primary" :loading="paying" @click="handlePay">确认已打款</NButton>
+    <NButton type="primary" :loading="paying" @click="handlePay">確認已打款</NButton>
   </template>
 </NModal>
 </template>

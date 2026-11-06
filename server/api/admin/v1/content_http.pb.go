@@ -33,29 +33,29 @@ const OperationAdminContentServiceUpdateCategory = "/zcard.api.admin.v1.AdminCon
 const OperationAdminContentServiceUpdatePost = "/zcard.api.admin.v1.AdminContentService/UpdatePost"
 
 type AdminContentServiceHTTPServer interface {
-	// CreateBanner CreateBanner 创建横幅（时间窗/跳转类型）。
+	// CreateBanner CreateBanner 創建橫幅（時間窗/跳轉類型）。
 	CreateBanner(context.Context, *CreateBannerRequest) (*Banner, error)
-	// CreateCategory CreateCategory 创建文章分类。
+	// CreateCategory CreateCategory 創建文章分類。
 	CreateCategory(context.Context, *CreatePostCategoryRequest) (*PostCategory, error)
-	// CreatePost CreatePost 创建文章（草稿/发布）。
+	// CreatePost CreatePost 創建文章（草稿/發佈）。
 	CreatePost(context.Context, *CreatePostRequest) (*Post, error)
-	// DeleteBanner DeleteBanner 删除横幅。
+	// DeleteBanner DeleteBanner 刪除橫幅。
 	DeleteBanner(context.Context, *DeleteBannerRequest) (*emptypb.Empty, error)
-	// DeleteCategory DeleteCategory 删除分类（存在文章时拒绝）。
+	// DeleteCategory DeleteCategory 刪除分類（存在文章時拒絕）。
 	DeleteCategory(context.Context, *DeletePostCategoryRequest) (*emptypb.Empty, error)
-	// DeletePost DeletePost 删除文章。
+	// DeletePost DeletePost 刪除文章。
 	DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error)
-	// ListBanners ListBanners 横幅列表（全量含停用）。
+	// ListBanners ListBanners 橫幅列表（全量含停用）。
 	ListBanners(context.Context, *ListBannersRequest) (*ListBannersReply, error)
-	// ListCategories ListCategories 分类列表。
+	// ListCategories ListCategories 分類列表。
 	ListCategories(context.Context, *ListPostCategoriesAdminRequest) (*ListPostCategoriesAdminReply, error)
 	// ListPosts ListPosts 文章列表（全量含草稿）。
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsReply, error)
-	// PublishPost PublishPost 发布/取消发布（首发回填 published_at）。
+	// PublishPost PublishPost 發佈/取消發佈（首發回填 published_at）。
 	PublishPost(context.Context, *PublishPostRequest) (*Post, error)
-	// UpdateBanner UpdateBanner 更新横幅。
+	// UpdateBanner UpdateBanner 更新橫幅。
 	UpdateBanner(context.Context, *UpdateBannerRequest) (*Banner, error)
-	// UpdateCategory UpdateCategory 更新分类。
+	// UpdateCategory UpdateCategory 更新分類。
 	UpdateCategory(context.Context, *UpdatePostCategoryRequest) (*PostCategory, error)
 	// UpdatePost UpdatePost 更新文章。
 	UpdatePost(context.Context, *UpdatePostRequest) (*Post, error)
@@ -347,29 +347,29 @@ func _AdminContentService_ListCategories1_HTTP_Handler(srv AdminContentServiceHT
 }
 
 type AdminContentServiceHTTPClient interface {
-	// CreateBanner CreateBanner 创建横幅（时间窗/跳转类型）。
+	// CreateBanner CreateBanner 創建橫幅（時間窗/跳轉類型）。
 	CreateBanner(ctx context.Context, req *CreateBannerRequest, opts ...http.CallOption) (rsp *Banner, err error)
-	// CreateCategory CreateCategory 创建文章分类。
+	// CreateCategory CreateCategory 創建文章分類。
 	CreateCategory(ctx context.Context, req *CreatePostCategoryRequest, opts ...http.CallOption) (rsp *PostCategory, err error)
-	// CreatePost CreatePost 创建文章（草稿/发布）。
+	// CreatePost CreatePost 創建文章（草稿/發佈）。
 	CreatePost(ctx context.Context, req *CreatePostRequest, opts ...http.CallOption) (rsp *Post, err error)
-	// DeleteBanner DeleteBanner 删除横幅。
+	// DeleteBanner DeleteBanner 刪除橫幅。
 	DeleteBanner(ctx context.Context, req *DeleteBannerRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// DeleteCategory DeleteCategory 删除分类（存在文章时拒绝）。
+	// DeleteCategory DeleteCategory 刪除分類（存在文章時拒絕）。
 	DeleteCategory(ctx context.Context, req *DeletePostCategoryRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// DeletePost DeletePost 删除文章。
+	// DeletePost DeletePost 刪除文章。
 	DeletePost(ctx context.Context, req *DeletePostRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ListBanners ListBanners 横幅列表（全量含停用）。
+	// ListBanners ListBanners 橫幅列表（全量含停用）。
 	ListBanners(ctx context.Context, req *ListBannersRequest, opts ...http.CallOption) (rsp *ListBannersReply, err error)
-	// ListCategories ListCategories 分类列表。
+	// ListCategories ListCategories 分類列表。
 	ListCategories(ctx context.Context, req *ListPostCategoriesAdminRequest, opts ...http.CallOption) (rsp *ListPostCategoriesAdminReply, err error)
 	// ListPosts ListPosts 文章列表（全量含草稿）。
 	ListPosts(ctx context.Context, req *ListPostsRequest, opts ...http.CallOption) (rsp *ListPostsReply, err error)
-	// PublishPost PublishPost 发布/取消发布（首发回填 published_at）。
+	// PublishPost PublishPost 發佈/取消發佈（首發回填 published_at）。
 	PublishPost(ctx context.Context, req *PublishPostRequest, opts ...http.CallOption) (rsp *Post, err error)
-	// UpdateBanner UpdateBanner 更新横幅。
+	// UpdateBanner UpdateBanner 更新橫幅。
 	UpdateBanner(ctx context.Context, req *UpdateBannerRequest, opts ...http.CallOption) (rsp *Banner, err error)
-	// UpdateCategory UpdateCategory 更新分类。
+	// UpdateCategory UpdateCategory 更新分類。
 	UpdateCategory(ctx context.Context, req *UpdatePostCategoryRequest, opts ...http.CallOption) (rsp *PostCategory, err error)
 	// UpdatePost UpdatePost 更新文章。
 	UpdatePost(ctx context.Context, req *UpdatePostRequest, opts ...http.CallOption) (rsp *Post, err error)
@@ -383,7 +383,7 @@ func NewAdminContentServiceHTTPClient(client *http.Client) AdminContentServiceHT
 	return &AdminContentServiceHTTPClientImpl{client}
 }
 
-// CreateBanner CreateBanner 创建横幅（时间窗/跳转类型）。
+// CreateBanner CreateBanner 創建橫幅（時間窗/跳轉類型）。
 func (c *AdminContentServiceHTTPClientImpl) CreateBanner(ctx context.Context, in *CreateBannerRequest, opts ...http.CallOption) (*Banner, error) {
 	var out Banner
 	pattern := "/api/v1/admin/content/banners"
@@ -401,7 +401,7 @@ func (c *AdminContentServiceHTTPClientImpl) CreateBanner(ctx context.Context, in
 	return &out, nil
 }
 
-// CreateCategory CreateCategory 创建文章分类。
+// CreateCategory CreateCategory 創建文章分類。
 func (c *AdminContentServiceHTTPClientImpl) CreateCategory(ctx context.Context, in *CreatePostCategoryRequest, opts ...http.CallOption) (*PostCategory, error) {
 	var out PostCategory
 	pattern := "/api/v1/admin/content/categories"
@@ -419,7 +419,7 @@ func (c *AdminContentServiceHTTPClientImpl) CreateCategory(ctx context.Context, 
 	return &out, nil
 }
 
-// CreatePost CreatePost 创建文章（草稿/发布）。
+// CreatePost CreatePost 創建文章（草稿/發佈）。
 func (c *AdminContentServiceHTTPClientImpl) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...http.CallOption) (*Post, error) {
 	var out Post
 	pattern := "/api/v1/admin/content/posts"
@@ -437,7 +437,7 @@ func (c *AdminContentServiceHTTPClientImpl) CreatePost(ctx context.Context, in *
 	return &out, nil
 }
 
-// DeleteBanner DeleteBanner 删除横幅。
+// DeleteBanner DeleteBanner 刪除橫幅。
 func (c *AdminContentServiceHTTPClientImpl) DeleteBanner(ctx context.Context, in *DeleteBannerRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/content/banners/{id}"
@@ -454,7 +454,7 @@ func (c *AdminContentServiceHTTPClientImpl) DeleteBanner(ctx context.Context, in
 	return &out, nil
 }
 
-// DeleteCategory DeleteCategory 删除分类（存在文章时拒绝）。
+// DeleteCategory DeleteCategory 刪除分類（存在文章時拒絕）。
 func (c *AdminContentServiceHTTPClientImpl) DeleteCategory(ctx context.Context, in *DeletePostCategoryRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/content/categories/{id}"
@@ -471,7 +471,7 @@ func (c *AdminContentServiceHTTPClientImpl) DeleteCategory(ctx context.Context, 
 	return &out, nil
 }
 
-// DeletePost DeletePost 删除文章。
+// DeletePost DeletePost 刪除文章。
 func (c *AdminContentServiceHTTPClientImpl) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/content/posts/{id}"
@@ -488,7 +488,7 @@ func (c *AdminContentServiceHTTPClientImpl) DeletePost(ctx context.Context, in *
 	return &out, nil
 }
 
-// ListBanners ListBanners 横幅列表（全量含停用）。
+// ListBanners ListBanners 橫幅列表（全量含停用）。
 func (c *AdminContentServiceHTTPClientImpl) ListBanners(ctx context.Context, in *ListBannersRequest, opts ...http.CallOption) (*ListBannersReply, error) {
 	var out ListBannersReply
 	pattern := "/api/v1/admin/content/banners"
@@ -505,7 +505,7 @@ func (c *AdminContentServiceHTTPClientImpl) ListBanners(ctx context.Context, in 
 	return &out, nil
 }
 
-// ListCategories ListCategories 分类列表。
+// ListCategories ListCategories 分類列表。
 func (c *AdminContentServiceHTTPClientImpl) ListCategories(ctx context.Context, in *ListPostCategoriesAdminRequest, opts ...http.CallOption) (*ListPostCategoriesAdminReply, error) {
 	var out ListPostCategoriesAdminReply
 	pattern := "/api/v1/admin/content/categories"
@@ -539,7 +539,7 @@ func (c *AdminContentServiceHTTPClientImpl) ListPosts(ctx context.Context, in *L
 	return &out, nil
 }
 
-// PublishPost PublishPost 发布/取消发布（首发回填 published_at）。
+// PublishPost PublishPost 發佈/取消發佈（首發回填 published_at）。
 func (c *AdminContentServiceHTTPClientImpl) PublishPost(ctx context.Context, in *PublishPostRequest, opts ...http.CallOption) (*Post, error) {
 	var out Post
 	pattern := "/api/v1/admin/content/posts/{id}/publish"
@@ -557,7 +557,7 @@ func (c *AdminContentServiceHTTPClientImpl) PublishPost(ctx context.Context, in 
 	return &out, nil
 }
 
-// UpdateBanner UpdateBanner 更新横幅。
+// UpdateBanner UpdateBanner 更新橫幅。
 func (c *AdminContentServiceHTTPClientImpl) UpdateBanner(ctx context.Context, in *UpdateBannerRequest, opts ...http.CallOption) (*Banner, error) {
 	var out Banner
 	pattern := "/api/v1/admin/content/banners/{id}"
@@ -575,7 +575,7 @@ func (c *AdminContentServiceHTTPClientImpl) UpdateBanner(ctx context.Context, in
 	return &out, nil
 }
 
-// UpdateCategory UpdateCategory 更新分类。
+// UpdateCategory UpdateCategory 更新分類。
 func (c *AdminContentServiceHTTPClientImpl) UpdateCategory(ctx context.Context, in *UpdatePostCategoryRequest, opts ...http.CallOption) (*PostCategory, error) {
 	var out PostCategory
 	pattern := "/api/v1/admin/content/categories/{id}"

@@ -7,22 +7,22 @@ option go_package = "github.com/NovaWorks/zcard-next/server/api/storefront/v1;st
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 
-// StoreContentService 前台内容：横幅（生效时间窗）、文章（公告/博客）、分类。
-// 多语言字段按请求语言回落（zh_CN 默认）。
+// StoreContentService 前台內容：橫幅（生效時間窗）、文章（公告/博客）、分類。
+// 多語言字段按請求語言回落（zh_CN 默認）。
 service StoreContentService {
-  // ListBanners 生效中横幅（position 过滤 + sort 排序 + 时间窗过滤）。
+  // ListBanners 生效中橫幅（position 過濾 + sort 排序 + 時間窗過濾）。
   rpc ListBanners(ListBannersRequest) returns (ListBannersReply) {
     option (google.api.http) = { get: "/api/v1/storefront/banners" };
   }
-  // ListPosts 已发布文章分页（type 过滤）。
+  // ListPosts 已發佈文章分頁（type 過濾）。
   rpc ListPosts(ListPostsRequest) returns (ListPostsReply) {
     option (google.api.http) = { get: "/api/v1/storefront/posts" };
   }
-  // GetPost 文章详情（slug；未发布返回 404 语义）。
+  // GetPost 文章詳情（slug；未發佈返回 404 語義）。
   rpc GetPost(GetPostRequest) returns (GetPostReply) {
     option (google.api.http) = { get: "/api/v1/storefront/posts/{slug}" };
   }
-  // ListPostCategories 分类列表。
+  // ListPostCategories 分類列表。
   rpc ListPostCategories(ListPostCategoriesRequest) returns (ListPostCategoriesReply) {
     option (google.api.http) = { get: "/api/v1/storefront/post-categories" };
   }
@@ -35,9 +35,9 @@ message ListBannersRequest {
 
 message StoreBanner {
   uint64 id = 1;
-  string title = 2; // 按语言回落后
+  string title = 2; // 按語言回落後
   string image = 3;
-  string mobile_image = 4; // 缺省回落 PC 图
+  string mobile_image = 4; // 缺省回落 PC 圖
   string link_type = 5;
   string link_value = 6;
 }
@@ -51,7 +51,7 @@ message ListPostsRequest {
   string locale = 2;
   int32 page = 3;
   int32 page_size = 4;
-  uint64 category_id = 5; // 栏目过滤；0 = 全部
+  uint64 category_id = 5; // 欄目過濾；0 = 全部
 }
 
 message StorePost {
@@ -79,7 +79,7 @@ message GetPostRequest {
 
 message GetPostReply {
   StorePost post = 1;
-  string content = 2; // 按语言回落后（sanitize 后的 HTML）
+  string content = 2; // 按語言回落後（sanitize 後的 HTML）
 }
 
 message ListPostCategoriesRequest {}

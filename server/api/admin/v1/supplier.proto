@@ -8,86 +8,86 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminSupplierService 对外供货管理：下游账户申请/审核/启停/重置密钥、
-// 供货定价 CRUD、账本流水、回调记录查询与手动重发。
+// AdminSupplierService 對外供貨管理：下游賬户申請/審核/啓停/重置密鑰、
+// 供貨定價 CRUD、賬本流水、回調記錄查詢與手動重發。
 service AdminSupplierService {
-  // CreateAccount 下游申请（secret 明文只在此响应出现一次）。
+  // CreateAccount 下游申請（secret 明文只在此響應出現一次）。
   rpc CreateAccount(CreateSupplierAccountRequest) returns (SupplierAccountReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/supplier/accounts"
       body: "*"
     };
   }
-  // ListAccounts 账户列表（secret 零回显）。
+  // ListAccounts 賬户列表（secret 零回顯）。
   rpc ListAccounts(ListSupplierAccountsRequest) returns (ListSupplierAccountsReply) {
     option (google.api.http) = { get: "/api/v1/admin/supplier/accounts" };
   }
-  // ReviewAccount 审核（applying → approved/rejected；驳回可带意见）。
+  // ReviewAccount 審核（applying → approved/rejected；駁回可帶意見）。
   rpc ReviewAccount(ReviewSupplierAccountRequest) returns (SupplierAccountReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/supplier/accounts/{id}/review"
       body: "*"
     };
   }
-  // ToggleAccount 启停。
+  // ToggleAccount 啓停。
   rpc ToggleAccount(ToggleSupplierAccountRequest) returns (SupplierAccountReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/supplier/accounts/{id}/toggle"
       body: "*"
     };
   }
-  // ResetSecret 重置密钥（返回明文一次）。
+  // ResetSecret 重置密鑰（返回明文一次）。
   rpc ResetSecret(ResetSupplierSecretRequest) returns (ResetSupplierSecretReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/supplier/accounts/{id}/reset-secret"
       body: "*"
     };
   }
-  // SetNotifyURL 配置回调地址。
+  // SetNotifyURL 配置回調地址。
   rpc SetNotifyURL(SetSupplierNotifyURLRequest) returns (SupplierAccountReply) {
     option (google.api.http) = {
       put: "/api/v1/admin/supplier/accounts/{id}/notify-url"
       body: "*"
     };
   }
-  // Recharge 账户充值（账本入账）。
+  // Recharge 賬户充值（賬本入賬）。
   rpc Recharge(RechargeSupplierRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/supplier/accounts/{id}/recharge"
       body: "*"
     };
   }
-  // ListLedger 账本流水（下游自助对账数据源）。
+  // ListLedger 賬本流水（下游自助對賬數據源）。
   rpc ListLedger(ListSupplierLedgerRequest) returns (ListSupplierLedgerReply) {
     option (google.api.http) = { get: "/api/v1/admin/supplier/ledger" };
   }
-  // ListPrices 账号的专属价列表(补齐：浏览/管理覆盖价）。
+  // ListPrices 賬號的專屬價列表(補齊：瀏覽/管理覆蓋價）。
   rpc ListPrices(ListSupplierPricesRequest) returns (ListSupplierPricesReply) {
     option (google.api.http) = { get: "/api/v1/admin/supplier/prices" };
   }
-  // DeletePrice 删除专属价（恢复基础供货价）。
+  // DeletePrice 刪除專屬價（恢復基礎供貨價）。
   rpc DeletePrice(DeleteSupplierPriceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { delete: "/api/v1/admin/supplier/prices/{id}" };
   }
-  // UpsertPrice 供货定价（覆盖价）。
+  // UpsertPrice 供貨定價（覆蓋價）。
   rpc UpsertPrice(UpsertSupplierPriceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/supplier/prices"
       body: "*"
     };
   }
-  // ListCallbacks 回调记录（含死信）。
+  // ListCallbacks 回調記錄（含死信）。
   rpc ListCallbacks(ListSupplierCallbacksRequest) returns (ListSupplierCallbacksReply) {
     option (google.api.http) = { get: "/api/v1/admin/supplier/callbacks" };
   }
-  // ResendCallback 手动重发回调（死信恢复）。
+  // ResendCallback 手動重發回調（死信恢復）。
   rpc ResendCallback(ResendSupplierCallbackRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/supplier/callbacks/{id}/resend"
       body: "*"
     };
   }
-  // SetSupplierIPWhitelist 设置 IP 白名单（空 = 所有 IP 放行；接口鉴权层强制）。
+  // SetSupplierIPWhitelist 設置 IP 白名單（空 = 所有 IP 放行；接口鑑權層強制）。
   rpc SetSupplierIPWhitelist(SetSupplierIPWhitelistRequest) returns (SupplierAccountReply) {
     option (google.api.http) = {
       put: "/api/v1/admin/supplier/accounts/{id}/ip-whitelist"
@@ -100,19 +100,19 @@ message SupplierAccountReply {
   uint64 id = 1;
   string name = 2;
   string api_key = 3;
-  string api_secret = 4; // 仅创建/重置时回显（一次）
+  string api_secret = 4; // 僅創建/重置時回顯（一次）
   string contact = 5;
   string status = 6; // applying | approved | rejected | disabled
   int64 balance_cache = 7;
   string notify_url = 8;
   int64 reviewed_at = 9;
   int64 created_at = 10;
-  string protocol = 11; // zcard | dujiao_next | acg_faka（对外供货协议； B/C）
-  string display_name = 12; // connect/ping 回显店铺名
-  uint64 owner_user_id = 13; // 前台申请归属用户（0=admin 手动建号）
-  string apply_reason = 14; // 申请理由（前台申请时填）
-  string review_note = 15; // 审核意见/驳回理由
-  repeated string ip_whitelist = 16; // IP 白名单（空=所有 IP 放行；精确 IP 或 CIDR）
+  string protocol = 11; // zcard | dujiao_next | acg_faka（對外供貨協議； B/C）
+  string display_name = 12; // connect/ping 回顯店鋪名
+  uint64 owner_user_id = 13; // 前台申請歸屬用户（0=admin 手動建號）
+  string apply_reason = 14; // 申請理由（前台申請時填）
+  string review_note = 15; // 審核意見/駁回理由
+  repeated string ip_whitelist = 16; // IP 白名單（空=所有 IP 放行；精確 IP 或 CIDR）
 }
 
 message CreateSupplierAccountRequest {
@@ -120,7 +120,7 @@ message CreateSupplierAccountRequest {
   string api_key = 2 [(google.api.field_behavior) = REQUIRED];
   string api_secret = 3 [(google.api.field_behavior) = REQUIRED];
   string contact = 4;
-  string protocol = 5; // 空 = zcard；dujiao_next/acg_faka 为兼容账号
+  string protocol = 5; // 空 = zcard；dujiao_next/acg_faka 為兼容賬號
   string display_name = 6;
 }
 
@@ -139,7 +139,7 @@ message ListSupplierAccountsReply {
 message ReviewSupplierAccountRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
   bool approve = 2;
-  string review_note = 3; // 审核意见；驳回时建议必填（≤500）
+  string review_note = 3; // 審核意見；駁回時建議必填（≤500）
 }
 
 message ToggleSupplierAccountRequest {
@@ -153,7 +153,7 @@ message ResetSupplierSecretRequest {
 }
 
 message ResetSupplierSecretReply {
-  string api_secret = 1; // 明文只出现这一次
+  string api_secret = 1; // 明文只出現這一次
 }
 
 message SetSupplierNotifyURLRequest {
@@ -165,7 +165,7 @@ message RechargeSupplierRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
   int64 amount_cents = 2 [(google.api.field_behavior) = REQUIRED];
   string remark = 3;
-  // 一次充值使用一个幂等键；重试沿用原键，下一笔充值使用新键。
+  // 一次充值使用一個冪等鍵；重試沿用原鍵，下一筆充值使用新鍵。
   string reference = 4;
 }
 
@@ -180,7 +180,7 @@ message SupplierLedgerEntry {
   uint64 account_id = 2;
   uint64 supply_order_id = 3;
   string type = 4; // recharge | supply_pay | supply_refund | adjust
-  int64 amount = 5; // 有符号分
+  int64 amount = 5; // 有符號分
   string reference = 6;
   string remark = 7;
   int64 created_at = 8;
@@ -198,7 +198,7 @@ message UpsertSupplierPriceRequest {
   uint64 product_id = 2;
   uint64 sku_id = 3;
   int64 price = 4;
-  string scope = 5; // 空或 product=专属价，category=分类折扣，global=整站折扣
+  string scope = 5; // 空或 product=專屬價，category=分類折扣，global=整站折扣
   uint64 category_id = 6;
   int32 discount_bps = 7; // 9000=9折，1..10000
 }
@@ -210,7 +210,7 @@ message ListSupplierPricesRequest {
 message SupplierPriceItem {
   uint64 id = 1;
   uint64 product_id = 2;
-  uint64 sku_id = 3; // 0 = 商品级默认价
+  uint64 sku_id = 3; // 0 = 商品級默認價
   int64 price = 4; // 分
   int64 updated_at = 5;
   string scope = 6;
@@ -261,5 +261,5 @@ message ResendSupplierCallbackRequest {
 
 message SetSupplierIPWhitelistRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
-  repeated string ips = 2; // 精确 IP 或 CIDR 网段；空 = 不限
+  repeated string ips = 2; // 精確 IP 或 CIDR 網段；空 = 不限
 }

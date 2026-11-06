@@ -4,9 +4,9 @@ type UsageKey = 'allow_purchase' | 'allow_member_recharge' | 'allow_supply_recha
 const props = defineProps<{ value: Partial<Record<UsageKey, boolean>>; parent?: Partial<Record<UsageKey, boolean>>; wallet?: boolean; compact?: boolean }>();
 const emit = defineEmits<{ (e: 'change', key: UsageKey, value: boolean): void }>();
 const uses: { key: UsageKey; label: string; help: string }[] = [
-  { key: 'allow_purchase', label: '商品购买', help: '商城订单结算时可用' },
-  { key: 'allow_member_recharge', label: '会员充值', help: '个人中心充值到会员余额' },
-  { key: 'allow_supply_recharge', label: '供货账号充值', help: '下游对接商充值到采购余额' },
+  { key: 'allow_purchase', label: '商品購買', help: '商城訂單結算時可用' },
+  { key: 'allow_member_recharge', label: '會員充值', help: '個人中心充值到會員餘額' },
+  { key: 'allow_supply_recharge', label: '供貨賬號充值', help: '下游對接商充值到採購餘額' },
 ];
 function blocked(key: UsageKey) { return props.parent?.[key] === false || (!!props.wallet && key !== 'allow_purchase'); }
 </script>

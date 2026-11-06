@@ -22,19 +22,19 @@ type MemberProductGroup struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// ProductIds holds the value of the "product_ids" field.
 	ProductIds []uint64 `json:"product_ids,omitempty"`
-	// 折扣（万分比）
+	// 折扣（萬分比）
 	Discount int32 `json:"discount,omitempty"`
-	// 与会员等级折扣叠加
+	// 與會員等級折扣疊加
 	StackMember bool `json:"stack_member,omitempty"`
-	// 与优惠券叠加
+	// 與優惠券疊加
 	StackCoupon bool `json:"stack_coupon,omitempty"`
-	// 标签样式
+	// 標籤樣式
 	BadgeStyle   string `json:"badge_style,omitempty"`
 	selectValues sql.SelectValues
 }

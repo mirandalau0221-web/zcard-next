@@ -24,13 +24,13 @@ const OperationAdminUpdateServiceGetUpdateStatus = "/zcard.api.admin.v1.AdminUpd
 const OperationAdminUpdateServiceRollbackUpdate = "/zcard.api.admin.v1.AdminUpdateService/RollbackUpdate"
 
 type AdminUpdateServiceHTTPServer interface {
-	// ApplyUpdate ApplyUpdate 触发更新（单飞；进行中重复调用返回当前态）。
+	// ApplyUpdate ApplyUpdate 觸發更新（單飛；進行中重複調用返回當前態）。
 	ApplyUpdate(context.Context, *ApplyUpdateRequest) (*UpdateStatus, error)
-	// CheckUpdate CheckUpdate 手动检查更新（源解析+manifest 验签；结果缓存于 status）。
+	// CheckUpdate CheckUpdate 手動檢查更新（源解析+manifest 驗籤；結果緩存於 status）。
 	CheckUpdate(context.Context, *emptypb.Empty) (*UpdateCheckResult, error)
-	// GetUpdateStatus GetUpdateStatus 当前状态（幂等轮询；含生效源/supervisor 探测/最近 check 结果）。
+	// GetUpdateStatus GetUpdateStatus 當前狀態（冪等輪詢；含生效源/supervisor 探測/最近 check 結果）。
 	GetUpdateStatus(context.Context, *emptypb.Empty) (*UpdateStatus, error)
-	// RollbackUpdate RollbackUpdate 回滚上一版本（zcard.prev）并重启。
+	// RollbackUpdate RollbackUpdate 回滾上一版本（zcard.prev）並重啓。
 	RollbackUpdate(context.Context, *emptypb.Empty) (*UpdateStatus, error)
 }
 
@@ -119,13 +119,13 @@ func _AdminUpdateService_RollbackUpdate0_HTTP_Handler(srv AdminUpdateServiceHTTP
 }
 
 type AdminUpdateServiceHTTPClient interface {
-	// ApplyUpdate ApplyUpdate 触发更新（单飞；进行中重复调用返回当前态）。
+	// ApplyUpdate ApplyUpdate 觸發更新（單飛；進行中重複調用返回當前態）。
 	ApplyUpdate(ctx context.Context, req *ApplyUpdateRequest, opts ...http.CallOption) (rsp *UpdateStatus, err error)
-	// CheckUpdate CheckUpdate 手动检查更新（源解析+manifest 验签；结果缓存于 status）。
+	// CheckUpdate CheckUpdate 手動檢查更新（源解析+manifest 驗籤；結果緩存於 status）。
 	CheckUpdate(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UpdateCheckResult, err error)
-	// GetUpdateStatus GetUpdateStatus 当前状态（幂等轮询；含生效源/supervisor 探测/最近 check 结果）。
+	// GetUpdateStatus GetUpdateStatus 當前狀態（冪等輪詢；含生效源/supervisor 探測/最近 check 結果）。
 	GetUpdateStatus(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UpdateStatus, err error)
-	// RollbackUpdate RollbackUpdate 回滚上一版本（zcard.prev）并重启。
+	// RollbackUpdate RollbackUpdate 回滾上一版本（zcard.prev）並重啓。
 	RollbackUpdate(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UpdateStatus, err error)
 }
 
@@ -137,7 +137,7 @@ func NewAdminUpdateServiceHTTPClient(client *http.Client) AdminUpdateServiceHTTP
 	return &AdminUpdateServiceHTTPClientImpl{client}
 }
 
-// ApplyUpdate ApplyUpdate 触发更新（单飞；进行中重复调用返回当前态）。
+// ApplyUpdate ApplyUpdate 觸發更新（單飛；進行中重複調用返回當前態）。
 func (c *AdminUpdateServiceHTTPClientImpl) ApplyUpdate(ctx context.Context, in *ApplyUpdateRequest, opts ...http.CallOption) (*UpdateStatus, error) {
 	var out UpdateStatus
 	pattern := "/api/v1/admin/update/apply"
@@ -155,7 +155,7 @@ func (c *AdminUpdateServiceHTTPClientImpl) ApplyUpdate(ctx context.Context, in *
 	return &out, nil
 }
 
-// CheckUpdate CheckUpdate 手动检查更新（源解析+manifest 验签；结果缓存于 status）。
+// CheckUpdate CheckUpdate 手動檢查更新（源解析+manifest 驗籤；結果緩存於 status）。
 func (c *AdminUpdateServiceHTTPClientImpl) CheckUpdate(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*UpdateCheckResult, error) {
 	var out UpdateCheckResult
 	pattern := "/api/v1/admin/update/check"
@@ -173,7 +173,7 @@ func (c *AdminUpdateServiceHTTPClientImpl) CheckUpdate(ctx context.Context, in *
 	return &out, nil
 }
 
-// GetUpdateStatus GetUpdateStatus 当前状态（幂等轮询；含生效源/supervisor 探测/最近 check 结果）。
+// GetUpdateStatus GetUpdateStatus 當前狀態（冪等輪詢；含生效源/supervisor 探測/最近 check 結果）。
 func (c *AdminUpdateServiceHTTPClientImpl) GetUpdateStatus(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*UpdateStatus, error) {
 	var out UpdateStatus
 	pattern := "/api/v1/admin/update/status"
@@ -190,7 +190,7 @@ func (c *AdminUpdateServiceHTTPClientImpl) GetUpdateStatus(ctx context.Context, 
 	return &out, nil
 }
 
-// RollbackUpdate RollbackUpdate 回滚上一版本（zcard.prev）并重启。
+// RollbackUpdate RollbackUpdate 回滾上一版本（zcard.prev）並重啓。
 func (c *AdminUpdateServiceHTTPClientImpl) RollbackUpdate(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*UpdateStatus, error) {
 	var out UpdateStatus
 	pattern := "/api/v1/admin/update/rollback"

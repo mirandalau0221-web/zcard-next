@@ -25,11 +25,11 @@ type ResellerPricing struct {
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
-	// 0=商品级（哨兵，参与唯一索引）
+	// 0=商品級（哨兵，參與唯一索引）
 	SkuID uint64 `json:"sku_id,omitempty"`
 	// Mode holds the value of the "mode" field.
 	Mode resellerpricing.Mode `json:"mode,omitempty"`
-	// markup_percent=万分比；fixed_*=分
+	// markup_percent=萬分比；fixed_*=分
 	Value        int64 `json:"value,omitempty"`
 	selectValues sql.SelectValues
 }

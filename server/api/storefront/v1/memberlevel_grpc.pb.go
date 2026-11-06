@@ -28,10 +28,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreMemberLevelService 会员等级(：等级进度 + 积分产生）。
+// StoreMemberLevelService 會員等級(：等級進度 + 積分產生）。
 type StoreMemberLevelServiceClient interface {
 	GetInviteBenefit(ctx context.Context, in *InviteBenefitRequest, opts ...grpc.CallOption) (*InviteBenefitReply, error)
-	// GetMyLevel 我的等级（当前等级 + 下一等级 + 升级进度 + 积分余额与产生规则）。
+	// GetMyLevel 我的等級（當前等級 + 下一等級 + 升級進度 + 積分餘額與產生規則）。
 	GetMyLevel(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MyLevelReply, error)
 }
 
@@ -67,10 +67,10 @@ func (c *storeMemberLevelServiceClient) GetMyLevel(ctx context.Context, in *empt
 // All implementations must embed UnimplementedStoreMemberLevelServiceServer
 // for forward compatibility.
 //
-// StoreMemberLevelService 会员等级(：等级进度 + 积分产生）。
+// StoreMemberLevelService 會員等級(：等級進度 + 積分產生）。
 type StoreMemberLevelServiceServer interface {
 	GetInviteBenefit(context.Context, *InviteBenefitRequest) (*InviteBenefitReply, error)
-	// GetMyLevel 我的等级（当前等级 + 下一等级 + 升级进度 + 积分余额与产生规则）。
+	// GetMyLevel 我的等級（當前等級 + 下一等級 + 升級進度 + 積分餘額與產生規則）。
 	GetMyLevel(context.Context, *emptypb.Empty) (*MyLevelReply, error)
 	mustEmbedUnimplementedStoreMemberLevelServiceServer()
 }

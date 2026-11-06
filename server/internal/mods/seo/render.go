@@ -12,9 +12,9 @@ import (
 	"strings"
 )
 
-// ── 站点设置装载 ────────────────────────────────────────────
+// ── 站點設置裝載 ────────────────────────────────────────────
 
-// siteInfo 动态渲染所需站点配置（settings 公开键）。
+// siteInfo 動態渲染所需站點配置（settings 公開鍵）。
 type siteInfo struct {
 	Name         string
 	SeoTitle     string
@@ -42,19 +42,19 @@ func (s siteInfo) translate(value string) string {
 		return value
 	}
 	if translated := map[string]string{
-		"幸运抽奖": "Lucky Draw", "个人中心": "My Account", "订单详情": "Order Details",
-		"订单支付": "Payment", "订单查询": "Find Order", "售后工单": "Support Tickets",
-		"申请提现": "Withdraw", "推广中心": "Affiliates", "购物车": "Cart", "优惠券": "Coupons",
-		"安装向导": "Setup", "登录": "Sign In", "注册": "Sign Up", "找回密码": "Reset Password",
-		"我的奖品": "My Prizes", "全部商品": "All Products", "文章公告": "News & Guides",
-		"积分商城": "Points Store", "页面不存在": "Page Not Found", "页面暂时无法加载": "Page Temporarily Unavailable",
+		"幸運抽獎": "Lucky Draw", "個人中心": "My Account", "訂單詳情": "Order Details",
+		"訂單支付": "Payment", "訂單查詢": "Find Order", "售後工單": "Support Tickets",
+		"申請提現": "Withdraw", "推廣中心": "Affiliates", "購物車": "Cart", "優惠券": "Coupons",
+		"安裝嚮導": "Setup", "登錄": "Sign In", "註冊": "Sign Up", "找回密碼": "Reset Password",
+		"我的獎品": "My Prizes", "全部商品": "All Products", "文章公告": "News & Guides",
+		"積分商城": "Points Store", "頁面不存在": "Page Not Found", "頁面暫時無法加載": "Page Temporarily Unavailable",
 	}[value]; translated != "" {
 		return translated
 	}
 	return value
 }
 
-// base 站点 URL 基准（site.url 优先，空则 https://请求 Host）。
+// base 站點 URL 基準（site.url 優先，空則 https://請求 Host）。
 func (s siteInfo) base(host string) string {
 	if u, err := url.Parse(strings.TrimSpace(s.URL)); err == nil && (u.Scheme == "http" || u.Scheme == "https") && u.Host != "" && u.User == nil {
 		u.RawQuery = ""
@@ -86,7 +86,7 @@ func (s *SeoService) loadSite(ctx context.Context) siteInfo {
 		}
 		return ""
 	}
-	enabled := []string{"zh_CN"}
+	enabled := []string{"zh_TW"}
 	if s.cfg != nil {
 		if raw, err := s.cfg.GetDefault(ctx, "i18n", "enabled_locales", nil); err == nil && len(raw) != 0 {
 			_ = json.Unmarshal(raw, &enabled)
@@ -108,7 +108,7 @@ func (s *SeoService) loadSite(ctx context.Context) siteInfo {
 	return site
 }
 
-// ── 纯文本工具（与前端 stripHtml/truncate 同口径）──────────
+// ── 純文本工具（與前端 stripHtml/truncate 同口徑）──────────
 
 func stripTags(markup string) string {
 	doc, err := htmlnode.Parse(strings.NewReader(markup))
@@ -149,7 +149,7 @@ func truncateStr(s string, n int) string {
 	return string(r[:n-1]) + "…"
 }
 
-// ── 页面模板 ────────────────────────────────────────────────
+// ── 頁面模板 ────────────────────────────────────────────────
 
 type crumb struct {
 	Name string
@@ -166,9 +166,9 @@ type seoPageData struct {
 	Robots      string
 	OGType      string
 	OGImage     string
-	JSONLD      template.HTML // json.Marshal 默认转义 <>& → script 上下文安全
+	JSONLD      template.HTML // json.Marshal 默認轉義 <>& → script 上下文安全
 	Crumbs      []crumb
-	Body        template.HTML // 商品/文章正文（入库前已 sanitize）
+	Body        template.HTML // 商品/文章正文（入庫前已 sanitize）
 }
 
 var pageTmpl = template.Must(template.New("page").Parse(`<!DOCTYPE html>
@@ -218,11 +218,11 @@ footer{border-top:1px solid #e5e7eb;margin-top:32px;padding:16px;color:#9ca3af;f
 </html>
 `))
 
-// jsonldPlaceholder 模板占位（html/template 的 script 上下文会对值二次转义、
-// HTML 注释会被剥离——占位用空 meta 标签，渲染后字符串替换注入 JSON-LD）。
+// jsonldPlaceholder 模板佔位（html/template 的 script 上下文會對值二次轉義、
+// HTML 註釋會被剝離——佔位用空 meta 標籤，渲染後字符串替換注入 JSON-LD）。
 const jsonldPlaceholder = `<meta name="zcard-jsonld" content="1">`
 
-// renderPage 渲染完整爬虫页 HTML。
+// renderPage 渲染完整爬蟲頁 HTML。
 func renderPage(d seoPageData) (string, error) {
 	var b strings.Builder
 	if err := pageTmpl.Execute(&b, d); err != nil {
@@ -240,7 +240,7 @@ func jsonldOf(v any) template.HTML {
 	return template.HTML(b)
 }
 
-// ── 商品/文章页数据组装（纯函数，可单测）────────────────────
+// ── 商品/文章頁數據組裝（純函數，可單測）────────────────────
 
 func productPageData(site siteInfo, host string, p *ProductSEO) seoPageData {
 	base := site.base(host)

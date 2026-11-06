@@ -21,10 +21,10 @@ export function filterAuthRoutesByRoles(routes: ElegantConstRoute[], roles: stri
 }
 
 /**
- * Filter auth routes by permission codes（后端 authz 权限点；按 route.name 查 ROUTE_PERMISSIONS）
+ * Filter auth routes by permission codes（後端 authz 權限點；按 route.name 查 ROUTE_PERMISSIONS）
  *
  * @param routes Auth routes
- * @param buttons 当前用户权限点集（profile.permissions）
+ * @param buttons 當前用户權限點集（profile.permissions）
  */
 export function filterAuthRoutesByPermissions(routes: ElegantConstRoute[], buttons: string[]) {
   return routes.flatMap((route) => filterAuthRouteByPermissions(route, buttons));
@@ -53,7 +53,7 @@ function filterAuthRouteByPermissions(
     return [];
   }
 
-  // constant 路由与未登记路由放行（登录即可见），登记路由须命中任一权限点
+  // constant 路由與未登記路由放行（登錄即可見），登記路由須命中任一權限點
   return hasRoutePermission(route.name as string, buttons) ? [filterRoute] : [];
 }
 

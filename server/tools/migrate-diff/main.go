@@ -1,7 +1,7 @@
-// migrate-diff 迁移生成工具（Atlas 版本化迁移，禁止手写 DDL）。
+// migrate-diff 遷移生成工具（Atlas 版本化遷移，禁止手寫 DDL）。
 //
-// 依据 ent schema（唯一真理源）与 dev-db 比对，生成 migrations/<dialect>/ 下的
-// 版本化迁移文件 + atlas.sum。经 Makefile 调用：
+// 依據 ent schema（唯一真理源）與 dev-db 比對，生成 migrations/<dialect>/ 下的
+// 版本化遷移文件 + atlas.sum。經 Makefile 調用：
 //
 //	make migrate-diff DIALECT=sqlite  NAME=init
 //	make migrate-diff DIALECT=mysql   NAME=add_xxx   （docker dev-db）
@@ -32,9 +32,9 @@ import (
 	"modernc.org/sqlite"
 )
 
-// atlas URL 模式按 URL scheme 查找 database/sql 驱动：sqlite→"sqlite3"、
-// postgres→"postgres"。modernc.org/sqlite 注册名是 "sqlite"、pgx stdlib 注册
-// "pgx"，此处注册别名（均为纯 Go 无 CGO，ADR-D19）。
+// atlas URL 模式按 URL scheme 查找 database/sql 驅動：sqlite→"sqlite3"、
+// postgres→"postgres"。modernc.org/sqlite 註冊名是 "sqlite"、pgx stdlib 註冊
+// "pgx"，此處註冊別名（均為純 Go 無 CGO，ADR-D19）。
 func init() {
 	if !slices.Contains(sql.Drivers(), "sqlite3") {
 		sql.Register("sqlite3", &sqlite.Driver{})
@@ -44,7 +44,7 @@ func init() {
 	}
 }
 
-// devURLFor 各方言默认 dev-db URL（SQLite 内存零依赖；MySQL/PG 由 Makefile 起 docker）。
+// devURLFor 各方言默認 dev-db URL（SQLite 內存零依賴；MySQL/PG 由 Makefile 起 docker）。
 func devURLFor(d string) string {
 	switch d {
 	case entdialect.MySQL:
@@ -52,7 +52,7 @@ func devURLFor(d string) string {
 	case entdialect.Postgres:
 		return "postgres://postgres:pass@localhost:15432/dev?sslmode=disable"
 	default:
-		// SQLite 内存 dev-db（atlas 按需建表比对）
+		// SQLite 內存 dev-db（atlas 按需建表比對）
 		return "sqlite://file?mode=memory&_fk=1"
 	}
 }
@@ -60,9 +60,9 @@ func devURLFor(d string) string {
 func main() {
 	var (
 		dialectName    = flag.String("dialect", "", "sqlite | mysql | postgres（必填）")
-		devURL         = flag.String("url", "", "dev-db URL（空则用方言默认）")
-		additiveTables = flag.String("additive-tables", "", "只生成指定表的新增列/索引/表（逗号分隔；排除无关 schema 漂移）")
-		name           = flag.String("name", "changes", "迁移名（kebab/snake）")
+		devURL         = flag.String("url", "", "dev-db URL（空則用方言默認）")
+		additiveTables = flag.String("additive-tables", "", "只生成指定表的新增列/索引/表（逗號分隔；排除無關 schema 漂移）")
+		name           = flag.String("name", "changes", "遷移名（kebab/snake）")
 	)
 	flag.Parse()
 
@@ -88,11 +88,11 @@ func main() {
 
 	dirPath := filepath.Join("migrations", *dialectName)
 	if err := os.MkdirAll(dirPath, 0o755); err != nil {
-		log.Fatalf("创建迁移目录失败: %v", err)
+		log.Fatalf("創建遷移目錄失敗: %v", err)
 	}
 	dir, err := atlasmigrate.NewLocalDir(dirPath)
 	if err != nil {
-		log.Fatalf("打开迁移目录失败: %v", err)
+		log.Fatalf("打開遷移目錄失敗: %v", err)
 	}
 	options := []entschema.MigrateOption{
 		entschema.WithDir(dir), entschema.WithMigrationMode(entschema.ModeReplay), entschema.WithDialect(d), entschema.WithFormatter(atlasmigrate.DefaultFormatter),
@@ -163,7 +163,7 @@ func main() {
 		*name,
 		options...,
 	); err != nil {
-		log.Fatalf("生成迁移失败: %v", err)
+		log.Fatalf("生成遷移失敗: %v", err)
 	}
-	fmt.Printf("迁移已生成：%s（方言 %s）\n", dirPath, d)
+	fmt.Printf("遷移已生成：%s（方言 %s）\n", dirPath, d)
 }

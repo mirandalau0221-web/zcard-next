@@ -17,17 +17,17 @@ var ProviderSet = wire.NewSet(
 	NewGiftcardRepo,
 	NewStoreWalletService,
 	NewAdminWalletService,
-	// ：钱包端口适配器（Entry 字段口径转换：port.Entry → 本地 Entry）
+	// ：錢包端口適配器（Entry 字段口徑轉換：port.Entry → 本地 Entry）
 	ProvidePortWallet,
-	// ：积分账本端口（payment 充值赠送消费）
+	// ：積分賬本端口（payment 充值贈送消費）
 	ProvidePortPoints,
-	// ：积分扣减/读取 + 累计充值口径端口（order 兑换下单、memberlevel 等级进度消费）
+	// ：積分扣減/讀取 + 累計充值口徑端口（order 兑換下單、memberlevel 等級進度消費）
 	ProvidePortPointsDebiter,
 	ProvidePortPointsReader,
 	ProvidePortRechargeReader,
 )
 
-// portWalletAdapter port.Wallet → WalletRepoImpl（Entry 转换）。
+// portWalletAdapter port.Wallet → WalletRepoImpl（Entry 轉換）。
 type portWalletAdapter struct{ repo *WalletRepoImpl }
 
 func (a portWalletAdapter) CreditInTx(ctx context.Context, e port.Entry) error {
@@ -46,7 +46,7 @@ func (a portWalletAdapter) Unlock(ctx context.Context, userID uint64, amount mon
 	return a.repo.Unlock(ctx, userID, int64(amount))
 }
 
-// portPointsAdapter port.Points → WalletRepoImpl（积分入账）。
+// portPointsAdapter port.Points → WalletRepoImpl（積分入賬）。
 type portPointsAdapter struct{ repo *WalletRepoImpl }
 
 func (a portPointsAdapter) PointCreditInTx(ctx context.Context, e port.PointEntry) error {
@@ -73,22 +73,22 @@ func (a portPointsAdapter) CumulativeRecharge(ctx context.Context, userID uint64
 	return a.repo.CumulativeRecharge(ctx, userID)
 }
 
-// ProvidePortPoints 积分端口适配 provider。
+// ProvidePortPoints 積分端口適配 provider。
 func ProvidePortPoints(repo *WalletRepoImpl) port.Points {
 	return portPointsAdapter{repo: repo}
 }
 
-// ProvidePortPointsDebiter 积分扣减端口（ order 积分兑换下单消费）。
+// ProvidePortPointsDebiter 積分扣減端口（ order 積分兑換下單消費）。
 func ProvidePortPointsDebiter(repo *WalletRepoImpl) port.PointsDebiter {
 	return portPointsAdapter{repo: repo}
 }
 
-// ProvidePortPointsReader 积分余额端口（ memberlevel 等级进度消费）。
+// ProvidePortPointsReader 積分餘額端口（ memberlevel 等級進度消費）。
 func ProvidePortPointsReader(repo *WalletRepoImpl) port.PointsReader {
 	return portPointsAdapter{repo: repo}
 }
 
-// ProvidePortRechargeReader 累计充值口径端口（ memberlevel 升级阈值消费）。
+// ProvidePortRechargeReader 累計充值口徑端口（ memberlevel 升級閾值消費）。
 func ProvidePortRechargeReader(repo *WalletRepoImpl) port.RechargeReader {
 	return portPointsAdapter{repo: repo}
 }
@@ -101,7 +101,7 @@ func toLocalEntry(e port.Entry) Entry {
 	}
 }
 
-// ProvidePortWallet 端口适配 provider。
+// ProvidePortWallet 端口適配 provider。
 func ProvidePortWallet(repo *WalletRepoImpl) port.Wallet {
 	return portWalletAdapter{repo: repo}
 }

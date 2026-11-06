@@ -86,5 +86,5 @@ func (r *SupplyRepoImpl) recordStock(ctx context.Context, connectionID uint64, c
 			return nil
 		}
 	}
-	return fmt.Errorf("库存缓存并发更新冲突")
+	return fmt.Errorf("庫存緩存併發更新衝突")
 }

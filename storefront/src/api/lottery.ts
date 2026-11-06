@@ -34,14 +34,14 @@ export interface LotteryDraw {
   content?: string;
 }
 export const lotteryStates: Record<string, string> = {
-  get scheduled() { return $t("活动未开始"); },
-  get live() { return $t("进行中"); },
-  get paused() { return $t("活动已暂停"); },
-  get ended() { return $t("活动已结束"); },
-  get unavailable() { return $t("奖品暂不可用，等待平台补充"); },
-  get pending() { return $t("待平台发放"); },
-  get delivered() { return $t("已发放"); },
-  get missed() { return $t("谢谢参与"); },
+  get scheduled() { return $t("活動未開始"); },
+  get live() { return $t("進行中"); },
+  get paused() { return $t("活動已暫停"); },
+  get ended() { return $t("活動已結束"); },
+  get unavailable() { return $t("獎品暫不可用，等待平台補充"); },
+  get pending() { return $t("待平台發放"); },
+  get delivered() { return $t("已發放"); },
+  get missed() { return $t("謝謝參與"); },
 };
 export const listLotteryActivities = () =>
   api.get<{ items: LotteryActivity[] }>("/lottery/activities");

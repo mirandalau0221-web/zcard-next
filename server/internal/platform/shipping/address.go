@@ -30,7 +30,7 @@ func Normalize(a map[string]string) (map[string]string, error) {
 	for _, k := range []string{"country", "region", "city", "district", "address", "address_line2", "name", "phone", "postal_code"} {
 		v := strings.TrimSpace(a[k])
 		if utf8.RuneCountInString(v) > 300 || strings.ContainsAny(v, "\x00\r\n") {
-			return nil, fmt.Errorf("收货信息格式无效")
+			return nil, fmt.Errorf("收貨信息格式無效")
 		}
 		// An absent/empty optional line must preserve the exact legacy map shape:
 		// normalized addresses participate in persisted idempotency fingerprints.
@@ -48,7 +48,7 @@ func Validate(a map[string]string) (map[string]string, error) {
 	}
 	r, ok := Regions[out["country"]]
 	if !ok {
-		return nil, fmt.Errorf("请选择有效国家或地区")
+		return nil, fmt.Errorf("請選擇有效國家或地區")
 	}
 	required := r["require"]
 	if required == "" {
@@ -56,12 +56,12 @@ func Validate(a map[string]string) (map[string]string, error) {
 	}
 	for _, k := range []string{"name", "phone", "address"} {
 		if out[k] == "" {
-			return nil, fmt.Errorf("请填写收货人、电话号码和详细地址")
+			return nil, fmt.Errorf("請填寫收貨人、電話號碼和詳細地址")
 		}
 	}
 	for code, key := range map[string]string{"S": "region", "C": "city", "Z": "postal_code", "D": "district"} {
 		if strings.Contains(required, code) && out[key] == "" {
-			return nil, fmt.Errorf("请完整填写国家要求的地区、城市和邮编")
+			return nil, fmt.Errorf("請完整填寫國家要求的地區、城市和郵編")
 		}
 	}
 	if keys := r["sub_keys"]; keys != "" && out["region"] != "" {
@@ -72,7 +72,7 @@ func Validate(a map[string]string) (map[string]string, error) {
 			}
 		}
 		if !valid {
-			return nil, fmt.Errorf("请选择属于该国家的地区")
+			return nil, fmt.Errorf("請選擇屬於該國家的地區")
 		}
 	}
 	digits := 0
@@ -82,11 +82,11 @@ func Validate(a map[string]string) (map[string]string, error) {
 		}
 	}
 	if digits < 6 || digits > 15 || !regexp.MustCompile(`^\+?[0-9 ()\-]{6,30}$`).MatchString(out["phone"]) {
-		return nil, fmt.Errorf("电话号码格式无效，请包含国际区号")
+		return nil, fmt.Errorf("電話號碼格式無效，請包含國際區號")
 	}
 	if pattern := r["zip"]; pattern != "" && out["postal_code"] != "" {
 		if re, e := regexp.Compile("(?i)^(?:" + pattern + ")$"); e == nil && !re.MatchString(out["postal_code"]) {
-			return nil, fmt.Errorf("邮编与国家格式不符")
+			return nil, fmt.Errorf("郵編與國家格式不符")
 		}
 	}
 	return out, nil

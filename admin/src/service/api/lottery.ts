@@ -96,18 +96,18 @@ export const listLotteryHistory = (id: number) =>
   }>({ url: base + "/activities/" + id + "/history" });
 export const lotteryState: Record<string, string> = {
   draft: "草稿",
-  scheduled: "未开始",
-  live: "进行中",
-  paused: "已暂停",
-  ended: "已结束",
-  archived: "已归档",
-  unavailable: "奖品暂不可用",
-  pending: "待平台发放",
-  delivered: "已发放",
-  missed: "未中奖",
+  scheduled: "未開始",
+  live: "進行中",
+  paused: "已暫停",
+  ended: "已結束",
+  archived: "已歸檔",
+  unavailable: "獎品暫不可用",
+  pending: "待平台發放",
+  delivered: "已發放",
+  missed: "未中獎",
 };
 export const lotteryMode: Record<string, string> = {
-  card: "系统发卡",
-  text: "系统发文字/链接",
-  manual: "平台人工领取",
+  card: "系統髮卡",
+  text: "系統發文字/鏈接",
+  manual: "平台人工領取",
 };

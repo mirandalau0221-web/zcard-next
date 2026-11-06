@@ -1,4 +1,4 @@
-// Package port 为 settings 模块对外契约（零依赖包）。
+// Package port 為 settings 模塊對外契約（零依賴包）。
 package port
 
 import (
@@ -6,22 +6,22 @@ import (
 	"encoding/json"
 )
 
-// Item 设置项。
+// Item 設置項。
 type Item struct {
 	Group string
 	Key   string
 	Value json.RawMessage
 }
 
-// Provider 设置读取窄接口（各模块启动/运行时读取业务开关的唯一入口，
-// 铁律 7：运行时业务开关在 settings 表，env/config 只作首次部署兜底）。
+// Provider 設置讀取窄接口（各模塊啓動/運行時讀取業務開關的唯一入口，
+// 鐵律 7：運行時業務開關在 settings 表，env/config 只作首次部署兜底）。
 type Provider interface {
 	Get(ctx context.Context, group, key string) (json.RawMessage, error)
-	// GetDefault 读取并绑定到默认值结构体（不存在时返回 def 原值）。
+	// GetDefault 讀取並綁定到默認值結構體（不存在時返回 def 原值）。
 	GetDefault(ctx context.Context, group, key string, def json.RawMessage) (json.RawMessage, error)
 }
 
-// CurrencyReader 货币读取（展示换算取数端， exchange 消费；rate 为 decimal 字符串）。
+// CurrencyReader 貨幣讀取（展示換算取數端， exchange 消費；rate 為 decimal 字符串）。
 type CurrencyReader interface {
 	CurrencyByCode(ctx context.Context, code string) (rate string, precision int32, err error)
 }

@@ -33,22 +33,22 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// RoleService 角色与权限管理（自建 RBAC，规划 ；）。
-// 权限目录由模块声明式生成（authz.Declare），本服务只读下发供前端勾选与动态路由。
+// RoleService 角色與權限管理（自建 RBAC，規劃 ；）。
+// 權限目錄由模塊聲明式生成（authz.Declare），本服務只讀下發供前端勾選與動態路由。
 type RoleServiceClient interface {
-	// ListRoles 角色列表（含权限点数量）。
+	// ListRoles 角色列表（含權限點數量）。
 	ListRoles(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListRolesReply, error)
-	// GetRole 角色详情（含权限点清单）。
+	// GetRole 角色詳情（含權限點清單）。
 	GetRole(ctx context.Context, in *GetRoleRequest, opts ...grpc.CallOption) (*Role, error)
-	// CreateRole 创建角色。
+	// CreateRole 創建角色。
 	CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...grpc.CallOption) (*Role, error)
-	// UpdateRole 修改角色（名称/描述；内置角色 code 不可改）。
+	// UpdateRole 修改角色（名稱/描述；內置角色 code 不可改）。
 	UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...grpc.CallOption) (*Role, error)
-	// DeleteRole 删除角色（内置角色拒绝；仍有员工挂载拒绝）。
+	// DeleteRole 刪除角色（內置角色拒絕；仍有員工掛載拒絕）。
 	DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// UpdateRolePermissions 全量替换角色权限点集（变更实时生效）。
+	// UpdateRolePermissions 全量替換角色權限點集（變更實時生效）。
 	UpdateRolePermissions(ctx context.Context, in *UpdateRolePermissionsRequest, opts ...grpc.CallOption) (*Role, error)
-	// GetPermissionTree 权限目录树（域分组 + 中文描述；前端勾选与菜单数据源）。
+	// GetPermissionTree 權限目錄樹（域分組 + 中文描述；前端勾選與菜單數據源）。
 	GetPermissionTree(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PermissionTree, error)
 }
 
@@ -134,22 +134,22 @@ func (c *roleServiceClient) GetPermissionTree(ctx context.Context, in *emptypb.E
 // All implementations must embed UnimplementedRoleServiceServer
 // for forward compatibility.
 //
-// RoleService 角色与权限管理（自建 RBAC，规划 ；）。
-// 权限目录由模块声明式生成（authz.Declare），本服务只读下发供前端勾选与动态路由。
+// RoleService 角色與權限管理（自建 RBAC，規劃 ；）。
+// 權限目錄由模塊聲明式生成（authz.Declare），本服務只讀下發供前端勾選與動態路由。
 type RoleServiceServer interface {
-	// ListRoles 角色列表（含权限点数量）。
+	// ListRoles 角色列表（含權限點數量）。
 	ListRoles(context.Context, *emptypb.Empty) (*ListRolesReply, error)
-	// GetRole 角色详情（含权限点清单）。
+	// GetRole 角色詳情（含權限點清單）。
 	GetRole(context.Context, *GetRoleRequest) (*Role, error)
-	// CreateRole 创建角色。
+	// CreateRole 創建角色。
 	CreateRole(context.Context, *CreateRoleRequest) (*Role, error)
-	// UpdateRole 修改角色（名称/描述；内置角色 code 不可改）。
+	// UpdateRole 修改角色（名稱/描述；內置角色 code 不可改）。
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
-	// DeleteRole 删除角色（内置角色拒绝；仍有员工挂载拒绝）。
+	// DeleteRole 刪除角色（內置角色拒絕；仍有員工掛載拒絕）。
 	DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error)
-	// UpdateRolePermissions 全量替换角色权限点集（变更实时生效）。
+	// UpdateRolePermissions 全量替換角色權限點集（變更實時生效）。
 	UpdateRolePermissions(context.Context, *UpdateRolePermissionsRequest) (*Role, error)
-	// GetPermissionTree 权限目录树（域分组 + 中文描述；前端勾选与菜单数据源）。
+	// GetPermissionTree 權限目錄樹（域分組 + 中文描述；前端勾選與菜單數據源）。
 	GetPermissionTree(context.Context, *emptypb.Empty) (*PermissionTree, error)
 	mustEmbedUnimplementedRoleServiceServer()
 }
@@ -383,21 +383,21 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminUserService 员工管理（数据层归 identity，API 面在此；）。
+// AdminUserService 員工管理（數據層歸 identity，API 面在此；）。
 type AdminUserServiceClient interface {
-	// ListAdmins 员工列表。
+	// ListAdmins 員工列表。
 	ListAdmins(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAdminsReply, error)
-	// CreateAdmin 创建员工（密码 bcrypt）。
+	// CreateAdmin 創建員工（密碼 bcrypt）。
 	CreateAdmin(ctx context.Context, in *CreateAdminRequest, opts ...grpc.CallOption) (*Admin, error)
-	// UpdateAdmin 修改员工（昵称/头像/角色）。
+	// UpdateAdmin 修改員工（暱稱/頭像/角色）。
 	UpdateAdmin(ctx context.Context, in *UpdateAdminRequest, opts ...grpc.CallOption) (*Admin, error)
-	// ToggleAdmin 启用/禁用员工。
+	// ToggleAdmin 啓用/禁用員工。
 	ToggleAdmin(ctx context.Context, in *ToggleAdminRequest, opts ...grpc.CallOption) (*Admin, error)
-	// ResetAdminPassword 重置员工密码（≥8 位 bcrypt；吊销其全部管理面会话强制重登）。
+	// ResetAdminPassword 重置員工密碼（≥8 位 bcrypt；吊銷其全部管理面會話強制重登）。
 	ResetAdminPassword(ctx context.Context, in *ResetAdminPasswordRequest, opts ...grpc.CallOption) (*Admin, error)
-	// ResetAdminTOTP 解绑员工 TOTP（吊销其全部管理面会话强制重登）。
+	// ResetAdminTOTP 解綁員工 TOTP（吊銷其全部管理面會話強制重登）。
 	ResetAdminTOTP(ctx context.Context, in *ResetAdminTOTPRequest, opts ...grpc.CallOption) (*Admin, error)
-	// DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话一并清除）。
+	// DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話一併清除）。
 	DeleteAdmin(ctx context.Context, in *DeleteAdminRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -483,21 +483,21 @@ func (c *adminUserServiceClient) DeleteAdmin(ctx context.Context, in *DeleteAdmi
 // All implementations must embed UnimplementedAdminUserServiceServer
 // for forward compatibility.
 //
-// AdminUserService 员工管理（数据层归 identity，API 面在此；）。
+// AdminUserService 員工管理（數據層歸 identity，API 面在此；）。
 type AdminUserServiceServer interface {
-	// ListAdmins 员工列表。
+	// ListAdmins 員工列表。
 	ListAdmins(context.Context, *emptypb.Empty) (*ListAdminsReply, error)
-	// CreateAdmin 创建员工（密码 bcrypt）。
+	// CreateAdmin 創建員工（密碼 bcrypt）。
 	CreateAdmin(context.Context, *CreateAdminRequest) (*Admin, error)
-	// UpdateAdmin 修改员工（昵称/头像/角色）。
+	// UpdateAdmin 修改員工（暱稱/頭像/角色）。
 	UpdateAdmin(context.Context, *UpdateAdminRequest) (*Admin, error)
-	// ToggleAdmin 启用/禁用员工。
+	// ToggleAdmin 啓用/禁用員工。
 	ToggleAdmin(context.Context, *ToggleAdminRequest) (*Admin, error)
-	// ResetAdminPassword 重置员工密码（≥8 位 bcrypt；吊销其全部管理面会话强制重登）。
+	// ResetAdminPassword 重置員工密碼（≥8 位 bcrypt；吊銷其全部管理面會話強制重登）。
 	ResetAdminPassword(context.Context, *ResetAdminPasswordRequest) (*Admin, error)
-	// ResetAdminTOTP 解绑员工 TOTP（吊销其全部管理面会话强制重登）。
+	// ResetAdminTOTP 解綁員工 TOTP（吊銷其全部管理面會話強制重登）。
 	ResetAdminTOTP(context.Context, *ResetAdminTOTPRequest) (*Admin, error)
-	// DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话一并清除）。
+	// DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話一併清除）。
 	DeleteAdmin(context.Context, *DeleteAdminRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAdminUserServiceServer()
 }

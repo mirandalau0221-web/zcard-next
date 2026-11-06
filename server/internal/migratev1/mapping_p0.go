@@ -1,8 +1,8 @@
 package migratev1
 
-// P0 系统域迁移：currencies / user_groups→member_levels(+UserGroup 兼容表) /
+// P0 系統域遷移：currencies / user_groups→member_levels(+UserGroup 兼容表) /
 // supply_sources→supply_connections / settings 首批映射。
-// 映射规格《数据迁移工具开发计划》§5.1；driver 枚举两端同名直传（dujiao_next/acg_faka/zcard）。
+// 映射規格《數據遷移工具開發計劃》§5.1；driver 枚舉兩端同名直傳（dujiao_next/acg_faka/zcard）。
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// MigrateSystem P0 阶段。
+// MigrateSystem P0 階段。
 func (m *Migrator) MigrateSystem(ctx context.Context) error {
 	if err := m.migrateCurrencies(ctx); err != nil {
 		return err
@@ -35,8 +35,8 @@ func (m *Migrator) MigrateSystem(ctx context.Context) error {
 	return m.migrateSettings(ctx)
 }
 
-// migrateCurrencies code 为唯一键（v1id_maps 不适用）：存在则更新汇率/展示参数，否则插入。
-// 1.x is_base 无 2.0 列（基础货币在 2.0 侧另行约定），非 CNY 基础货币仅进报告提示。
+// migrateCurrencies code 為唯一鍵（v1id_maps 不適用）：存在則更新匯率/展示參數，否則插入。
+// 1.x is_base 無 2.0 列（基礎貨幣在 2.0 側另行約定），非 CNY 基礎貨幣僅進報告提示。
 func (m *Migrator) migrateCurrencies(ctx context.Context) error {
 	var (
 		code, symbol              string
@@ -44,7 +44,7 @@ func (m *Migrator) migrateCurrencies(ctx context.Context) error {
 		decimalPlaces, sort, enab int64
 		isBase                    bool
 	)
-	_ = name // 1.x 币种名无 2.0 列，显式丢弃
+	_ = name // 1.x 幣種名無 2.0 列，顯式丟棄
 	return m.scanAll(ctx, "currencies",
 		[]string{"code", "name", "symbol", "symbol_position", "decimal_places", "exchange_rate", "is_base", "is_enabled", "sort"},
 		func() []any {
@@ -86,7 +86,7 @@ func (m *Migrator) migrateCurrencies(ctx context.Context) error {
 				return err
 			}
 			if isBase {
-				m.RW.AddError("currencies", 0, fmt.Sprintf("基础货币 %s 无 2.0 直迁列（请在 2.0 核对基础货币约定）", code))
+				m.RW.AddError("currencies", 0, fmt.Sprintf("基礎貨幣 %s 無 2.0 直遷列（請在 2.0 核對基礎貨幣約定）", code))
 			}
 			m.st.Record("currencies", "migrated")
 			return nil
@@ -94,9 +94,9 @@ func (m *Migrator) migrateCurrencies(ctx context.Context) error {
 	)
 }
 
-// migrateUserGroups 1.x user_groups → member_levels + UserGroup 兼容表（双写）。
-// discount：1.x decimal 百分数（100.00=原价）→ 2.0 万分比（10000）。
-// 用户显式组不落列（2.0 等级由累计充值/消费阈值实时推导），交易域迁完后自动恢复。
+// migrateUserGroups 1.x user_groups → member_levels + UserGroup 兼容表（雙寫）。
+// discount：1.x decimal 百分數（100.00=原價）→ 2.0 萬分比（10000）。
+// 用户顯式組不落列（2.0 等級由累計充值/消費閾值實時推導），交易域遷完後自動恢復。
 func (m *Migrator) migrateUserGroups(ctx context.Context) error {
 	var (
 		id, sort, status            int64
@@ -115,7 +115,7 @@ func (m *Migrator) migrateUserGroups(ctx context.Context) error {
 			}
 			discount, err := strconv.ParseFloat(strings.TrimSpace(discountStr), 64)
 			if err != nil {
-				return fmt.Errorf("discount %q 解析失败: %w", discountStr, err)
+				return fmt.Errorf("discount %q 解析失敗: %w", discountStr, err)
 			}
 			thresholdType := memberlevel.ThresholdTypeRecharge
 			switch {
@@ -141,7 +141,7 @@ func (m *Migrator) migrateUserGroups(ctx context.Context) error {
 				SetName(name).
 				SetLevelID(lv.ID).
 				Save(ctx); err != nil {
-				return fmt.Errorf("UserGroup 兼容表写入失败: %w", err)
+				return fmt.Errorf("UserGroup 兼容表寫入失敗: %w", err)
 			}
 			if _, err := m.IDs.Put(ctx, m.Client, "user_groups", uint64(id), lv.ID); err != nil {
 				return err
@@ -153,7 +153,7 @@ func (m *Migrator) migrateUserGroups(ctx context.Context) error {
 }
 
 // migrateSupplySources 1.x supply_sources → supply_connections。
-// credentials：APP_KEY 解密（容错历史明文）→ DataBox AES-256-GCM 重加密。
+// credentials：APP_KEY 解密（容錯歷史明文）→ DataBox AES-256-GCM 重加密。
 func (m *Migrator) migrateSupplySources(ctx context.Context) error {
 	var (
 		id                          int64
@@ -168,7 +168,7 @@ func (m *Migrator) migrateSupplySources(ctx context.Context) error {
 			"balance_cache", "last_synced_at", "last_error", "deleted_at"},
 		func() []any {
 			return []any{&id, &name, &driver, &baseURL, &cred, &status, &settingsJSON,
-				&balance, &lastSynced, &lastErr, &deletedAt} // 可空列一律 Null 扫描
+				&balance, &lastSynced, &lastErr, &deletedAt} // 可空列一律 Null 掃描
 		},
 		func(int64) error {
 			if _, ok := m.IDs.Get(ctx, "supply_sources", uint64(id)); ok {
@@ -178,14 +178,14 @@ func (m *Migrator) migrateSupplySources(ctx context.Context) error {
 			plain := cred
 			if laracrypt.LooksEncrypted(cred) {
 				if m.AppKey == nil {
-					return fmt.Errorf("credentials 为密文但 APP_KEY 不可用")
+					return fmt.Errorf("credentials 為密文但 APP_KEY 不可用")
 				}
 				c, err := laracrypt.New(m.AppKey)
 				if err != nil {
 					return err
 				}
 				if plain, err = c.OpenString(cred); err != nil {
-					return fmt.Errorf("credentials 解密失败: %w", err)
+					return fmt.Errorf("credentials 解密失敗: %w", err)
 				}
 			}
 			if plain != "" && !json.Valid([]byte(plain)) {
@@ -193,7 +193,7 @@ func (m *Migrator) migrateSupplySources(ctx context.Context) error {
 			}
 			box, err := crypto.NewBox(m.DataKey)
 			if err != nil {
-				return fmt.Errorf("ZCARD_DATA_KEY 不可用（凭据重加密必需）: %w", err)
+				return fmt.Errorf("ZCARD_DATA_KEY 不可用（憑據重加密必需）: %w", err)
 			}
 			sealed, err := box.Seal([]byte(plain), nil)
 			if err != nil {
@@ -237,7 +237,7 @@ func (m *Migrator) migrateSupplySources(ctx context.Context) error {
 }
 
 // migrateSettings 1.x settings（key-value json）→ 2.0 settings(group,key)。
-// 命中映射表 → 目标组；SECRET/弃用 → 跳过（报告提示重配）；其余 → group=v1_legacy 保真。
+// 命中映射表 → 目標組；SECRET/棄用 → 跳過（報告提示重配）；其餘 → group=v1_legacy 保真。
 func (m *Migrator) migrateSettings(ctx context.Context) error {
 	var (
 		id  int64
@@ -250,7 +250,7 @@ func (m *Migrator) migrateSettings(ctx context.Context) error {
 		func() []any { return []any{&id, &k, &v, &grp} },
 		func(int64) error {
 			if reason, skip := settingsSkipped[k]; skip {
-				m.RW.AddError("settings", uint64(id), fmt.Sprintf("跳过 %s：%s", k, reason))
+				m.RW.AddError("settings", uint64(id), fmt.Sprintf("跳過 %s：%s", k, reason))
 				m.st.Record("settings", "skip")
 				return nil
 			}
@@ -261,11 +261,11 @@ func (m *Migrator) migrateSettings(ctx context.Context) error {
 				g, key = rule.Group, rule.Key
 				nv, err := normalizeSettingValue(rule, nullStr(v))
 				if err != nil {
-					return fmt.Errorf("settings %s 值转换失败: %w", k, err)
+					return fmt.Errorf("settings %s 值轉換失敗: %w", k, err)
 				}
 				value = nv
 			} else {
-				value = json.RawMessage(nullStr(v)) // 原样保真（1.x value 本就是 JSON 文档；NULL → 空 JSON）
+				value = json.RawMessage(nullStr(v)) // 原樣保真（1.x value 本就是 JSON 文檔；NULL → 空 JSON）
 			}
 			exists, err := m.Client.Setting.Query().
 				Where(setting.Group(g), setting.Key(key)).Exist(ctx)

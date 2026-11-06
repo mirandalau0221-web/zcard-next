@@ -24,11 +24,11 @@ type Withdrawal struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uint64 `json:"user_id,omitempty"`
-	// 提现金额（分）
+	// 提現金額（分）
 	Amount int64 `json:"amount,omitempty"`
-	// 手续费（分）
+	// 手續費（分）
 	Fee int64 `json:"fee,omitempty"`
-	// 收款方式快照（渠道/账号/姓名）
+	// 收款方式快照（渠道/賬號/姓名）
 	Method map[string]interface{} `json:"method,omitempty"`
 	// Status holds the value of the "status" field.
 	Status withdrawal.Status `json:"status,omitempty"`

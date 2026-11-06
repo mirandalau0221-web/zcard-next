@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// 文章管理（公告/博客）：列表为主视图，栏目作为分类维度收纳进工具栏——
-// 状态筛选 + 栏目筛选 + 「栏目管理」入口（弹窗表格含排序/增删改），对齐
-// WordPress/掘金 后台「内容列表 + 分类管理入口」的大厂布局。
+// 文章管理（公告/博客）：列表為主視圖，欄目作為分類維度收納進工具欄——
+// 狀態篩選 + 欄目篩選 + 「欄目管理」入口（彈窗表格含排序/增刪改），對齊
+// WordPress/掘金 後台「內容列表 + 分類管理入口」的大廠佈局。
 import { computed, h, onMounted, ref } from "vue";
 import { NButton, NDataTable, NInput, NModal, NForm, NFormItem, NInputNumber, NPopconfirm, NSelect, NSwitch, NTag } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
@@ -62,11 +62,11 @@ function selectPostLocale(locale: "zh_CN" | "en") {
   }
 }
 
-// 筛选：发布状态（带计数）+ 栏目（下拉，全部栏目=空）
+// 篩選：發佈狀態（帶計數）+ 欄目（下拉，全部欄目=空）
 const postFilter = ref<"" | "published" | "draft">("");
 const postTabs = [
   { label: "全部", value: "", type: "default" as const },
-  { label: "已发布", value: "published", type: "success" as const },
+  { label: "已發佈", value: "published", type: "success" as const },
   { label: "草稿", value: "draft", type: "warning" as const },
 ];
 const postCounts = computed(() => ({
@@ -94,7 +94,7 @@ function zhValue(json: string): string {
   }
 }
 
-// ── 文章栏目（分类维度；管理入口=工具栏「栏目管理」弹窗）──
+// ── 文章欄目（分類維度；管理入口=工具欄「欄目管理」彈窗）──
 const categories = ref<any[]>([]);
 const showCategoryMgr = ref(false);
 const showCategory = ref(false);
@@ -107,21 +107,21 @@ function categoryName(id: number): string {
 }
 
 const categoryOptions = computed(() => categories.value.map((c) => ({ label: c.name, value: c.id })));
-const categoryFilterOptions = computed(() => [{ label: "全部栏目", value: 0 }, ...categoryOptions.value]);
+const categoryFilterOptions = computed(() => [{ label: "全部欄目", value: 0 }, ...categoryOptions.value]);
 
 const postColumns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 50 },
   { title: "排序", key: "sort", width: 70, render: (row) => row.sort ?? 0 },
   { title: "slug", key: "slug", width: 130 },
   {
-    title: "类型",
+    title: "類型",
     key: "type",
     width: 70,
     render: (row) => h(NTag, { size: "small", type: row.type === "notice" ? "warning" : "info" }, { default: () => (row.type === "notice" ? "公告" : "博客") }),
   },
-  { title: "标题", key: "title_json", minWidth: 160, ellipsis: true, render: (row) => zhValue(row.title_json) },
+  { title: "標題", key: "title_json", minWidth: 160, ellipsis: true, render: (row) => zhValue(row.title_json) },
   {
-    title: "栏目",
+    title: "欄目",
     key: "category_id",
     width: 90,
     render: (row) =>
@@ -130,10 +130,10 @@ const postColumns: DataTableColumns<any> = [
         : "-",
   },
   {
-    title: "发布",
+    title: "發佈",
     key: "is_published",
     width: 80,
-    render: (row) => h(NTag, { size: "small", type: row.is_published ? "success" : "default" }, { default: () => (row.is_published ? "已发布" : "草稿") }),
+    render: (row) => h(NTag, { size: "small", type: row.is_published ? "success" : "default" }, { default: () => (row.is_published ? "已發佈" : "草稿") }),
   },
   {
     title: "操作",
@@ -142,13 +142,13 @@ const postColumns: DataTableColumns<any> = [
     render: (row) =>
       h("div", { class: "flex gap-4px" }, [
         canWrite()
-          ? h(NButton, { size: "tiny", onClick: () => openEditPost(row) }, { default: () => "编辑" })
+          ? h(NButton, { size: "tiny", onClick: () => openEditPost(row) }, { default: () => "編輯" })
           : null,
         canWrite()
-          ? h(NButton, { size: "tiny", onClick: () => handlePublish(row) }, { default: () => (row.is_published ? "下架" : "发布") })
+          ? h(NButton, { size: "tiny", onClick: () => handlePublish(row) }, { default: () => (row.is_published ? "下架" : "發佈") })
           : null,
         canWrite()
-          ? h(NPopconfirm, { onPositiveClick: () => handleDeletePost(row.id) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "删除" }), default: () => "确定删除？" })
+          ? h(NPopconfirm, { onPositiveClick: () => handleDeletePost(row.id) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "刪除" }), default: () => "確定刪除？" })
           : null,
       ]),
   },
@@ -157,7 +157,7 @@ const postColumns: DataTableColumns<any> = [
 async function loadPosts() {
   postLoading.value = true;
   try {
-    // 筛选与计数在本地完成，因此需读取全部分页，不能只管理默认第一页。
+    // 篩選與計數在本地完成，因此需讀取全部分頁，不能只管理默認第一頁。
     const rows: any[] = [];
     for (let page = 1; ; page++) {
       const { data, error } = await fetchPosts({ page, page_size: 100 });
@@ -206,7 +206,7 @@ function openEditPost(row: any) {
 async function handlePost() {
   saveLanguageDraft();
   if (!postForm.value.slug || !(["zh_CN", "en"] as const).some((locale) => translationValue(postTranslations.title, locale).trim() && translationValue(postTranslations.content, locale).trim())) {
-    window.$message?.warning("请填写 slug，并至少完整填写一种语言的标题和正文");
+    window.$message?.warning("請填寫 slug，並至少完整填寫一種語言的標題和正文");
     return;
   }
   postSaving.value = true;
@@ -236,7 +236,7 @@ async function handlePost() {
         sort: postForm.value.sort ?? 0,
       });
       if (!error) {
-        window.$message?.success("文章已创建");
+        window.$message?.success("文章已創建");
         showPost.value = false;
         loadPosts();
       }
@@ -249,7 +249,7 @@ async function handlePost() {
 async function handlePublish(row: any) {
   const { error } = await publishPost(row.id, !row.is_published);
   if (!error) {
-    window.$message?.success(row.is_published ? "已下架" : "已发布");
+    window.$message?.success(row.is_published ? "已下架" : "已發佈");
     loadPosts();
   }
 }
@@ -257,12 +257,12 @@ async function handlePublish(row: any) {
 async function handleDeletePost(id: number) {
   const { error } = await deletePost(id);
   if (!error) {
-    window.$message?.success("已删除");
+    window.$message?.success("已刪除");
     loadPosts();
   }
 }
 
-// ── 栏目管理（弹窗表格）──
+// ── 欄目管理（彈窗表格）──
 const categoryColumns: DataTableColumns<any> = [
   {
     title: "排序",
@@ -283,10 +283,10 @@ const categoryColumns: DataTableColumns<any> = [
         h("span", { class: "text-12px color-gray" }, String(row.sort ?? 0)),
       ]),
   },
-  { title: "名称", key: "name", minWidth: 140, render: (row) => h("span", { class: "font-500" }, row.name) },
+  { title: "名稱", key: "name", minWidth: 140, render: (row) => h("span", { class: "font-500" }, row.name) },
   { title: "slug", key: "slug", width: 130, ellipsis: true, render: (row) => h("span", { class: "text-12px color-gray" }, row.slug) },
   {
-    title: "文章数",
+    title: "文章數",
     key: "post_count",
     width: 80,
     render: (row) => h("span", { class: "text-12px color-gray" }, String(posts.value.filter((p) => p.category_id === row.id).length)),
@@ -297,9 +297,9 @@ const categoryColumns: DataTableColumns<any> = [
     width: 110,
     render: (row) =>
       h("div", { class: "flex gap-4px" }, [
-        canWrite() ? h(NButton, { size: "tiny", onClick: () => openEditCategory(row) }, { default: () => "编辑" }) : null,
+        canWrite() ? h(NButton, { size: "tiny", onClick: () => openEditCategory(row) }, { default: () => "編輯" }) : null,
         canWrite()
-          ? h(NPopconfirm, { onPositiveClick: () => handleDeleteCategory(row) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "删除" }), default: () => "确定删除该栏目？" })
+          ? h(NPopconfirm, { onPositiveClick: () => handleDeleteCategory(row) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "刪除" }), default: () => "確定刪除該欄目？" })
           : null,
       ]),
   },
@@ -328,14 +328,14 @@ async function handleCategory() {
     if (editingCategory.value) {
       const { error } = await updatePostCategory(editingCategory.value.id, { name: categoryForm.value.name, sort: categoryForm.value.sort });
       if (!error) {
-        window.$message?.success("栏目已更新");
+        window.$message?.success("欄目已更新");
         showCategory.value = false;
         loadCategories();
       }
     } else {
       const { error } = await createPostCategory({ name: categoryForm.value.name, slug: categoryForm.value.slug, sort: categoryForm.value.sort });
       if (!error) {
-        window.$message?.success("栏目已创建");
+        window.$message?.success("欄目已創建");
         showCategory.value = false;
         loadCategories();
       }
@@ -347,18 +347,18 @@ async function handleCategory() {
 
 async function handleDeleteCategory(row: any) {
   if (posts.value.some((p) => p.category_id === row.id)) {
-    window.$message?.warning("该栏目下存在文章，请先在文章中移除栏目");
+    window.$message?.warning("該欄目下存在文章，請先在文章中移除欄目");
     return;
   }
   const { error } = await deletePostCategory(row.id);
   if (!error) {
-    window.$message?.success("已删除");
+    window.$message?.success("已刪除");
     loadCategories();
     if (categoryFilter.value === row.id) categoryFilter.value = null;
   }
 }
 
-// 上移/下移：与相邻栏目互换 sort 并保存（sort 保持唯一递增，交换可靠）
+// 上移/下移：與相鄰欄目互換 sort 並保存（sort 保持唯一遞增，交換可靠）
 async function moveCategory(row: any, dir: -1 | 1) {
   const idx = categories.value.findIndex((c) => c.id === row.id);
   const target = categories.value[idx + dir];
@@ -384,7 +384,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-12px">
-    <!-- 工具栏：状态筛选 | 栏目筛选 + 栏目管理 + 新增 -->
+    <!-- 工具欄：狀態篩選 | 欄目篩選 + 欄目管理 + 新增 -->
     <div class="flex items-center justify-between gap-12px flex-wrap">
       <FilterTabs v-model:value="postFilter" :options="postTabs" :counts="postCounts" size="small" />
       <div class="flex items-center gap-8px">
@@ -393,37 +393,37 @@ onMounted(() => {
           :options="categoryFilterOptions"
           size="small"
           style="width: 150px"
-          placeholder="全部栏目"
+          placeholder="全部欄目"
         />
-        <NButton v-if="canWrite()" size="small" @click="showCategoryMgr = true">栏目管理</NButton>
+        <NButton v-if="canWrite()" size="small" @click="showCategoryMgr = true">欄目管理</NButton>
         <NButton v-if="canWrite()" size="small" type="primary" @click="openCreatePost">新增文章</NButton>
       </div>
     </div>
 
     <NDataTable :columns="postColumns" :data="filteredPosts" :loading="postLoading" size="small" :max-height="560" />
 
-    <!-- 新增/编辑文章 -->
+    <!-- 新增/編輯文章 -->
     <NModal
       v-model:show="showPost"
       preset="dialog"
-      :title="editingPost ? `编辑文章：${editingPost.slug}` : '新增公告/文章'"
+      :title="editingPost ? `編輯文章：${editingPost.slug}` : '新增公告/文章'"
       style="width: 680px"
       display-directive="show"
     >
       <NForm :model="postForm" label-placement="left" label-width="72">
-        <NFormItem label="内容语言">
-          <NSelect :value="postLocale" :options="[{ label: '简体中文', value: 'zh_CN' }, { label: 'English', value: 'en' }]" @update:value="selectPostLocale" />
+        <NFormItem label="內容語言">
+          <NSelect :value="postLocale" :options="[{ label: '簡體中文', value: 'zh_CN' }, { label: 'English', value: 'en' }]" @update:value="selectPostLocale" />
         </NFormItem>
         <NFormItem label="slug" required>
           <NInput v-model:value="postForm.slug" placeholder="如 notice-0818" :disabled="!!editingPost" />
         </NFormItem>
-        <NFormItem label="类型">
+        <NFormItem label="類型">
           <NSelect v-model:value="postForm.type" :options="[{ label: '公告', value: 'notice' }, { label: '博客', value: 'blog' }]" :disabled="!!editingPost" />
         </NFormItem>
-        <NFormItem label="栏目">
-          <NSelect v-model:value="postForm.category_id" :options="categoryOptions" clearable filterable placeholder="不选 = 未分类" />
+        <NFormItem label="欄目">
+          <NSelect v-model:value="postForm.category_id" :options="categoryOptions" clearable filterable placeholder="不選 = 未分類" />
         </NFormItem>
-        <NFormItem label="标题" required>
+        <NFormItem label="標題" required>
           <NInput v-model:value="postForm.title" />
         </NFormItem>
         <NFormItem label="摘要">
@@ -432,7 +432,7 @@ onMounted(() => {
         <NFormItem label="排序">
           <div class="w-full">
             <NInputNumber v-model:value="postForm.sort" :min="0" :max="2147483647" :precision="0" class="w-full" />
-            <div class="mt-6px text-12px text-gray-500">数字越小越靠前，默认 0；相同数值保留原有排序。</div>
+            <div class="mt-6px text-12px text-gray-500">數字越小越靠前，默認 0；相同數值保留原有排序。</div>
           </div>
         </NFormItem>
         <NFormItem label="正文" required>
@@ -440,38 +440,38 @@ onMounted(() => {
             <MdHtmlEditor v-if="showPost" v-model="postForm.content" height="300px" />
           </div>
         </NFormItem>
-        <NFormItem label="直接发布">
+        <NFormItem label="直接發佈">
           <NSwitch v-model:value="postForm.is_published" />
         </NFormItem>
       </NForm>
       <template #action>
         <NButton @click="showPost = false">取消</NButton>
-        <NButton type="primary" :loading="postSaving" @click="handlePost">{{ editingPost ? "保存" : "创建" }}</NButton>
+        <NButton type="primary" :loading="postSaving" @click="handlePost">{{ editingPost ? "保存" : "創建" }}</NButton>
       </template>
     </NModal>
 
-    <!-- 栏目管理（分类维度集中管理：排序/增删改） -->
-    <NModal v-model:show="showCategoryMgr" preset="dialog" title="栏目管理" style="width: 660px">
+    <!-- 欄目管理（分類維度集中管理：排序/增刪改） -->
+    <NModal v-model:show="showCategoryMgr" preset="dialog" title="欄目管理" style="width: 660px">
       <div class="flex flex-col gap-8px">
-        <div class="text-12px text-gray-400">栏目是文章的分类维度，前台文章页按栏目筛选；排序即前台展示顺序。</div>
+        <div class="text-12px text-gray-400">欄目是文章的分類維度，前台文章頁按欄目篩選；排序即前台展示順序。</div>
         <div class="flex justify-end">
-          <NButton v-if="canWrite()" size="tiny" dashed @click="openCreateCategory">+ 新增栏目</NButton>
+          <NButton v-if="canWrite()" size="tiny" dashed @click="openCreateCategory">+ 新增欄目</NButton>
         </div>
         <NDataTable :columns="categoryColumns" :data="categories" size="small" :max-height="360" />
       </div>
       <template #action>
-        <NButton @click="showCategoryMgr = false">关闭</NButton>
+        <NButton @click="showCategoryMgr = false">關閉</NButton>
       </template>
     </NModal>
 
-    <!-- 新增/编辑栏目 -->
-    <NModal v-model:show="showCategory" preset="dialog" :title="editingCategory ? `编辑栏目：${editingCategory.name}` : '新增栏目'" style="width: 420px">
+    <!-- 新增/編輯欄目 -->
+    <NModal v-model:show="showCategory" preset="dialog" :title="editingCategory ? `編輯欄目：${editingCategory.name}` : '新增欄目'" style="width: 420px">
       <NForm :model="categoryForm" label-placement="left" label-width="72">
-        <NFormItem label="名称" required>
-          <NInput v-model:value="categoryForm.name" placeholder="如 使用帮助 / 平台公告" />
+        <NFormItem label="名稱" required>
+          <NInput v-model:value="categoryForm.name" placeholder="如 使用幫助 / 平台公告" />
         </NFormItem>
         <NFormItem label="slug" :required="!editingCategory">
-          <NInput v-model:value="categoryForm.slug" placeholder="如 help（唯一标识，创建后不可改）" :disabled="!!editingCategory" />
+          <NInput v-model:value="categoryForm.slug" placeholder="如 help（唯一標識，創建後不可改）" :disabled="!!editingCategory" />
         </NFormItem>
         <NFormItem label="排序">
           <NInputNumber v-model:value="categoryForm.sort" class="w-full" :min="0" />
@@ -479,7 +479,7 @@ onMounted(() => {
       </NForm>
       <template #action>
         <NButton @click="showCategory = false">取消</NButton>
-        <NButton type="primary" :loading="categorySaving" @click="handleCategory">{{ editingCategory ? "保存" : "创建" }}</NButton>
+        <NButton type="primary" :loading="categorySaving" @click="handleCategory">{{ editingCategory ? "保存" : "創建" }}</NButton>
       </template>
     </NModal>
   </div>

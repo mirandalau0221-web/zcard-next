@@ -1,7 +1,7 @@
 package settings
 
-// 设置分组目录（）：每分组强类型默认值 + SECRET/PUBLIC 双清单 + 键校验。
-// 运行时业务开关的真理源在 settings 表（铁律 7）；本目录是「键合法性 + 默认值 + 脱敏」的唯一裁决。
+// 設置分組目錄（）：每分組強類型默認值 + SECRET/PUBLIC 雙清單 + 鍵校驗。
+// 運行時業務開關的真理源在 settings 表（鐵律 7）；本目錄是「鍵合法性 + 默認值 + 脱敏」的唯一裁決。
 
 import (
 	"encoding/json"
@@ -9,33 +9,33 @@ import (
 	"sort"
 )
 
-// GroupDef 分组定义。
+// GroupDef 分組定義。
 type GroupDef struct {
 	Name string
 	Desc string
-	// Defaults 默认值（key → JSON 值）；GetStruct 缺省回落
+	// Defaults 默認值（key → JSON 值）；GetStruct 缺省回落
 	Defaults map[string]any
-	// Labels 业务显示名称（key → 中文名；admin 列表/表单渲染，缺失回落 key 本身）
+	// Labels 業務顯示名稱（key → 中文名；admin 列表/表單渲染，缺失回落 key 本身）
 	Labels map[string]string
-	// Options 枚举选项（key → value → 展示名；admin 表单渲染下拉）
+	// Options 枚舉選項（key → value → 展示名；admin 表單渲染下拉）
 	Options map[string]map[string]string
-	// SecretKeys 敏感键：读接口脱敏 ****（写回时 **** 视为未修改），前台绝不下发
+	// SecretKeys 敏感鍵：讀接口脱敏 ****（寫回時 **** 視為未修改），前台絕不下發
 	SecretKeys map[string]bool
-	// PublicKeys 前台白名单键（GetPublicConfig 仅下发这些；不在其中的键绝不外泄）
+	// PublicKeys 前台白名單鍵（GetPublicConfig 僅下發這些；不在其中的鍵絕不外泄）
 	PublicKeys map[string]bool
 }
 
-// groups 全部分组目录（ 清裁）。
+// groups 全部分組目錄（ 清裁）。
 var groups = map[string]*GroupDef{
-	"ticket": {Name: "ticket", Desc: "工单 / TG订单通知", Labels: map[string]string{"urgent_fee": "加急费（分，0 为免费）"}, Defaults: map[string]any{"urgent_fee": 0}},
+	"ticket": {Name: "ticket", Desc: "工單 / TG訂單通知", Labels: map[string]string{"urgent_fee": "加急費（分，0 為免費）"}, Defaults: map[string]any{"urgent_fee": 0}},
 	"site": {
-		Name: "site", Desc: "站点基础",
+		Name: "site", Desc: "站點基礎",
 		Labels: map[string]string{
-			"name": "站点名称", "logo": "站点 Logo", "url": "站点地址",
-			"seo_title": "SEO 标题", "seo_keywords": "SEO 关键词", "seo_desc": "SEO 描述",
-			"verification_google": "Google 站长验证码", "verification_bing": "Bing 站长验证码",
-			"robots_custom": "robots.txt 自定义规则",
-			"admin_path":    "后台安全路径", "top_button": "顶部自定义按钮",
+			"name": "站點名稱", "logo": "站點 Logo", "url": "站點地址",
+			"seo_title": "SEO 標題", "seo_keywords": "SEO 關鍵詞", "seo_desc": "SEO 描述",
+			"verification_google": "Google 站長驗證碼", "verification_bing": "Bing 站長驗證碼",
+			"robots_custom": "robots.txt 自定義規則",
+			"admin_path":    "後台安全路徑", "top_button": "頂部自定義按鈕",
 		},
 		Defaults: map[string]any{
 			"name":                "ZCard 演示站",
@@ -48,27 +48,27 @@ var groups = map[string]*GroupDef{
 			"verification_bing":   "",
 			"robots_custom":       "",
 			"admin_path":          "",
-			"top_button":          nil, // 顶部自定义按钮 {text,url}
+			"top_button":          nil, // 頂部自定義按鈕 {text,url}
 		},
 		PublicKeys: map[string]bool{"name": true, "logo": true, "url": true, "seo_title": true, "seo_keywords": true, "seo_desc": true, "verification_google": true, "verification_bing": true, "robots_custom": true, "top_button": true},
 	},
 	"template": {
 		Name: "template", Desc: "模板",
 		Labels: map[string]string{
-			"pc_template": "商城主题（PC / 手机）", "mobile_template": "商城主题（兼容旧设置）", "bg_image": "电脑背景图", "bg_image_mobile": "手机背景图",
-			"category_nav_style": "分类导航样式", "default_view": "商品默认视图",
-			"per_row": "每行商品数", "per_page": "每页商品数", "sort_by": "默认排序方式",
-			"show_stock": "显示库存", "show_sales": "显示销量", "show_reviews": "显示评价",
+			"pc_template": "商城主題（PC / 手機）", "mobile_template": "商城主題（兼容舊設置）", "bg_image": "電腦背景圖", "bg_image_mobile": "手機背景圖",
+			"category_nav_style": "分類導航樣式", "default_view": "商品默認視圖",
+			"per_row": "每行商品數", "per_page": "每頁商品數", "sort_by": "默認排序方式",
+			"show_stock": "顯示庫存", "show_sales": "顯示銷量", "show_reviews": "顯示評價",
 		},
 		Options: map[string]map[string]string{
-			"category_nav_style": {"list": "列表", "grid": "网格"},
-			"default_view":       {"list": "列表", "grid": "网格", "big": "大图"},
+			"category_nav_style": {"list": "列表", "grid": "網格"},
+			"default_view":       {"list": "列表", "grid": "網格", "big": "大圖"},
 			"sort_by": {
-				"default":    "综合排序（默认）",
-				"sales":      "销量优先",
+				"default":    "綜合排序（默認）",
+				"sales":      "銷量優先",
 				"newest":     "最新上架",
-				"price_asc":  "价格从低到高",
-				"price_desc": "价格从高到低",
+				"price_asc":  "價格從低到高",
+				"price_desc": "價格從高到低",
 			},
 		},
 		Defaults: map[string]any{
@@ -89,10 +89,10 @@ var groups = map[string]*GroupDef{
 		PublicKeys: map[string]bool{"pc_template": true, "mobile_template": true, "bg_image": true, "bg_image_mobile": true, "category_nav_style": true, "default_view": true, "per_row": true, "per_page": true, "sort_by": true, "show_stock": true, "show_sales": true, "show_reviews": true},
 	},
 	"footer": {
-		Name: "footer", Desc: "页脚",
+		Name: "footer", Desc: "頁腳",
 		Labels: map[string]string{
-			"about": "页脚关于", "nav": "页脚导航", "agreement": "用户协议",
-			"contact": "联系方式", "social": "社交链接", "icp": "ICP 备案号",
+			"about": "頁腳關於", "nav": "頁腳導航", "agreement": "用户協議",
+			"contact": "聯繫方式", "social": "社交鏈接", "icp": "ICP 備案號",
 		},
 		Defaults: map[string]any{
 			"about":     "",
@@ -105,24 +105,24 @@ var groups = map[string]*GroupDef{
 		PublicKeys: map[string]bool{"about": true, "nav": true, "agreement": true, "contact": true, "social": true, "icp": true},
 	},
 	"promo": {
-		Name: "promo", Desc: "推荐位（落地行为 content/banners）",
-		Labels: map[string]string{"top_banner_enabled": "顶部横幅开关", "nav_recommend": "导航推荐位"},
+		Name: "promo", Desc: "推薦位（落地行為 content/banners）",
+		Labels: map[string]string{"top_banner_enabled": "頂部橫幅開關", "nav_recommend": "導航推薦位"},
 		Defaults: map[string]any{
 			"top_banner_enabled": true,
 			"nav_recommend":      nil,
 		},
 		PublicKeys: map[string]bool{"top_banner_enabled": true, "nav_recommend": true},
 	},
-	// 客户代码（service）：第三方 JS 嵌入——客服代码（悬浮球）与统计代码（页面底部）
+	// 客户代碼（service）：第三方 JS 嵌入——客服代碼（懸浮球）與統計代碼（頁面底部）
 	"service": {
-		Name: "service", Desc: "客服与统计代码",
+		Name: "service", Desc: "客服與統計代碼",
 		Labels: map[string]string{
-			"widget_script": "客服代码（Chatwoot/Crisp 等嵌入代码）",
-			"stats_script":  "统计代码（百度/GA/51la，页面底部注入）",
+			"widget_script": "客服代碼（Chatwoot/Crisp 等嵌入代碼）",
+			"stats_script":  "統計代碼（百度/GA/51la，頁面底部注入）",
 		},
 		Defaults: map[string]any{
-			"widget_script": "", // 客服嵌入代码（含 <script> 标签）；非空时前台显示第三方客服悬浮球
-			"stats_script":  "", // 统计代码（body 末尾注入；百度/GA/51la 等）
+			"widget_script": "", // 客服嵌入代碼（含 <script> 標籤）；非空時前台顯示第三方客服懸浮球
+			"stats_script":  "", // 統計代碼（body 末尾註入；百度/GA/51la 等）
 		},
 		PublicKeys: map[string]bool{
 			"widget_script": true, "stats_script": true,
@@ -131,12 +131,12 @@ var groups = map[string]*GroupDef{
 	"trade": {
 		Name: "trade", Desc: "交易",
 		Labels: map[string]string{
-			"guest_checkout": "游客下单", "contact_required": "联系方式要求", "contact_scope": "联系方式适用买家（积分兑换除外）", "query_password": "订单查询密码",
-			"order_ttl_minutes": "订单超时（分钟）", "cart_enabled": "购物车功能", "api_order_enabled": "API 下单",
+			"guest_checkout": "遊客下單", "contact_required": "聯繫方式要求", "contact_scope": "聯繫方式適用買家（積分兑換除外）", "query_password": "訂單查詢密碼",
+			"order_ttl_minutes": "訂單超時（分鐘）", "cart_enabled": "購物車功能", "api_order_enabled": "API 下單",
 		},
 		Options: map[string]map[string]string{
-			"contact_scope":    {"guest": "仅游客", "all": "所有买家"},
-			"contact_required": {"none": "不要求", "phone": "手机号", "email": "邮箱", "qq": "QQ", "any": "任意一种"},
+			"contact_scope":    {"guest": "僅遊客", "all": "所有買家"},
+			"contact_required": {"none": "不要求", "phone": "手機號", "email": "郵箱", "qq": "QQ", "any": "任意一種"},
 		},
 		Defaults: map[string]any{
 			"guest_checkout":    true,
@@ -151,17 +151,17 @@ var groups = map[string]*GroupDef{
 	"security": {
 		Name: "security", Desc: "安全",
 		Labels: map[string]string{
-			"register_enabled": "开放注册", "register_method": "注册方式（多选）",
-			"captcha_register": "注册验证码", "captcha_login": "登录验证码", "captcha_order": "下单验证码（仅游客）",
-			"captcha_reset": "重置密码验证码", "captcha_admin_login": "后台登录验证码",
-			"captcha_length": "验证码位数", "captcha_charset": "验证码字符类型",
-			"username_min_len":   "用户名最小长度",
-			"max_pending_per_ip": "单 IP 待付款订单上限", "risk_enabled": "风控拦截",
+			"register_enabled": "開放註冊", "register_method": "註冊方式（多選）",
+			"captcha_register": "註冊驗證碼", "captcha_login": "登錄驗證碼", "captcha_order": "下單驗證碼（僅遊客）",
+			"captcha_reset": "重置密碼驗證碼", "captcha_admin_login": "後台登錄驗證碼",
+			"captcha_length": "驗證碼位數", "captcha_charset": "驗證碼字符類型",
+			"username_min_len":   "用户名最小長度",
+			"max_pending_per_ip": "單 IP 待付款訂單上限", "risk_enabled": "風控攔截",
 		},
 		Options: map[string]map[string]string{
-			// 多选（数组）：勾选的通道全部可用；至少含 username 才能免验证注册
-			"register_method": {"username": "用户名", "email": "邮箱验证", "phone": "手机验证"},
-			"captcha_charset": {"digit": "纯数字", "letter": "纯字母", "mixed": "数字字母混合"},
+			// 多選（數組）：勾選的通道全部可用；至少含 username 才能免驗證註冊
+			"register_method": {"username": "用户名", "email": "郵箱驗證", "phone": "手機驗證"},
+			"captcha_charset": {"digit": "純數字", "letter": "純字母", "mixed": "數字字母混合"},
 		},
 		Defaults: map[string]any{
 			"register_enabled":    true,
@@ -179,26 +179,26 @@ var groups = map[string]*GroupDef{
 		},
 	},
 	"ops": {
-		Name: "ops", Desc: "运维",
+		Name: "ops", Desc: "運維",
 		Labels: map[string]string{
-			"maintenance": "维护模式", "maintenance_style": "维护提示样式",
-			"maintenance_modal_freq": "维护弹窗频率",
-			"announcement_type":      "公告类型", "announcement": "公告内容",
-			"installed_at": "安装时间（只读）",
+			"maintenance": "維護模式", "maintenance_style": "維護提示樣式",
+			"maintenance_modal_freq": "維護彈窗頻率",
+			"announcement_type":      "公告類型", "announcement": "公告內容",
+			"installed_at": "安裝時間（只讀）",
 		},
 		Options: map[string]map[string]string{
-			"maintenance_style": {"modal": "弹窗", "banner": "顶部横幅"},
-			// 弹窗样式下的自动弹出频率（banner 样式不生效）
-			"maintenance_modal_freq": {"every": "每次进入都弹", "daily": "24 小时内只弹一次"},
-			"announcement_type":      {"text": "文本", "image": "图片", "carousel": "轮播"},
+			"maintenance_style": {"modal": "彈窗", "banner": "頂部橫幅"},
+			// 彈窗樣式下的自動彈出頻率（banner 樣式不生效）
+			"maintenance_modal_freq": {"every": "每次進入都彈", "daily": "24 小時內只彈一次"},
+			"announcement_type":      {"text": "文本", "image": "圖片", "carousel": "輪播"},
 		},
 		Defaults: map[string]any{
 			"maintenance":            false,
 			"maintenance_style":      "modal", // modal | banner
-			"maintenance_modal_freq": "every", // every | daily（仅 modal 样式生效）
+			"maintenance_modal_freq": "every", // every | daily（僅 modal 樣式生效）
 			"announcement_type":      "text",  // text | image | carousel
 			"announcement":           "",
-			"installed_at":           nil, // 安装时间（install 写入，业务只读）
+			"installed_at":           nil, // 安裝時間（install 寫入，業務只讀）
 		},
 		PublicKeys: map[string]bool{
 			"maintenance": true, "maintenance_style": true, "maintenance_modal_freq": true,
@@ -208,8 +208,8 @@ var groups = map[string]*GroupDef{
 	"recharge": {
 		Name: "recharge", Desc: "充值",
 		Labels: map[string]string{
-			"enabled": "充值功能", "min_amount": "最小充值金额（分）",
-			"max_amount": "最大充值金额（分）", "gift_tiers": "充值赠送档位",
+			"enabled": "充值功能", "min_amount": "最小充值金額（分）",
+			"max_amount": "最大充值金額（分）", "gift_tiers": "充值贈送檔位",
 		},
 		Defaults: map[string]any{
 			"enabled":    true,
@@ -217,52 +217,52 @@ var groups = map[string]*GroupDef{
 			"max_amount": 500000,
 			"gift_tiers": nil, // [{amount,gift_balance,gift_points}]
 		},
-		// 前台公开：充值页档位/赠送规则展示（；金额裁决仍在服务端）
+		// 前台公開：充值頁檔位/贈送規則展示（；金額裁決仍在服務端）
 		PublicKeys: map[string]bool{"enabled": true, "min_amount": true, "max_amount": true, "gift_tiers": true},
 	},
 	"supplier_recharge": {
-		Name: "supplier_recharge", Desc: "供货充值",
+		Name: "supplier_recharge", Desc: "供貨充值",
 		Labels: map[string]string{
-			"enabled": "供货充值功能", "min_amount": "最小充值金额（分）",
-			"max_amount": "最大充值金额（分）",
-			"gift_tiers": "充值赠送档位",
+			"enabled": "供貨充值功能", "min_amount": "最小充值金額（分）",
+			"max_amount": "最大充值金額（分）",
+			"gift_tiers": "充值贈送檔位",
 		},
 		Defaults: map[string]any{
 			"enabled":    true,
-			"min_amount": 1000, // 分（独立于钱包充值档位）
+			"min_amount": 1000, // 分（獨立於錢包充值檔位）
 			"max_amount": 500000,
-			"gift_tiers": nil, // [{amount,gift_balance}] 充满 amount 分赠 gift_balance 分供货余额
+			"gift_tiers": nil, // [{amount,gift_balance}] 充滿 amount 分贈 gift_balance 分供貨餘額
 		},
-		// 前台公开：对接账户充值弹窗限额与赠送档位展示（金额裁决仍在服务端）
+		// 前台公開：對接賬户充值彈窗限額與贈送檔位展示（金額裁決仍在服務端）
 		PublicKeys: map[string]bool{"enabled": true, "min_amount": true, "max_amount": true, "gift_tiers": true},
 	},
 	"license": {
-		Name: "license", Desc: "订阅许可证",
+		Name: "license", Desc: "訂閲許可證",
 		Labels: map[string]string{
-			"file": "许可证内容", "pubkey": "许可证公钥", "domain": "绑定域名",
-			"instance_id": "实例 ID", "purchase_monthly_cents": "月付价格（分）",
-			"purchase_yearly_cents": "年付价格（分）", "purchase_privkey": "购买签发私钥",
+			"file": "許可證內容", "pubkey": "許可證公鑰", "domain": "綁定域名",
+			"instance_id": "實例 ID", "purchase_monthly_cents": "月付價格（分）",
+			"purchase_yearly_cents": "年付價格（分）", "purchase_privkey": "購買簽發私鑰",
 		},
 		Defaults: map[string]any{
-			"file":        "", // 许可证内容（JSON；安装时写入）
-			"pubkey":      "", // ed25519 公钥（base64；发行侧配置）
-			"domain":      "", // 主站域名（许可证绑定校验；空=跳过）
-			"instance_id": "", // 实例 ID（首次读取时生成并持久化）
-			// 在线购买（发行侧部署配置；「专业套餐可购买激活」）
+			"file":        "", // 許可證內容（JSON；安裝時寫入）
+			"pubkey":      "", // ed25519 公鑰（base64；發行側配置）
+			"domain":      "", // 主站域名（許可證綁定校驗；空=跳過）
+			"instance_id": "", // 實例 ID（首次讀取時生成並持久化）
+			// 在線購買（發行側部署配置；「專業套餐可購買激活」）
 			"purchase_monthly_cents": 300,  // 月付 3U
 			"purchase_yearly_cents":  3000, // 年付 30U
-			"purchase_privkey":       "",   // ed25519 签发私钥（base64；空=不开通在线购买）
+			"purchase_privkey":       "",   // ed25519 簽發私鑰（base64；空=不開通在線購買）
 		},
 		SecretKeys: map[string]bool{"purchase_privkey": true},
 	},
 	"withdraw": {
-		Name: "withdraw", Desc: "提现",
+		Name: "withdraw", Desc: "提現",
 		Labels: map[string]string{
-			"enabled": "提现功能", "min_amount": "最小提现金额（分）",
-			"fee_type": "手续费方式", "fee_value": "手续费值", "methods": "收款方式白名单",
+			"enabled": "提現功能", "min_amount": "最小提現金額（分）",
+			"fee_type": "手續費方式", "fee_value": "手續費值", "methods": "收款方式白名單",
 		},
 		Options: map[string]map[string]string{
-			"fee_type": {"fixed": "固定金额", "percent": "按比例"},
+			"fee_type": {"fixed": "固定金額", "percent": "按比例"},
 		},
 		Defaults: map[string]any{
 			"enabled":    false,
@@ -270,38 +270,38 @@ var groups = map[string]*GroupDef{
 			"fee_type":   "fixed", // fixed | percent
 			"fee_value":  0,
 			"methods": []map[string]string{
-				{"type": "alipay", "name": "支付宝"},
+				{"type": "alipay", "name": "支付寶"},
 				{"type": "wechat", "name": "微信"},
 				{"type": "usdt_trc20", "name": "USDT TRC20"},
-			}, // 白名单 [{type,name}]
+			}, // 白名單 [{type,name}]
 		},
 	},
 	"points": {
-		Name: "points", Desc: "积分",
+		Name: "points", Desc: "積分",
 		Labels: map[string]string{
-			"enabled": "积分功能", "deduct_rate": "积分抵现比例", "max_deduct_pct": "最大抵扣比例（%）",
+			"enabled": "積分功能", "deduct_rate": "積分抵現比例", "max_deduct_pct": "最大抵扣比例（%）",
 		},
 		Defaults: map[string]any{
 			"enabled":        true,
-			"deduct_rate":    100, // X 积分抵 1 分
-			"max_deduct_pct": 50,  // 单单最大抵扣比例
+			"deduct_rate":    100, // X 積分抵 1 分
+			"max_deduct_pct": 50,  // 單單最大抵扣比例
 		},
 	},
 	"affiliate": {
-		Name: "affiliate", Desc: "分销",
+		Name: "affiliate", Desc: "分銷",
 		PublicKeys: map[string]bool{"enabled": true, "levels": true, "base": true},
 		Labels: map[string]string{
-			"enabled": "分销功能", "levels": "分销层级",
-			"rate_l1": "L1 佣金（万分比）", "rate_l2": "L2 佣金（万分比）", "rate_l3": "L3 佣金（万分比）",
-			"base": "佣金基数", "confirm_days": "确认收货天数", "self_buy": "允许自购",
+			"enabled": "分銷功能", "levels": "分銷層級",
+			"rate_l1": "L1 佣金（萬分比）", "rate_l2": "L2 佣金（萬分比）", "rate_l3": "L3 佣金（萬分比）",
+			"base": "佣金基數", "confirm_days": "確認收貨天數", "self_buy": "允許自購",
 		},
 		Options: map[string]map[string]string{
-			"base": {"amount": "订单金额", "profit": "利润"},
+			"base": {"amount": "訂單金額", "profit": "利潤"},
 		},
 		Defaults: map[string]any{
 			"enabled":      false,
 			"levels":       3,
-			"rate_l1":      500, // 万分比
+			"rate_l1":      500, // 萬分比
 			"rate_l2":      200,
 			"rate_l3":      100,
 			"base":         "amount", // amount | profit
@@ -310,10 +310,10 @@ var groups = map[string]*GroupDef{
 		},
 	},
 	"supply": {
-		Name: "supply", Desc: "货源",
+		Name: "supply", Desc: "貨源",
 		Labels: map[string]string{
-			"import_max_lines": "导入最大行数", "low_stock_alert_enabled": "启用库存预警", "low_stock_threshold": "库存低于此数量时提醒",
-			"sync_interval_minutes": "同步间隔（分钟）",
+			"import_max_lines": "導入最大行數", "low_stock_alert_enabled": "啓用庫存預警", "low_stock_threshold": "庫存低於此數量時提醒",
+			"sync_interval_minutes": "同步間隔（分鐘）",
 		},
 		Defaults: map[string]any{
 			"import_max_lines":        100000,
@@ -323,27 +323,27 @@ var groups = map[string]*GroupDef{
 		},
 	},
 	"notify": {
-		Name: "notify", Desc: "邮件短信",
+		Name: "notify", Desc: "郵件短信",
 		Labels: map[string]string{
-			"telegram_enabled": "Telegram 通知通道", "telegram_order_enabled": "Telegram 主站订单通知", "telegram_low_stock_enabled": "Telegram 低库存通知",
+			"telegram_enabled": "Telegram 通知通道", "telegram_order_enabled": "Telegram 主站訂單通知", "telegram_low_stock_enabled": "Telegram 低庫存通知",
 			"telegram_bot_token": "Telegram Bot Token", "telegram_chat_ids": "Telegram 接收 Chat ID",
-			"telegram_events": "Telegram 订单通知事件", "telegram_targets": "Telegram 接收位置",
-			"smtp_security": "SMTP 连接方式", "smtp_auth": "SMTP 认证方式", "smtp_tls_verify": "校验 SMTP 服务器证书",
-			"smtp_host": "SMTP 服务器", "smtp_port": "SMTP 端口", "smtp_user": "SMTP 用户名",
-			"smtp_password": "SMTP 密码", "smtp_from": "发件邮箱", "smtp_name": "发件人名称",
-			"sms_provider": "短信服务商", "sms_key": "短信 AccessKey",
+			"telegram_events": "Telegram 訂單通知事件", "telegram_targets": "Telegram 接收位置",
+			"smtp_security": "SMTP 連接方式", "smtp_auth": "SMTP 認證方式", "smtp_tls_verify": "校驗 SMTP 服務器證書",
+			"smtp_host": "SMTP 服務器", "smtp_port": "SMTP 端口", "smtp_user": "SMTP 用户名",
+			"smtp_password": "SMTP 密碼", "smtp_from": "發件郵箱", "smtp_name": "發件人名稱",
+			"sms_provider": "短信服務商", "sms_key": "短信 AccessKey",
 			"sms_secret":            "短信 SecretKey",
-			"sms_sign":              "短信签名",
+			"sms_sign":              "短信簽名",
 			"sms_sdk_app_id":        "短信 SDK AppID",
 			"sms_template_code":     "短信模板 ID",
-			"sms_template_register": "注册验证码短信模板（内容需与通道模板一致；变量 {code}{minutes}{site}）",
-			"sms_template_reset":    "找回密码短信模板（内容需与通道模板一致；变量 {code}{minutes}{site}）",
+			"sms_template_register": "註冊驗證碼短信模板（內容需與通道模板一致；變量 {code}{minutes}{site}）",
+			"sms_template_reset":    "找回密碼短信模板（內容需與通道模板一致；變量 {code}{minutes}{site}）",
 		},
 		Options: map[string]map[string]string{
-			"telegram_events": {"order.created": "新订单", "order.paid": "付款成功", "order.delivered": "发货完成", "order.refunded": "退款成功"},
-			"smtp_security":   {"auto": "自动（兼容旧配置）", "plain": "普通 SMTP（不加密）", "tls": "SSL/TLS（通常 465）", "starttls": "STARTTLS（通常 587）"},
-			"smtp_auth":       {"auto": "自动", "plain": "PLAIN", "login": "LOGIN", "cram_md5": "CRAM-MD5", "none": "无需认证（中继）"},
-			"sms_provider":    {"aliyun": "阿里云短信", "tencent": "腾讯云短信", "qiniu": "七牛短信"},
+			"telegram_events": {"order.created": "新訂單", "order.paid": "付款成功", "order.delivered": "發貨完成", "order.refunded": "退款成功"},
+			"smtp_security":   {"auto": "自動（兼容舊配置）", "plain": "普通 SMTP（不加密）", "tls": "SSL/TLS（通常 465）", "starttls": "STARTTLS（通常 587）"},
+			"smtp_auth":       {"auto": "自動", "plain": "PLAIN", "login": "LOGIN", "cram_md5": "CRAM-MD5", "none": "無需認證（中繼）"},
+			"sms_provider":    {"aliyun": "阿里雲短信", "tencent": "騰訊雲短信", "qiniu": "七牛短信"},
 		},
 		Defaults: map[string]any{
 			"telegram_enabled": false, "telegram_order_enabled": false, "telegram_low_stock_enabled": false,
@@ -362,33 +362,33 @@ var groups = map[string]*GroupDef{
 			"sms_secret":      "",
 			"sms_sign":        "",
 			"sms_sdk_app_id":  "",
-			// 模板变量：{code} 验证码 {minutes} 有效分钟 {site} 站点名
+			// 模板變量：{code} 驗證碼 {minutes} 有效分鐘 {site} 站點名
 			"sms_template_code":     "",
-			"sms_template_register": "【{site}】您的注册验证码：{code}，{minutes} 分钟内有效。",
-			"sms_template_reset":    "【{site}】您正在重置密码，验证码：{code}，{minutes} 分钟内有效。",
+			"sms_template_register": "【{site}】您的註冊驗證碼：{code}，{minutes} 分鐘內有效。",
+			"sms_template_reset":    "【{site}】您正在重置密碼，驗證碼：{code}，{minutes} 分鐘內有效。",
 		},
 		SecretKeys: map[string]bool{"smtp": true, "telegram": true, "telegram_bot_token": true, "smtp_password": true, "sms_key": true, "sms_secret": true},
 	},
 	"i18n": {
-		Name: "i18n", Desc: "语言货币",
+		Name: "i18n", Desc: "語言貨幣",
 		Labels: map[string]string{
-			"default_locale": "默认语言", "enabled_locales": "启用语言列表", "base_currency": "基础货币 / 默认结算货币",
-			"display_currency": "前端显示货币",
+			"default_locale": "默認語言", "enabled_locales": "啓用語言列表", "base_currency": "基礎貨幣 / 默認結算貨幣",
+			"display_currency": "前端顯示貨幣",
 		},
 		Defaults: map[string]any{
-			"default_locale":   "zh_CN",
-			"enabled_locales":  []string{"zh_CN"},
+			"default_locale":   "zh_TW",
+			"enabled_locales":  []string{"zh_TW"},
 			"base_currency":    "CNY",
-			"display_currency": "", // 空=跟随基础货币；多币种站可设 USD 等（展示层换算，结算仍以基础币）
+			"display_currency": "", // 空=跟隨基礎貨幣；多幣種站可設 USD 等（展示層換算，結算仍以基礎幣）
 		},
 		PublicKeys: map[string]bool{"default_locale": true, "enabled_locales": true, "base_currency": true, "display_currency": true},
 	},
-	// 在线更新（）：源配置运行时可改——mode 四态
-	// （auto=直连探测不通走加速，语义「大陆才加速」）、repo/加速器列表/静态基址/通道。
+	// 在線更新（）：源配置運行時可改——mode 四態
+	// （auto=直連探測不通走加速，語義「大陸才加速」）、repo/加速器列表/靜態基址/通道。
 	"system": {
-		Name: "system", Desc: "系统更新",
+		Name: "system", Desc: "系統更新",
 		Labels: map[string]string{
-			"update": "在线更新源配置",
+			"update": "在線更新源配置",
 		},
 		Defaults: map[string]any{
 			"update": map[string]any{
@@ -396,30 +396,30 @@ var groups = map[string]*GroupDef{
 				"repo":         "NovaWorks/zcard-next",
 				"accelerators": []string{"https://gh-proxy.com", "https://ghfast.top", "https://ghproxy.net"},
 				"static_base":  "",       // source=static 必填
-				"channel":      "stable", // beta 仅 github 直连/静态源
-				"supervisor":   "auto",   // auto=探测 | systemd | supervisord | pm2 | none（探测盲区手动指定）
+				"channel":      "stable", // beta 僅 github 直連/靜態源
+				"supervisor":   "auto",   // auto=探測 | systemd | supervisord | pm2 | none（探測盲區手動指定）
 			},
 		},
 	},
 }
 
-// trade 组 PublicKeys 在 init 内补充（同文件上方字段初始化保持简洁）
+// trade 組 PublicKeys 在 init 內補充（同文件上方字段初始化保持簡潔）
 func init() {
 	groups["trade"].PublicKeys = map[string]bool{
 		"guest_checkout": true, "query_password": true, "contact_required": true, "contact_scope": true, "cart_enabled": true,
 	}
-	// withdraw 组公开键（提现页表单驱动：开关/最低额/手续费/白名单）
+	// withdraw 組公開鍵（提現頁表單驅動：開關/最低額/手續費/白名單）
 	groups["withdraw"].PublicKeys = map[string]bool{
 		"enabled": true, "min_amount": true, "fee_type": true, "fee_value": true, "methods": true,
 	}
-	// security 组公开键：注册页动态表单渲染（开关/方式）+ 图形验证码场景开关（前端条件渲染）
+	// security 組公開鍵：註冊頁動態表單渲染（開關/方式）+ 圖形驗證碼場景開關（前端條件渲染）
 	groups["security"].PublicKeys = map[string]bool{
 		"register_enabled": true, "register_method": true,
 		"captcha_register": true, "captcha_login": true, "captcha_order": true, "captcha_reset": true,
 	}
 }
 
-// mustJSON 序列化（目录默认值为字面量，序列化不会失败）。
+// mustJSON 序列化（目錄默認值為字面量，序列化不會失敗）。
 func mustJSON(v any) string {
 	b, err := json.Marshal(v)
 	if err != nil {
@@ -428,13 +428,13 @@ func mustJSON(v any) string {
 	return string(b)
 }
 
-// Group 取分组定义。
+// Group 取分組定義。
 func Group(name string) (*GroupDef, bool) {
 	g, ok := groups[name]
 	return g, ok
 }
 
-// GroupsSorted 全部分组名（稳定排序）。
+// GroupsSorted 全部分組名（穩定排序）。
 func GroupsSorted() []string {
 	out := make([]string, 0, len(groups))
 	for k := range groups {
@@ -444,31 +444,31 @@ func GroupsSorted() []string {
 	return out
 }
 
-// ValidateKey 键校验：分组存在 + 键在默认值目录内（未知键拒绝，防脏数据）。
+// ValidateKey 鍵校驗：分組存在 + 鍵在默認值目錄內（未知鍵拒絕，防髒數據）。
 func ValidateKey(group, key string) error {
 	g, ok := groups[group]
 	if !ok {
-		return fmt.Errorf("settings: 未知分组 %q（合法：%v）", group, GroupsSorted())
+		return fmt.Errorf("settings: 未知分組 %q（合法：%v）", group, GroupsSorted())
 	}
 	if _, ok := g.Defaults[key]; !ok {
-		return fmt.Errorf("settings: 分组 %q 内未知键 %q", group, key)
+		return fmt.Errorf("settings: 分組 %q 內未知鍵 %q", group, key)
 	}
 	return nil
 }
 
-// IsSecret 是否敏感键。
+// IsSecret 是否敏感鍵。
 func IsSecret(group, key string) bool {
 	g, ok := groups[group]
 	return ok && g.SecretKeys[key]
 }
 
-// IsPublic 是否前台白名单键。
+// IsPublic 是否前台白名單鍵。
 func IsPublic(group, key string) bool {
 	g, ok := groups[group]
 	return ok && g.PublicKeys[key]
 }
 
-// PublicKeysOf 分组前台键清单（测试快照用）。
+// PublicKeysOf 分組前台鍵清單（測試快照用）。
 func PublicKeysOf(group string) []string {
 	g, ok := groups[group]
 	if !ok {
@@ -482,7 +482,7 @@ func PublicKeysOf(group string) []string {
 	return out
 }
 
-// DefaultJSON 分组默认值整体 JSON（GetStruct 兜底与 install 初始写入用）。
+// DefaultJSON 分組默認值整體 JSON（GetStruct 兜底與 install 初始寫入用）。
 func (g *GroupDef) DefaultJSON(key string) (string, bool) {
 	v, ok := g.Defaults[key]
 	if !ok {

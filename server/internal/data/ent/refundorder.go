@@ -29,13 +29,13 @@ type RefundOrder struct {
 	Amount int64 `json:"amount,omitempty"`
 	// ItemAllocations holds the value of the "item_allocations" field.
 	ItemAllocations []map[string]int64 `json:"item_allocations,omitempty"`
-	// 订单范围内的退款请求幂等摘要；历史记录为空
+	// 訂單範圍內的退款請求冪等摘要；歷史記錄為空
 	RequestKey string `json:"request_key,omitempty"`
-	// 退款请求内容摘要
+	// 退款請求內容摘要
 	RequestHash string `json:"request_hash,omitempty"`
 	// ShippingAmount holds the value of the "shipping_amount" field.
 	ShippingAmount int64 `json:"shipping_amount,omitempty"`
-	// 本次退还的支付手续费（分）
+	// 本次退還的支付手續費（分）
 	FeeAmount int64 `json:"fee_amount,omitempty"`
 	// 退款通道
 	Channel refundorder.Channel `json:"channel,omitempty"`
@@ -43,9 +43,9 @@ type RefundOrder struct {
 	Status refundorder.Status `json:"status,omitempty"`
 	// Reason holds the value of the "reason" field.
 	Reason string `json:"reason,omitempty"`
-	// 操作者（需 order:refund 权限 + 二次确认 + 审计）
+	// 操作者（需 order:refund 權限 + 二次確認 + 審計）
 	OperatorID uint64 `json:"operator_id,omitempty"`
-	// 上游退款单号（传导，M2）
+	// 上游退款單號（傳導，M2）
 	UpstreamRefundID string `json:"upstream_refund_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RefundOrderQuery when eager-loading is set.

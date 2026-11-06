@@ -1,4 +1,4 @@
-// Package admincmd 运维子命令（规划 §10.3：打进同一二进制，容器免工具）。
+// Package admincmd 運維子命令（規劃 §10.3：打進同一二進制，容器免工具）。
 //
 //	zcard admin create --username admin --password <pwd> [--nickname <n>] [--role super_admin]
 //	zcard admin list
@@ -22,7 +22,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// Run admin 子命令入口（main 分发调用）。
+// Run admin 子命令入口（main 分發調用）。
 func Run(args []string) error {
 	if len(args) == 0 {
 		return usage()
@@ -43,7 +43,7 @@ func Run(args []string) error {
 }
 
 func usage() error {
-	fmt.Print(`zcard admin —— 管理员运维子命令
+	fmt.Print(`zcard admin —— 管理員運維子命令
 
 用法:
   zcard admin reset-2fa --username <u> [--conf configs] [--yes] [--dry-run]
@@ -54,13 +54,13 @@ func usage() error {
 	return nil
 }
 
-// open 打开数据层（含内置角色种子；不执行迁移——迁移由 serve/migrate 负责）。
+// open 打開數據層（含內置角色種子；不執行遷移——遷移由 serve/migrate 負責）。
 func open(confDir string) (*ent.Client, func(), error) {
 	if confDir == "" {
 		confDir = "configs"
 	}
 	bc := &conf.Bootstrap{}
-	// 复用 file source 解析
+	// 複用 file source 解析
 	if err := scanConf(confDir, bc); err != nil {
 		return nil, nil, err
 	}
@@ -73,19 +73,19 @@ func open(confDir string) (*ent.Client, func(), error) {
 
 func runCreate(args []string) error {
 	fs := flag.NewFlagSet("admin create", flag.ExitOnError)
-	confDir := fs.String("conf", "configs", "配置目录")
-	username := fs.String("username", "", "登录名")
-	password := fs.String("password", "", "密码")
-	nickname := fs.String("nickname", "", "昵称（默认同登录名）")
-	roleCode := fs.String("role", "super_admin", "角色编码（默认 super_admin）")
+	confDir := fs.String("conf", "configs", "配置目錄")
+	username := fs.String("username", "", "登錄名")
+	password := fs.String("password", "", "密碼")
+	nickname := fs.String("nickname", "", "暱稱（默認同登錄名）")
+	roleCode := fs.String("role", "super_admin", "角色編碼（默認 super_admin）")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
 	if *username == "" || *password == "" {
-		return fmt.Errorf("--username 与 --password 必填")
+		return fmt.Errorf("--username 與 --password 必填")
 	}
 	if len(*password) < 8 {
-		return fmt.Errorf("密码至少 8 位（安全基线）")
+		return fmt.Errorf("密碼至少 8 位（安全基線）")
 	}
 
 	client, cleanup, err := open(*confDir)
@@ -96,11 +96,11 @@ func runCreate(args []string) error {
 	ctx := context.Background()
 
 	if err := authz.EnsureBuiltinRoles(ctx, client); err != nil {
-		return fmt.Errorf("内置角色种子失败: %w", err)
+		return fmt.Errorf("內置角色種子失敗: %w", err)
 	}
 	role, err := client.AdminRole.Query().Where(adminrole.Code(*roleCode)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return fmt.Errorf("角色 %q 不存在（内置：super_admin/operator/support）", *roleCode)
+		return fmt.Errorf("角色 %q 不存在（內置：super_admin/operator/support）", *roleCode)
 	}
 	if err != nil {
 		return err
@@ -110,7 +110,7 @@ func runCreate(args []string) error {
 		return err
 	}
 	if exists {
-		return fmt.Errorf("管理员 %q 已存在", *username)
+		return fmt.Errorf("管理員 %q 已存在", *username)
 	}
 	hash, err := crypto.HashPassword(*password)
 	if err != nil {
@@ -129,13 +129,13 @@ func runCreate(args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("管理员创建成功：%s（角色 %s，ID %d）\n", u.Username, role.Name, u.ID)
+	fmt.Printf("管理員創建成功：%s（角色 %s，ID %d）\n", u.Username, role.Name, u.ID)
 	return nil
 }
 
 func runList(args []string) error {
 	fs := flag.NewFlagSet("admin list", flag.ExitOnError)
-	confDir := fs.String("conf", "configs", "配置目录")
+	confDir := fs.String("conf", "configs", "配置目錄")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func runList(args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%-4s %-20s %-12s %-8s %-10s\n", "ID", "用户名", "昵称", "启用", "最近登录")
+	fmt.Printf("%-4s %-20s %-12s %-8s %-10s\n", "ID", "用户名", "暱稱", "啓用", "最近登錄")
 	for _, r := range rows {
 		last := "-"
 		if !r.LastLoginAt.IsZero() {
@@ -161,17 +161,17 @@ func runList(args []string) error {
 
 func runResetPassword(args []string) error {
 	fs := flag.NewFlagSet("admin reset-password", flag.ExitOnError)
-	confDir := fs.String("conf", "configs", "配置目录")
-	username := fs.String("username", "", "登录名")
-	password := fs.String("password", "", "新密码")
+	confDir := fs.String("conf", "configs", "配置目錄")
+	username := fs.String("username", "", "登錄名")
+	password := fs.String("password", "", "新密碼")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
 	if *username == "" || *password == "" {
-		return fmt.Errorf("--username 与 --password 必填")
+		return fmt.Errorf("--username 與 --password 必填")
 	}
 	if len(*password) < 8 {
-		return fmt.Errorf("密码至少 8 位（安全基线）")
+		return fmt.Errorf("密碼至少 8 位（安全基線）")
 	}
 	client, cleanup, err := open(*confDir)
 	if err != nil {
@@ -181,7 +181,7 @@ func runResetPassword(args []string) error {
 	ctx := context.Background()
 	u, err := client.AdminUser.Query().Where(adminuser.Username(*username)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return fmt.Errorf("管理员 %q 不存在", *username)
+		return fmt.Errorf("管理員 %q 不存在", *username)
 	}
 	if err != nil {
 		return err
@@ -189,7 +189,7 @@ func runResetPassword(args []string) error {
 	if err := identity.NewAdminUserRepoImpl(&data.Data{Client: client}).ResetPassword(ctx, u.ID, *password); err != nil {
 		return err
 	}
-	fmt.Printf("密码已重置：%s\n", u.Username)
+	fmt.Printf("密碼已重置：%s\n", u.Username)
 	return nil
 }
 

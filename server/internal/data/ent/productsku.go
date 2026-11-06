@@ -23,25 +23,25 @@ type ProductSku struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
-	// 所属商品（硬外键 → products）
+	// 所屬商品（硬外鍵 → products）
 	ProductID uint64 `json:"product_id,omitempty"`
 	// PhysicalStock holds the value of the "physical_stock" field.
 	PhysicalStock int64 `json:"physical_stock,omitempty"`
-	// 规格名（如「月卡」）
+	// 規格名（如「月卡」）
 	Name string `json:"name,omitempty"`
-	// 规格值组合 {规格: 值}
+	// 規格值組合 {規格: 值}
 	SpecValues map[string]string `json:"spec_values,omitempty"`
-	// 独立售价（分，NULL=继承商品价）
+	// 獨立售價（分，NULL=繼承商品價）
 	Price int64 `json:"price,omitempty"`
-	// 独立成本（分）
+	// 獨立成本（分）
 	Cost int64 `json:"cost,omitempty"`
 	// FulfillmentMode holds the value of the "fulfillment_mode" field.
 	FulfillmentMode string `json:"fulfillment_mode,omitempty"`
-	// 独立库存位
+	// 獨立庫存位
 	StockOffset int32 `json:"stock_offset,omitempty"`
-	// 上游 SKU 标识（M2）
+	// 上游 SKU 標識（M2）
 	UpstreamSkuID string `json:"upstream_sku_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProductSkuQuery when eager-loading is set.

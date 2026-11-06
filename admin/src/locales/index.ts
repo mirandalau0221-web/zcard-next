@@ -3,8 +3,12 @@ import { createI18n } from "vue-i18n";
 import { localStg } from "@/utils/storage";
 import messages from "./locale";
 
+// Legacy stored preference "zh-CN" resolves to Traditional Chinese now.
+const storedLang = localStg.get("lang");
+const initialLang = (storedLang === "zh-CN" ? "zh-TW" : storedLang || "zh-TW") as App.I18n.LangType;
+
 const i18n = createI18n({
-  locale: localStg.get("lang") || "zh-CN",
+  locale: initialLang,
   fallbackLocale: "en",
   messages,
   legacy: false,

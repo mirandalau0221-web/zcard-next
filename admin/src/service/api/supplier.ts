@@ -1,5 +1,5 @@
-// 供货账号 API（supplier:read / supplier:write）：下游账户（含 B/C 兼容账号）、
-// 审核/启停/充值、账本、回调记录。
+// 供貨賬號 API（supplier:read / supplier:write）：下游賬户（含 B/C 兼容賬號）、
+// 審核/啓停/充值、賬本、回調記錄。
 
 import { request } from "../request";
 
@@ -12,7 +12,7 @@ export function createSupplierAccount(data: {
   api_key: string;
   api_secret: string;
   contact?: string;
-  protocol?: string; // zcard（默认）| dujiao_next | acg_faka（兼容账号）
+  protocol?: string; // zcard（默認）| dujiao_next | acg_faka（兼容賬號）
   display_name?: string;
 }) {
   return request({ url: "/api/v1/admin/supplier/accounts", method: "post", data });
@@ -47,7 +47,7 @@ export function resendSupplierCallback(id: number) {
 }
 
 export function upsertSupplierPrice(data: { account_id: number; product_id: number; sku_id?: number; price: number; scope?: string; category_id?: number; discount_bps?: number }) {
-  // price 单位分（界面输入元，提交前换算）
+  // price 單位分（界面輸入元，提交前換算）
   return request({ url: "/api/v1/admin/supplier/prices", method: "post", data });
 }
 

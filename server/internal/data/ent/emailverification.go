@@ -17,13 +17,13 @@ type EmailVerification struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// 目标地址（邮箱或手机号；purpose 区分通道）
+	// 目標地址（郵箱或手機號；purpose 區分通道）
 	Email string `json:"email,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uint64 `json:"user_id,omitempty"`
 	// Purpose holds the value of the "purpose" field.
 	Purpose emailverification.Purpose `json:"purpose,omitempty"`
-	// 验证码哈希
+	// 驗證碼哈希
 	CodeHash string `json:"code_hash,omitempty"`
 	// ExpiresAt holds the value of the "expires_at" field.
 	ExpiresAt time.Time `json:"expires_at,omitempty"`

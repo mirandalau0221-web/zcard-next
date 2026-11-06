@@ -29,12 +29,12 @@ type ListOrdersRequest struct {
 	Status         string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	Cursor         uint64                 `protobuf:"varint,2,opt,name=cursor,proto3" json:"cursor,omitempty"`
 	Limit          int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
-	Keyword        string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"` // 订单号或联系方式（包含匹配）。
+	Keyword        string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"` // 訂單號或聯繫方式（包含匹配）。
 	StartTime      int64                  `protobuf:"varint,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime        int64                  `protobuf:"varint,6,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	TimeField      string                 `protobuf:"bytes,7,opt,name=time_field,json=timeField,proto3" json:"time_field,omitempty"` // created/paid
 	ChannelId      uint64                 `protobuf:"varint,8,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
-	ChannelCode    string                 `protobuf:"bytes,9,opt,name=channel_code,json=channelCode,proto3" json:"channel_code,omitempty"` // 历史无 channel_id 流水
+	ChannelCode    string                 `protobuf:"bytes,9,opt,name=channel_code,json=channelCode,proto3" json:"channel_code,omitempty"` // 歷史無 channel_id 流水
 	ProductId      uint64                 `protobuf:"varint,10,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -243,7 +243,7 @@ func (x *GetAdminOrderRequest) GetOrderNo() string {
 	return ""
 }
 
-// AdminOrder 管理面订单（含成本；StripCostPrice 由 service 判权限）。
+// AdminOrder 管理面訂單（含成本；StripCostPrice 由 service 判權限）。
 type AdminOrder struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	ShippingStatus   string                 `protobuf:"bytes,40,opt,name=shipping_status,json=shippingStatus,proto3" json:"shipping_status,omitempty"`
@@ -519,7 +519,7 @@ type AdminOrderItem struct {
 	InventoryTracked      *bool                  `protobuf:"varint,39,opt,name=inventory_tracked,json=inventoryTracked,proto3,oneof" json:"inventory_tracked,omitempty"`
 	FormAnswersJson       string                 `protobuf:"bytes,18,opt,name=form_answers_json,json=formAnswersJson,proto3" json:"form_answers_json,omitempty"`
 	AssignedAdminId       uint64                 `protobuf:"varint,19,opt,name=assigned_admin_id,json=assignedAdminId,proto3" json:"assigned_admin_id,omitempty"`
-	Id                    uint64                 `protobuf:"varint,17,opt,name=id,proto3" json:"id,omitempty"` // 订单商品项 ID，人工补发使用
+	Id                    uint64                 `protobuf:"varint,17,opt,name=id,proto3" json:"id,omitempty"` // 訂單商品項 ID，人工補發使用
 	ProductId             uint64                 `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	SkuId                 uint64                 `protobuf:"varint,2,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
 	Quantity              int32                  `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
@@ -527,14 +527,14 @@ type AdminOrderItem struct {
 	AmountCents           int64                  `protobuf:"varint,5,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
 	FulfillmentType       string                 `protobuf:"bytes,6,opt,name=fulfillment_type,json=fulfillmentType,proto3" json:"fulfillment_type,omitempty"`
 	FulfillmentStatus     string                 `protobuf:"bytes,7,opt,name=fulfillment_status,json=fulfillmentStatus,proto3" json:"fulfillment_status,omitempty"`
-	Name                  string                 `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`                                                             // 商品名（联查当前）
+	Name                  string                 `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`                                                             // 商品名（聯查當前）
 	SkuName               string                 `protobuf:"bytes,9,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`                                        // SKU 名快照
 	CostCents             int64                  `protobuf:"varint,10,opt,name=cost_cents,json=costCents,proto3" json:"cost_cents,omitempty"`                                // 成本快照（分）
-	IsSelf                bool                   `protobuf:"varint,11,opt,name=is_self,json=isSelf,proto3" json:"is_self,omitempty"`                                         // 自营（upstream_source_id 为空）
-	UpstreamSourceId      uint64                 `protobuf:"varint,12,opt,name=upstream_source_id,json=upstreamSourceId,proto3" json:"upstream_source_id,omitempty"`         // 货源连接 ID
+	IsSelf                bool                   `protobuf:"varint,11,opt,name=is_self,json=isSelf,proto3" json:"is_self,omitempty"`                                         // 自營（upstream_source_id 為空）
+	UpstreamSourceId      uint64                 `protobuf:"varint,12,opt,name=upstream_source_id,json=upstreamSourceId,proto3" json:"upstream_source_id,omitempty"`         // 貨源連接 ID
 	UpstreamSourceName    string                 `protobuf:"bytes,13,opt,name=upstream_source_name,json=upstreamSourceName,proto3" json:"upstream_source_name,omitempty"`    // 上游渠道名
-	UpstreamDriver        string                 `protobuf:"bytes,14,opt,name=upstream_driver,json=upstreamDriver,proto3" json:"upstream_driver,omitempty"`                  // 上游驱动（zcard/dujiao_next/acg_faka）
-	UpstreamProductCode   string                 `protobuf:"bytes,15,opt,name=upstream_product_code,json=upstreamProductCode,proto3" json:"upstream_product_code,omitempty"` // 上游商品标识
+	UpstreamDriver        string                 `protobuf:"bytes,14,opt,name=upstream_driver,json=upstreamDriver,proto3" json:"upstream_driver,omitempty"`                  // 上游驅動（zcard/dujiao_next/acg_faka）
+	UpstreamProductCode   string                 `protobuf:"bytes,15,opt,name=upstream_product_code,json=upstreamProductCode,proto3" json:"upstream_product_code,omitempty"` // 上游商品標識
 	UpstreamUrl           string                 `protobuf:"bytes,16,opt,name=upstream_url,json=upstreamUrl,proto3" json:"upstream_url,omitempty"`                           // 上游地址（base_url）
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache

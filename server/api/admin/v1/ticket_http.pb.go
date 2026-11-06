@@ -25,15 +25,15 @@ const OperationAdminTicketServiceReplyTicket = "/zcard.api.admin.v1.AdminTicketS
 const OperationAdminTicketServiceResolveTicket = "/zcard.api.admin.v1.AdminTicketService/ResolveTicket"
 
 type AdminTicketServiceHTTPServer interface {
-	// CloseTicket CloseTicket 关闭。
+	// CloseTicket CloseTicket 關閉。
 	CloseTicket(context.Context, *TicketNoRequest) (*emptypb.Empty, error)
-	// GetTicket GetTicket 详情（含内部备注——客服侧全量）。
+	// GetTicket GetTicket 詳情（含內部備註——客服側全量）。
 	GetTicket(context.Context, *GetTicketRequest) (*GetTicketReply, error)
-	// ListTickets ListTickets 工作台列表（urgent_paid 置顶 → 高 → 中 → 低；状态/类型/订单筛选）。
+	// ListTickets ListTickets 工作台列表（urgent_paid 置頂 → 高 → 中 → 低；狀態/類型/訂單篩選）。
 	ListTickets(context.Context, *ListTicketsRequest) (*ListTicketsReply, error)
-	// ReplyTicket ReplyTicket 客服回复（可内部备注）。
+	// ReplyTicket ReplyTicket 客服回覆（可內部備註）。
 	ReplyTicket(context.Context, *AdminReplyRequest) (*emptypb.Empty, error)
-	// ResolveTicket ResolveTicket 解决。
+	// ResolveTicket ResolveTicket 解決。
 	ResolveTicket(context.Context, *TicketNoRequest) (*emptypb.Empty, error)
 }
 
@@ -154,15 +154,15 @@ func _AdminTicketService_CloseTicket0_HTTP_Handler(srv AdminTicketServiceHTTPSer
 }
 
 type AdminTicketServiceHTTPClient interface {
-	// CloseTicket CloseTicket 关闭。
+	// CloseTicket CloseTicket 關閉。
 	CloseTicket(ctx context.Context, req *TicketNoRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// GetTicket GetTicket 详情（含内部备注——客服侧全量）。
+	// GetTicket GetTicket 詳情（含內部備註——客服側全量）。
 	GetTicket(ctx context.Context, req *GetTicketRequest, opts ...http.CallOption) (rsp *GetTicketReply, err error)
-	// ListTickets ListTickets 工作台列表（urgent_paid 置顶 → 高 → 中 → 低；状态/类型/订单筛选）。
+	// ListTickets ListTickets 工作台列表（urgent_paid 置頂 → 高 → 中 → 低；狀態/類型/訂單篩選）。
 	ListTickets(ctx context.Context, req *ListTicketsRequest, opts ...http.CallOption) (rsp *ListTicketsReply, err error)
-	// ReplyTicket ReplyTicket 客服回复（可内部备注）。
+	// ReplyTicket ReplyTicket 客服回覆（可內部備註）。
 	ReplyTicket(ctx context.Context, req *AdminReplyRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ResolveTicket ResolveTicket 解决。
+	// ResolveTicket ResolveTicket 解決。
 	ResolveTicket(ctx context.Context, req *TicketNoRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
@@ -174,7 +174,7 @@ func NewAdminTicketServiceHTTPClient(client *http.Client) AdminTicketServiceHTTP
 	return &AdminTicketServiceHTTPClientImpl{client}
 }
 
-// CloseTicket CloseTicket 关闭。
+// CloseTicket CloseTicket 關閉。
 func (c *AdminTicketServiceHTTPClientImpl) CloseTicket(ctx context.Context, in *TicketNoRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/tickets/{ticket_no}/close"
@@ -192,7 +192,7 @@ func (c *AdminTicketServiceHTTPClientImpl) CloseTicket(ctx context.Context, in *
 	return &out, nil
 }
 
-// GetTicket GetTicket 详情（含内部备注——客服侧全量）。
+// GetTicket GetTicket 詳情（含內部備註——客服側全量）。
 func (c *AdminTicketServiceHTTPClientImpl) GetTicket(ctx context.Context, in *GetTicketRequest, opts ...http.CallOption) (*GetTicketReply, error) {
 	var out GetTicketReply
 	pattern := "/api/v1/admin/tickets/{ticket_no}"
@@ -209,7 +209,7 @@ func (c *AdminTicketServiceHTTPClientImpl) GetTicket(ctx context.Context, in *Ge
 	return &out, nil
 }
 
-// ListTickets ListTickets 工作台列表（urgent_paid 置顶 → 高 → 中 → 低；状态/类型/订单筛选）。
+// ListTickets ListTickets 工作台列表（urgent_paid 置頂 → 高 → 中 → 低；狀態/類型/訂單篩選）。
 func (c *AdminTicketServiceHTTPClientImpl) ListTickets(ctx context.Context, in *ListTicketsRequest, opts ...http.CallOption) (*ListTicketsReply, error) {
 	var out ListTicketsReply
 	pattern := "/api/v1/admin/tickets"
@@ -226,7 +226,7 @@ func (c *AdminTicketServiceHTTPClientImpl) ListTickets(ctx context.Context, in *
 	return &out, nil
 }
 
-// ReplyTicket ReplyTicket 客服回复（可内部备注）。
+// ReplyTicket ReplyTicket 客服回覆（可內部備註）。
 func (c *AdminTicketServiceHTTPClientImpl) ReplyTicket(ctx context.Context, in *AdminReplyRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/tickets/{ticket_no}/reply"
@@ -244,7 +244,7 @@ func (c *AdminTicketServiceHTTPClientImpl) ReplyTicket(ctx context.Context, in *
 	return &out, nil
 }
 
-// ResolveTicket ResolveTicket 解决。
+// ResolveTicket ResolveTicket 解決。
 func (c *AdminTicketServiceHTTPClientImpl) ResolveTicket(ctx context.Context, in *TicketNoRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/tickets/{ticket_no}/resolve"

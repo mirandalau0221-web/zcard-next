@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * 列表快捷筛选卡片（GitHub issues / Stripe 筛选 pill 交互）：
- * 状态等低基数维度一点即筛，替代下拉的「点开-选择-收起」三步；选中项以主题色
- * 胶囊高亮，语义色圆点常显（Linear/Notion 状态点惯例）；counts 可选展示计数。
- * 语义色取 Naive 主题变量（跟随主题配置，非硬编码）；change 统一触发重查。
+ * 列表快捷篩選卡片（GitHub issues / Stripe 篩選 pill 交互）：
+ * 狀態等低基數維度一點即篩，替代下拉的「點開-選擇-收起」三步；選中項以主題色
+ * 膠囊高亮，語義色圓點常顯（Linear/Notion 狀態點慣例）；counts 可選展示計數。
+ * 語義色取 Naive 主題變量（跟隨主題配置，非硬編碼）；change 統一觸發重查。
  */
 import { computed } from "vue";
 import { useThemeVars } from "naive-ui";
@@ -11,7 +11,7 @@ import { useThemeVars } from "naive-ui";
 interface FilterTabOption {
   label: string;
   value: string | number;
-  /** 语义色（状态圆点 + 选中态描边/文字）；缺省用主题色 */
+  /** 語義色（狀態圓點 + 選中態描邊/文字）；缺省用主題色 */
   type?: "default" | "primary" | "success" | "warning" | "error" | "info";
 }
 
@@ -19,7 +19,7 @@ const props = withDefaults(
   defineProps<{
     value: string | number;
     options: FilterTabOption[];
-    /** value 字符串键 → 条数（客户端筛选场景可传，服务端无计数接口省略） */
+    /** value 字符串鍵 → 條數（客户端篩選場景可傳，服務端無計數接口省略） */
     counts?: Record<string, number>;
     size?: "small" | "medium";
   }>(),
@@ -46,7 +46,7 @@ function colorOf(opt: FilterTabOption): string {
   return typeColor.value[opt.type ?? "primary"] || vars.value.primaryColor;
 }
 
-// 选中态：主题色描边 + 文字 + 同色 10% 洗底（hex → rgba，避免硬编码色值）
+// 選中態：主題色描邊 + 文字 + 同色 10% 洗底（hex → rgba，避免硬編碼色值）
 function styleOf(opt: FilterTabOption) {
   if (opt.value !== props.value) return undefined;
   const c = colorOf(opt);

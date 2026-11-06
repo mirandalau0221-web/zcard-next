@@ -8,7 +8,7 @@ export function useAuth() {
       return false;
     }
 
-    // buttons = profile 下发的权限点码；"*" 为超管通配（与后端 authz.Allowed 同语义）
+    // buttons = profile 下發的權限點碼；"*" 為超管通配（與後端 authz.Allowed 同語義）
     const buttons = authStore.userInfo.buttons;
 
     if (buttons.includes("*")) {

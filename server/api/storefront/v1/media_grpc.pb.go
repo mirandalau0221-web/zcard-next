@@ -26,9 +26,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreMediaService 前台媒体（登录态；收款码上传——复用 media 安全三件套）。
+// StoreMediaService 前台媒體（登錄態；收款碼上傳——複用 media 安全三件套）。
 type StoreMediaServiceClient interface {
-	// Upload base64 上传（图片白名单/魔数/重编码；≤2MB）。
+	// Upload base64 上傳（圖片白名單/魔數/重編碼；≤2MB）。
 	Upload(ctx context.Context, in *StoreUploadRequest, opts ...grpc.CallOption) (*StoreUploadReply, error)
 }
 
@@ -54,9 +54,9 @@ func (c *storeMediaServiceClient) Upload(ctx context.Context, in *StoreUploadReq
 // All implementations must embed UnimplementedStoreMediaServiceServer
 // for forward compatibility.
 //
-// StoreMediaService 前台媒体（登录态；收款码上传——复用 media 安全三件套）。
+// StoreMediaService 前台媒體（登錄態；收款碼上傳——複用 media 安全三件套）。
 type StoreMediaServiceServer interface {
-	// Upload base64 上传（图片白名单/魔数/重编码；≤2MB）。
+	// Upload base64 上傳（圖片白名單/魔數/重編碼；≤2MB）。
 	Upload(context.Context, *StoreUploadRequest) (*StoreUploadReply, error)
 	mustEmbedUnimplementedStoreMediaServiceServer()
 }

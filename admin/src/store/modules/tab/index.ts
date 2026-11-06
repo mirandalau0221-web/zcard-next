@@ -77,7 +77,7 @@ export const useTabStore = defineStore(SetupStoreId.Tab, () => {
    * @param active Whether to activate the added tab
    */
   function addTab(route: App.Global.TabRoute, active = true) {
-    // 非业务路由（constant 空白布局页：login/403/404/500）不入标签栏
+    // 非業務路由（constant 空白布局頁：login/403/404/500）不入標籤欄
     if (route.meta?.constant) return;
 
     const tab = getTabByRoute(route);

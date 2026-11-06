@@ -1,7 +1,7 @@
 package schema
 
-// 所有权：mods/identity（P0-02）/ mods/audit（P2-06）
-// 字段对齐《数据库架构设计.md》§4/§5；业务功能按各任务书里程碑开发。
+// 所有權：mods/identity（P0-02）/ mods/audit（P2-06）
+// 字段對齊《數據庫架構設計.md》§4/§5；業務功能按各任務書里程碑開發。
 
 import (
 	"entgo.io/ent"
@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// Session 会话（access/refresh 双令牌中的 refresh 载体：14d 轮换、一次性、可吊销）。
+// Session 會話（access/refresh 雙令牌中的 refresh 載體：14d 輪換、一次性、可吊銷）。
 type Session struct {
 	ent.Schema
 }
@@ -17,9 +17,9 @@ type Session struct {
 func (Session) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.Enum("realm").Values("admin", "user").Comment("双 realm：admin_users.id 或 users.id"),
+		field.Enum("realm").Values("admin", "user").Comment("雙 realm：admin_users.id 或 users.id"),
 		field.Uint64("user_id").Comment("按 realm 指向 admin_users/users"),
-		field.String("refresh_token_hash").MaxLen(128).Comment("refresh 令牌哈希（SHA-256，明文绝不落库）"),
+		field.String("refresh_token_hash").MaxLen(128).Comment("refresh 令牌哈希（SHA-256，明文絕不落庫）"),
 		field.Int("auth_version").Default(0),
 		field.String("device").MaxLen(120).Optional(),
 		field.String("ip").MaxLen(64).Optional(),
@@ -39,7 +39,7 @@ func (Session) Indexes() []ent.Index {
 	}
 }
 
-// UserGroup 1.x 用户组兼容映射表：仅 migrate-from-v1 写入、memberlevel 读取，业务不写。
+// UserGroup 1.x 用户組兼容映射表：僅 migrate-from-v1 寫入、memberlevel 讀取，業務不寫。
 type UserGroup struct {
 	ent.Schema
 }
@@ -49,13 +49,13 @@ func (UserGroup) Mixin() []ent.Mixin { return []ent.Mixin{TimeMixin{}} }
 func (UserGroup) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.String("code").MaxLen(60).Unique().Comment("1.x 组标识"),
+		field.String("code").MaxLen(60).Unique().Comment("1.x 組標識"),
 		field.String("name").MaxLen(60),
 		field.Uint64("level_id").Optional().Comment("映射 member_levels.id"),
 	}
 }
 
-// ExternalIdentity 第三方登录绑定（UNIQUE(provider, provider_user_id)；M3 接 OAuth）。
+// ExternalIdentity 第三方登錄綁定（UNIQUE(provider, provider_user_id)；M3 接 OAuth）。
 type ExternalIdentity struct {
 	ent.Schema
 }
@@ -81,8 +81,8 @@ func (ExternalIdentity) Indexes() []ent.Index {
 	}
 }
 
-// EmailVerification 邮箱/短信验证码（purpose 区分注册/手机注册/找回；attempt 上限防爆破。
-// email 列复用为目标地址：邮箱地址或手机号——purpose 隔离通道）。
+// EmailVerification 郵箱/短信驗證碼（purpose 區分註冊/手機註冊/找回；attempt 上限防爆破。
+// email 列複用為目標地址：郵箱地址或手機號——purpose 隔離通道）。
 type EmailVerification struct {
 	ent.Schema
 }
@@ -90,10 +90,10 @@ type EmailVerification struct {
 func (EmailVerification) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.String("email").MaxLen(255).Comment("目标地址（邮箱或手机号；purpose 区分通道）"),
+		field.String("email").MaxLen(255).Comment("目標地址（郵箱或手機號；purpose 區分通道）"),
 		field.Uint64("user_id").Optional(),
 		field.Enum("purpose").Values("register", "phone_register", "reset", "order_access"),
-		field.String("code_hash").MaxLen(128).Comment("验证码哈希"),
+		field.String("code_hash").MaxLen(128).Comment("驗證碼哈希"),
 		field.Time("expires_at").SchemaType(mysqlTime),
 		field.Time("verified_at").SchemaType(mysqlTime).Optional(),
 		field.Int32("attempt_count").Default(0),
@@ -107,7 +107,7 @@ func (EmailVerification) Indexes() []ent.Index {
 	}
 }
 
-// AuditLog 管理员操作审计（变更类 admin 操作：操作者/权限点/前后快照/IP）。
+// AuditLog 管理員操作審計（變更類 admin 操作：操作者/權限點/前後快照/IP）。
 type AuditLog struct {
 	ent.Schema
 }
@@ -120,8 +120,8 @@ func (AuditLog) Fields() []ent.Field {
 		field.String("permission_point").MaxLen(100).Optional(),
 		field.String("action").MaxLen(10).Comment("POST/PUT/DELETE"),
 		field.String("route").MaxLen(255),
-		field.JSON("before", map[string]any{}).Optional().Comment("变更前快照"),
-		field.JSON("after", map[string]any{}).Optional().Comment("变更后快照"),
+		field.JSON("before", map[string]any{}).Optional().Comment("變更前快照"),
+		field.JSON("after", map[string]any{}).Optional().Comment("變更後快照"),
 		field.String("ip").MaxLen(64).Optional(),
 		field.String("user_agent").MaxLen(255).Optional(),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
@@ -135,7 +135,7 @@ func (AuditLog) Indexes() []ent.Index {
 	}
 }
 
-// SecurityAuditLog 安全审计（登录失败/异地/敏感操作——解密/取货/导出/权限变更/密钥轮换）。
+// SecurityAuditLog 安全審計（登錄失敗/異地/敏感操作——解密/取貨/導出/權限變更/密鑰輪換）。
 type SecurityAuditLog struct {
 	ent.Schema
 }
@@ -147,7 +147,7 @@ func (SecurityAuditLog) Fields() []ent.Field {
 		field.Uint64("actor_id").Optional(),
 		field.String("action").MaxLen(255).Comment("事件名（identity.login_failed / card.decrypt ...）"),
 		field.String("ip").MaxLen(64).Optional(),
-		field.JSON("metadata", map[string]any{}).Optional().Comment("关键 ID 等（明文卡密/凭据绝不入内）"),
+		field.JSON("metadata", map[string]any{}).Optional().Comment("關鍵 ID 等（明文卡密/憑據絕不入內）"),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
 	}
 }
@@ -159,7 +159,7 @@ func (SecurityAuditLog) Indexes() []ent.Index {
 	}
 }
 
-// VisitLog 访问统计（轻量聚合：按小时×路径聚合行，不记明细）。
+// VisitLog 訪問統計（輕量聚合：按小時×路徑聚合行，不記明細）。
 type VisitLog struct {
 	ent.Schema
 }
@@ -172,7 +172,7 @@ func (VisitLog) Fields() []ent.Field {
 		field.Uint64("subsite_id").Default(0),
 		field.String("stat_date").MaxLen(8).Comment("yyyymmdd"),
 		field.Int8("stat_hour").Comment("0-23"),
-		field.String("path").MaxLen(255).Comment("路径或来源标识"),
+		field.String("path").MaxLen(255).Comment("路徑或來源標識"),
 		field.Int64("pv").Default(0),
 		field.Int64("uv").Default(0),
 	}
@@ -184,9 +184,9 @@ func (VisitLog) Indexes() []ent.Index {
 	}
 }
 
-// RiskLockKey 风控锁定（IP 维度哈希键 + TTL；下单 pending 闸门/取货失败锁定）。
-// 注：库文档写 key_hash 为主键，实现取 uint64 自增主键 + key_hash 唯一索引
-// （与全库主键策略一致，唯一性语义等价）。
+// RiskLockKey 風控鎖定（IP 維度哈希鍵 + TTL；下單 pending 閘門/取貨失敗鎖定）。
+// 注：庫文檔寫 key_hash 為主鍵，實現取 uint64 自增主鍵 + key_hash 唯一索引
+// （與全庫主鍵策略一致，唯一性語義等價）。
 type RiskLockKey struct {
 	ent.Schema
 }
@@ -194,9 +194,9 @@ type RiskLockKey struct {
 func (RiskLockKey) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.String("key_hash").MaxLen(128).Comment("锁定键哈希（IP/订单维度，命名空间前缀）"),
-		field.Int("failure_count").Default(5).Comment("连续失败次数；默认5保留升级前已有锁定"),
-		field.Time("expires_at").SchemaType(mysqlTime).Comment("TTL 过期自动失效"),
+		field.String("key_hash").MaxLen(128).Comment("鎖定鍵哈希（IP/訂單維度，命名空間前綴）"),
+		field.Int("failure_count").Default(5).Comment("連續失敗次數；默認5保留升級前已有鎖定"),
+		field.Time("expires_at").SchemaType(mysqlTime).Comment("TTL 過期自動失效"),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
 	}
 }

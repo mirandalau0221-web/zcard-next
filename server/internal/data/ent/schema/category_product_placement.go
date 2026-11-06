@@ -1,6 +1,6 @@
 package schema
 
-// 所有权：mods/catalog。分类内运营配置与商品所属分类、首页推荐独立。
+// 所有權：mods/catalog。分類內運營配置與商品所屬分類、首頁推薦獨立。
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"

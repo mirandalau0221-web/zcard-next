@@ -23,7 +23,7 @@ type Media struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID uint64 `json:"category_id,omitempty"`
-	// 相对存储根（uploads/YYYY/MM/随机名）
+	// 相對存儲根（uploads/YYYY/MM/隨機名）
 	Path string `json:"path,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
@@ -35,11 +35,11 @@ type Media struct {
 	Width int32 `json:"width,omitempty"`
 	// Height holds the value of the "height" field.
 	Height int32 `json:"height,omitempty"`
-	// 秒传去重
+	// 秒傳去重
 	Sha256 string `json:"sha256,omitempty"`
 	// Storage holds the value of the "storage" field.
 	Storage media.Storage `json:"storage,omitempty"`
-	// 引用计数（删除需 confirm）
+	// 引用計數（刪除需 confirm）
 	RefCount int32 `json:"ref_count,omitempty"`
 	// UploaderID holds the value of the "uploader_id" field.
 	UploaderID   uint64 `json:"uploader_id,omitempty"`

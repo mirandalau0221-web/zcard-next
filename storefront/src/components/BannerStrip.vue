@@ -3,7 +3,7 @@
     <component :is="banner.link_type === 'notice' || banner.link_value ? 'button' : 'div'"
       v-for="banner in banners" :key="banner.id" class="banner-item"
       :type="banner.link_type === 'notice' || banner.link_value ? 'button' : undefined"
-      :aria-label="banner.title || $t('查看横幅内容')" @click="$emit('open', banner)">
+      :aria-label="banner.title || $t('查看橫幅內容')" @click="$emit('open', banner)">
       <picture>
         <source v-if="banner.mobile_image" media="(max-width: 639px)" :srcset="banner.mobile_image" />
         <img :src="banner.image" :alt="banner.title || ''" loading="lazy" />
@@ -24,7 +24,7 @@ defineEmits<{ open: [banner: Banner] }>();
 button.banner-item { cursor: pointer; }
 button.banner-item:focus-visible { outline: 3px solid var(--zc-primary); outline-offset: 3px; }
 .banner-item picture, .banner-item img { display: block; width: 100%; height: auto; }
-/* 商品流横幅沿用商品间距，保留完整图片，避免高图撑满屏幕。 */
+/* 商品流橫幅沿用商品間距，保留完整圖片，避免高圖撐滿屏幕。 */
 .banner-strip--catalog { grid-column: 1 / -1; margin: 0; border-radius: 12px; }
 .banner-strip--catalog.banner-strip--multiple { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .banner-strip--catalog .banner-item { background: var(--card-bg, #fff); border: 1px solid var(--border-color, #e5e7eb); }

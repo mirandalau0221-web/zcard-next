@@ -24,13 +24,13 @@ const OperationAdminOrderServiceGetOrder = "/zcard.api.admin.v1.AdminOrderServic
 const OperationAdminOrderServiceListOrders = "/zcard.api.admin.v1.AdminOrderService/ListOrders"
 
 type AdminOrderServiceHTTPServer interface {
-	// CancelOrder CancelOrder 取消订单（pending 可取消）。
+	// CancelOrder CancelOrder 取消訂單（pending 可取消）。
 	CancelOrder(context.Context, *CancelOrderRequest) (*emptypb.Empty, error)
-	// DeleteOrders DeleteOrders 从管理列表移除已取消或已过期的未付款订单，保留关联记录。
+	// DeleteOrders DeleteOrders 從管理列表移除已取消或已過期的未付款訂單，保留關聯記錄。
 	DeleteOrders(context.Context, *DeleteOrdersRequest) (*emptypb.Empty, error)
-	// GetOrder GetOrder 订单详情（含金额行+状态事件时间线）。
+	// GetOrder GetOrder 訂單詳情（含金額行+狀態事件時間線）。
 	GetOrder(context.Context, *GetAdminOrderRequest) (*AdminOrder, error)
-	// ListOrders ListOrders 订单列表（游标分页）。
+	// ListOrders ListOrders 訂單列表（遊標分頁）。
 	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersReply, error)
 }
 
@@ -125,13 +125,13 @@ func _AdminOrderService_DeleteOrders0_HTTP_Handler(srv AdminOrderServiceHTTPServ
 }
 
 type AdminOrderServiceHTTPClient interface {
-	// CancelOrder CancelOrder 取消订单（pending 可取消）。
+	// CancelOrder CancelOrder 取消訂單（pending 可取消）。
 	CancelOrder(ctx context.Context, req *CancelOrderRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// DeleteOrders DeleteOrders 从管理列表移除已取消或已过期的未付款订单，保留关联记录。
+	// DeleteOrders DeleteOrders 從管理列表移除已取消或已過期的未付款訂單，保留關聯記錄。
 	DeleteOrders(ctx context.Context, req *DeleteOrdersRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// GetOrder GetOrder 订单详情（含金额行+状态事件时间线）。
+	// GetOrder GetOrder 訂單詳情（含金額行+狀態事件時間線）。
 	GetOrder(ctx context.Context, req *GetAdminOrderRequest, opts ...http.CallOption) (rsp *AdminOrder, err error)
-	// ListOrders ListOrders 订单列表（游标分页）。
+	// ListOrders ListOrders 訂單列表（遊標分頁）。
 	ListOrders(ctx context.Context, req *ListOrdersRequest, opts ...http.CallOption) (rsp *ListOrdersReply, err error)
 }
 
@@ -143,7 +143,7 @@ func NewAdminOrderServiceHTTPClient(client *http.Client) AdminOrderServiceHTTPCl
 	return &AdminOrderServiceHTTPClientImpl{client}
 }
 
-// CancelOrder CancelOrder 取消订单（pending 可取消）。
+// CancelOrder CancelOrder 取消訂單（pending 可取消）。
 func (c *AdminOrderServiceHTTPClientImpl) CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/orders/{order_no}/cancel"
@@ -161,7 +161,7 @@ func (c *AdminOrderServiceHTTPClientImpl) CancelOrder(ctx context.Context, in *C
 	return &out, nil
 }
 
-// DeleteOrders DeleteOrders 从管理列表移除已取消或已过期的未付款订单，保留关联记录。
+// DeleteOrders DeleteOrders 從管理列表移除已取消或已過期的未付款訂單，保留關聯記錄。
 func (c *AdminOrderServiceHTTPClientImpl) DeleteOrders(ctx context.Context, in *DeleteOrdersRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/orders/delete"
@@ -179,7 +179,7 @@ func (c *AdminOrderServiceHTTPClientImpl) DeleteOrders(ctx context.Context, in *
 	return &out, nil
 }
 
-// GetOrder GetOrder 订单详情（含金额行+状态事件时间线）。
+// GetOrder GetOrder 訂單詳情（含金額行+狀態事件時間線）。
 func (c *AdminOrderServiceHTTPClientImpl) GetOrder(ctx context.Context, in *GetAdminOrderRequest, opts ...http.CallOption) (*AdminOrder, error) {
 	var out AdminOrder
 	pattern := "/api/v1/admin/orders/{order_no}"
@@ -196,7 +196,7 @@ func (c *AdminOrderServiceHTTPClientImpl) GetOrder(ctx context.Context, in *GetA
 	return &out, nil
 }
 
-// ListOrders ListOrders 订单列表（游标分页）。
+// ListOrders ListOrders 訂單列表（遊標分頁）。
 func (c *AdminOrderServiceHTTPClientImpl) ListOrders(ctx context.Context, in *ListOrdersRequest, opts ...http.CallOption) (*ListOrdersReply, error) {
 	var out ListOrdersReply
 	pattern := "/api/v1/admin/orders"

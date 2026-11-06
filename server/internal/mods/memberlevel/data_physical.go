@@ -78,9 +78,9 @@ func (s *PointsService) reconcilePhysicalPoints(ctx context.Context, o *ent.Orde
 		PointRevokeInTx(context.Context, walletport.PointEntry) error
 	})
 	if !ok {
-		return fmt.Errorf("积分退款服务未装配")
+		return fmt.Errorf("積分退款服務未裝配")
 	}
-	if e = reverser.PointRevokeInTx(ctx, walletport.PointEntry{UserID: o.UserID, Direction: "out", Type: "refund_revoke", Amount: delta, Reference: fmt.Sprintf("points_refund:%d:%d", o.ID, target), OrderID: o.ID, Remark: "商品退款撤销积分，已使用部分形成积分欠额"}); e != nil {
+	if e = reverser.PointRevokeInTx(ctx, walletport.PointEntry{UserID: o.UserID, Direction: "out", Type: "refund_revoke", Amount: delta, Reference: fmt.Sprintf("points_refund:%d:%d", o.ID, target), OrderID: o.ID, Remark: "商品退款撤銷積分，已使用部分形成積分欠額"}); e != nil {
 		return e
 	}
 	o.Extra["physical_points_reversed"] = target

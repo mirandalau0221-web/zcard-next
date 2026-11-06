@@ -35,10 +35,10 @@ func (r *SupplierRepoImpl) LoadPricing(ctx context.Context, accountID uint64) (*
 		case "global":
 			out.global = row.DiscountBps
 		default:
-			return nil, fmt.Errorf("supplier.INVALID_PRICING: 未知定价范围")
+			return nil, fmt.Errorf("supplier.INVALID_PRICING: 未知定價範圍")
 		}
 		if row.Scope != "product" && (row.DiscountBps < 1 || row.DiscountBps > 10000) {
-			return nil, fmt.Errorf("supplier.INVALID_PRICING: 折扣配置无效")
+			return nil, fmt.Errorf("supplier.INVALID_PRICING: 折扣配置無效")
 		}
 	}
 	if len(out.categories) > 0 {
@@ -95,54 +95,54 @@ func (r *SupplierRepoImpl) upsertPriceRule(ctx context.Context, accountID, produ
 	client := data.Client(ctx, r.data)
 	if _, err := client.SupplierAccount.Get(ctx, accountID); err != nil {
 		if ent.IsNotFound(err) {
-			return invalid("供货账号不存在")
+			return invalid("供貨賬號不存在")
 		}
 		return err
 	}
 	switch scope {
 	case "product":
 		if productID == 0 || price <= 0 || categoryID != 0 || discount != 0 {
-			return invalid("请选择商品并填写大于零的专属价")
+			return invalid("請選擇商品並填寫大於零的專屬價")
 		}
 		exists, err := r.lockCatalogProduct(ctx, productID, false)
 		if err != nil {
 			return err
 		}
 		if !exists {
-			return invalid("商品不存在或已删除")
+			return invalid("商品不存在或已刪除")
 		}
 		if skuID > 0 {
 			sku, e := client.ProductSku.Get(ctx, skuID)
 			if ent.IsNotFound(e) {
-				return invalid("规格不存在")
+				return invalid("規格不存在")
 			}
 			if e != nil {
 				return e
 			}
 			if sku.ProductID != productID {
-				return invalid("规格不属于所选商品")
+				return invalid("規格不屬於所選商品")
 			}
 		}
 	case "category", "global":
 		if productID != 0 || skuID != 0 || price != 0 || discount < 1 || discount > 10000 {
-			return invalid("折扣须大于 0 且不超过 10 折")
+			return invalid("折扣須大於 0 且不超過 10 折")
 		}
 		if scope == "category" {
 			if categoryID == 0 {
-				return invalid("请选择分类")
+				return invalid("請選擇分類")
 			}
 			exists, err := r.lockCatalogCategory(ctx, categoryID)
 			if err != nil {
 				return err
 			}
 			if !exists {
-				return invalid("分类不存在或已删除")
+				return invalid("分類不存在或已刪除")
 			}
 		} else if categoryID != 0 {
-			return invalid("整站规则不能指定分类")
+			return invalid("整站規則不能指定分類")
 		}
 	default:
-		return invalid("不支持的定价范围")
+		return invalid("不支持的定價範圍")
 	}
 	return client.SupplierProductPrice.Create().SetSupplierAccountID(accountID).SetProductID(productID).SetSkuID(skuID).SetCategoryID(categoryID).SetScope(scope).SetPrice(price).SetDiscountBps(discount).
 		OnConflictColumns(supplierproductprice.FieldSupplierAccountID, supplierproductprice.FieldScope, supplierproductprice.FieldProductID, supplierproductprice.FieldSkuID, supplierproductprice.FieldCategoryID).UpdateNewValues().Exec(ctx)

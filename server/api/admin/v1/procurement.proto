@@ -8,27 +8,27 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminProcurementService 采购管理：采购单列表/详情/手动重试/手动标记完成。
+// AdminProcurementService 採購管理：採購單列表/詳情/手動重試/手動標記完成。
 service AdminProcurementService {
  rpc ListSMS(ListProcurementsRequest) returns (SMSDiagnostics) { option (google.api.http) = { get: "/api/v1/admin/sms-intents" }; }
  rpc RetrySMS(RetrySMSRequest) returns (google.protobuf.Empty) { option (google.api.http) = { post: "/api/v1/admin/sms-intents/{id}/retry" body: "*" }; }
 
-  // ListProcurements 采购单列表（按状态过滤）。
+  // ListProcurements 採購單列表（按狀態過濾）。
   rpc ListProcurements(ListProcurementsRequest) returns (ListProcurementsReply) {
     option (google.api.http) = { get: "/api/v1/admin/procurements" };
   }
-  // GetProcurement 采购单详情（含采购项/密文行数）。
+  // GetProcurement 採購單詳情（含採購項/密文行數）。
   rpc GetProcurement(GetProcurementRequest) returns (ProcurementOrder) {
     option (google.api.http) = { get: "/api/v1/admin/procurements/{id}" };
   }
-  // RetryProcurement 手动重试（pending/submitted/polling 均可重新提交或推进轮询）。
+  // RetryProcurement 手動重試（pending/submitted/polling 均可重新提交或推進輪詢）。
   rpc RetryProcurement(RetryProcurementRequest) returns (ProcurementOrder) {
     option (google.api.http) = {
       post: "/api/v1/admin/procurements/{id}/retry"
       body: "*"
     };
   }
-  // MarkProcurementManual 手动标记完成/转人工（人工拿货后回填）。
+  // MarkProcurementManual 手動標記完成/轉人工（人工拿貨後回填）。
   rpc MarkProcurementManual(MarkProcurementManualRequest) returns (ProcurementOrder) {
     option (google.api.http) = {
       post: "/api/v1/admin/procurements/{id}/manual"
@@ -53,7 +53,7 @@ message ProcurementOrder {
   string upstream_refund_id = 13;
   int32 item_quantity = 14;
   int64 item_unit_cost = 15;
-  int32 received_cards = 16; // 已到手卡密行数（密文行数）
+  int32 received_cards = 16; // 已到手卡密行數（密文行數）
   int64 created_at = 17;
   int64 updated_at = 18;
   string order_no = 19;
@@ -67,13 +67,13 @@ message ProcurementOrder {
   string upstream_product_code = 27;
   int64 sale_unit_cents = 28;
   int64 sale_amount_cents = 29;
-  int64 allocated_sale_cents = 30; // 整单优惠按子项金额分摊
+  int64 allocated_sale_cents = 30; // 整單優惠按子項金額分攤
   int64 cost_unit_cents = 31;
   int64 cost_total_cents = 32;
-  int64 profit_cents = 33; // 预计毛利，未计退款和手续费
+  int64 profit_cents = 33; // 預計毛利，未計退款和手續費
   string cost_basis = 34; // order_snapshot | unrecorded
   int32 delivered_quantity = 35;
-  bool delivery_incomplete = 36; // 可发货订单的该商品尚未足额交付
+  bool delivery_incomplete = 36; // 可發貨訂單的該商品尚未足額交付
 
 }
 
@@ -81,7 +81,7 @@ message ListProcurementsRequest {
   string status = 1; // 空 = 全部
   int32 page = 2;
   int32 page_size = 3;
-  string order_no = 4; // 客户订单号精确匹配
+  string order_no = 4; // 客户訂單號精確匹配
 }
 
 message ListProcurementsReply {

@@ -4,10 +4,10 @@ const narrowPaymentForm = useMediaQuery("(max-width: 639px)");
 import SponsorSlots from "@/components/common/sponsor-slots.vue";
 import UsageSwitches from "./components/usage-switches.vue";
 type Usage = { allow_purchase?: boolean; allow_member_recharge?: boolean; allow_supply_recharge?: boolean };
-// 支付渠道管理（ 重写）——大厂交互：
-// 卡片网格（品牌徽标/状态 Tag/已配置判定）+ 勾选式添加（批量接入 + 引导配置）
-// + schema 驱动配置弹窗（敏感字段留空不修改、回调地址一键复制、手续费区）。
-// 设计参照：1.x sysadmin 卡片式 + Filament 配置弹窗（回调地址展示先例）。
+// 支付渠道管理（ 重寫）——大廠交互：
+// 卡片網格（品牌徽標/狀態 Tag/已配置判定）+ 勾選式添加（批量接入 + 引導配置）
+// + schema 驅動配置彈窗（敏感字段留空不修改、回調地址一鍵複製、手續費區）。
+// 設計參照：1.x sysadmin 卡片式 + Filament 配置彈窗（回調地址展示先例）。
 import { useRoute } from "vue-router";
 import { ref, reactive, computed, onMounted, h, watch } from "vue";
 import {
@@ -81,17 +81,17 @@ interface ChannelRow extends Usage, Recommendation {
   methods_json?: string;
 }
 
-// 支付方式（收银台顾客看到的选项；params=网关路由参数）
+// 支付方式（收銀台顧客看到的選項；params=網關路由參數）
 interface MethodRow extends Usage, Recommendation {
   code: string;
   name: string;
   icon: string;
-  iconArr: string[]; // 编辑态（MediaField 数组绑定；保存收成 icon）
+  iconArr: string[]; // 編輯態（MediaField 數組綁定；保存收成 icon）
   enabled: boolean;
   params: Record<string, string>;
 }
 
-// ── 品牌徽标（品牌色字母徽章；未知驱动回落通用卡标）──
+// ── 品牌徽標（品牌色字母徽章；未知驅動回落通用卡標）──
 const driverBadges: Record<string, { char: string; bg: string; color?: string }> = {
   alipay: { char: "支", bg: "linear-gradient(135deg,#1677ff,#0e5fd8)", color: "#fff" },
   wechat: { char: "微", bg: "linear-gradient(135deg,#07c160,#06ad56)", color: "#fff" },
@@ -111,13 +111,13 @@ const saving = ref(false);
 const channels = ref<ChannelRow[]>([]);
 const drivers = ref<DriverMeta[]>([]);
 
-// ── 添加渠道（勾选式批量接入）──
+// ── 添加渠道（勾選式批量接入）──
 const addVisible = ref(false);
 const driversLoading = ref(false);
 const adding = ref(false);
 const checkedDrivers = reactive<Record<string, boolean>>({});
 
-// ── 配置弹窗 ──
+// ── 配置彈窗 ──
 const configVisible = ref(false);
 const current = ref<ChannelRow | null>(null);
 const currentFields = computed<ConfigFieldSchema[]>(() => {
@@ -137,8 +137,8 @@ const form = reactive({
   fee_bearer: "merchant",
   recommended: false, recommend_label: "", recommend_description: "",
   values: {} as Record<string, any>,
-  icon: [] as string[], // 渠道图标（MediaField 单图；空=回落内置徽标）
-  methods: [] as MethodRow[], // 支付方式列表（聚合网关按方式收银）
+  icon: [] as string[], // 渠道圖標（MediaField 單圖；空=回落內置徽標）
+  methods: [] as MethodRow[], // 支付方式列表（聚合網關按方式收銀）
 });
 
 // BEpusdt selects networks on its own cashier; GM Pay uses local method rows.
@@ -148,16 +148,16 @@ const visibleFields = computed(() => currentFields.value.filter(f => {
   return (f.key !== "trade_type" || !cashier) && (f.key !== "currencies" || cashier);
 }));
 
-// 聚合网关（一个渠道多种支付方式）：epay 协议 type 路由 / USDT 按链选择
+// 聚合網關（一個渠道多種支付方式）：epay 協議 type 路由 / USDT 按鏈選擇
 const isAggregateDriver = computed(() => ["epay", "epusdt"].includes(current.value?.driver || ""));
 
-// 方式参数选项（易支付协议 type / USDT network——网关参数域，静态即可）
+// 方式參數選項（易支付協議 type / USDT network——網關參數域，靜態即可）
 const EPAY_TYPES = [
-  { label: "支付宝", value: "alipay" },
+  { label: "支付寶", value: "alipay" },
   { label: "微信支付", value: "wxpay" },
-  { label: "QQ 钱包", value: "qqpay" },
-  { label: "京东支付", value: "jdpay" },
-  { label: "银行", value: "bank" },
+  { label: "QQ 錢包", value: "qqpay" },
+  { label: "京東支付", value: "jdpay" },
+  { label: "銀行", value: "bank" },
 ];
 function selectedValues(value: unknown): string[] {
   return (Array.isArray(value) ? value : typeof value === "string" ? [value] : []).map(String).map(v => v.trim()).filter(Boolean);
@@ -179,7 +179,7 @@ async function addMethod() {
   }
   const epoch = optionsEpoch;
   const network = selectedValues(form.values.network)[0] || cryptoNetworks.value[0]?.value;
-  if (!network) { message.warning("请先在 EP 后台启用收款链和钱包，再刷新可用资产"); return; }
+  if (!network) { message.warning("請先在 EP 後台啓用收款鏈和錢包，再刷新可用資產"); return; }
   const result = await loadMethodTokens(network);
   if (epoch !== optionsEpoch || !configVisible.value) return;
   const selected = selectedValues(form.values.token);
@@ -191,7 +191,7 @@ async function genDefaultMethods() {
   if (generatingMethods.value) return;
   if (current.value?.driver === "epay") {
     form.methods = [
-      { code: "alipay", name: "支付宝", icon: "", iconArr: [], enabled: true, params: { type: "alipay" } },
+      { code: "alipay", name: "支付寶", icon: "", iconArr: [], enabled: true, params: { type: "alipay" } },
       { code: "wxpay", name: "微信支付", icon: "", iconArr: [], enabled: true, params: { type: "wxpay" } },
     ];
     return;
@@ -209,18 +209,18 @@ async function genDefaultMethods() {
       const result = await loadMethodTokens(network);
       if (epoch !== optionsEpoch || !configVisible.value) return;
       if (dynamicOpts.network?.fallback || result.fallback) {
-        message.warning("未能确认 EP 可用资产，请检查网关后重试；现有支付方式已保留"); return;
+        message.warning("未能確認 EP 可用資產，請檢查網關後重試；現有支付方式已保留"); return;
       }
       for (const option of result.options) {
         if (!tokens.length || tokens.includes(option.value)) rows.push(cryptoMethod(network, option.value, rows));
       }
     }
-    if (!rows.length) { message.warning("所选链与代币没有可用组合，请检查 EP 的链、代币和钱包配置"); return; }
+    if (!rows.length) { message.warning("所選鏈與代幣沒有可用組合，請檢查 EP 的鏈、代幣和錢包配置"); return; }
     form.methods = rows;
   } finally { generatingMethods.value = false; }
 }
 
-// 动态选项（epusdt network/token——以网关 supported_assets 为准；失败回落静态 + 提示）
+// 動態選項（epusdt network/token——以網關 supported_assets 為準；失敗回落靜態 + 提示）
 const dynamicOpts = reactive<Record<string, { options: { label: string; value: string }[]; fallback: boolean }>>({});
 const dynamicLoading = reactive<Record<string, boolean>>({});
 type AssetOptions = { options: { label: string; value: string }[]; fallback: boolean };
@@ -264,7 +264,7 @@ watch(() => [configVisible.value, ...form.methods.map(m => m.params.network)], (
   if (configVisible.value && current.value?.driver === "epusdt") for (const m of form.methods) if (m.params.network) void loadMethodTokens(m.params.network);
 });
 
-/** 加载动态字段选项；partial 取当前表单非敏感值（api_url 等），network 变化联动 token */
+/** 加載動態字段選項；partial 取當前表單非敏感值（api_url 等），network 變化聯動 token */
 async function loadFieldOptions(f: ConfigFieldSchema) {
   const key = f.key;
   const epoch = optionsEpoch, requestId = (fieldRequests[key] || 0) + 1;
@@ -290,16 +290,16 @@ async function loadFieldOptions(f: ConfigFieldSchema) {
   dynamicLoading[key] = false;
 }
 
-/** 字段选项（动态优先，未加载回落 schema 静态 options） */
+/** 字段選項（動態優先，未加載回落 schema 靜態 options） */
 function fieldOptionsOf(f: ConfigFieldSchema) {
   if (f.dynamic && dynamicOpts[f.key]) return dynamicOpts[f.key].options;
   return f.options || [];
 }
 
-/** 输入框占位提示：帮助文字/已配置提醒并入 placeholder（输入后自然消失，不再占行） */
+/** 輸入框佔位提示：幫助文字/已配置提醒併入 placeholder（輸入後自然消失，不再佔行） */
 function fieldHint(f: ConfigFieldSchema) {
   const parts: string[] = [];
-  if (f.sensitive && configuredKeys.value.has(f.key)) parts.push("已配置，留空保持不变");
+  if (f.sensitive && configuredKeys.value.has(f.key)) parts.push("已配置，留空保持不變");
   if (f.placeholder) parts.push(f.placeholder);
   if (f.help) parts.push(f.help);
   return parts.join(" · ") || undefined;
@@ -323,7 +323,7 @@ async function loadDrivers() {
   if (!error && data) drivers.value = (data as any).drivers || [];
 }
 
-// ── 添加渠道：勾选驱动 → 批量创建 → 引导配置第一个 ──
+// ── 添加渠道：勾選驅動 → 批量創建 → 引導配置第一個 ──
 function openAddDialog() {
   addVisible.value = true;
   driversLoading.value = true;
@@ -348,7 +348,7 @@ function nextChannelIdentity(driver: DriverMeta, rows: ChannelRow[]) {
 async function handleAdd() {
   const picked = drivers.value.filter((d) => checkedDrivers[d.code]);
   if (picked.length === 0) {
-    message.warning("请至少选择一个支付渠道");
+    message.warning("請至少選擇一個支付渠道");
     return;
   }
   adding.value = true;
@@ -364,11 +364,11 @@ async function handleAdd() {
         enabled: d.code === "wallet",
         fee: 0,
         fee_type: "fixed",
-        // 易支付默认挂支付宝+微信两方式（配置弹窗可增删改）
+        // 易支付默認掛支付寶+微信兩方式（配置彈窗可增刪改）
         methods_json:
           d.code === "epay"
             ? JSON.stringify([
-                { code: "alipay", name: "支付宝", icon: "", enabled: true, params: { type: "alipay" } },
+                { code: "alipay", name: "支付寶", icon: "", enabled: true, params: { type: "alipay" } },
                 { code: "wxpay", name: "微信支付", icon: "", enabled: true, params: { type: "wxpay" } },
               ])
             : "",
@@ -379,19 +379,19 @@ async function handleAdd() {
     adding.value = false;
   }
   if (created.length === 0) {
-    message.error("添加失败，请重试");
+    message.error("添加失敗，請重試");
     return;
   }
   addVisible.value = false;
-  message.success(`已添加 ${created.length} 个渠道`);
+  message.success(`已添加 ${created.length} 個渠道`);
   await loadList();
-  // 引导式：自动打开第一个新渠道的配置弹窗补凭据
+  // 引導式：自動打開第一個新渠道的配置彈窗補憑據
   openConfig(created[0]);
   form.enabled = true;
 }
 
-// ── 配置弹窗：schema 驱动表单 ──
-const feeLabel = computed(() => (form.fee_type === "percent" ? "比例（%）" : `固定金额（${currencyUnit()}）`));
+// ── 配置彈窗：schema 驅動表單 ──
+const feeLabel = computed(() => (form.fee_type === "percent" ? "比例（%）" : `固定金額（${currencyUnit()}）`));
 
 function openConfig(ch: ChannelRow) {
   resetAssetOptions();
@@ -405,10 +405,10 @@ function openConfig(ch: ChannelRow) {
   form.fee_type = ch.fee_type || "fixed";
   form.fee_bearer = ch.driver === "wallet" ? "merchant" : ch.fee_bearer || "merchant";
   form.recommended = !!ch.recommended; form.recommend_label = ch.recommend_label || ""; form.recommend_description = ch.recommend_description || "";
-  // fee：fixed=分 → 元；percent=万分比 → 百分比（proto3 零值不输出——undefined 兜底 0）
+  // fee：fixed=分 → 元；percent=萬分比 → 百分比（proto3 零值不輸出——undefined 兜底 0）
   form.fee = ch.driver === "wallet" ? 0 : Number(ch.fee || 0) / 100;
   form.values = {};
-  // 脱敏回显：非敏感字段显值；敏感字段 **** → 显示为空（留空=不修改）
+  // 脱敏回顯：非敏感字段顯值；敏感字段 **** → 顯示為空（留空=不修改）
   let echo: Record<string, any> = {};
   try {
     echo = JSON.parse(ch.config_json || "{}");
@@ -422,18 +422,18 @@ function openConfig(ch: ChannelRow) {
     } else if (ch.driver === "upay" && f.key === "trade_types") {
       form.values[f.key] = selectedValues(v);
     } else if (Array.isArray(v)) {
-      form.values[f.key] = v; // 多选字段回显
+      form.values[f.key] = v; // 多選字段回顯
     } else if (ch.driver === "bepusdt" && f.multiple) {
       form.values[f.key] = [];
     } else if (typeof v === "string" && v !== "****" && v !== "") {
       form.values[f.key] = v;
     }
   }
-  // 动态选项字段（epusdt network/token）：打开即拉取网关 supported_assets
+  // 動態選項字段（epusdt network/token）：打開即拉取網關 supported_assets
   for (const f of currentFields.value) {
     if (f.dynamic) loadFieldOptions(f);
   }
-  // 图标与支付方式回填
+  // 圖標與支付方式回填
   form.icon = ch.icon ? [ch.icon] : [];
   try {
     form.methods = (JSON.parse(ch.methods_json || "[]") as MethodRow[]).map((m) => ({
@@ -459,47 +459,47 @@ function moveMethod(index: number, offset: number) {
 
 function handleConfigSave() {
   if (!current.value || saving.value || generatingMethods.value) return;
-  // 必填校验：未配置过的必填字段必须填写（数组=非空）
+  // 必填校驗：未配置過的必填字段必須填寫（數組=非空）
   for (const f of currentFields.value) {
     const v = form.values[f.key];
     const filled = Array.isArray(v) ? v.length > 0 : f.type === "number" ? typeof v === "number" && Number.isFinite(v) : !!String(v ?? "").trim();
     if (f.required && (!configuredKeys.value.has(f.key) || (current.value.driver === "upay" && f.key === "trade_types")) && !filled) {
-      message.warning(`请填写「${f.label}」`);
+      message.warning(`請填寫「${f.label}」`);
       return;
     }
   }
-  // 构造凭据：非空且非掩码的字段；敏感字段留空=不覆盖（后端 **** 语义）
+  // 構造憑據：非空且非掩碼的字段；敏感字段留空=不覆蓋（後端 **** 語義）
   const cfg: Record<string, any> = {};
   for (const f of currentFields.value) {
     const v = form.values[f.key];
     if (f.type === "number") {
       if (typeof v === "number" && Number.isFinite(v)) cfg[f.key] = v;
     } else if (Array.isArray(v)) {
-      cfg[f.key] = v; // 空数组也提交，允许清空旧的币种/网络限制
+      cfg[f.key] = v; // 空數組也提交，允許清空舊的幣種/網絡限制
     } else {
       const sv = String(v ?? "").trim();
       if (sv && sv !== "****") cfg[f.key] = sv;
     }
   }
-  // 支付方式校验（聚合网关）：code/name 必填且 code 不重复
+  // 支付方式校驗（聚合網關）：code/name 必填且 code 不重複
   if (isAggregateDriver.value) {
     const seen = new Set<string>();
     for (const m of form.methods) {
       if (!m.code.trim() || !m.name.trim()) {
-        message.warning("支付方式的标识与名称必填");
+        message.warning("支付方式的標識與名稱必填");
         return;
       }
       if (seen.has(m.code.trim())) {
-        message.warning(`支付方式标识「${m.code}」重复`);
+        message.warning(`支付方式標識「${m.code}」重複`);
         return;
       }
       if (current.value.driver === "epusdt" && m.enabled) {
         const network = (m.params.network || "").trim().toLowerCase();
         const token = (m.params.token || "").trim().toUpperCase();
-        if (!network || !token) { message.warning("请选择每个启用支付方式的收款链和代币"); return; }
+        if (!network || !token) { message.warning("請選擇每個啓用支付方式的收款鏈和代幣"); return; }
         const assets = methodTokens[network];
         if ((dynamicOpts.network && !dynamicOpts.network.fallback && !cryptoNetworks.value.some(o => o.value === network)) || (assets && !assets.fallback && !assets.options.some(o => o.value === token))) {
-          message.warning(`${m.name} 的链与代币当前在 EP 不可用，请启用对应资产和钱包后刷新`); return;
+          message.warning(`${m.name} 的鏈與代幣當前在 EP 不可用，請啓用對應資產和錢包後刷新`); return;
         }
         m.params.network = network; m.params.token = token;
       }
@@ -537,19 +537,19 @@ function handleConfigSave() {
     .finally(() => (saving.value = false));
 }
 
-// ── 启用/删除 ──
+// ── 啓用/刪除 ──
 async function handleToggle(row: ChannelRow, val: boolean) {
   const { error } = await updateChannel(row.id, { enabled: val });
   if (!error) {
     row.enabled = val;
-    message.success(val ? "已启用" : "已停用");
+    message.success(val ? "已啓用" : "已停用");
   }
 }
 
 async function handleDelete(row: ChannelRow) {
   const { error } = await deleteChannel(row.id);
   if (!error) {
-    message.success("已删除");
+    message.success("已刪除");
     loadList();
   }
 }
@@ -557,9 +557,9 @@ async function handleDelete(row: ChannelRow) {
 async function copyText(text: string) {
   try {
     await navigator.clipboard.writeText(text);
-    message.success("已复制");
+    message.success("已複製");
   } catch {
-    message.error("复制失败，请手动选择复制");
+    message.error("複製失敗，請手動選擇複製");
   }
 }
 
@@ -571,11 +571,11 @@ onMounted(() => {
 
 <template>
   <div class="min-h-500px">
-    <!-- 页头：标题 + 说明 + 添加入口 -->
+    <!-- 頁頭：標題 + 説明 + 添加入口 -->
     <div class="payment-heading mb-16px">
       <div>
         <div class="text-16px font-600">支付渠道</div>
-        <div class="text-12px opacity-60 mt-4px">接入支付渠道并在下方完成凭据配置，保存后立即生效</div>
+        <div class="text-12px opacity-60 mt-4px">接入支付渠道並在下方完成憑據配置，保存後立即生效</div>
       </div>
       <SponsorSlots class="payment-sponsors" />
       <NButton class="payment-add" v-auth="'payment:write'" type="primary" @click="openAddDialog">添加渠道</NButton>
@@ -583,12 +583,12 @@ onMounted(() => {
 
     <NTabs v-model:value="activeTab" type="line">
       <NTabPane name="channels" tab="渠道管理">
-            <!-- 渠道卡片网格 -->
+            <!-- 渠道卡片網格 -->
     <NSpin :show="loading">
       <div v-if="channels.length === 0 && !loading">
         <NEmpty description="尚未接入任何支付渠道" style="padding: 48px 0">
           <template #extra>
-            <NButton v-auth="'payment:write'" type="primary" @click="openAddDialog">添加第一个支付渠道</NButton>
+            <NButton v-auth="'payment:write'" type="primary" @click="openAddDialog">添加第一個支付渠道</NButton>
           </template>
         </NEmpty>
       </div>
@@ -601,7 +601,7 @@ onMounted(() => {
           :key="ch.id"
           class="rounded-12px border border-#e5e7eb dark:border-#333 p-20px flex flex-col gap-12px transition-shadow hover:shadow-md"
         >
-          <!-- 头部：徽标 + 名称 + 状态 -->
+          <!-- 頭部：徽標 + 名稱 + 狀態 -->
           <div class="flex items-start gap-12px">
             <div
               class="w-44px h-44px rounded-12px flex items-center justify-center text-20px font-700 shrink-0"
@@ -616,25 +616,25 @@ onMounted(() => {
             <NSwitch size="small" :value="ch.enabled" @update:value="(v: boolean) => handleToggle(ch, v)" />
           </div>
 
-          <!-- 状态 Tags：启用 + 已配置 -->
+          <!-- 狀態 Tags：啓用 + 已配置 -->
           <div class="flex gap-8px">
             <NTag size="small" :type="ch.enabled ? 'success' : 'default'" :bordered="false">
-              {{ ch.enabled ? "已启用" : "已停用" }}
+              {{ ch.enabled ? "已啓用" : "已停用" }}
             </NTag>
             <NTag size="small" :type="isConfigured(ch) ? 'success' : 'warning'" :bordered="false">
-              {{ ch.driver === "wallet" ? "无需凭据" : isConfigured(ch) ? "已配置" : "待配置" }}
+              {{ ch.driver === "wallet" ? "無需憑據" : isConfigured(ch) ? "已配置" : "待配置" }}
             </NTag>
             <NTag v-if="(ch.fee || 0) > 0" size="small" type="info" :bordered="false">
-              {{ ch.fee_type === "percent" ? `费率 ${((ch.fee || 0) / 100).toFixed(2)}%` : `手续费 ${((ch.fee || 0) / 100).toFixed(2)} ${currencyUnit()}` }} · {{ ch.fee_bearer === 'user' ? '用户承担' : '商家承担' }}
+              {{ ch.fee_type === "percent" ? `費率 ${((ch.fee || 0) / 100).toFixed(2)}%` : `手續費 ${((ch.fee || 0) / 100).toFixed(2)} ${currencyUnit()}` }} · {{ ch.fee_bearer === 'user' ? '用户承擔' : '商家承擔' }}
             </NTag>
           </div>
 
           <div class="flex flex-wrap gap-6px text-12px" aria-label="渠道用途">
-            <NTag size="small" :bordered="false" :type="ch.allow_purchase !== false ? 'info' : 'default'">购买{{ ch.allow_purchase !== false ? '已开' : '已关' }}</NTag>
-            <NTag v-if="ch.driver !== 'wallet'" size="small" :bordered="false" :type="ch.allow_member_recharge !== false ? 'info' : 'default'">会员充值{{ ch.allow_member_recharge !== false ? '已开' : '已关' }}</NTag>
-            <NTag v-if="ch.driver !== 'wallet'" size="small" :bordered="false" :type="ch.allow_supply_recharge !== false ? 'info' : 'default'">供货充值{{ ch.allow_supply_recharge !== false ? '已开' : '已关' }}</NTag>
+            <NTag size="small" :bordered="false" :type="ch.allow_purchase !== false ? 'info' : 'default'">購買{{ ch.allow_purchase !== false ? '已開' : '已關' }}</NTag>
+            <NTag v-if="ch.driver !== 'wallet'" size="small" :bordered="false" :type="ch.allow_member_recharge !== false ? 'info' : 'default'">會員充值{{ ch.allow_member_recharge !== false ? '已開' : '已關' }}</NTag>
+            <NTag v-if="ch.driver !== 'wallet'" size="small" :bordered="false" :type="ch.allow_supply_recharge !== false ? 'info' : 'default'">供貨充值{{ ch.allow_supply_recharge !== false ? '已開' : '已關' }}</NTag>
           </div>
-          <!-- 驱动说明 -->
+          <!-- 驅動説明 -->
           <div class="text-12px opacity-60 flex-1">{{ driverOf(ch.driver)?.description || ch.driver }}</div>
 
           <!-- 操作 -->
@@ -644,23 +644,23 @@ onMounted(() => {
             </NButton>
             <NPopconfirm :on-positive-click="() => handleDelete(ch)">
               <template #trigger>
-                <NButton v-auth="'payment:delete'" size="small" type="error" secondary :disabled="['bepusdt', 'upay'].includes(ch.driver) && ch.enabled" :title="['bepusdt', 'upay'].includes(ch.driver) && ch.enabled ? '请先停用渠道再删除' : undefined">删除</NButton>
+                <NButton v-auth="'payment:delete'" size="small" type="error" secondary :disabled="['bepusdt', 'upay'].includes(ch.driver) && ch.enabled" :title="['bepusdt', 'upay'].includes(ch.driver) && ch.enabled ? '請先停用渠道再刪除' : undefined">刪除</NButton>
               </template>
-              {{ ['bepusdt', 'upay'].includes(ch.driver) ? (ch.enabled ? '请先停用渠道再删除。' : '删除后将从渠道列表移除，历史支付记录和到账通知仍会保留，确定删除？') : '删除后该渠道将无法继续收款，确定删除？' }}
+              {{ ['bepusdt', 'upay'].includes(ch.driver) ? (ch.enabled ? '請先停用渠道再刪除。' : '刪除後將從渠道列表移除，歷史支付記錄和到賬通知仍會保留，確定刪除？') : '刪除後該渠道將無法繼續收款，確定刪除？' }}
             </NPopconfirm>
           </div>
         </div>
       </div>
     </NSpin>
       </NTabPane>
-      <NTabPane v-if="checkAuth('payment:read_detail')" name="payments" tab="支付单/退款单">
+      <NTabPane v-if="checkAuth('payment:read_detail')" name="payments" tab="支付單/退款單">
         <PaymentsTab />
       </NTabPane>
     </NTabs>
 
-    <!-- 添加渠道：勾选式批量接入 -->
+    <!-- 添加渠道：勾選式批量接入 -->
     <NModal v-model:show="addVisible" preset="card" title="添加支付渠道" style="width: 560px; max-width: 94vw">
-      <div class="text-12px opacity-60 mb-12px">同一支付类型可添加多个渠道，分别配置不同上游的网关、商户号和密钥。新渠道默认停用，请配置后启用。</div>
+      <div class="text-12px opacity-60 mb-12px">同一支付類型可添加多個渠道，分別配置不同上游的網關、商户號和密鑰。新渠道默認停用，請配置後啓用。</div>
       <NSpin :show="driversLoading">
         <div class="flex flex-col gap-8px max-h-360px overflow-auto pr-4px">
           <NCheckbox
@@ -679,7 +679,7 @@ onMounted(() => {
               </div>
               <div class="min-w-0">
                 <div class="text-13px font-500">{{ d.name }}</div>
-                <div v-if="channels.some((ch) => ch.driver === d.code)" class="text-12px">已添加 {{ channels.filter((ch) => ch.driver === d.code).length }} 个，可继续添加独立配置</div>
+                <div v-if="channels.some((ch) => ch.driver === d.code)" class="text-12px">已添加 {{ channels.filter((ch) => ch.driver === d.code).length }} 個，可繼續添加獨立配置</div>
                 <div class="text-12px opacity-50 truncate">{{ d.description }}</div>
               </div>
             </div>
@@ -693,56 +693,56 @@ onMounted(() => {
         <div class="flex justify-end gap-8px">
           <NButton @click="addVisible = false">取消</NButton>
           <NButton type="primary" :loading="adding" :disabled="Object.values(checkedDrivers).filter(Boolean).length === 0" @click="handleAdd">
-            添加所选（{{ Object.values(checkedDrivers).filter(Boolean).length }}）
+            添加所選（{{ Object.values(checkedDrivers).filter(Boolean).length }}）
           </NButton>
         </div>
       </template>
     </NModal>
 
-    <!-- 配置弹窗：schema 驱动 -->
+    <!-- 配置彈窗：schema 驅動 -->
     <NModal v-model:show="configVisible" preset="card" :title="`配置「${current?.name || ''}」`" style="width: 760px; max-width: 94vw; max-height: 92vh; overflow-y: auto">
-      <div class="text-12px opacity-60 mb-16px">填写该支付通道所需的参数，保存后立即生效</div>
+      <div class="text-12px opacity-60 mb-16px">填寫該支付通道所需的參數，保存後立即生效</div>
 
       <NForm :label-placement="narrowPaymentForm ? 'top' : 'left'" label-width="110" class="config-form">
-        <NFormItem label="渠道名称">
-          <NInput v-model:value="form.name" placeholder="渠道显示名称" />
+        <NFormItem label="渠道名稱">
+          <NInput v-model:value="form.name" placeholder="渠道顯示名稱" />
         </NFormItem>
         <NFormItem label="前端排序">
-          <div class="w-full"><NInputNumber v-model:value="form.sort" :min="0" :max="2147483647" :precision="0" /><div class="text-12px mt-4px">数字越小越靠前，同值按渠道创建顺序排列</div></div>
+          <div class="w-full"><NInputNumber v-model:value="form.sort" :min="0" :max="2147483647" :precision="0" /><div class="text-12px mt-4px">數字越小越靠前，同值按渠道創建順序排列</div></div>
         </NFormItem>
-        <NFormItem label="渠道图标">
+        <NFormItem label="渠道圖標">
           <div class="w-full">
-            <MediaField v-model:value="form.icon" tip="收银台渠道/方式图标（建议 1:1 透明 PNG）；留空使用内置徽标" />
+            <MediaField v-model:value="form.icon" tip="收銀台渠道/方式圖標（建議 1:1 透明 PNG）；留空使用內置徽標" />
           </div>
         </NFormItem>
-        <NFormItem label="启用">
+        <NFormItem label="啓用">
           <NSwitch v-model:value="form.enabled" />
         </NFormItem>
 
-        <NFormItem label="开放用途">
+        <NFormItem label="開放用途">
           <div class="w-full">
             <UsageSwitches :value="form" :wallet="current?.driver === 'wallet'" @change="(key, value) => form[key] = value" />
-            <div class="text-12px mt-8px">关闭某项后，该渠道不会出现在对应收银台，新的支付请求也会被拒绝。已发起的支付仍正常核对到账。</div>
-            <div v-if="isAggregateDriver" class="text-12px mt-4px">下方可进一步限制支付宝、微信等方式。渠道关闭的用途，对所有方式生效。</div>
+            <div class="text-12px mt-8px">關閉某項後，該渠道不會出現在對應收銀台，新的支付請求也會被拒絕。已發起的支付仍正常核對到賬。</div>
+            <div v-if="isAggregateDriver" class="text-12px mt-4px">下方可進一步限制支付寶、微信等方式。渠道關閉的用途，對所有方式生效。</div>
           </div>
         </NFormItem>
-        <!-- 支付方式（聚合网关）：易支付按支付宝/微信分开收、USDT 按链选择 -->
+        <!-- 支付方式（聚合網關）：易支付按支付寶/微信分開收、USDT 按鏈選擇 -->
         <template v-if="isAggregateDriver">
           <NDivider title-placement="left" style="margin: 4px 0 16px">
-            支付方式（顾客在收银台看到的选项）
+            支付方式（顧客在收銀台看到的選項）
           </NDivider>
           <div class="flex items-center justify-between mb-8px">
             <span class="text-12px opacity-60">
-              {{ current?.driver === "epay" ? "同一易支付网关可分开接入支付宝/微信等，顾客按方式下单" : "每个方式指定收款链和代币，顾客在商城收银台选择" }}
+              {{ current?.driver === "epay" ? "同一易支付網關可分開接入支付寶/微信等，顧客按方式下單" : "每個方式指定收款鏈和代幣，顧客在商城收銀台選擇" }}
             </span>
             <div class="flex gap-8px">
-              <NButton v-if="current?.driver === 'epusdt'" size="tiny" secondary @click="refreshAssets">刷新可用资产</NButton>
+              <NButton v-if="current?.driver === 'epusdt'" size="tiny" secondary @click="refreshAssets">刷新可用資產</NButton>
               <NButton size="tiny" secondary :loading="generatingMethods" @click="genDefaultMethods">按模板生成</NButton>
               <NButton size="tiny" type="primary" secondary @click="addMethod">添加方式</NButton>
             </div>
           </div>
           <NAlert v-if="current?.driver === 'epusdt'" type="info" class="mb-12px">
-            先在 EP 后台启用链、代币并配置收款钱包。这里的支付方式优先于下方渠道默认值；修改默认值不会改写已有方式。TRX 请选择 Tron + TRX；Polygon 是链名，收款代币需按 EP 实际支持选择。
+            先在 EP 後台啓用鏈、代幣並配置收款錢包。這裏的支付方式優先於下方渠道默認值；修改默認值不會改寫已有方式。TRX 請選擇 Tron + TRX；Polygon 是鏈名，收款代幣需按 EP 實際支持選擇。
           </NAlert>
           <div class="flex flex-col gap-8px mb-8px">
             <div
@@ -752,14 +752,14 @@ onMounted(() => {
               :class="{ 'opacity-50': !m.enabled }"
             >
               <NSwitch v-model:value="m.enabled" size="small" />
-              <NInput v-model:value="m.name" size="small" placeholder="方式名称（如 支付宝）" style="width: 150px" />
-              <NInput v-model:value="m.code" size="small" placeholder="标识（如 alipay）" style="width: 120px" />
+              <NInput v-model:value="m.name" size="small" placeholder="方式名稱（如 支付寶）" style="width: 150px" />
+              <NInput v-model:value="m.code" size="small" placeholder="標識（如 alipay）" style="width: 120px" />
               <NSelect
                 v-if="current?.driver === 'epay'"
                 v-model:value="m.params.type"
                 size="small"
                 :options="EPAY_TYPES"
-                placeholder="网关支付类型"
+                placeholder="網關支付類型"
                 style="width: 130px"
               />
               <template v-else>
@@ -770,48 +770,48 @@ onMounted(() => {
                   :loading="!!dynamicLoading.network"
                   filterable
                   @update:value="() => { delete m.params.token; }"
-                  placeholder="收款链"
+                  placeholder="收款鏈"
                   style="width: 170px"
                 />
-                <NSelect v-model:value="m.params.token" size="small" placeholder="收款代币" style="width: 130px"
+                <NSelect v-model:value="m.params.token" size="small" placeholder="收款代幣" style="width: 130px"
                   :options="methodTokens[m.params.network]?.options || []" :loading="!!m.params.network && !methodTokens[m.params.network]"
                   :disabled="!m.params.network" filterable :tag="!!methodTokens[m.params.network]?.fallback" />
-                <span v-if="methodTokens[m.params.network]?.fallback" class="text-12px text-orange-600">未确认 EP 可用资产，保存前请核对网关；已有配置保留。</span>
+                <span v-if="methodTokens[m.params.network]?.fallback" class="text-12px text-orange-600">未確認 EP 可用資產，保存前請核對網關；已有配置保留。</span>
               </template>
               <div style="min-width: 110px">
                 <MediaField v-model:value="m.iconArr" />
               </div>
               <NButton size="tiny" :disabled="i === 0" @click="moveMethod(i, -1)">上移</NButton>
               <NButton size="tiny" :disabled="i === form.methods.length - 1" @click="moveMethod(i, 1)">下移</NButton>
-              <NButton size="tiny" type="error" quaternary @click="form.methods.splice(i, 1)">删除</NButton>
+              <NButton size="tiny" type="error" quaternary @click="form.methods.splice(i, 1)">刪除</NButton>
               <div class="w-full flex items-center gap-8px flex-wrap">
-                <span class="text-12px">推荐此方式</span><NSwitch v-model:value="m.recommended" size="small" />
-                <NInput v-if="m.recommended" v-model:value="m.recommend_label" placeholder="推荐标签，默认推荐" :maxlength="6" style="width: 170px" size="small" />
-                <NInput v-if="m.recommended" v-model:value="m.recommend_description" placeholder="推荐说明（选填）" :maxlength="60" style="flex: 1; min-width: 160px" size="small" />
+                <span class="text-12px">推薦此方式</span><NSwitch v-model:value="m.recommended" size="small" />
+                <NInput v-if="m.recommended" v-model:value="m.recommend_label" placeholder="推薦標籤，默認推薦" :maxlength="6" style="width: 170px" size="small" />
+                <NInput v-if="m.recommended" v-model:value="m.recommend_description" placeholder="推薦説明（選填）" :maxlength="60" style="flex: 1; min-width: 160px" size="small" />
               </div>
               <UsageSwitches :value="m" :parent="form" compact @change="(key, value) => m[key] = value" />
             </div>
             <div v-if="form.methods.length === 0" class="text-12px opacity-50 py-4px">
-              尚未配置支付方式——顾客将看到渠道本身（或点「按模板生成」快速创建）
+              尚未配置支付方式——顧客將看到渠道本身（或點「按模板生成」快速創建）
             </div>
           </div>
         </template>
 
         <template v-if="!isAggregateDriver || !form.methods.length">
-          <NDivider title-placement="left">收银台推荐</NDivider>
-          <NFormItem label="推荐此渠道"><NSwitch v-model:value="form.recommended" /></NFormItem>
-          <NFormItem v-if="form.recommended" label="推荐标签"><NInput v-model:value="form.recommend_label" placeholder="默认：推荐" :maxlength="6" show-count /></NFormItem>
-          <NFormItem v-if="form.recommended" label="推荐说明"><NInput v-model:value="form.recommend_description" placeholder="选填，如支持 USDT 支付" :maxlength="60" show-count /></NFormItem>
+          <NDivider title-placement="left">收銀台推薦</NDivider>
+          <NFormItem label="推薦此渠道"><NSwitch v-model:value="form.recommended" /></NFormItem>
+          <NFormItem v-if="form.recommended" label="推薦標籤"><NInput v-model:value="form.recommend_label" placeholder="默認：推薦" :maxlength="6" show-count /></NFormItem>
+          <NFormItem v-if="form.recommended" label="推薦説明"><NInput v-model:value="form.recommend_description" placeholder="選填，如支持 USDT 支付" :maxlength="60" show-count /></NFormItem>
         </template>
-        <!-- 手续费 -->
-        <NDivider title-placement="left" style="margin: 4px 0 16px">手续费</NDivider>
-        <NFormItem label="承担方">
-          <NRadioGroup v-model:value="form.fee_bearer" :disabled="current?.driver === 'wallet'"><NRadio value="merchant">商家承担</NRadio><NRadio value="user">用户承担</NRadio></NRadioGroup>
+        <!-- 手續費 -->
+        <NDivider title-placement="left" style="margin: 4px 0 16px">手續費</NDivider>
+        <NFormItem label="承擔方">
+          <NRadioGroup v-model:value="form.fee_bearer" :disabled="current?.driver === 'wallet'"><NRadio value="merchant">商家承擔</NRadio><NRadio value="user">用户承擔</NRadio></NRadioGroup>
         </NFormItem>
-        <p class="text-12px mb-12px opacity-70">{{ current?.driver === 'wallet' ? '余额支付固定免手续费。' : form.fee_bearer === 'user' ? '在优惠后的订单金额上加收，按分四舍五入；充值手续费不计入余额。已创建支付沿用原费用。' : '不增加顾客实付金额，收银台显示免手续费。' }}</p>
-        <NFormItem label="计费方式">
+        <p class="text-12px mb-12px opacity-70">{{ current?.driver === 'wallet' ? '餘額支付固定免手續費。' : form.fee_bearer === 'user' ? '在優惠後的訂單金額上加收，按分四捨五入；充值手續費不計入餘額。已創建支付沿用原費用。' : '不增加顧客實付金額，收銀台顯示免手續費。' }}</p>
+        <NFormItem label="計費方式">
           <NRadioGroup v-model:value="form.fee_type" :disabled="current?.driver === 'wallet'">
-            <NRadio value="fixed">固定金额</NRadio>
+            <NRadio value="fixed">固定金額</NRadio>
             <NRadio value="percent">按比例</NRadio>
           </NRadioGroup>
         </NFormItem>
@@ -828,9 +828,9 @@ onMounted(() => {
           <span class="ml-8px text-12px opacity-50">{{ form.fee_type === "percent" ? "%" : currencyUnit() }}</span>
         </NFormItem>
 
-        <!-- 渠道参数（schema 驱动） -->
+        <!-- 渠道參數（schema 驅動） -->
         <template v-if="currentFields.length > 0">
-          <NDivider title-placement="left" style="margin: 4px 0 16px">渠道参数</NDivider>
+          <NDivider title-placement="left" style="margin: 4px 0 16px">渠道參數</NDivider>
           <NFormItem
             v-for="f in visibleFields"
             :key="f.key"
@@ -846,11 +846,11 @@ onMounted(() => {
                   :collapse-tags="f.multiple"
                   :max-tag-count="f.multiple ? 3 : undefined"
                   :loading="!!dynamicLoading[f.key]"
-                  :placeholder="f.multiple ? '选择支持的选项（可多选）' : f.placeholder || '请选择'"
+                  :placeholder="f.multiple ? '選擇支持的選項（可多選）' : f.placeholder || '請選擇'"
                   style="width: 100%"
                   @update:value="
                     (v) => {
-                      // 级联：network 变化 → 刷新 token 选项（已选链的代币并集）
+                      // 級聯：network 變化 → 刷新 token 選項（已選鏈的代幣並集）
                       if (f.dynamic && f.key === 'network') {
                         const tokenField = currentFields.find((x) => x.key === 'token');
                         if (tokenField) loadFieldOptions(tokenField);
@@ -859,7 +859,7 @@ onMounted(() => {
                   "
                 />
                 <div v-if="f.dynamic && dynamicOpts[f.key]?.fallback" class="text-12px opacity-50 mt-4px">
-                  无法连接网关，当前为内置选项（配置网关地址后自动刷新）
+                  無法連接網關，當前為內置選項（配置網關地址後自動刷新）
                 </div>
                 <div v-if="['bepusdt', 'upay'].includes(current?.driver || '') && f.help" class="text-12px opacity-70 mt-4px">{{ f.help }}</div>
               </div>
@@ -896,16 +896,16 @@ onMounted(() => {
           </NFormItem>
         </template>
 
-        <!-- 回调地址（配置到支付平台 webhook/notify） -->
+        <!-- 回調地址（配置到支付平台 webhook/notify） -->
         <template v-if="current?.callback_url">
-          <NDivider title-placement="left" style="margin: 4px 0 16px">回调地址</NDivider>
-          <NAlert type="info" :show-icon="true" title="异步通知回调地址" style="margin-bottom: 16px">
-            <div class="text-12px opacity-70 mb-8px">将该地址配置到支付平台的 webhook / 异步通知，用于接收支付结果</div>
+          <NDivider title-placement="left" style="margin: 4px 0 16px">回調地址</NDivider>
+          <NAlert type="info" :show-icon="true" title="異步通知回調地址" style="margin-bottom: 16px">
+            <div class="text-12px opacity-70 mb-8px">將該地址配置到支付平台的 webhook / 異步通知，用於接收支付結果</div>
             <div class="flex items-center gap-8px">
               <code class="flex-1 text-12px break-all select-all bg-#f1f5f9 dark:bg-#333 rounded-6px px-8px py-6px">
                 {{ current.callback_url }}
               </code>
-              <NButton size="small" secondary type="primary" @click="copyText(current.callback_url)">复制</NButton>
+              <NButton size="small" secondary type="primary" @click="copyText(current.callback_url)">複製</NButton>
             </div>
           </NAlert>
         </template>

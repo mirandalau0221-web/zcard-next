@@ -8,18 +8,18 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminPaymentService 支付管理：渠道 CRUD + 支付单 + 退款。
+// AdminPaymentService 支付管理：渠道 CRUD + 支付單 + 退款。
 service AdminPaymentService {
   // ── 渠道管理 ──
   rpc ListChannels(google.protobuf.Empty) returns (ChannelList) {
     option (google.api.http) = { get: "/api/v1/admin/payment/channels" };
   }
-  // ListDrivers 驱动元数据（含配置字段 schema——admin 配置面动态表单渲染）。
+  // ListDrivers 驅動元數據（含配置字段 schema——admin 配置面動態表單渲染）。
   rpc ListDrivers(google.protobuf.Empty) returns (DriverList) {
     option (google.api.http) = { get: "/api/v1/admin/payment/drivers" };
   }
-  // FieldOptions 驱动字段选项动态加载（epusdt network/token 以网关 supported_assets
-  // 为准；网关不可达时后端回落静态矩阵并标记 fallback）。
+  // FieldOptions 驅動字段選項動態加載（epusdt network/token 以網關 supported_assets
+  // 為準；網關不可達時後端回落靜態矩陣並標記 fallback）。
   rpc FieldOptions(FieldOptionsRequest) returns (FieldOptionsReply) {
     option (google.api.http) = { get: "/api/v1/admin/payment/drivers/{code}/field-options" };
   }
@@ -33,14 +33,14 @@ service AdminPaymentService {
     option (google.api.http) = { delete: "/api/v1/admin/payment/channels/{id}" };
   }
 
-  // ── 支付单 ──
+  // ── 支付單 ──
   rpc ListPayments(ListPaymentsRequest) returns (ListPaymentsReply) {
     option (google.api.http) = { get: "/api/v1/admin/payments" };
   }
   rpc GetPayment(GetPaymentRequest) returns (Payment) {
     option (google.api.http) = { get: "/api/v1/admin/payments/{id}" };
   }
-  // CapturePayment 补单（主动拉网关状态复走回调管线）。
+  // CapturePayment 補單（主動拉網關狀態復走回調管線）。
   rpc CapturePayment(CapturePaymentRequest) returns (Payment) {
     option (google.api.http) = { post: "/api/v1/admin/payments/{id}/capture" body: "*" };
   }
@@ -58,21 +58,21 @@ message ChannelList {
   repeated Channel channels = 1;
 }
 
-// Channel 渠道（config 为 AES-GCM 加密凭据，列表返回 ****）。
+// Channel 渠道（config 為 AES-GCM 加密憑據，列表返回 ****）。
 message Channel {
   uint64 id = 1;
   string name = 2;
   string code = 3;
   string driver = 4;
-  string config_json = 5; // 脱敏后
+  string config_json = 5; // 脱敏後
   int64 fee = 6;
   string fee_type = 7;
   bool enabled = 8;
   int32 sort = 9;
-  repeated string configured_fields = 10; // 已配置字段名（仅名不显值——脱敏）
-  string callback_url = 11; // 回调地址（站点 URL 拼接；未配置站点时为相对路径）
-  string icon = 12; // 渠道自定义图标（素材库 URL，空=回落内置徽标）
-  string methods_json = 13; // 支付方式列表 JSON [{code,name,icon,enabled,params}]（空=单方式渠道）
+  repeated string configured_fields = 10; // 已配置字段名（僅名不顯值——脱敏）
+  string callback_url = 11; // 回調地址（站點 URL 拼接；未配置站點時為相對路徑）
+  string icon = 12; // 渠道自定義圖標（素材庫 URL，空=回落內置徽標）
+  string methods_json = 13; // 支付方式列表 JSON [{code,name,icon,enabled,params}]（空=單方式渠道）
   optional bool allow_purchase = 14;
   optional bool allow_member_recharge = 15;
   optional bool allow_supply_recharge = 16;
@@ -82,31 +82,31 @@ message Channel {
   string recommend_description = 20;
 }
 
-// DriverList 驱动元数据列表。
+// DriverList 驅動元數據列表。
 message DriverList {
   repeated Driver drivers = 1;
 }
 
-// Driver 渠道驱动元数据（ListDrivers）。
+// Driver 渠道驅動元數據（ListDrivers）。
 message Driver {
-  string code = 1; // 驱动码（= adapter Type）
-  string name = 2; // 显示名
-  string icon = 3; // 品牌图标标识（前端图标库映射）
-  string description = 4; // 说明（适用场景/收款币种）
+  string code = 1; // 驅動碼（= adapter Type）
+  string name = 2; // 顯示名
+  string icon = 3; // 品牌圖標標識（前端圖標庫映射）
+  string description = 4; // 説明（適用場景/收款幣種）
   repeated ConfigField fields = 5; // 配置字段 schema
 }
 
-// ConfigField 配置字段 schema（前端按 type 动态渲染表单）。
+// ConfigField 配置字段 schema（前端按 type 動態渲染表單）。
 message ConfigField {
   string key = 1;
   string label = 2;
   string type = 3; // text | password | textarea | select | number | switch
   bool required = 4;
   string placeholder = 5;
-  string help = 6; // 字段帮助文案
-  bool sensitive = 7; // 敏感字段：编辑时留空=保持原值，不回显
-  bool dynamic = 8; // 选项动态加载（FieldOptions；失败回落 options）
-  bool multiple = 9; // 多选（保存为数组；epusdt token/network——占位订单模式）
+  string help = 6; // 字段幫助文案
+  bool sensitive = 7; // 敏感字段：編輯時留空=保持原值，不回顯
+  bool dynamic = 8; // 選項動態加載（FieldOptions；失敗回落 options）
+  bool multiple = 9; // 多選（保存為數組；epusdt token/network——佔位訂單模式）
   repeated Option options = 10;
   string default = 11;
 }
@@ -117,27 +117,27 @@ message Option {
 }
 
 message FieldOptionsRequest {
-  string code = 1 [(google.api.field_behavior) = REQUIRED]; // 驱动码
+  string code = 1 [(google.api.field_behavior) = REQUIRED]; // 驅動碼
   string field = 2 [(google.api.field_behavior) = REQUIRED]; // 字段 key（network/token）
-  string config_json = 3; // 部分配置（仅非敏感字段，如 api_url）
+  string config_json = 3; // 部分配置（僅非敏感字段，如 api_url）
 }
 
 message FieldOptionsReply {
   repeated Option options = 1;
-  bool fallback = 2; // true=上游不可达回落静态矩阵（前端提示）
+  bool fallback = 2; // true=上游不可達回落靜態矩陣（前端提示）
 }
 
 message CreateChannelRequest {
   string name = 1 [(google.api.field_behavior) = REQUIRED];
   string code = 2 [(google.api.field_behavior) = REQUIRED];
   string driver = 3 [(google.api.field_behavior) = REQUIRED];
-  string config_json = 4 [(google.api.field_behavior) = REQUIRED]; // 凭据 JSON 明文（入库前加密）
+  string config_json = 4 [(google.api.field_behavior) = REQUIRED]; // 憑據 JSON 明文（入庫前加密）
   int64 fee = 5;
   string fee_type = 6;
   bool enabled = 7;
   int32 sort = 8;
   string icon = 9;
-  string methods_json = 10; // 支付方式列表 JSON（聚合网关按方式收银）
+  string methods_json = 10; // 支付方式列表 JSON（聚合網關按方式收銀）
   optional bool allow_purchase = 11;
   optional bool allow_member_recharge = 12;
   optional bool allow_supply_recharge = 13;
@@ -191,7 +191,7 @@ message CapturePaymentRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// Payment 支付单。
+// Payment 支付單。
 message Payment {
   uint64 id = 1;
   uint64 order_id = 2;
@@ -233,7 +233,7 @@ message ListRefundsReply {
   repeated RefundOrder refunds = 1;
 }
 
-// RefundOrder 退款单。
+// RefundOrder 退款單。
 message RefundOrder {
   uint64 id = 1;
   uint64 order_id = 2;

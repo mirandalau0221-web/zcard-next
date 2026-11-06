@@ -55,7 +55,7 @@ async function run(apply = false) {
         : {},
     });
     if (e) {
-      error.value = (e as any)?.response?.data?.message || "处理失败，请重试；设置已保留";
+      error.value = (e as any)?.response?.data?.message || "處理失敗，請重試；設置已保留";
       return;
     }
     result.value = data;
@@ -70,7 +70,7 @@ async function run(apply = false) {
   <NModal
     :show="show"
     preset="card"
-    title="按关键词自动分类"
+    title="按關鍵詞自動分類"
     style="width: 740px; max-width: 96vw"
     :mask-closable="!busy"
     :closable="!busy"
@@ -79,10 +79,10 @@ async function run(apply = false) {
   >
     <div class="classify-products">
       <NAlert type="info"
-        >范围：本站全部商品，包含已下架商品。按商品名称匹配；锁定商品、已手动指定分类的商品会跳过。先预览，再确认修改。</NAlert
+        >範圍：本站全部商品，包含已下架商品。按商品名稱匹配；鎖定商品、已手動指定分類的商品會跳過。先預覽，再確認修改。</NAlert
       >
       <label
-        >包含关键词（逗号分隔）<NInput
+        >包含關鍵詞（逗號分隔）<NInput
           v-model:value="form.keywords"
           :disabled="busy"
           placeholder="例如：小火箭，Shadowrocket，Apple ID"
@@ -92,36 +92,36 @@ async function run(apply = false) {
         @update:value="(v) => (form.match_all = Boolean(v))"
         :disabled="busy"
         :options="[
-          { label: '包含任意一个关键词', value: 0 },
-          { label: '必须包含所有关键词', value: 1 },
+          { label: '包含任意一個關鍵詞', value: 0 },
+          { label: '必須包含所有關鍵詞', value: 1 },
         ]"
       />
       <label
-        >排除关键词（可不填）<NInput
+        >排除關鍵詞（可不填）<NInput
           v-model:value="form.excludes"
           :disabled="busy"
-          placeholder="例如：独享，充值"
+          placeholder="例如：獨享，充值"
       /></label>
       <label
-        >分到哪个分类<NSelect
+        >分到哪個分類<NSelect
           v-model:value="form.category_id"
           :disabled="busy"
           :options="categories"
           filterable
-          placeholder="选择目标分类"
+          placeholder="選擇目標分類"
       /></label>
       <NAlert v-if="error" type="error">{{ error }}</NAlert>
       <template v-if="result">
         <NAlert v-if="result.truncated" type="warning"
-          >匹配超过1000件，请补充关键词缩小范围后重新预览。</NAlert
+          >匹配超過1000件，請補充關鍵詞縮小範圍後重新預覽。</NAlert
         >
         <NAlert v-else :type="applied ? 'success' : 'info'"
           >{{
             applied
               ? `已修改 ${result.updated || 0} 件`
-              : `将修改 ${result.items?.length || 0} 件，移至「${target}」`
-          }}；跳过锁定 {{ result.skipped_locked || 0 }} 件，保留手动分类
-          {{ result.skipped_protected || 0 }} 件，已在目标分类
+              : `將修改 ${result.items?.length || 0} 件，移至「${target}」`
+          }}；跳過鎖定 {{ result.skipped_locked || 0 }} 件，保留手動分類
+          {{ result.skipped_protected || 0 }} 件，已在目標分類
           {{ result.unchanged || 0 }} 件。</NAlert
         >
         <div class="classification-preview">
@@ -129,34 +129,34 @@ async function run(apply = false) {
             <span>{{ p.name }}</span
             ><NTag :type="p.status === 'conflict' ? 'warning' : 'default'">{{
               p.status === "conflict"
-                ? "设置已变化，跳过"
+                ? "設置已變化，跳過"
                 : p.status === "updated"
                   ? "已修改"
                   : p.status === "protected"
-                    ? "保留手动分类"
+                    ? "保留手動分類"
                     : target
             }}</NTag>
           </div>
         </div>
         <p v-if="applied">
-          仅本次预览中的商品会被修改。今后导入的新商品，可在导入窗口保存关键词分类规则。
+          僅本次預覽中的商品會被修改。今後導入的新商品，可在導入窗口保存關鍵詞分類規則。
         </p>
       </template>
     </div>
     <template #footer
       ><NSpace justify="end"
-        ><NButton :disabled="busy" @click="emit('update:show', false)">关闭</NButton
+        ><NButton :disabled="busy" @click="emit('update:show', false)">關閉</NButton
         ><NButton
           :loading="busy && !applied"
           :disabled="!form.category_id || !words(form.keywords).length"
           @click="run(false)"
-          >预览匹配商品</NButton
+          >預覽匹配商品</NButton
         ><NButton
           v-if="result && !applied"
           type="primary"
           :disabled="busy || result.truncated || !result.items?.length"
           @click="run(true)"
-          >确认分类 {{ result.items?.length || 0 }} 件商品</NButton
+          >確認分類 {{ result.items?.length || 0 }} 件商品</NButton
         ></NSpace
       ></template
     >

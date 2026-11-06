@@ -12,7 +12,7 @@ import (
 func (s *SeoService) RenderThemeHTML(r *http.Request, shell []byte) ([]byte, int, error) {
 	d, status, err := s.pageData(r)
 	if err != nil {
-		d = noindexPage(s.loadSite(r.Context()), r.Host, r.URL.Path, "页面暂时无法加载")
+		d = noindexPage(s.loadSite(r.Context()), r.Host, r.URL.Path, "頁面暫時無法加載")
 		status = http.StatusServiceUnavailable
 	}
 	out, err := injectThemeHTML(shell, d)

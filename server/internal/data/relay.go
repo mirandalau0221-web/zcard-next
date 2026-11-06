@@ -1,10 +1,10 @@
 package data
 
-// Outbox relay（规划 ； ）：500ms 扫描 publishing 事件 →
-// 入队（asynq 或进程内同步分发）→ 标记 published。
+// Outbox relay（規劃 ； ）：500ms 掃描 publishing 事件 →
+// 入隊（asynq 或進程內同步分發）→ 標記 published。
 //
-// 多实例安全：MySQL/PG 认领用 FOR UPDATE SKIP LOCKED；SQLite 单写者事务天然串行
-// （BATCH 内一次事务认领+投递后标记，崩溃由至少一次投递 + 消费幂等兜底）。
+// 多實例安全：MySQL/PG 認領用 FOR UPDATE SKIP LOCKED；SQLite 單寫者事務天然串行
+// （BATCH 內一次事務認領+投遞後標記，崩潰由至少一次投遞 + 消費冪等兜底）。
 
 import (
 	"context"
@@ -25,22 +25,22 @@ import (
 const (
 	relayInterval = 500 * time.Millisecond
 	relayBatch    = 100
-	relayMaxTry   = 3 // 连续投递失败次数上限，超过置 failed + 告警日志
+	relayMaxTry   = 3 // 連續投遞失敗次數上限，超過置 failed + 告警日誌
 )
 
-// OutboxRelay outbox 投递器（kratos server 生命周期托管，见 internal/server/background.go）。
+// OutboxRelay outbox 投遞器（kratos server 生命週期託管，見 internal/server/background.go）。
 type OutboxRelay struct {
 	data  *Data
 	queue queue.Enqueuer
 	log   *slog.Logger
 
 	mu      sync.Mutex
-	attempt map[uint64]int // 内存重试计数（进程重启归零，由消费幂等兜底）
+	attempt map[uint64]int // 內存重試計數（進程重啓歸零，由消費冪等兜底）
 	stop    chan struct{}
 	stopOne sync.Once
 }
 
-// NewOutboxRelay 构造。
+// NewOutboxRelay 構造。
 func NewOutboxRelay(d *Data, q queue.Enqueuer, log *slog.Logger) *OutboxRelay {
 	return &OutboxRelay{
 		data: d, queue: q, log: log,
@@ -49,7 +49,7 @@ func NewOutboxRelay(d *Data, q queue.Enqueuer, log *slog.Logger) *OutboxRelay {
 	}
 }
 
-// Run 阻塞循环（调用方以 goroutine 托管）；ctx 取消或 Stop 后返回。
+// Run 阻塞循環（調用方以 goroutine 託管）；ctx 取消或 Stop 後返回。
 func (r *OutboxRelay) Run(ctx context.Context) {
 	ticker := time.NewTicker(relayInterval)
 	defer ticker.Stop()
@@ -67,10 +67,10 @@ func (r *OutboxRelay) Run(ctx context.Context) {
 	}
 }
 
-// Stop 幂等停止。
+// Stop 冪等停止。
 func (r *OutboxRelay) Stop() { r.stopOne.Do(func() { close(r.stop) }) }
 
-// tick 单轮：认领一批 publishing → 逐条投递 → 投递成功即标记 published。
+// tick 單輪：認領一批 publishing → 逐條投遞 → 投遞成功即標記 published。
 func (r *OutboxRelay) tick(ctx context.Context) error {
 	rows, err := r.claim(ctx)
 	if err != nil || len(rows) == 0 {
@@ -78,14 +78,14 @@ func (r *OutboxRelay) tick(ctx context.Context) error {
 	}
 	for _, row := range rows {
 		if err := r.deliver(ctx, row); err != nil {
-			return nil // 本条失败不阻断后续 tick；计数与置 failed 在 deliver 内处理
+			return nil // 本條失敗不阻斷後續 tick；計數與置 failed 在 deliver 內處理
 		}
 	}
 	return nil
 }
 
-// claim 认领一批：MySQL/PG 行锁 SKIP LOCKED（多实例不重复认领）；SQLite 普通查询
-// （单写者串行；崩溃场景由至少一次语义 + 消费幂等兜底）。
+// claim 認領一批：MySQL/PG 行鎖 SKIP LOCKED（多實例不重複認領）；SQLite 普通查詢
+// （單寫者串行；崩潰場景由至少一次語義 + 消費冪等兜底）。
 func (r *OutboxRelay) claim(ctx context.Context) ([]*ent.OutboxEvent, error) {
 	q := Client(ctx, r.data).OutboxEvent.Query().
 		Where(outboxevent.StatusEQ(outboxevent.StatusPublishing)).
@@ -97,13 +97,13 @@ func (r *OutboxRelay) claim(ctx context.Context) ([]*ent.OutboxEvent, error) {
 	return q.All(ctx)
 }
 
-// deliver 投递单条：入队成功 → published；失败 → 计数，连续 relayMaxTry 次置 failed。
+// deliver 投遞單條：入隊成功 → published；失敗 → 計數，連續 relayMaxTry 次置 failed。
 func (r *OutboxRelay) deliver(ctx context.Context, row *ent.OutboxEvent) error {
 	env := events.Envelope{
 		EventID:     row.ID,
 		Type:        row.Type,
 		AggregateID: row.AggregateID,
-		Payload:     row.Payload, // 事件载荷必须随信封投递（消费方按载荷解析业务字段）
+		Payload:     row.Payload, // 事件載荷必須隨信封投遞（消費方按載荷解析業務字段）
 	}
 	payload, err := json.Marshal(env)
 	if err != nil {
@@ -112,10 +112,10 @@ func (r *OutboxRelay) deliver(ctx context.Context, row *ent.OutboxEvent) error {
 	task := queue.Task{
 		Type:    "event:" + row.Type,
 		Payload: payload,
-		Queue:   queue.QueueCritical, // 事件扇出（交付/采购/补单）默认 critical；细分由订阅方任务类型承接
+		Queue:   queue.QueueCritical, // 事件扇出（交付/採購/補單）默認 critical；細分由訂閲方任務類型承接
 	}
 	if row.Module == "notify" {
-		task.Queue = queue.QueueDefault // 通知类事件降级 default
+		task.Queue = queue.QueueDefault // 通知類事件降級 default
 	}
 	if err := r.queue.Enqueue(ctx, task); err != nil {
 		r.mu.Lock()
@@ -150,4 +150,4 @@ func (r *OutboxRelay) markFailed(ctx context.Context, row *ent.OutboxEvent, caus
 	return err
 }
 
-var _ = db.SQLite // 保持 db 包引用（能力判定见 claim）
+var _ = db.SQLite // 保持 db 包引用（能力判定見 claim）

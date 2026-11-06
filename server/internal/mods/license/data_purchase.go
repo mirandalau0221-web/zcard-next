@@ -1,13 +1,13 @@
 package license
 
-// ：专业套餐在线购买（发行侧部署）。
+// ：專業套餐在線購買（發行側部署）。
 //
-// 模型：本部署同时充当发行侧时（settings.license.purchase_privkey 配置了 ed25519
-// 签发私钥），站点用户可钱包余额购买专业套餐；签发的许可证绑定目标实例 ID
-// （购买人填自己的实例 ID——在其部署后台可见；空=绑定本实例自装）。
-// 原子性：购买单落库 + 钱包扣款 + 许可证签发自验 + （自购时）安装，全部同一事务；
-// 任一步失败整单回滚（铁律 15/16：金额服务端裁决，扣款前零落账）。
-// 经济闭环：充值管线（真实支付渠道）→ 钱包余额 → 购买扣款——「3U/月、30U/年」。
+// 模型：本部署同時充當發行側時（settings.license.purchase_privkey 配置了 ed25519
+// 簽發私鑰），站點用户可錢包餘額購買專業套餐；簽發的許可證綁定目標實例 ID
+// （購買人填自己的實例 ID——在其部署後台可見；空=綁定本實例自裝）。
+// 原子性：購買單落庫 + 錢包扣款 + 許可證簽發自驗 + （自購時）安裝，全部同一事務；
+// 任一步失敗整單回滾（鐵律 15/16：金額服務端裁決，扣款前零落賬）。
+// 經濟閉環：充值管線（真實支付渠道）→ 錢包餘額 → 購買扣款——「3U/月、30U/年」。
 
 import (
 	"context"
@@ -25,43 +25,43 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/money"
 )
 
-// 专业套餐特性清单（ 首批；* 为永久通配——订阅版逐项授权）。
+// 專業套餐特性清單（ 首批；* 為永久通配——訂閲版逐項授權）。
 var professionalFeatures = []string{"analytics", "whitelabel_ads", "auto_pricing"}
 
-// PurchaseOffer 报价视图。
+// PurchaseOffer 報價視圖。
 type PurchaseOffer struct {
 	MonthlyCents int64
 	YearlyCents  int64
-	Purchasable  bool   // 签发私钥已配置
-	InstanceID   string // 本部署实例 ID
+	Purchasable  bool   // 簽發私鑰已配置
+	InstanceID   string // 本部署實例 ID
 }
 
-// PurchaseRepo 购买仓储。
+// PurchaseRepo 購買倉儲。
 type PurchaseRepo struct {
 	data   *data.Data
 	lic    *LicenseRepo
 	wallet walletport.Wallet
 }
 
-// NewPurchaseRepo 构造。
+// NewPurchaseRepo 構造。
 func NewPurchaseRepo(d *data.Data, lic *LicenseRepo, wallet walletport.Wallet) *PurchaseRepo {
 	return &PurchaseRepo{data: d, lic: lic, wallet: wallet}
 }
 
-// settingInt 读 license 组数值键（缺省回落默认值）。
+// settingInt 讀 license 組數值鍵（缺省回落默認值）。
 func (r *PurchaseRepo) settingInt(ctx context.Context, key string, fallback int64) int64 {
 	raw, err := r.lic.settings.Get(ctx, "license", key)
 	if err != nil || len(raw) == 0 {
 		return fallback
 	}
-	var v float64 // settings JSON 数值统一 float64
+	var v float64 // settings JSON 數值統一 float64
 	if json.Unmarshal(raw, &v) != nil {
 		return fallback
 	}
 	return int64(v)
 }
 
-// Offer 报价（价格服务端裁决；铁律 16）。
+// Offer 報價（價格服務端裁決；鐵律 16）。
 func (r *PurchaseRepo) Offer(ctx context.Context) (*PurchaseOffer, error) {
 	self, err := r.lic.InstanceID(ctx)
 	if err != nil {
@@ -75,7 +75,7 @@ func (r *PurchaseRepo) Offer(ctx context.Context) (*PurchaseOffer, error) {
 	}, nil
 }
 
-// issuerKey 签发私钥（未配置返回 nil）。
+// issuerKey 簽發私鑰（未配置返回 nil）。
 func (r *PurchaseRepo) issuerKey(ctx context.Context) ed25519.PrivateKey {
 	raw, err := r.lic.settings.Get(ctx, "license", "purchase_privkey")
 	if err != nil || len(raw) == 0 {
@@ -92,9 +92,9 @@ func (r *PurchaseRepo) issuerKey(ctx context.Context) ed25519.PrivateKey {
 	return ed25519.PrivateKey(priv)
 }
 
-// Purchase 购买（单事务：建单 → 扣款 → 签发自验 → 自购安装 → success）。
+// Purchase 購買（單事務：建單 → 扣款 → 簽發自驗 → 自購安裝 → success）。
 func (r *PurchaseRepo) Purchase(ctx context.Context, payer uint64, plan, targetInstance, targetDomain string) (*ent.LicenseOrder, error) {
-	// 事务前 fail-fast：档位/价格/密钥/公钥
+	// 事務前 fail-fast：檔位/價格/密鑰/公鑰
 	var price int64
 	var months int
 	switch plan {
@@ -121,7 +121,7 @@ func (r *PurchaseRepo) Purchase(ctx context.Context, payer uint64, plan, targetI
 		return nil, err
 	}
 	if targetInstance == "" {
-		targetInstance = self // 自购：绑定本实例
+		targetInstance = self // 自購：綁定本實例
 	}
 	now := time.Now().UTC()
 	expires := now.AddDate(0, months, 0)
@@ -129,7 +129,7 @@ func (r *PurchaseRepo) Purchase(ctx context.Context, payer uint64, plan, targetI
 	var row *ent.LicenseOrder
 	err = data.Tx(ctx, r.data, func(txCtx context.Context) error {
 		client := data.Client(txCtx, r.data)
-		// 1) 购买单（pending）
+		// 1) 購買單（pending）
 		var derr error
 		row, derr = client.LicenseOrder.Create().
 			SetPlan(licenseorder.Plan(plan)).
@@ -144,16 +144,16 @@ func (r *PurchaseRepo) Purchase(ctx context.Context, payer uint64, plan, targetI
 		if derr != nil {
 			return derr
 		}
-		// 2) 钱包扣款（幂等键 license_order:<id>；余额不足整单回滚）
+		// 2) 錢包扣款（冪等鍵 license_order:<id>；餘額不足整單回滾）
 		if err := r.wallet.DebitInTx(txCtx, walletport.Entry{
 			UserID: payer, Direction: walletport.DirectionOut,
 			Type: "license_purchase", Amount: money.Cents(price),
 			Reference: fmt.Sprintf("license_order:%d", row.ID),
-			Remark:    "专业套餐 " + plan,
+			Remark:    "專業套餐 " + plan,
 		}); err != nil {
 			return fmt.Errorf("license.BALANCE_INSUFFICIENT: %w", err)
 		}
-		// 3) 签发 + 自验（防签发配置错误直接落库）
+		// 3) 簽發 + 自驗（防簽發配置錯誤直接落庫）
 		file, err := platformlicense.Sign(priv, platformlicense.License{
 			InstanceID: targetInstance, Domain: targetDomain,
 			Features: professionalFeatures,
@@ -165,7 +165,7 @@ func (r *PurchaseRepo) Purchase(ctx context.Context, payer uint64, plan, targetI
 		if _, err := platformlicense.Verify(file, pub, targetInstance, targetDomain, now); err != nil {
 			return fmt.Errorf("license.SIGN_VERIFY_FAILED: %w", err)
 		}
-		// 4) 自购（目标=本实例）：同事务安装直接激活
+		// 4) 自購（目標=本實例）：同事務安裝直接激活
 		if targetInstance == self {
 			if err := r.lic.settings.Put(txCtx, "license", "file", json.RawMessage(`"`+jsonEscape(string(file))+`"`)); err != nil {
 				return err
@@ -185,7 +185,7 @@ func (r *PurchaseRepo) Purchase(ctx context.Context, payer uint64, plan, targetI
 	return row, nil
 }
 
-// ListPurchases 购买记录（购买人视角）。
+// ListPurchases 購買記錄（購買人視角）。
 func (r *PurchaseRepo) ListPurchases(ctx context.Context, payer uint64, page, size int) ([]*ent.LicenseOrder, int64, error) {
 	q := data.Client(ctx, r.data).LicenseOrder.Query().
 		Where(licenseorder.PayerUserID(payer)).

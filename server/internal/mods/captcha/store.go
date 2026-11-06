@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// memoryStore 将写入、消费和过期清理放在同一把锁内。
-// base64Captcha v1.3.8 的内置 store 在锁外访问清理计数，不能用于并发生成。
+// memoryStore 將寫入、消費和過期清理放在同一把鎖內。
+// base64Captcha v1.3.8 的內置 store 在鎖外訪問清理計數，不能用於併發生成。
 type memoryStore struct {
 	mu          sync.Mutex
 	answers     map[string]storedAnswer

@@ -53,11 +53,11 @@ func (s *AdminMediaService) uploadVideo(ctx context.Context, r *http.Request, w 
 	defer http.NewResponseController(w).SetReadDeadline(time.Time{})
 	reader, err := r.MultipartReader()
 	if err != nil {
-		return nil, errors.BadRequest("media.VIDEO_FORM", "请使用文件上传")
+		return nil, errors.BadRequest("media.VIDEO_FORM", "請使用文件上傳")
 	}
 	part, err := reader.NextPart()
 	if err != nil || part.FormName() != "file" || strings.ToLower(filepath.Ext(part.FileName())) != ".mp4" {
-		return nil, errors.BadRequest("media.VIDEO_TYPE", "请选择 MP4 视频（H.264 / AAC）")
+		return nil, errors.BadRequest("media.VIDEO_TYPE", "請選擇 MP4 視頻（H.264 / AAC）")
 	}
 	name := filepath.Base(part.FileName())
 	dir := filepath.Join(StorageRoot, time.Now().UTC().Format("2006/01"))
@@ -72,10 +72,10 @@ func (s *AdminMediaService) uploadVideo(ctx context.Context, r *http.Request, w 
 	hash := sha256.New()
 	n, err := io.Copy(io.MultiWriter(f, hash), io.LimitReader(part, limit+1))
 	if err != nil || n > limit {
-		return nil, errors.BadRequest("media.VIDEO_SIZE", "视频上传中断或超过大小限制")
+		return nil, errors.BadRequest("media.VIDEO_SIZE", "視頻上傳中斷或超過大小限制")
 	}
 	if _, err := reader.NextPart(); err != io.EOF {
-		return nil, errors.BadRequest("media.VIDEO_FORM", "一次只能上传一个视频文件")
+		return nil, errors.BadRequest("media.VIDEO_FORM", "一次只能上傳一個視頻文件")
 	}
 	if err := validateMP4(f, n); err != nil {
 		return nil, errors.BadRequest("media.VIDEO_INVALID", err.Error())
@@ -110,12 +110,12 @@ func validateMP4(r io.ReaderAt, size int64) error {
 	boxes := 0
 	walk = func(start, end int64, depth int) error {
 		if depth > 8 {
-			return fmt.Errorf("视频结构层级异常")
+			return fmt.Errorf("視頻結構層級異常")
 		}
 		for pos := start; pos < end; {
 			boxes++
 			if boxes > 100000 || end-pos < 8 {
-				return fmt.Errorf("视频文件不完整")
+				return fmt.Errorf("視頻文件不完整")
 			}
 			h := make([]byte, 16)
 			if _, err := r.ReadAt(h[:8], pos); err != nil {
@@ -128,14 +128,14 @@ func validateMP4(r io.ReaderAt, size int64) error {
 				}
 				u := binary.BigEndian.Uint64(h[8:])
 				if u > uint64(end-pos) {
-					return fmt.Errorf("视频长度异常")
+					return fmt.Errorf("視頻長度異常")
 				}
 				n, header = int64(u), 16
 			} else if n == 0 {
 				n = end - pos
 			}
 			if n < header || n > end-pos {
-				return fmt.Errorf("视频文件不完整")
+				return fmt.Errorf("視頻文件不完整")
 			}
 			kind := string(h[4:8])
 			if depth == 0 {
@@ -155,7 +155,7 @@ func validateMP4(r io.ReaderAt, size int64) error {
 				}
 			case "stsd":
 				if n < header+8 {
-					return fmt.Errorf("缺少视频编码信息")
+					return fmt.Errorf("缺少視頻編碼信息")
 				}
 				if err := walk(pos+header+8, pos+n, depth+1); err != nil {
 					return err
@@ -163,7 +163,7 @@ func validateMP4(r io.ReaderAt, size int64) error {
 			case "avc1", "avc3":
 				avc = n >= header+78
 			case "hvc1", "hev1", "av01", "vp09":
-				return fmt.Errorf("请先转换为 H.264 编码的 MP4 视频")
+				return fmt.Errorf("請先轉換為 H.264 編碼的 MP4 視頻")
 			}
 			pos += n
 		}
@@ -173,7 +173,7 @@ func validateMP4(r io.ReaderAt, size int64) error {
 		return err
 	}
 	if !ftyp || !moov || !mdat || !avc {
-		return fmt.Errorf("请选择完整的 H.264 MP4 视频文件")
+		return fmt.Errorf("請選擇完整的 H.264 MP4 視頻文件")
 	}
 	return nil
 }

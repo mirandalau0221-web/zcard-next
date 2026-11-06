@@ -23,7 +23,7 @@ func (r *ProductRepoImpl) listInventory(ctx context.Context, q *ent.ProductQuery
 	switch f.Inventory {
 	case "", "available", "low", "empty", "unknown":
 	default:
-		return nil, 0, fmt.Errorf("库存筛选无效")
+		return nil, 0, fmt.Errorf("庫存篩選無效")
 	}
 	var out []*ent.Product
 	var total int64
@@ -88,25 +88,25 @@ func listingRevision(p *ent.Product) string {
 
 func (s *AdminCatalogService) listingUnsupported(ctx context.Context, p *ent.Product) string {
 	if p.ProductKind == "sms_channel" {
-		return "接码渠道按选项报价和库存，不支持普通库存自动上下架"
+		return "接碼渠道按選項報價和庫存，不支持普通庫存自動上下架"
 	}
 	if p.SubsiteID != 0 {
-		return "仅主站上游商品支持自动上下架"
+		return "僅主站上游商品支持自動上下架"
 	}
 	if p.UpstreamSourceID == 0 || p.UpstreamProductCode == "" {
-		return "仅支持上游供货商品"
+		return "僅支持上游供貨商品"
 	}
 	if p.FulfillmentMode != "auto" || string(p.StockType) != "card" {
-		return "本地或人工发货不参与上游自动上下架"
+		return "本地或人工發貨不參與上游自動上下架"
 	}
 	c := data.Client(ctx, s.repo.data)
 	local, err := data.HasLocalDelivery(ctx, c, p)
 	if err != nil || local {
-		return "含本地卡密或重复发货规格，暂不支持"
+		return "含本地卡密或重複發貨規格，暫不支持"
 	}
 	active, err := c.SupplyConnection.Query().Where(supplyconnection.ID(p.UpstreamSourceID), supplyconnection.StatusEQ(supplyconnection.StatusActive)).Exist(ctx)
 	if err != nil || !active {
-		return "货源已停用或不可用"
+		return "貨源已停用或不可用"
 	}
 	return ""
 }
@@ -118,7 +118,7 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 	switch req.Action {
 	case "enable", "disable", "on", "off", "hide":
 	default:
-		return nil, fmt.Errorf("请选择有效操作")
+		return nil, fmt.Errorf("請選擇有效操作")
 	}
 	actor, err := batchActor(ctx)
 	if err != nil {
@@ -129,13 +129,13 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 		var rows []*ent.Product
 		if len(req.Ids) > 0 {
 			if len(req.Ids) > 5000 {
-				return nil, fmt.Errorf("单次最多预览 5000 件，请缩小范围")
+				return nil, fmt.Errorf("單次最多預覽 5000 件，請縮小範圍")
 			}
 			rows, err = data.Client(ctx, s.repo.data).Product.Query().Where(product.IDIn(req.Ids...), product.SubsiteID(tenancy.FromContext(ctx).SubsiteID), product.StatusGTE(0)).Order(ent.Asc(product.FieldID)).All(ctx)
 			out.Matched = int32(len(rows))
 		} else {
 			if req.Filter == nil {
-				return nil, fmt.Errorf("请指定商品或筛选范围")
+				return nil, fmt.Errorf("請指定商品或篩選範圍")
 			}
 			f := s.adminFilter(ctx, req.Filter)
 			f.Page = 1
@@ -156,7 +156,7 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 			row := &adminv1.ProductListingTarget{Id: p.ID, Name: p.Name, Revision: listingRevision(p), Status: int32(p.Status), AutoListing: p.AutoListing, Result: "ready"}
 			if p.IsLocked {
 				row.Result = "locked"
-				row.Message = "已锁定，跳过"
+				row.Message = "已鎖定，跳過"
 				out.SkippedLocked++
 			} else if req.Action == "enable" {
 				row.Message = s.listingUnsupported(ctx, p)
@@ -164,20 +164,20 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 					row.Result = "unsupported"
 					out.Unsupported++
 				} else if p.Status == 0 {
-					row.Message = "开启后重新检查库存；确认有货将上架"
+					row.Message = "開啓後重新檢查庫存；確認有貨將上架"
 				} else {
-					row.Message = "缺货复核后下架，补货后恢复原展示状态"
+					row.Message = "缺貨複核後下架，補貨後恢復原展示狀態"
 				}
 			}
 			if req.Action == "on" || req.Action == "off" || req.Action == "hide" {
-				row.Message = "人工设置将暂停自动上下架"
+				row.Message = "人工設置將暫停自動上下架"
 			}
 			out.Items = append(out.Items, row)
 		}
 		return out, nil
 	}
 	if len(req.Revisions) == 0 || len(req.Revisions) > 100 {
-		return nil, fmt.Errorf("请先预览，每批最多处理 100 件")
+		return nil, fmt.Errorf("請先預覽，每批最多處理 100 件")
 	}
 	ids := make([]uint64, 0, len(req.Revisions))
 	for id := range req.Revisions {
@@ -200,7 +200,7 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 			row.AutoListing = p.AutoListing
 			if listingRevision(p) != req.Revisions[id] {
 				row.Result = "conflict"
-				row.Message = "商品已变化，请重新预览"
+				row.Message = "商品已變化，請重新預覽"
 				return nil
 			}
 			if req.Action == "enable" {
@@ -213,7 +213,7 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 			q := data.Client(ctx, s.repo.data).Product.UpdateOneID(id)
 			switch req.Action {
 			case "enable":
-				q.SetAutoListing(true).SetListingChangedAt(time.Now().UnixMilli()).SetListingZeroSince(0).SetListingMessage("自动管理已开启，等待后台重新检查")
+				q.SetAutoListing(true).SetListingChangedAt(time.Now().UnixMilli()).SetListingZeroSince(0).SetListingMessage("自動管理已開啓，等待後台重新檢查")
 				if p.Status == 0 {
 					q.SetListingReason("stock_out")
 					if p.ListingReason != "stock_out" {
@@ -223,7 +223,7 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 					q.SetListingRestoreStatus(p.Status)
 				}
 			case "disable":
-				q.SetAutoListing(false).SetListingChangedAt(time.Now().UnixMilli()).SetListingZeroSince(0).SetListingMessage("自动管理已关闭，保留当前状态")
+				q.SetAutoListing(false).SetListingChangedAt(time.Now().UnixMilli()).SetListingZeroSince(0).SetListingMessage("自動管理已關閉，保留當前狀態")
 			default:
 				status := int8(0)
 				if req.Action == "on" {
@@ -245,7 +245,7 @@ func (s *AdminCatalogService) ManageProductListing(ctx context.Context, req *adm
 		})
 		if err != nil {
 			row.Result = "failed"
-			row.Message = "处理失败，请刷新后重试"
+			row.Message = "處理失敗，請刷新後重試"
 		}
 		out.Matched++
 		switch row.Result {

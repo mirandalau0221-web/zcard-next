@@ -8,16 +8,16 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 
 
-// StorePaymentService 顾客支付。
+// StorePaymentService 顧客支付。
 service StorePaymentService {
-  // ListChannels 启用渠道列表（支付页渠道下拉数据源—— 替代前端硬编码枚举）。
+  // ListChannels 啓用渠道列表（支付頁渠道下拉數據源—— 替代前端硬編碼枚舉）。
   rpc ListChannels(ListPaymentChannelsRequest) returns (ChannelListReply) {
     option (google.api.http) = { get: "/api/v1/storefront/payment/channels" };
   }
   rpc QuotePayment(PaymentQuoteRequest) returns (PaymentQuote) {
     option (google.api.http) = { post: "/api/v1/storefront/payment/quote" body: "*" };
   }
-  // CreatePayment 创建支付（返回收银台/二维码跳转信息）。
+  // CreatePayment 創建支付（返回收銀台/二維碼跳轉信息）。
   rpc CreatePayment(CreatePaymentRequest) returns (CreatePaymentReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/payments"
@@ -30,33 +30,33 @@ message ListPaymentChannelsRequest {
   string scene = 1; // purchase (default) | member_recharge | supply_recharge
 }
 
-// ChannelListReply 启用渠道列表。
+// ChannelListReply 啓用渠道列表。
 message ChannelListReply {
   repeated ChannelItem channels = 1;
 }
 
 message ChannelItem {
   string code = 1;
-  string name = 2; // 渠道名称（管理端配置）
+  string name = 2; // 渠道名稱（管理端配置）
   string driver = 3;
-  string icon = 4; // 渠道自定义图标 URL（空=前端回落内置徽标）
+  string icon = 4; // 渠道自定義圖標 URL（空=前端回落內置徽標）
   int64 fee = 6;
   string fee_type = 7;
   string fee_bearer = 8;
   bool recommended = 9;
   string recommend_label = 10;
   string recommend_description = 11;
-  repeated MethodItem methods = 5; // 支付方式列表（聚合网关；空=单方式渠道）
+  repeated MethodItem methods = 5; // 支付方式列表（聚合網關；空=單方式渠道）
 }
 
-// MethodItem 支付方式（收银台顾客看到的选项：支付宝/微信/USDT-TRC20…）。
+// MethodItem 支付方式（收銀台顧客看到的選項：支付寶/微信/USDT-TRC20…）。
 message MethodItem {
   string code = 1;
   string name = 2;
   bool recommended = 4;
   string recommend_label = 5;
   string recommend_description = 6;
-  string icon = 3; // 方式级自定义图标（空=回落渠道图标/内置徽标）
+  string icon = 3; // 方式級自定義圖標（空=回落渠道圖標/內置徽標）
 }
 
 message CreatePaymentRequest {
@@ -65,14 +65,14 @@ message CreatePaymentRequest {
   string query_password = 5;
   string order_no = 1 [(google.api.field_behavior) = REQUIRED];
   string channel = 2 [(google.api.field_behavior) = REQUIRED];
-  string method = 3; // 支付方式 code（多方式渠道必选；单方式渠道可空）
+  string method = 3; // 支付方式 code（多方式渠道必選；單方式渠道可空）
 }
 
 message CreatePaymentReply {
   PaymentQuote quote = 4;
   uint64 payment_id = 1;
   string type = 2; // redirect | qrcode | params
-  string payload = 3; // URL / 二维码内容 / 参数 JSON
+  string payload = 3; // URL / 二維碼內容 / 參數 JSON
 }
 
 message PaymentQuoteRequest {

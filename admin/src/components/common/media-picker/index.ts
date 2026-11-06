@@ -1,10 +1,10 @@
 import { reactive } from "vue";
 
 /**
- * 素材选择器全局单例（模块级状态，App.vue 挂载 <MediaPickerHost /> 一次）。
+ * 素材選擇器全局單例（模塊級狀態，App.vue 掛載 <MediaPickerHost /> 一次）。
  *
  * 用法：const urls = await pickMedia({ multiple: true }); // 取消返回 null
- * 所有「上传/选择图片」入口统一呼出素材管理弹窗——复用已有素材 + 就地上传。
+ * 所有「上傳/選擇圖片」入口統一呼出素材管理彈窗——複用已有素材 + 就地上傳。
  */
 
 interface MediaPickerState {
@@ -26,16 +26,16 @@ export const mediaPickerState = reactive<MediaPickerState>({
 });
 
 export interface PickMediaOptions {
-  /** 多选（图集）；默认单选 */
+  /** 多選（圖集）；默認單選 */
   multiple?: boolean;
   initialURLs?: string[];
  kind?: "image" | "video";
-  /** 当前图片用途的上传提示 */
+  /** 當前圖片用途的上傳提示 */
   tip?: string;
 }
 
 export function pickMedia(options: PickMediaOptions = {}): Promise<string[] | null> {
-  // 二次打开时废弃上一个等待（防悬挂 Promise）
+  // 二次打開時廢棄上一個等待（防懸掛 Promise）
   mediaPickerState.resolve?.(null);
   mediaPickerState.multiple = options.multiple ?? false;
   mediaPickerState.initialURLs = [...new Set(options.initialURLs || [])];
@@ -47,7 +47,7 @@ export function pickMedia(options: PickMediaOptions = {}): Promise<string[] | nu
   });
 }
 
-/** 弹窗内部专用：确认/取消回填 */
+/** 彈窗內部專用：確認/取消回填 */
 export function settleMediaPicker(urls: string[] | null) {
   mediaPickerState.show = false;
   mediaPickerState.resolve?.(urls);

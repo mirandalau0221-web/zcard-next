@@ -1,6 +1,6 @@
 package ticket
 
-// 工单服务（）：storefront + admin 双面 + 付费加急（余额）+ 通知双侧。
+// 工單服務（）：storefront + admin 雙面 + 付費加急（餘額）+ 通知雙側。
 
 import (
 	"context"
@@ -25,16 +25,16 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// 加急费配置键（settings.ticket.urgent_fee；0=免费直接加急）。
+// 加急費配置鍵（settings.ticket.urgent_fee；0=免費直接加急）。
 const urgentFeeGroup, urgentFeeKey = "ticket", "urgent_fee"
 
-// 付费加急 SLA（小时；普通单 48h——仅回填预留位，M4 告警消费）。
+// 付費加急 SLA（小時；普通單 48h——僅回填預留位，M4 告警消費）。
 const (
 	urgentSLAHours = 2
 	normalSLAHours = 48
 )
 
-// StoreTicketService 用户工单服务。
+// StoreTicketService 用户工單服務。
 type StoreTicketService struct {
 	storefrontv1.UnimplementedStoreTicketServiceServer
 	repo     *TicketRepo
@@ -45,12 +45,12 @@ type StoreTicketService struct {
 	log      *slog.Logger
 }
 
-// NewStoreTicketService 构造。
+// NewStoreTicketService 構造。
 func NewStoreTicketService(repo *TicketRepo, gen *id.Generator, wallet walletport.Wallet, settings settingsport.Provider, outbox events.Writer, logger *slog.Logger) *StoreTicketService {
 	return &StoreTicketService{repo: repo, gen: gen, wallet: wallet, settings: settings, outbox: outbox, log: logger}
 }
 
-// CreateTicket 创建（登录/游客）。
+// CreateTicket 創建（登錄/遊客）。
 func (s *StoreTicketService) CreateTicket(ctx context.Context, req *storefrontv1.CreateTicketRequest) (*storefrontv1.Ticket, error) {
 	if req.GetContent() == "" {
 		return nil, errors.New("ticket.CONTENT_REQUIRED")
@@ -79,7 +79,7 @@ func (s *StoreTicketService) CreateTicket(ctx context.Context, req *storefrontv1
 	return toStorePB(t), nil
 }
 
-// ListMyTickets 我的工单。
+// ListMyTickets 我的工單。
 func (s *StoreTicketService) ListMyTickets(ctx context.Context, req *storefrontv1.ListMyTicketsRequest) (*storefrontv1.ListMyTicketsReply, error) {
 	userID := currentUserID(ctx)
 	if userID == 0 {
@@ -97,16 +97,16 @@ func (s *StoreTicketService) ListMyTickets(ctx context.Context, req *storefrontv
 	return reply, nil
 }
 
-// GetTicket 详情（归属校验 + 内部备注过滤）。
+// GetTicket 詳情（歸屬校驗 + 內部備註過濾）。
 func (s *StoreTicketService) GetTicket(ctx context.Context, req *storefrontv1.GetTicketRequest) (*storefrontv1.GetTicketReply, error) {
 	t, err := s.repo.GetByNo(ctx, req.GetTicketNo())
 	if err != nil {
 		return nil, err
 	}
 	if !s.canAccess(ctx, t) {
-		return nil, ErrNotFound // 越权视同不存在（防枚举）
+		return nil, ErrNotFound // 越權視同不存在（防枚舉）
 	}
-	msgs, err := s.repo.MessagesUserVisible(ctx, t.ID) // 内部备注过滤
+	msgs, err := s.repo.MessagesUserVisible(ctx, t.ID) // 內部備註過濾
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (s *StoreTicketService) GetTicket(ctx context.Context, req *storefrontv1.Ge
 	if currentUserID(ctx) != 0 && t.UserID == currentUserID(ctx) && (t.Status == ticket.StatusOpen || t.Status == ticket.StatusProcessing) && t.Priority != ticket.PriorityUrgentPaid {
 		fee, err := s.urgentFee(ctx)
 		if err != nil {
-			reply.UrgentError = "暂时无法读取加急费用，请稍后重试"
+			reply.UrgentError = "暫時無法讀取加急費用，請稍後重試"
 		} else {
 			reply.UrgentAvailable = true
 			reply.UrgentFeeCents = fee
@@ -126,7 +126,7 @@ func (s *StoreTicketService) GetTicket(ctx context.Context, req *storefrontv1.Ge
 	return reply, nil
 }
 
-// ReplyTicket 用户回复。
+// ReplyTicket 用户回覆。
 func (s *StoreTicketService) ReplyTicket(ctx context.Context, req *storefrontv1.ReplyTicketRequest) (*emptypb.Empty, error) {
 	t, err := s.assertAccess(ctx, req.GetTicketNo())
 	if err != nil {
@@ -135,7 +135,7 @@ func (s *StoreTicketService) ReplyTicket(ctx context.Context, req *storefrontv1.
 	if _, err := s.repo.CreateMessage(ctx, t.ID, "user", currentUserID(ctx), req.GetContent(), req.GetAttachmentMediaIds(), false); err != nil {
 		return nil, err
 	}
-	// resolved 追加回复 → processing 重开
+	// resolved 追加回復 → processing 重開
 	if string(t.Status) == "resolved" {
 		if err := s.repo.Transition(ctx, t.ID, "processing"); err != nil {
 			return nil, err
@@ -145,7 +145,7 @@ func (s *StoreTicketService) ReplyTicket(ctx context.Context, req *storefrontv1.
 	return &emptypb.Empty{}, nil
 }
 
-// RateTicket 评价（resolved 后 1-5）。
+// RateTicket 評價（resolved 後 1-5）。
 func (s *StoreTicketService) RateTicket(ctx context.Context, req *storefrontv1.RateTicketRequest) (*emptypb.Empty, error) {
 	t, err := s.assertAccess(ctx, req.GetTicketNo())
 	if err != nil {
@@ -171,7 +171,7 @@ func (s *StoreTicketService) PayUrgent(ctx context.Context, req *storefrontv1.Pa
 		}
 		userID := currentUserID(ctx)
 		if userID == 0 || t.UserID != userID {
-			return errors.New("ticket.UNAUTHORIZED: 请使用工单所属账户登录")
+			return errors.New("ticket.UNAUTHORIZED: 請使用工單所屬賬户登錄")
 		}
 		client := data.Client(ctx, s.repo.data)
 		reference := "ticket_urgent:" + t.TicketNo
@@ -187,14 +187,14 @@ func (s *StoreTicketService) PayUrgent(ctx context.Context, req *storefrontv1.Pa
 			return nil
 		}
 		if t.Status != ticket.StatusOpen && t.Status != ticket.StatusProcessing {
-			return errors.New("ticket.NOT_ACTIVE: 已解决或关闭的工单不能加急")
+			return errors.New("ticket.NOT_ACTIVE: 已解決或關閉的工單不能加急")
 		}
 		fee, err := s.urgentFee(ctx)
 		if err != nil {
-			return fmt.Errorf("ticket.FEE_UNAVAILABLE: 无法读取加急费用: %w", err)
+			return fmt.Errorf("ticket.FEE_UNAVAILABLE: 無法讀取加急費用: %w", err)
 		}
 		if req.ExpectedFeeCents == nil || req.GetExpectedFeeCents() != fee {
-			return errors.New("ticket.FEE_CHANGED: 请刷新页面后重新确认加急费用")
+			return errors.New("ticket.FEE_CHANGED: 請刷新頁面後重新確認加急費用")
 		}
 		n, err := client.Ticket.Update().Where(ticket.ID(t.ID), ticket.UserID(userID), ticket.PriorityNEQ(ticket.PriorityUrgentPaid), ticket.StatusIn(ticket.StatusOpen, ticket.StatusProcessing)).
 			SetPriority(ticket.PriorityUrgentPaid).SetSLADueAt(time.Now().UTC().Add(urgentSLAHours * time.Hour)).Save(ctx)
@@ -202,7 +202,7 @@ func (s *StoreTicketService) PayUrgent(ctx context.Context, req *storefrontv1.Pa
 			return err
 		}
 		if n != 1 {
-			return errors.New("ticket.CONCURRENT_UPDATE: 工单状态已变化，请刷新重试")
+			return errors.New("ticket.CONCURRENT_UPDATE: 工單狀態已變化，請刷新重試")
 		}
 		if fee > 0 {
 			if s.wallet == nil {
@@ -251,13 +251,13 @@ func (s *StoreTicketService) urgentFee(ctx context.Context) (int64, error) {
 	return *fee, nil
 }
 
-// canAccess 归属判定（本人或游客无主单按号访问——游客凭单号+联系方式创建后即持有）。
+// canAccess 歸屬判定（本人或遊客無主單按號訪問——遊客憑單號+聯繫方式創建後即持有）。
 func (s *StoreTicketService) canAccess(ctx context.Context, t *ent.Ticket) bool {
 	userID := currentUserID(ctx)
 	if t.UserID != 0 {
 		return userID == t.UserID
 	}
-	return true // 游客单：单号即凭据（雪花不可枚举）
+	return true // 遊客單：單號即憑據（雪花不可枚舉）
 }
 
 func (s *StoreTicketService) assertAccess(ctx context.Context, ticketNo string) (*ent.Ticket, error) {
@@ -271,7 +271,7 @@ func (s *StoreTicketService) assertAccess(ctx context.Context, ticketNo string) 
 	return t, nil
 }
 
-// publish 工单事件（notify 消费：用户通知/客服告警）。
+// publish 工單事件（notify 消費：用户通知/客服告警）。
 func (s *StoreTicketService) publish(ctx context.Context, typ string, t *ent.Ticket, extra map[string]any) {
 	if s.outbox == nil {
 		return

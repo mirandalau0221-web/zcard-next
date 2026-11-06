@@ -1,6 +1,6 @@
 package migratev1
 
-// 1.x .env 解析与源库 DSN 构造（--old-env 指向 1.x 部署目录时的自动装配）。
+// 1.x .env 解析與源庫 DSN 構造（--old-env 指向 1.x 部署目錄時的自動裝配）。
 
 import (
 	"bufio"
@@ -13,12 +13,12 @@ import (
 	gomysql "github.com/go-sql-driver/mysql"
 )
 
-// ParseDotEnv 解析 Laravel .env（KEY=VALUE；支持单双引号包裹与 # 注释行）。
-// 未存在的文件返回错误（--old-env 是显式指定，指向错误应立刻暴露）。
+// ParseDotEnv 解析 Laravel .env（KEY=VALUE；支持單雙引號包裹與 # 註釋行）。
+// 未存在的文件返回錯誤（--old-env 是顯式指定，指向錯誤應立刻暴露）。
 func ParseDotEnv(path string) (map[string]string, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("读取 1.x .env 失败（%s）: %w", path, err)
+		return nil, fmt.Errorf("讀取 1.x .env 失敗（%s）: %w", path, err)
 	}
 	defer f.Close()
 
@@ -46,7 +46,7 @@ func ParseDotEnv(path string) (map[string]string, error) {
 	return env, nil
 }
 
-// OldEnvPath .env 路径（目录或直接指向 .env 文件均可）。
+// OldEnvPath .env 路徑（目錄或直接指向 .env 文件均可）。
 func OldEnvPath(dir string) string {
 	if filepath.Base(dir) == ".env" {
 		return dir
@@ -54,15 +54,15 @@ func OldEnvPath(dir string) string {
 	return filepath.Join(dir, ".env")
 }
 
-// MySQLDSN 由 .env 键集构造 go-sql-driver DSN（经 mysql.Config 转义，密码特殊字符安全）。
-// 缺省端口 3306；附带 utf8mb4 与保守超时。
+// MySQLDSN 由 .env 鍵集構造 go-sql-driver DSN（經 mysql.Config 轉義，密碼特殊字符安全）。
+// 缺省端口 3306；附帶 utf8mb4 與保守超時。
 func MySQLDSN(env map[string]string) string {
 	host := env["DB_HOST"]
 	if host == "" {
 		host = "127.0.0.1"
 	}
 	if host == "localhost" {
-		host = "127.0.0.1" // 避免走 socket 的歧义
+		host = "127.0.0.1" // 避免走 socket 的歧義
 	}
 	port := env["DB_PORT"]
 	if port == "" {
@@ -75,7 +75,7 @@ func MySQLDSN(env map[string]string) string {
 	cfg.Addr = host + ":" + port
 	cfg.DBName = env["DB_DATABASE"]
 	cfg.Params = map[string]string{"charset": "utf8mb4"}
-	// 时间列以原始字符串读出，由映射层按 APP_TIMEZONE 显式转 UTC（避免 parseTime+loc 隐式偏移）
+	// 時間列以原始字符串讀出，由映射層按 APP_TIMEZONE 顯式轉 UTC（避免 parseTime+loc 隱式偏移）
 	cfg.ParseTime = false
 	cfg.Timeout = 10 * time.Second
 	cfg.ReadTimeout = 60 * time.Second

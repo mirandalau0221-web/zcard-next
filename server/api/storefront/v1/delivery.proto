@@ -8,16 +8,16 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// StoreDeliveryService 顾客取货(三重门：单号+密码+限流）。
+// StoreDeliveryService 顧客取貨(三重門：單號+密碼+限流）。
 service StoreDeliveryService {
-  // FetchDelivery 取货（一次性明文；默认 1 次后掩码；Cache-Control: no-store）。
+  // FetchDelivery 取貨（一次性明文；默認 1 次後掩碼；Cache-Control: no-store）。
   rpc FetchDelivery(FetchDeliveryRequest) returns (FetchDeliveryReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/delivery/fetch"
       body: "*"
     };
   }
-  // MaskedDeliveries 我的订单掩码列表。
+  // MaskedDeliveries 我的訂單掩碼列表。
   rpc MaskedDeliveries(MaskedDeliveriesRequest) returns (MaskedDeliveriesReply) {
     option (google.api.http) = { get: "/api/v1/storefront/delivery" };
   }
@@ -36,7 +36,7 @@ message FetchDeliveryReply {
   int32 fetch_count = 4;
 }
 
-// DeliveryItem 交付项（明文只在首次取货返回；之后掩码）。
+// DeliveryItem 交付項（明文只在首次取貨返回；之後掩碼）。
 message DeliveryItem {
   uint64 delivery_id = 4;
   string kind = 5;

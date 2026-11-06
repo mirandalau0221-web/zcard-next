@@ -23,15 +23,15 @@ type RechargeOrder struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uint64 `json:"user_id,omitempty"`
-	// 充值金额（分）
+	// 充值金額（分）
 	Amount int64 `json:"amount,omitempty"`
-	// 赠送余额（分）
+	// 贈送餘額（分）
 	GiftAmount int64 `json:"gift_amount,omitempty"`
-	// 赠送积分
+	// 贈送積分
 	GiftPoints int32 `json:"gift_points,omitempty"`
-	// 入账方向（supply=供货商预存，M2）
+	// 入賬方向（supply=供貨商預存，M2）
 	Target rechargeorder.Target `json:"target,omitempty"`
-	// target=supply 时的入账目标对接账户
+	// target=supply 時的入賬目標對接賬户
 	SupplierAccountID uint64 `json:"supplier_account_id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status rechargeorder.Status `json:"status,omitempty"`

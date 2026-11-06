@@ -1,25 +1,25 @@
 import { computed, ref } from 'vue';
 import english from './locales/en.json';
 
-export type Locale = 'zh_CN' | 'en';
+export type Locale = 'zh_TW' | 'en';
 export const SUPPORTED_LOCALES = [
-  { value: 'zh_CN' as const, label: '简体中文', tag: 'zh-CN' },
+  { value: 'zh_TW' as const, label: '繁體中文', tag: 'zh-TW' },
   { value: 'en' as const, label: 'English', tag: 'en' },
 ];
 const STORAGE_KEY = 'zcard_locale';
-const active = ref<Locale>('zh_CN');
-const available = ref<Locale[]>(['zh_CN']);
-const siteDefault = ref<Locale>('zh_CN');
+const active = ref<Locale>('zh_TW');
+const available = ref<Locale[]>(['zh_TW']);
+const siteDefault = ref<Locale>('zh_TW');
 let customerChoice: Locale | null = null;
 export const locale = computed(() => active.value);
 export const enabledLocales = computed(() => available.value);
-export const localeTag = computed(() => active.value === 'zh_CN' ? 'zh-CN' : 'en');
+export const localeTag = computed(() => active.value === 'zh_TW' ? 'zh-TW' : 'en');
 const dictionary: Record<string, string> = english;
 
 export function normalizeLocale(value: unknown): Locale | null {
   if (typeof value !== 'string') return null;
   const tag = value.trim().toLowerCase().replace(/_/g, '-');
-  if (tag === 'zh' || tag === 'zh-cn' || tag === 'zh-hans') return 'zh_CN';
+  if (tag === 'zh' || tag.startsWith('zh-')) return 'zh_TW';
   if (tag === 'en' || /^en-[a-z]{2}$/.test(tag)) return 'en';
   return null;
 }
@@ -39,7 +39,7 @@ export function applyLocaleConfig(entries: { key: string; value_json: string }[]
   const enabled = Array.isArray(configured)
     ? [...new Set(configured.map(normalizeLocale).filter((item): item is Locale => item !== null))]
     : [];
-  available.value = enabled.length ? enabled : ['zh_CN'];
+  available.value = enabled.length ? enabled : ['zh_TW'];
   const requestedDefault = normalizeLocale(value('i18n.default_locale'));
   siteDefault.value = requestedDefault && available.value.includes(requestedDefault)
     ? requestedDefault : available.value[0];
@@ -79,21 +79,21 @@ export function apiError(payload: unknown, status?: number): string {
   const problem = payload && typeof payload === 'object' ? payload as Record<string, unknown> : {};
   const reason = typeof problem.reason === 'string' ? problem.reason : '';
   const message = typeof problem.message === 'string' ? problem.message : '';
-  if (active.value === 'zh_CN' && message) return message;
+  if (active.value === 'zh_TW' && message) return message;
   // The API localizes known reasons. Old servers may still return Chinese messages.
   if (message && active.value === 'en' && !/[\p{Script=Han}]/u.test(message)) return message;
   if (message && dictionary[message.trim().replace(/\s+/g, ' ')]) return t(message);
-  if (/CURRENCY_MISMATCH/.test(reason)) return t('账户币种与基础货币不一致，请联系管理员迁移');
-  if (/STOCK|SOLD_OUT/.test(reason)) return t('库存不足，请调整数量后重试');
-  if (/BALANCE|FUNDS|POINTS_INSUFFICIENT/.test(reason)) return t('余额或积分不足，请检查后重试');
-  if (/CAPTCHA|VERIFICATION|VERIFY_CODE/.test(reason)) return t('验证码错误或已过期，请重新获取');
-  if (/LOGIN_FAILED|PASSWORD_INVALID|INVALID_CREDENTIALS/.test(reason)) return t('账号或密码错误');
-  if (status === 401) return t('登录已过期，请重新登录');
-  if (status === 403) return t('无法执行此操作，请检查账户权限');
-  if (status === 404) return t('请求的内容不存在或已下架');
-  if (status === 429) return t('请求过于频繁，请稍后重试');
-  if (status && status >= 500) return t('服务暂时不可用，请稍后重试');
-  return t('操作失败，请检查输入后重试');
+  if (/CURRENCY_MISMATCH/.test(reason)) return t('賬户幣種與基礎貨幣不一致，請聯繫管理員遷移');
+  if (/STOCK|SOLD_OUT/.test(reason)) return t('庫存不足，請調整數量後重試');
+  if (/BALANCE|FUNDS|POINTS_INSUFFICIENT/.test(reason)) return t('餘額或積分不足，請檢查後重試');
+  if (/CAPTCHA|VERIFICATION|VERIFY_CODE/.test(reason)) return t('驗證碼錯誤或已過期，請重新獲取');
+  if (/LOGIN_FAILED|PASSWORD_INVALID|INVALID_CREDENTIALS/.test(reason)) return t('賬號或密碼錯誤');
+  if (status === 401) return t('登錄已過期，請重新登錄');
+  if (status === 403) return t('無法執行此操作，請檢查賬户權限');
+  if (status === 404) return t('請求的內容不存在或已下架');
+  if (status === 429) return t('請求過於頻繁，請稍後重試');
+  if (status && status >= 500) return t('服務暫時不可用，請稍後重試');
+  return t('操作失敗，請檢查輸入後重試');
 }
 
 let messagePatterns: { source: string; expression: RegExp; indexes: number[] }[] | undefined;

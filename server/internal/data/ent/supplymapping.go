@@ -42,11 +42,11 @@ type SupplyMapping struct {
 	StockProbeLease int64 `json:"stock_probe_lease,omitempty"`
 	// StockProbeFailures holds the value of the "stock_probe_failures" field.
 	StockProbeFailures int `json:"stock_probe_failures,omitempty"`
-	// 库存缓存（-1=无限，-2=未知）
+	// 庫存緩存（-1=無限，-2=未知）
 	UpStock int32 `json:"up_stock,omitempty"`
 	// StockCheckedAt holds the value of the "stock_checked_at" field.
 	StockCheckedAt time.Time `json:"stock_checked_at,omitempty"`
-	// 上次成功库存，仅作展示参考
+	// 上次成功庫存，僅作展示參考
 	StockReference int32 `json:"stock_reference,omitempty"`
 	// StockReferenceAt holds the value of the "stock_reference_at" field.
 	StockReferenceAt time.Time `json:"stock_reference_at,omitempty"`

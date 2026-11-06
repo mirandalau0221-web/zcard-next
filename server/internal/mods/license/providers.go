@@ -12,12 +12,12 @@ import (
 var ProviderSet = wire.NewSet(
 	ProvideLicenseRepo,
 	NewAdminLicenseService,
-	// ：专业套餐在线购买（storefront 面）
+	// ：專業套餐在線購買（storefront 面）
 	NewPurchaseRepo,
 	NewStoreLicenseService,
 )
 
-// ProvideLicenseRepo 装配（设置读写经 *settings.RepoImpl——通道 A，wire 注入）。
+// ProvideLicenseRepo 裝配（設置讀寫經 *settings.RepoImpl——通道 A，wire 注入）。
 func ProvideLicenseRepo(repo *settings.RepoImpl) *LicenseRepo {
 	return NewLicenseRepo(repo)
 }

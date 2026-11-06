@@ -22,9 +22,9 @@ const OperationStorefrontConfigServiceGetPublicConfig = "/zcard.api.storefront.v
 const OperationStorefrontConfigServiceListCurrencies = "/zcard.api.storefront.v1.StorefrontConfigService/ListCurrencies"
 
 type StorefrontConfigServiceHTTPServer interface {
-	// GetPublicConfig GetPublicConfig 前台公开配置（全部分组白名单键合并下发，稳定排序）。
+	// GetPublicConfig GetPublicConfig 前台公開配置（全部分組白名單鍵合併下發，穩定排序）。
 	GetPublicConfig(context.Context, *emptypb.Empty) (*PublicConfig, error)
-	// ListCurrencies ListCurrencies 启用货币列表（展示换算用）。
+	// ListCurrencies ListCurrencies 啓用貨幣列表（展示換算用）。
 	ListCurrencies(context.Context, *emptypb.Empty) (*Currencies, error)
 }
 
@@ -73,9 +73,9 @@ func _StorefrontConfigService_ListCurrencies0_HTTP_Handler(srv StorefrontConfigS
 }
 
 type StorefrontConfigServiceHTTPClient interface {
-	// GetPublicConfig GetPublicConfig 前台公开配置（全部分组白名单键合并下发，稳定排序）。
+	// GetPublicConfig GetPublicConfig 前台公開配置（全部分組白名單鍵合併下發，穩定排序）。
 	GetPublicConfig(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *PublicConfig, err error)
-	// ListCurrencies ListCurrencies 启用货币列表（展示换算用）。
+	// ListCurrencies ListCurrencies 啓用貨幣列表（展示換算用）。
 	ListCurrencies(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *Currencies, err error)
 }
 
@@ -87,7 +87,7 @@ func NewStorefrontConfigServiceHTTPClient(client *http.Client) StorefrontConfigS
 	return &StorefrontConfigServiceHTTPClientImpl{client}
 }
 
-// GetPublicConfig GetPublicConfig 前台公开配置（全部分组白名单键合并下发，稳定排序）。
+// GetPublicConfig GetPublicConfig 前台公開配置（全部分組白名單鍵合併下發，穩定排序）。
 func (c *StorefrontConfigServiceHTTPClientImpl) GetPublicConfig(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*PublicConfig, error) {
 	var out PublicConfig
 	pattern := "/api/v1/storefront/config"
@@ -104,7 +104,7 @@ func (c *StorefrontConfigServiceHTTPClientImpl) GetPublicConfig(ctx context.Cont
 	return &out, nil
 }
 
-// ListCurrencies ListCurrencies 启用货币列表（展示换算用）。
+// ListCurrencies ListCurrencies 啓用貨幣列表（展示換算用）。
 func (c *StorefrontConfigServiceHTTPClientImpl) ListCurrencies(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*Currencies, error) {
 	var out Currencies
 	pattern := "/api/v1/storefront/currencies"

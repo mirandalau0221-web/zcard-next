@@ -1,7 +1,7 @@
 package supply
 
-// 管理面 API（）：连接 CRUD + Ping、映射规则、同步任务、健康列表。
-// 凭据纪律：credentials 仅创建/重配时明文接收；任何响应零回显（credentials_set 布尔）。
+// 管理面 API（）：連接 CRUD + Ping、映射規則、同步任務、健康列表。
+// 憑據紀律：credentials 僅創建/重配時明文接收；任何響應零回顯（credentials_set 布爾）。
 
 import (
 	"context"
@@ -22,7 +22,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminSupplyService 管理面货源服务。
+// AdminSupplyService 管理面貨源服務。
 type AdminSupplyService struct {
 	adminv1.UnimplementedAdminSupplyServiceServer
 	repo           *SupplyRepoImpl
@@ -30,17 +30,17 @@ type AdminSupplyService struct {
 	adapterFactory func(string, string, adapter.Credentials, []int) (adapter.Adapter, error)
 }
 
-// NewAdminSupplyService 构造。
+// NewAdminSupplyService 構造。
 func NewAdminSupplyService(repo *SupplyRepoImpl, sync *SyncService) *AdminSupplyService {
 	return &AdminSupplyService{repo: repo, sync: sync}
 }
 
-// ── 连接 ──────────────────────────────────────────────────
+// ── 連接 ──────────────────────────────────────────────────
 
-// CreateConnection 创建连接：driver 校验 + base_url SSRF 校验 + 凭据加密。
+// CreateConnection 創建連接：driver 校驗 + base_url SSRF 校驗 + 憑據加密。
 func (s *AdminSupplyService) CreateConnection(ctx context.Context, req *adminv1.CreateConnectionRequest) (*adminv1.SupplyConnection, error) {
 	if req.GetDriver() == "" {
-		return nil, errors.New("supply.DRIVER_REQUIRED: 请选择驱动")
+		return nil, errors.New("supply.DRIVER_REQUIRED: 請選擇驅動")
 	}
 	if req.GetBaseUrl() == "" {
 		return nil, errors.New("supply.BASE_URL_REQUIRED")
@@ -49,7 +49,7 @@ func (s *AdminSupplyService) CreateConnection(ctx context.Context, req *adminv1.
 		return nil, fmt.Errorf("supply.SSRF_REJECTED: %w", err)
 	}
 	if req.GetCredentials() == "" {
-		return nil, errors.New("supply.CREDENTIALS_REQUIRED: 凭据必填（仅创建时可设置）")
+		return nil, errors.New("supply.CREDENTIALS_REQUIRED: 憑據必填（僅創建時可設置）")
 	}
 	enc, err := s.repo.SealCredentials(req.GetDriver(), req.GetBaseUrl(), req.GetCredentials())
 	if err != nil {
@@ -92,7 +92,7 @@ func (s *AdminSupplyService) CreateConnection(ctx context.Context, req *adminv1.
 	return toProtoConnection(conn), nil
 }
 
-// UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+// UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
 func (s *AdminSupplyService) UpdateConnection(ctx context.Context, req *adminv1.UpdateConnectionRequest) (*adminv1.SupplyConnection, error) {
 	var result *adminv1.SupplyConnection
 	err := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
@@ -182,7 +182,7 @@ func (s *AdminSupplyService) updateConnection(ctx context.Context, req *adminv1.
 	return toProtoConnection(updated), nil
 }
 
-// DeleteConnection 删除连接（存在映射时拒绝）。
+// DeleteConnection 刪除連接（存在映射時拒絕）。
 func (s *AdminSupplyService) DeleteConnection(ctx context.Context, req *adminv1.DeleteConnectionRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteConnection(ctx, req.GetId()); err != nil {
 		return nil, err
@@ -190,7 +190,7 @@ func (s *AdminSupplyService) DeleteConnection(ctx context.Context, req *adminv1.
 	return &emptypb.Empty{}, nil
 }
 
-// ListConnections 连接列表（凭据零回显）。
+// ListConnections 連接列表（憑據零回顯）。
 func (s *AdminSupplyService) ListConnections(ctx context.Context, req *adminv1.ListConnectionsRequest) (*adminv1.ListConnectionsReply, error) {
 	page, pageSize := pageParams(req.GetPage(), req.GetPageSize())
 	conns, total, err := s.repo.ListConnections(ctx, page, pageSize)
@@ -235,7 +235,7 @@ func (s *AdminSupplyService) ListMappings(ctx context.Context, req *adminv1.List
 	return reply, nil
 }
 
-// UpsertMapping 创建/更新映射。
+// UpsertMapping 創建/更新映射。
 func (s *AdminSupplyService) UpsertMapping(ctx context.Context, req *adminv1.UpsertMappingRequest) (*adminv1.SupplyMapping, error) {
 	var result *ent.SupplyMapping
 	err := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
@@ -253,7 +253,7 @@ func (s *AdminSupplyService) UpsertMapping(ctx context.Context, req *adminv1.Ups
 		if req.GetPricingOverride() != "" {
 			var patch map[string]any
 			if err := json.Unmarshal([]byte(req.GetPricingOverride()), &patch); err != nil || patch == nil {
-				return fmt.Errorf("定价规则必须为 JSON 对象")
+				return fmt.Errorf("定價規則必須為 JSON 對象")
 			}
 			// Baselines are internal observations, never replaced by an admin form.
 			for k, v := range patch {
@@ -272,7 +272,7 @@ func (s *AdminSupplyService) UpsertMapping(ctx context.Context, req *adminv1.Ups
 			if fixed, ok := override["price"]; ok {
 				n, ok := fixed.(float64)
 				if !ok || n <= 0 || n != math.Trunc(n) || n > float64(1<<53-1) {
-					return fmt.Errorf("固定售价必须为正整数分")
+					return fmt.Errorf("固定售價必須為正整數分")
 				}
 			}
 		}
@@ -291,7 +291,7 @@ func (s *AdminSupplyService) UpsertMapping(ctx context.Context, req *adminv1.Ups
 	return toProtoMapping(result), nil
 }
 
-// DeleteMapping 删除映射。
+// DeleteMapping 刪除映射。
 func (s *AdminSupplyService) DeleteMapping(ctx context.Context, req *adminv1.DeleteMappingRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteMapping(ctx, req.GetId()); err != nil {
 		return nil, err
@@ -299,22 +299,22 @@ func (s *AdminSupplyService) DeleteMapping(ctx context.Context, req *adminv1.Del
 	return &emptypb.Empty{}, nil
 }
 
-// ── 同步任务 ──────────────────────────────────────────────
+// ── 同步任務 ──────────────────────────────────────────────
 
-// CreateSyncTask 创建同步任务并入队（low 队列；降级模式进程内异步）。
+// CreateSyncTask 創建同步任務併入隊（low 隊列；降級模式進程內異步）。
 func (s *AdminSupplyService) CreateSyncTask(ctx context.Context, req *adminv1.CreateSyncTaskRequest) (*adminv1.SupplySyncTask, error) {
 	if _, err := s.repo.GetConnection(ctx, req.GetConnectionId()); err != nil {
 		return nil, err
 	}
 	if req.Scope == ScopeImport {
-		return nil, fmt.Errorf("请从商品导入入口创建任务")
+		return nil, fmt.Errorf("請從商品導入入口創建任務")
 	}
 	mode := req.GetMode()
 	if mode == "" {
 		mode = "full"
 	}
 	if req.GetScope() == ScopeStock && mode != "full" && mode != "failed" {
-		return nil, fmt.Errorf("库存补查模式必须为 full 或 failed")
+		return nil, fmt.Errorf("庫存補查模式必須為 full 或 failed")
 	}
 	task, err := s.repo.CreateSyncTask(ctx, req.GetConnectionId(), mode, req.GetScope(), req.GetForceReprice())
 	if err != nil {
@@ -327,7 +327,7 @@ func (s *AdminSupplyService) CreateSyncTask(ctx context.Context, req *adminv1.Cr
 	return toProtoTask(task), nil
 }
 
-// ListSyncTasks 任务列表。
+// ListSyncTasks 任務列表。
 func (s *AdminSupplyService) ListSyncTasks(ctx context.Context, req *adminv1.ListSyncTasksRequest) (*adminv1.ListSyncTasksReply, error) {
 	page, pageSize := pageParams(req.GetPage(), req.GetPageSize())
 	ts, total, err := s.repo.ListSyncTasks(ctx, req.GetConnectionId(), page, pageSize)
@@ -345,7 +345,7 @@ func (s *AdminSupplyService) ListSyncTasks(ctx context.Context, req *adminv1.Lis
 	return reply, nil
 }
 
-// GetSyncTask 任务详情。
+// GetSyncTask 任務詳情。
 func (s *AdminSupplyService) GetSyncTask(ctx context.Context, req *adminv1.GetSyncTaskRequest) (*adminv1.SupplySyncTask, error) {
 	t, err := s.repo.GetSyncTask(ctx, req.GetId())
 	if err != nil {
@@ -354,7 +354,7 @@ func (s *AdminSupplyService) GetSyncTask(ctx context.Context, req *adminv1.GetSy
 	return s.importTaskProto(ctx, t)
 }
 
-// CancelSyncTask 请求取消。
+// CancelSyncTask 請求取消。
 func (s *AdminSupplyService) CancelSyncTask(ctx context.Context, req *adminv1.CancelSyncTaskRequest) (*adminv1.SupplySyncTask, error) {
 	existing, err := s.repo.GetSyncTask(ctx, req.GetId())
 	if err != nil {
@@ -374,7 +374,7 @@ func (s *AdminSupplyService) CancelSyncTask(ctx context.Context, req *adminv1.Ca
 
 // ── 健康 ──────────────────────────────────────────────────
 
-// ListHealth 连接健康列表。
+// ListHealth 連接健康列表。
 func (s *AdminSupplyService) ListHealth(ctx context.Context, _ *adminv1.ListHealthRequest) (*adminv1.ListHealthReply, error) {
 	items, err := s.sync.ListHealth(ctx)
 	if err != nil {
@@ -399,7 +399,7 @@ func (s *AdminSupplyService) ListHealth(ctx context.Context, _ *adminv1.ListHeal
 	return reply, nil
 }
 
-// ── 转换 ──────────────────────────────────────────────────
+// ── 轉換 ──────────────────────────────────────────────────
 
 func toProtoConnection(c *ent.SupplyConnection) *adminv1.SupplyConnection {
 	p := &adminv1.SupplyConnection{
@@ -510,7 +510,7 @@ func toProtoTask(t *ent.SupplySyncTask) *adminv1.SupplySyncTask {
 	return p
 }
 
-// pageParams 分页参数归一化（扁平 int32；page 从 1 起）。
+// pageParams 分頁參數歸一化（扁平 int32；page 從 1 起）。
 func pageParams(page, pageSize int32) (int, int) {
 	p := int(page)
 	if p < 1 {
@@ -526,7 +526,7 @@ func pageParams(page, pageSize int32) (int, int) {
 	return p, ps
 }
 
-// mustJSONMap 解析 JSON 字符串为 map（空串 → nil；非法 → nil 不阻断）。
+// mustJSONMap 解析 JSON 字符串為 map（空串 → nil；非法 → nil 不阻斷）。
 func mustJSONMap(s string) map[string]any {
 	if s == "" {
 		return nil
@@ -538,7 +538,7 @@ func mustJSONMap(s string) map[string]any {
 	return m
 }
 
-// orDefault 空串回落默认值（枚举字段 proto3 零值语义）。
+// orDefault 空串回落默認值（枚舉字段 proto3 零值語義）。
 func orDefault(v, def string) string {
 	if v == "" {
 		return def
@@ -548,15 +548,15 @@ func orDefault(v, def string) string {
 
 func validatePricing(rate, percent float64, amount int64, rounding string) error {
 	if math.IsNaN(rate) || math.IsInf(rate, 0) || rate <= 0 {
-		return errors.New("汇率必须是大于 0 的有限数值")
+		return errors.New("匯率必須是大於 0 的有限數值")
 	}
 	if math.IsNaN(percent) || math.IsInf(percent, 0) || percent < 0 || amount < 0 {
-		return errors.New("加价比例和固定加价不能为负数或非有限数值")
+		return errors.New("加價比例和固定加價不能為負數或非有限數值")
 	}
 	switch rounding {
 	case "", RoundingNone, RoundingCeilInt, RoundingCeilTenth:
 	default:
-		return errors.New("无效的价格取整方式")
+		return errors.New("無效的價格取整方式")
 	}
 	return nil
 }
@@ -567,7 +567,7 @@ func parseConnectionSettings(raw string) (map[string]any, error) {
 	}
 	var settings map[string]any
 	if err := json.Unmarshal([]byte(raw), &settings); err != nil || settings == nil {
-		return nil, errors.New("渠道设置必须是 JSON 对象")
+		return nil, errors.New("渠道設置必須是 JSON 對象")
 	}
 	return settings, nil
 }

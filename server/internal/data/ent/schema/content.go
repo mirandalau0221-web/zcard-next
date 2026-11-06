@@ -1,7 +1,7 @@
 package schema
 
-// 所有权：mods/content（P2-04）/ mods/notify（P2-05）/ mods/dashboard（P3-07）
-// 多语言字段用 JSON（*_json），按请求语言回落 zh_CN。
+// 所有權：mods/content（P2-04）/ mods/notify（P2-05）/ mods/dashboard（P3-07）
+// 多語言字段用 JSON（*_json），按請求語言回落 zh_CN。
 
 import (
 	"entgo.io/ent"
@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// Banner 横幅/轮播（生效时间窗；link_type=ad 承载第三方广告位）。
+// Banner 橫幅/輪播（生效時間窗；link_type=ad 承載第三方廣告位）。
 type Banner struct {
 	ent.Schema
 }
@@ -21,9 +21,9 @@ func (Banner) Fields() []ent.Field {
 		field.Uint64("id"),
 		field.String("name").MaxLen(100),
 		field.Enum("position").Values("top", "middle", "bottom").Default("top"),
-		field.JSON("title_json", map[string]string{}).Optional().Comment("多语言标题"),
+		field.JSON("title_json", map[string]string{}).Optional().Comment("多語言標題"),
 		field.String("image").MaxLen(255),
-		field.String("mobile_image").MaxLen(255).Optional().Comment("缺省回落 PC 图"),
+		field.String("mobile_image").MaxLen(255).Optional().Comment("缺省回落 PC 圖"),
 		field.Enum("link_type").Values("product", "category", "url", "ad", "post", "notice").Default("url"),
 		field.String("link_value").MaxLen(500).Optional(),
 		field.Bool("is_active").Default(true),
@@ -39,7 +39,7 @@ func (Banner) Indexes() []ent.Index {
 	}
 }
 
-// PostCategory 文章分类。
+// PostCategory 文章分類。
 type PostCategory struct {
 	ent.Schema
 }
@@ -55,7 +55,7 @@ func (PostCategory) Fields() []ent.Field {
 	}
 }
 
-// Post 文章/公告（type=notice 公告；content 经 sanitize）。
+// Post 文章/公告（type=notice 公告；content 經 sanitize）。
 type Post struct {
 	ent.Schema
 }
@@ -69,7 +69,7 @@ func (Post) Fields() []ent.Field {
 		field.Enum("type").Values("blog", "notice").Default("blog"),
 		field.JSON("title_json", map[string]string{}),
 		field.JSON("summary_json", map[string]string{}).Optional(),
-		field.Text("content_json").Comment("多语言内容（JSON，sanitize 后）"),
+		field.Text("content_json").Comment("多語言內容（JSON，sanitize 後）"),
 		field.String("thumbnail").MaxLen(255).Optional(),
 		field.Uint64("category_id").Optional(),
 		field.Bool("is_published").Default(false),
@@ -85,7 +85,7 @@ func (Post) Indexes() []ent.Index {
 	}
 }
 
-// Notification 站内信（用户铃铛）。
+// Notification 站內信（用户鈴鐺）。
 type Notification struct {
 	ent.Schema
 }
@@ -97,7 +97,7 @@ func (Notification) Fields() []ent.Field {
 		field.String("title").MaxLen(200),
 		field.Text("content"),
 		field.Time("read_at").SchemaType(mysqlTime).Optional(),
-		field.String("source_type").MaxLen(40).Optional().Comment("来源（order/ticket/broadcast）"),
+		field.String("source_type").MaxLen(40).Optional().Comment("來源（order/ticket/broadcast）"),
 		field.Uint64("source_id").Optional(),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
 	}
@@ -109,7 +109,7 @@ func (Notification) Indexes() []ent.Index {
 	}
 }
 
-// NotifyTemplate 事件驱动模板（事件 × 通道 × 语言；占位符白名单渲染）。
+// NotifyTemplate 事件驅動模板（事件 × 通道 × 語言；佔位符白名單渲染）。
 type NotifyTemplate struct {
 	ent.Schema
 }
@@ -134,7 +134,7 @@ func (NotifyTemplate) Indexes() []ent.Index {
 	}
 }
 
-// NotificationLog 发送日志（status=skipped 为降级标记：通道未配置不报错雪崩）。
+// NotificationLog 發送日誌（status=skipped 為降級標記：通道未配置不報錯雪崩）。
 type NotificationLog struct {
 	ent.Schema
 }
@@ -169,7 +169,7 @@ func (NotificationLog) Indexes() []ent.Index {
 	}
 }
 
-// DailyStat 日结指标（报表只扫此表不扫大表；今日实时走 report 层）。
+// DailyStat 日結指標（報表只掃此表不掃大表；今日實時走 report 層）。
 type DailyStat struct {
 	ent.Schema
 }
@@ -180,7 +180,7 @@ func (DailyStat) Fields() []ent.Field {
 		field.Uint64("subsite_id").Default(0),
 		field.String("stat_date").MaxLen(8).Comment("yyyymmdd"),
 		field.String("metric").MaxLen(64).Comment("orders/amount/profit/pay_success_rate..."),
-		field.String("dimension_key").MaxLen(128).Default("").Comment("维度（商品ID 等；空=总量）"),
+		field.String("dimension_key").MaxLen(128).Default("").Comment("維度（商品ID 等；空=總量）"),
 		field.Int64("value").Default(0),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
 		field.Time("updated_at").SchemaType(mysqlTime).Default(nowUTC).UpdateDefault(nowUTC),
@@ -189,12 +189,12 @@ func (DailyStat) Fields() []ent.Field {
 
 func (DailyStat) Indexes() []ent.Index {
 	return []ent.Index{
-		// 日结幂等（重跑覆盖同维度行）
+		// 日結冪等（重跑覆蓋同維度行）
 		index.Fields("subsite_id", "stat_date", "metric", "dimension_key").Unique(),
 	}
 }
 
-// ReconciliationJob 对账任务（时间窗内 procurement vs 上游订单）。
+// ReconciliationJob 對賬任務（時間窗內 procurement vs 上游訂單）。
 type ReconciliationJob struct {
 	ent.Schema
 }
@@ -216,7 +216,7 @@ func (ReconciliationJob) Fields() []ent.Field {
 	}
 }
 
-// ReconciliationItem 对账明细（四态：matched/mismatched/local_only/upstream_only）。
+// ReconciliationItem 對賬明細（四態：matched/mismatched/local_only/upstream_only）。
 type ReconciliationItem struct {
 	ent.Schema
 }
@@ -229,7 +229,7 @@ func (ReconciliationItem) Fields() []ent.Field {
 		field.String("local_order_no").MaxLen(64).Optional(),
 		field.String("upstream_order_no").MaxLen(80).Optional(),
 		field.Enum("status").Values("matched", "mismatched", "local_only", "upstream_only"),
-		field.JSON("diff_json", map[string]any{}).Optional().Comment("金额/状态差异"),
+		field.JSON("diff_json", map[string]any{}).Optional().Comment("金額/狀態差異"),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
 	}
 }
@@ -240,7 +240,7 @@ func (ReconciliationItem) Indexes() []ent.Index {
 	}
 }
 
-// V1IDMap 1.x→2.0 迁移 ID 映射（migrate-from-v1 专用，业务不读）。
+// V1IDMap 1.x→2.0 遷移 ID 映射（migrate-from-v1 專用，業務不讀）。
 type V1IDMap struct {
 	ent.Schema
 }
@@ -248,7 +248,7 @@ type V1IDMap struct {
 func (V1IDMap) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.String("table_name").MaxLen(64).Comment("1.x 表名（列名 table 为保留字，取 table_name）"),
+		field.String("table_name").MaxLen(64).Comment("1.x 表名（列名 table 為保留字，取 table_name）"),
 		field.Uint64("old_id"),
 		field.Uint64("new_id"),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
@@ -261,7 +261,7 @@ func (V1IDMap) Indexes() []ent.Index {
 	}
 }
 
-// NotifyBroadcast 群发任务（P2-05 T4：目标筛选/定时/取消/统计）。
+// NotifyBroadcast 羣發任務（P2-05 T4：目標篩選/定時/取消/統計）。
 type NotifyBroadcast struct {
 	ent.Schema
 }
@@ -272,14 +272,14 @@ func (NotifyBroadcast) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.String("title").MaxLen(200),
-		field.Text("content").Comment("正文（群发渠道适配：inbox 原文/email HTML）"),
+		field.Text("content").Comment("正文（羣發渠道適配：inbox 原文/email HTML）"),
 		field.JSON("channels", []string{}).Comment("投放通道集合（inbox/email/sms/telegram）"),
-		field.Enum("target_type").Values("all", "active", "specified").Default("all").Comment("目标筛选"),
-		field.JSON("target_ids", []uint64{}).Optional().Comment("specified 时的用户 ID 集合"),
-		field.Time("scheduled_at").SchemaType(mysqlTime).Optional().Comment("定时发送（空=立即）"),
+		field.Enum("target_type").Values("all", "active", "specified").Default("all").Comment("目標篩選"),
+		field.JSON("target_ids", []uint64{}).Optional().Comment("specified 時的用户 ID 集合"),
+		field.Time("scheduled_at").SchemaType(mysqlTime).Optional().Comment("定時發送（空=立即）"),
 		field.Enum("status").Values("pending", "sending", "done", "canceled").Default("pending"),
-		field.Uint64("created_by").Comment("创建管理员"),
-		field.Int64("audience").Default(0).Comment("覆盖人数（发送时预估回填）"),
+		field.Uint64("created_by").Comment("創建管理員"),
+		field.Int64("audience").Default(0).Comment("覆蓋人數（發送時預估回填）"),
 		field.Int64("sent_count").Default(0),
 		field.Int64("failed_count").Default(0),
 		field.Time("started_at").SchemaType(mysqlTime).Optional(),

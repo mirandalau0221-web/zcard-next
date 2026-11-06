@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminFulfillmentService 履约管理：待发货列表 + 手动交付。
+// AdminFulfillmentService 履約管理：待發貨列表 + 手動交付。
 service AdminFulfillmentService {
  rpc ShipOrder(ShipOrderRequest) returns (google.protobuf.Empty) { option (google.api.http) = { post: "/api/v1/admin/fulfillment/{order_no}/ship" body: "*" }; }
  rpc UpdateShipping(UpdateShippingRequest) returns (google.protobuf.Empty) { option (google.api.http) = { post: "/api/v1/admin/fulfillment/{order_no}/shipping" body: "*" }; }
@@ -17,18 +17,18 @@ service AdminFulfillmentService {
   rpc StartService(StartServiceRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { post: "/api/v1/admin/fulfillment/{order_no}/start" body: "*" };
   }
-  // ListPending 待发货列表（实体快递配送及人工交付）。
+  // ListPending 待發貨列表（實體快遞配送及人工交付）。
   rpc ListPending(ListPendingRequest) returns (ListPendingReply) {
     option (google.api.http) = { get: "/api/v1/admin/fulfillment/pending" };
   }
-  // ManualDeliver 手动交付（卡密内容或物流单号）。
+  // ManualDeliver 手動交付（卡密內容或物流單號）。
   rpc ManualDeliver(ManualDeliverRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/fulfillment/{order_no}/deliver"
       body: "*"
     };
   }
-  // ListDeliveries 交付记录列表（掩码默认）。
+  // ListDeliveries 交付記錄列表（掩碼默認）。
   rpc ListDeliveries(ListDeliveriesRequest) returns (ListDeliveriesReply) {
     option (google.api.http) = { get: "/api/v1/admin/fulfillment" };
   }
@@ -41,7 +41,7 @@ message ListPendingRequest {
 
 message ListPendingReply {
   repeated PendingOrder orders = 1;
-  bool has_more = 2; // 按订单分页，单页可包含多个商品项
+  bool has_more = 2; // 按訂單分頁，單頁可包含多個商品項
 }
 
 message PendingOrder {
@@ -62,10 +62,10 @@ message PendingOrder {
 message ManualDeliverRequest {
   string service_content = 6;
   string order_no = 1 [(google.api.field_behavior) = REQUIRED];
-  string content = 2; // 卡密内容（多行，每行一条）
-  string logistics_no = 3; // 物流单号（与 content 二选一）
+  string content = 2; // 卡密內容（多行，每行一條）
+  string logistics_no = 3; // 物流單號（與 content 二選一）
   string remark = 4;
-  uint64 order_item_id = 5; // 多商品订单必须指定补发商品项
+  uint64 order_item_id = 5; // 多商品訂單必須指定補發商品項
 }
 
 message ListDeliveriesRequest {
@@ -80,8 +80,8 @@ message ListDeliveriesReply {
   int64 total = 2;
 }
 
-// DeliveryRecord 交付记录（content=完整卡密，服务端现场解密；路由受
-// order:view_delivery 权限门控 + 查看审计留痕）。
+// DeliveryRecord 交付記錄（content=完整卡密，服務端現場解密；路由受
+// order:view_delivery 權限門控 + 查看審計留痕）。
 message DeliveryRecord {
   uint64 order_item_id = 11;
   string kind = 12;

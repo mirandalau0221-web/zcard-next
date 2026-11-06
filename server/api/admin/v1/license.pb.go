@@ -25,7 +25,7 @@ const (
 
 type InstallLicenseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"` // 许可证文件内容（JSON）
+	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"` // 許可證文件內容（JSON）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -75,7 +75,7 @@ type LicenseStatus struct {
 	Domain        string                 `protobuf:"bytes,4,opt,name=domain,proto3" json:"domain,omitempty"`
 	Features      []string               `protobuf:"bytes,5,rep,name=features,proto3" json:"features,omitempty"`
 	ExpiresAt     string                 `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	Error         string                 `protobuf:"bytes,7,opt,name=error,proto3" json:"error,omitempty"` // 未安装/无效时的原因（fail-closed 提示）
+	Error         string                 `protobuf:"bytes,7,opt,name=error,proto3" json:"error,omitempty"` // 未安裝/無效時的原因（fail-closed 提示）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

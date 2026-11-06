@@ -13,7 +13,7 @@ const packages = computed(() => shipments(props.order.shipments_json));
 const physicalItems = computed(() => (props.order.items || []).filter(item => item.goods_type === "physical"));
 const hasCollectShipping = computed(() => physicalItems.value.some(item => item.shipping_collect));
 async function receive(id: number) {
-  if (busy.value || !confirm($t("确认已收到此包裹中的商品？"))) return;
+  if (busy.value || !confirm($t("確認已收到此包裹中的商品？"))) return;
   busy.value = true;
   const r = await api.post(`/orders/${props.order.order_no}/receive`, {
     shipment_id: id,
@@ -30,34 +30,34 @@ async function receive(id: number) {
 }
 </script>
 <template>
-  <section class="card shipping-details" :aria-label="$t('收货及配送信息')">
-    <h3>{{ $t('实体配送 ·') }} {{ $t(shippingStatus(order.shipping_status) || '') }}</h3>
+  <section class="card shipping-details" :aria-label="$t('收貨及配送信息')">
+    <h3>{{ $t('實體配送 ·') }} {{ $t(shippingStatus(order.shipping_status) || '') }}</h3>
     <p>{{ order.shipping_address?.name }} · {{ order.shipping_address?.phone }}</p>
     <p v-for="(line, index) in addressLines(order.shipping_address || {})" :key="index">{{ line }}</p>
-    <p>{{ $t(hasCollectShipping ? '在线支付运费' : '运费') }} {{ formatMoney(order.shipping_cents || 0) }}</p>
-    <p v-if="hasCollectShipping">{{ $t('到付商品的运费由快递在收货时收取。') }}</p>
+    <p>{{ $t(hasCollectShipping ? '在線支付運費' : '運費') }} {{ formatMoney(order.shipping_cents || 0) }}</p>
+    <p v-if="hasCollectShipping">{{ $t('到付商品的運費由快遞在收貨時收取。') }}</p>
     <p v-for="it in physicalItems" :key="it.id" class="muted">
-      {{ it.product_name }}{{ $t('：购买') }} {{ it.quantity }} {{ $t('件 · 已发') }} {{ it.shipped_quantity || 0 }} {{ $t('件 · 已收') }} {{ it.received_quantity || 0 }} {{ $t('件') }}<span v-if="it.canceled_quantity"> {{ $t('· 已取消') }} {{ it.canceled_quantity }} {{ $t('件') }}</span><span v-if="it.returned_quantity"> {{ $t('· 已退货') }} {{ it.returned_quantity }} {{ $t('件') }}</span>
-      <strong v-if="it.shipping_collect"> · {{ $t('运费到付') }}</strong>
+      {{ it.product_name }}{{ $t('：購買') }} {{ it.quantity }} {{ $t('件 · 已發') }} {{ it.shipped_quantity || 0 }} {{ $t('件 · 已收') }} {{ it.received_quantity || 0 }} {{ $t('件') }}<span v-if="it.canceled_quantity"> {{ $t('· 已取消') }} {{ it.canceled_quantity }} {{ $t('件') }}</span><span v-if="it.returned_quantity"> {{ $t('· 已退貨') }} {{ it.returned_quantity }} {{ $t('件') }}</span>
+      <strong v-if="it.shipping_collect"> · {{ $t('運費到付') }}</strong>
     </p>
     <p v-if="!packages.length" class="muted">
       {{
         order.status === "pending_payment"
-          ? $t('付款后安排发货')
+          ? $t('付款後安排發貨')
           : order.shipping_status === "canceled"
-            ? $t('实体商品配送已取消')
-            : $t('等待商家寄出，发货后将在此显示快递信息。')
+            ? $t('實體商品配送已取消')
+            : $t('等待商家寄出，發貨後將在此顯示快遞信息。')
       }}
     </p>
     <div v-for="p in packages" :key="p.id" class="shipment">
-      <b>{{ $t('包裹 #') }}{{ p.id }} · {{ p.status === "received" ? $t('已收货') : $t('已寄出') }}</b>
+      <b>{{ $t('包裹 #') }}{{ p.id }} · {{ p.status === "received" ? $t('已收貨') : $t('已寄出') }}</b>
       <p>
         {{ p.carrier }} · <span class="tracking">{{ p.tracking_no }}</span>
       </p>
       <p v-for="(qty, id) in p.items" :key="id">
         {{
           (order.items || []).find((i: any) => String(i.id) === String(id))?.product_name ||
-          $t('商品项 #{0}', [id])
+          $t('商品項 #{0}', [id])
         }}
         × {{ qty }}
       </p>
@@ -66,7 +66,7 @@ async function receive(id: number) {
         class="btn secondary"
         :disabled="busy"
         @click="receive(p.id)"
-      > {{ $t('确认收到此包裹') }} </button>
+      > {{ $t('確認收到此包裹') }} </button>
     </div>
     <p v-if="error" class="error" role="alert">{{ uiText(error) }}</p>
   </section>

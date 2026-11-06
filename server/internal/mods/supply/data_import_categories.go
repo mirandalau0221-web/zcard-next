@@ -14,7 +14,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/tenancy"
 )
 
-// 保存前先校验选择范围；事务只包含分类和配置写入，不包含上游请求或图片下载。
+// 保存前先校驗選擇範圍；事務只包含分類和配置寫入，不包含上游請求或圖片下載。
 func (s *AdminSupplyService) saveImportCategories(ctx context.Context, req *adminv1.ImportProductsRequest, products map[string]adapter.Product, mode string, percent float64, amount int64) (map[string]uint64, error) {
 	tree := map[string]adapter.Category{}
 	if req.SnapshotId != "" {
@@ -41,30 +41,30 @@ func (s *AdminSupplyService) saveImportCategories(ctx context.Context, req *admi
 	for _, code := range req.Codes {
 		p, ok := products[code]
 		if !ok {
-			return nil, fmt.Errorf("商品 %s 已不可用，请刷新目录后重试", code)
+			return nil, fmt.Errorf("商品 %s 已不可用，請刷新目錄後重試", code)
 		}
 		selected[p.CategoryID] = true
 	}
 	if len(selected) == 0 {
-		return nil, fmt.Errorf("请先选择商品")
+		return nil, fmt.Errorf("請先選擇商品")
 	}
 	for code := range req.CategoryMap {
 		if !selected[code] {
-			return nil, fmt.Errorf("只能保存所选商品涉及的分类映射")
+			return nil, fmt.Errorf("只能保存所選商品涉及的分類映射")
 		}
 	}
 	drafts := map[string]bool{}
 	invalidNames := []string{}
 	for _, draft := range req.CategoryDrafts {
 		if draft == nil || !selected[draft.UpstreamCode] {
-			return nil, fmt.Errorf("待新建分类必须对应所选商品")
+			return nil, fmt.Errorf("待新建分類必須對應所選商品")
 		}
 		if drafts[draft.UpstreamCode] {
-			return nil, fmt.Errorf("重复的分类草稿")
+			return nil, fmt.Errorf("重複的分類草稿")
 		}
 		drafts[draft.UpstreamCode] = true
 		if _, ok := req.CategoryMap[draft.UpstreamCode]; ok {
-			return nil, fmt.Errorf("同一分类不能同时新建和指定映射")
+			return nil, fmt.Errorf("同一分類不能同時新建和指定映射")
 		}
 		name := strings.TrimSpace(draft.Name)
 		if data.ValidateCategoryName(name) != nil {
@@ -72,16 +72,16 @@ func (s *AdminSupplyService) saveImportCategories(ctx context.Context, req *admi
 			if len(label) > 40 {
 				label = append(label[:40], '…')
 			}
-			invalidNames = append(invalidNames, fmt.Sprintf("「%s」（上游分类 %s）", string(label), draft.UpstreamCode))
+			invalidNames = append(invalidNames, fmt.Sprintf("「%s」（上游分類 %s）", string(label), draft.UpstreamCode))
 		}
 	}
 	if len(invalidNames) > 0 {
-		return nil, fmt.Errorf("以下分类名称须为 1–100 个字符：%s", strings.Join(invalidNames, "、"))
+		return nil, fmt.Errorf("以下分類名稱須為 1–100 個字符：%s", strings.Join(invalidNames, "、"))
 	}
 	result := map[string]uint64{}
 	err := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		client := s.repo.entClient(ctx)
-		// 写锁串行化同一渠道的提交；重试读取最新映射，避免重复创建。
+		// 寫鎖串行化同一渠道的提交；重試讀取最新映射，避免重複創建。
 		if err := client.SupplyConnection.UpdateOneID(req.ConnectionId).AddRetryMax(0).Exec(ctx); err != nil {
 			return err
 		}
@@ -115,7 +115,7 @@ func (s *AdminSupplyService) saveImportCategories(ctx context.Context, req *admi
 				return err
 			}
 			if !exists {
-				return fmt.Errorf("所选本地分类或父分类已不存在，请刷新后重试")
+				return fmt.Errorf("所選本地分類或父分類已不存在，請刷新後重試")
 			}
 			return nil
 		}
@@ -123,7 +123,7 @@ func (s *AdminSupplyService) saveImportCategories(ctx context.Context, req *admi
 			if err := validate(id); err != nil {
 				return err
 			}
-			result[code] = id // 0 是显式清除，不能回退旧映射。
+			result[code] = id // 0 是顯式清除，不能回退舊映射。
 		}
 		for _, draft := range req.CategoryDrafts {
 			if len(tree) > 0 && draft.ParentId == 0 {
@@ -149,7 +149,7 @@ func (s *AdminSupplyService) saveImportCategories(ctx context.Context, req *admi
 				return err
 			}
 			if len(matches) > 1 {
-				return fmt.Errorf("同一位置有多个同名分类「%s」，请手动选择", name)
+				return fmt.Errorf("同一位置有多個同名分類「%s」，請手動選擇", name)
 			}
 			if len(matches) == 1 {
 				result[draft.UpstreamCode] = matches[0].ID

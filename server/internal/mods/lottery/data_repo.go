@@ -56,21 +56,21 @@ func actor(ctx context.Context) uint64 {
 func (r *Repo) member(ctx context.Context) (uint64, error) {
 	id := actor(ctx)
 	if id == 0 {
-		return 0, errors.Unauthorized("lottery.LOGIN_REQUIRED", "请先登录")
+		return 0, errors.Unauthorized("lottery.LOGIN_REQUIRED", "請先登錄")
 	}
 	ok, e := data.Client(ctx, r.Data).User.Query().Where(user.ID(id), user.StatusEQ(user.StatusActive)).Exist(ctx)
 	if e != nil {
 		return 0, e
 	}
 	if !ok {
-		return 0, errors.Forbidden("lottery.USER_UNAVAILABLE", "账号不可参与抽奖")
+		return 0, errors.Forbidden("lottery.USER_UNAVAILABLE", "賬號不可參與抽獎")
 	}
 	return id, nil
 }
 func (r *Repo) activity(ctx context.Context, id uint64, lock bool) (*ent.LotteryActivity, error) {
 	c := data.Client(ctx, r.Data)
 	if lock {
-		// 条件 UPDATE 持有事务行锁；MySQL 未变化行可能返回 0，存在性由下面查询判断。
+		// 條件 UPDATE 持有事務行鎖；MySQL 未變化行可能返回 0，存在性由下面查詢判斷。
 		_, e := c.LotteryActivity.Update().Where(lotteryactivity.ID(id), lotteryactivity.SubsiteID(site(ctx))).AddRevision(0).Save(ctx)
 		if e != nil {
 			return nil, e
@@ -78,7 +78,7 @@ func (r *Repo) activity(ctx context.Context, id uint64, lock bool) (*ent.Lottery
 	}
 	a, e := c.LotteryActivity.Query().Where(lotteryactivity.ID(id), lotteryactivity.SubsiteID(site(ctx))).Only(ctx)
 	if ent.IsNotFound(e) {
-		return nil, bad("活动不存在")
+		return nil, bad("活動不存在")
 	}
 	return a, e
 }
@@ -102,7 +102,7 @@ func state(a *ent.LotteryActivity, now time.Time) string {
 }
 func active(a *ent.LotteryActivity, now time.Time) error {
 	if state(a, now) != "live" {
-		return bad("活动未开始、已暂停或已结束")
+		return bad("活動未開始、已暫停或已結束")
 	}
 	return nil
 }
@@ -120,7 +120,7 @@ var keyRE = regexp.MustCompile(`^[A-Za-z0-9_-]{16,64}$`)
 
 func requestKey(key string) error {
 	if !keyRE.MatchString(key) {
-		return bad("请求标识无效，请刷新页面后重试")
+		return bad("請求標識無效，請刷新頁面後重試")
 	}
 	return nil
 }
@@ -142,7 +142,7 @@ func validImage(s string) bool {
 	return e == nil && (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" && u.User == nil
 }
 
-// eligibleCard 同时用于发布与每次抽奖；不绕过商品来源、分类隐藏、规格或控件要求。
+// eligibleCard 同時用於發佈與每次抽獎；不繞過商品來源、分類隱藏、規格或控件要求。
 func (r *Repo) eligibleCard(ctx context.Context, pid, sku uint64, currentRead ...bool) (*ent.Product, error) {
 	c := data.Client(ctx, r.Data)
 	// Saving prize references holds the parent product lock. Re-read the product
@@ -156,7 +156,7 @@ func (r *Repo) eligibleCard(ctx context.Context, pid, sku uint64, currentRead ..
 	p, e := pq.Only(ctx)
 	if e != nil {
 		if ent.IsNotFound(e) {
-			return nil, bad("自动发奖商品不存在或已下架")
+			return nil, bad("自動發獎商品不存在或已下架")
 		}
 		return nil, e
 	}
@@ -164,21 +164,21 @@ func (r *Repo) eligibleCard(ctx context.Context, pid, sku uint64, currentRead ..
 		return nil, bad(e.Error())
 	}
 	if p.UpstreamSourceID != 0 || string(p.StockType) != "card" || string(p.DeliveryMode) != "status" {
-		return nil, bad("自动发卡仅支持普通自营卡密和保留卡密模式")
+		return nil, bad("自動髮卡僅支持普通自營卡密和保留卡密模式")
 	}
 	seen := map[uint64]bool{}
 	cid := p.CategoryID
 	for cid != 0 {
 		if seen[cid] {
-			return nil, bad("商品分类层级异常")
+			return nil, bad("商品分類層級異常")
 		}
 		seen[cid] = true
 		cat, e := c.Category.Query().Where(category.ID(cid), category.SubsiteID(site(ctx))).Only(ctx)
 		if e != nil {
-			return nil, bad("商品分类不可用")
+			return nil, bad("商品分類不可用")
 		}
 		if cat.Hide {
-			return nil, bad("商品分类已隐藏，请改用人工奖品")
+			return nil, bad("商品分類已隱藏，請改用人工獎品")
 		}
 		cid = cat.ParentID
 	}
@@ -187,7 +187,7 @@ func (r *Repo) eligibleCard(ctx context.Context, pid, sku uint64, currentRead ..
 		return nil, e
 	}
 	if required {
-		return nil, bad("该商品有必填下单控件，请改用人工奖品")
+		return nil, bad("該商品有必填下單控件，請改用人工獎品")
 	}
 	sq := c.ProductSku.Query().Where(productsku.ProductID(pid), productsku.SubsiteID(site(ctx))).Limit(1)
 	if sku != 0 {
@@ -201,10 +201,10 @@ func (r *Repo) eligibleCard(ctx context.Context, pid, sku uint64, currentRead ..
 		return nil, e
 	}
 	if sku != 0 && len(skus) == 0 {
-		return nil, bad("奖品规格不存在或不属于该商品")
+		return nil, bad("獎品規格不存在或不屬於該商品")
 	}
 	if sku == 0 && len(skus) > 0 {
-		return nil, bad("该商品有多个规格，请明确选择奖品规格")
+		return nil, bad("該商品有多個規格，請明確選擇獎品規格")
 	}
 	return p, nil
 }
@@ -223,7 +223,7 @@ func (r *Repo) ready(ctx context.Context, ps []*ent.LotteryPrize) error {
 			continue
 		}
 		if p.Issued >= p.Quantity {
-			return bad("奖品已发完，活动暂不可抽奖，请等待平台补充奖品")
+			return bad("獎品已發完，活動暫不可抽獎，請等待平台補充獎品")
 		}
 		if p.Mode == "card" {
 			if _, e := r.eligibleCard(ctx, p.ProductID, p.SkuID); e != nil {
@@ -234,12 +234,12 @@ func (r *Repo) ready(ctx context.Context, ps []*ent.LotteryPrize) error {
 				return e
 			}
 			if n == 0 {
-				return bad("奖品库存不足，活动暂不可抽奖，请等待平台补货")
+				return bad("獎品庫存不足，活動暫不可抽獎，請等待平台補貨")
 			}
 		}
 	}
 	if total <= 0 || total > 10000 {
-		return bad("奖品概率配置无效")
+		return bad("獎品概率配置無效")
 	}
 	return nil
 }
@@ -299,7 +299,7 @@ func (r *Repo) Claim(ctx context.Context, id, uid uint64) (int32, string, error)
 }
 func (r *Repo) Grant(ctx context.Context, id, uid uint64, count int32, remark, key string) error {
 	if count < 1 || count > 1000 || strings.TrimSpace(remark) == "" || len([]rune(remark)) > 500 {
-		return bad("补发数量应为 1～1000 次，并填写原因")
+		return bad("補發數量應為 1～1000 次，並填寫原因")
 	}
 	if e := requestKey(key); e != nil {
 		return e
@@ -313,7 +313,7 @@ func (r *Repo) Grant(ctx context.Context, id, uid uint64, count int32, remark, k
 		old, e := c.LotteryChanceLog.Query().Where(lotterychancelog.SubsiteID(site(ctx)), lotterychancelog.ActivityID(id), lotterychancelog.UserID(uid), lotterychancelog.RequestKey("grant:"+key)).Only(ctx)
 		if e == nil {
 			if old.Amount != count || old.Remark != remark {
-				return bad("请求标识已用于其他补发操作")
+				return bad("請求標識已用於其他補發操作")
 			}
 			return nil
 		}
@@ -321,7 +321,7 @@ func (r *Repo) Grant(ctx context.Context, id, uid uint64, count int32, remark, k
 			return e
 		}
 		if !a.Published || a.Status == "archived" || !r.now().Before(a.EndAt) {
-			return bad("仅可给尚未结束的已发布活动补发次数")
+			return bad("僅可給尚未結束的已發佈活動補發次數")
 		}
 		ok, e := c.User.Query().Where(user.ID(uid), user.StatusEQ(user.StatusActive)).Exist(ctx)
 		if e != nil {
@@ -335,7 +335,7 @@ func (r *Repo) Grant(ctx context.Context, id, uid uint64, count int32, remark, k
 			return e
 		}
 		if acc.Balance > 100000-count {
-			return bad("该账号剩余次数过多")
+			return bad("該賬號剩餘次數過多")
 		}
 		if _, e = c.LotteryChanceLog.Create().SetSubsiteID(site(ctx)).SetActivityID(id).SetUserID(uid).SetPeriod(acc.Period).SetAmount(count).SetKind("manual").SetRequestKey("grant:" + key).SetRemark(remark).SetAdminID(actor(ctx)).Save(ctx); e != nil {
 			return e

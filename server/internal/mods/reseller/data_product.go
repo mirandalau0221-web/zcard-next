@@ -1,9 +1,9 @@
 package reseller
 
-// 分站自营商品上架链路（ 验收旅程出单段）：
-// 分站主自服务面创建商品（subsite_id = 本人 profile.ID）→ 分站域名下单
-// → 管线步骤 7 接 ResolveUnitPrice（分站价）→ order.paid → SettleService 利润入账。
-// 商品行数据隔离与主站同构：products.subsite_id 行级隔离（铁律 14）。
+// 分站自營商品上架鏈路（ 驗收旅程出單段）：
+// 分站主自服務面創建商品（subsite_id = 本人 profile.ID）→ 分站域名下單
+// → 管線步驟 7 接 ResolveUnitPrice（分站價）→ order.paid → SettleService 利潤入賬。
+// 商品行數據隔離與主站同構：products.subsite_id 行級隔離（鐵律 14）。
 
 import (
 	"context"
@@ -15,23 +15,23 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/product"
 )
 
-// OwnProductInput 分站自营商品上架输入（description 已 sanitize）。
+// OwnProductInput 分站自營商品上架輸入（description 已 sanitize）。
 type OwnProductInput struct {
 	Name         string
 	CategoryID   uint64
 	Description  string
 	Cover        string
-	Price        int64 // 分（主站基础价口径；分站价由定价引擎叠加）
+	Price        int64 // 分（主站基礎價口徑；分站價由定價引擎疊加）
 	FactoryPrice int64
 	StockType    string // card | url | code
 	DeliveryMode string
 	StockVisible bool
 	Sort         int32
-	Status       int8 // 1=上架 0=下架 2=隐藏
+	Status       int8 // 1=上架 0=下架 2=隱藏
 }
 
-// CreateOwnProduct 分站自营商品创建（subsite_id 显式传入——分站主自服务面，
-// 不经租户上下文；slug 在分站内唯一，分站间同 slug 不冲突）。
+// CreateOwnProduct 分站自營商品創建（subsite_id 顯式傳入——分站主自服務面，
+// 不經租户上下文；slug 在分站內唯一，分站間同 slug 不衝突）。
 func (r *ResellerRepo) createOwnProduct(ctx context.Context, subsiteID uint64, in OwnProductInput) (*ent.Product, error) {
 	client := data.Client(ctx, r.data)
 	slug, err := r.ownProductSlug(ctx, subsiteID, in.Name)
@@ -65,8 +65,8 @@ func (r *ResellerRepo) createOwnProduct(ctx context.Context, subsiteID uint64, i
 	return create.Save(ctx)
 }
 
-// ownProductSlug 分站内唯一 slug（与 catalog 同构的 slugify 简化版；
-// 判据 products.subsite_id + slug——分站间同名商品不冲突）。
+// ownProductSlug 分站內唯一 slug（與 catalog 同構的 slugify 簡化版；
+// 判據 products.subsite_id + slug——分站間同名商品不衝突）。
 func (r *ResellerRepo) ownProductSlug(ctx context.Context, subsiteID uint64, name string) (string, error) {
 	base := slugifyOwn(name)
 	if base == "" {

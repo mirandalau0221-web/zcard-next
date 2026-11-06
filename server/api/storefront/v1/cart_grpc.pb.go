@@ -30,14 +30,14 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreCartService 购物车(销账）：登录态专属 CRUD；
-// 结算复用 StoreOrderService.CreateOrder（多商品一单支付，零下单改动）。
+// StoreCartService 購物車(銷賬）：登錄態專屬 CRUD；
+// 結算複用 StoreOrderService.CreateOrder（多商品一單支付，零下單改動）。
 type StoreCartServiceClient interface {
-	// AddCartItem 加购（同 user+product+sku 合并数量；商品须上架）。
+	// AddCartItem 加購（同 user+product+sku 合併數量；商品須上架）。
 	AddCartItem(ctx context.Context, in *AddCartItemRequest, opts ...grpc.CallOption) (*CartItem, error)
-	// ListCart 我的购物车（商品快照联查；失效商品打标）。
+	// ListCart 我的購物車（商品快照聯查；失效商品打標）。
 	ListCart(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListCartReply, error)
-	// UpdateCartItem 改量（quantity=0 即删除）。
+	// UpdateCartItem 改量（quantity=0 即刪除）。
 	UpdateCartItem(ctx context.Context, in *UpdateCartItemRequest, opts ...grpc.CallOption) (*CartItem, error)
 	// RemoveCartItem 移除。
 	RemoveCartItem(ctx context.Context, in *RemoveCartItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -95,14 +95,14 @@ func (c *storeCartServiceClient) RemoveCartItem(ctx context.Context, in *RemoveC
 // All implementations must embed UnimplementedStoreCartServiceServer
 // for forward compatibility.
 //
-// StoreCartService 购物车(销账）：登录态专属 CRUD；
-// 结算复用 StoreOrderService.CreateOrder（多商品一单支付，零下单改动）。
+// StoreCartService 購物車(銷賬）：登錄態專屬 CRUD；
+// 結算複用 StoreOrderService.CreateOrder（多商品一單支付，零下單改動）。
 type StoreCartServiceServer interface {
-	// AddCartItem 加购（同 user+product+sku 合并数量；商品须上架）。
+	// AddCartItem 加購（同 user+product+sku 合併數量；商品須上架）。
 	AddCartItem(context.Context, *AddCartItemRequest) (*CartItem, error)
-	// ListCart 我的购物车（商品快照联查；失效商品打标）。
+	// ListCart 我的購物車（商品快照聯查；失效商品打標）。
 	ListCart(context.Context, *emptypb.Empty) (*ListCartReply, error)
-	// UpdateCartItem 改量（quantity=0 即删除）。
+	// UpdateCartItem 改量（quantity=0 即刪除）。
 	UpdateCartItem(context.Context, *UpdateCartItemRequest) (*CartItem, error)
 	// RemoveCartItem 移除。
 	RemoveCartItem(context.Context, *RemoveCartItemRequest) (*emptypb.Empty, error)

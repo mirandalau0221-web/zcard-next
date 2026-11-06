@@ -10,24 +10,24 @@ const expanded = ref(false);
 onMounted(() => { expanded.value = matchMedia('(min-width: 768px)').matches; });
 </script>
 <template>
-  <section v-if="level.levels?.length || level.private_level || level.has_referral_level" class="card level-benefits" :aria-label="$t('会员等级与折扣')">
-    <header><div><h3>{{ $t('会员等级与折扣') }}</h3><p class="muted">{{ $t('当前：') }}{{ level.current?.name || (level.private_level ? $t('专属会员') : $t('普通会员')) }} · {{ level.private_level || level.current?.display_mode === 'contact' ? $t('联系客服') : levelDiscount(level.current?.discount ?? 10000) }}</p></div>
-      <span v-if="level.next" class="muted">{{ $t('下一等级：') }}{{ level.next.name }}</span></header>
-    <p v-if="level.source === 'manual'" class="muted">{{ $t('当前等级由后台指定。') }}</p>
-    <p v-else-if="level.source === 'referral'" class="muted">{{ $t('已通过推荐注册获得会员等级，无需先满足充值或消费门槛。') }}</p>
-    <p v-else-if="level.has_referral_level" class="muted">{{ $t('已保留推荐注册资格，当前自动等级的会员折扣优先适用。') }}</p>
-    <p v-if="level.next" class="next-benefit"><b>{{ $t('{0}：{1}', [level.next.name, level.next.display_mode === 'contact' ? $t('联系客服') : levelDiscount(level.next.discount)]) }}</b><span>{{ levelThreshold(level.next) }}</span></p>
+  <section v-if="level.levels?.length || level.private_level || level.has_referral_level" class="card level-benefits" :aria-label="$t('會員等級與折扣')">
+    <header><div><h3>{{ $t('會員等級與折扣') }}</h3><p class="muted">{{ $t('當前：') }}{{ level.current?.name || (level.private_level ? $t('專屬會員') : $t('普通會員')) }} · {{ level.private_level || level.current?.display_mode === 'contact' ? $t('聯繫客服') : levelDiscount(level.current?.discount ?? 10000) }}</p></div>
+      <span v-if="level.next" class="muted">{{ $t('下一等級：') }}{{ level.next.name }}</span></header>
+    <p v-if="level.source === 'manual'" class="muted">{{ $t('當前等級由後台指定。') }}</p>
+    <p v-else-if="level.source === 'referral'" class="muted">{{ $t('已通過推薦註冊獲得會員等級，無需先滿足充值或消費門檻。') }}</p>
+    <p v-else-if="level.has_referral_level" class="muted">{{ $t('已保留推薦註冊資格，當前自動等級的會員折扣優先適用。') }}</p>
+    <p v-if="level.next" class="next-benefit"><b>{{ $t('{0}：{1}', [level.next.name, level.next.display_mode === 'contact' ? $t('聯繫客服') : levelDiscount(level.next.discount)]) }}</b><span>{{ levelThreshold(level.next) }}</span></p>
     <details v-if="level.levels?.length" :open="expanded" @toggle="expanded = ($event.target as HTMLDetailsElement).open">
-      <summary>{{ expanded ? $t('收起等级列表') : $t('查看全部 {0} 个等级与折扣', [level.levels.length]) }}</summary>
+      <summary>{{ expanded ? $t('收起等級列表') : $t('查看全部 {0} 個等級與折扣', [level.levels.length]) }}</summary>
       <div class="level-list">
       <article v-for="item in level.levels" :key="item.id || item.name" class="level-item" :class="{ current: !!item.id && item.id === level.current?.id }">
-        <div class="level-name"><b>{{ item.name }}</b><span v-if="!!item.id && item.id === level.current?.id" class="level-current">{{ $t('当前等级') }}</span></div>
-        <strong>{{ item.display_mode === 'contact' ? $t('联系客服') : levelDiscount(item.discount) }}<small v-if="item.display_mode !== 'contact'">{{ $t('会员折扣') }}</small></strong>
+        <div class="level-name"><b>{{ item.name }}</b><span v-if="!!item.id && item.id === level.current?.id" class="level-current">{{ $t('當前等級') }}</span></div>
+        <strong>{{ item.display_mode === 'contact' ? $t('聯繫客服') : levelDiscount(item.discount) }}<small v-if="item.display_mode !== 'contact'">{{ $t('會員折扣') }}</small></strong>
         <p>{{ levelThreshold(item) }}</p>
       </article>
       </div>
     </details>
-    <p class="muted level-note">{{ $t('已累计充值') }} {{ formatMoney(level.recharged_cents) }} {{ $t('· 已累计消费') }} {{ formatMoney(level.consumed_cents) }}{{ $t('。充值与消费按各等级条件累计，商品实际优惠以结算价为准。') }}</p>
+    <p class="muted level-note">{{ $t('已累計充值') }} {{ formatMoney(level.recharged_cents) }} {{ $t('· 已累計消費') }} {{ formatMoney(level.consumed_cents) }}{{ $t('。充值與消費按各等級條件累計，商品實際優惠以結算價為準。') }}</p>
   </section>
 </template>
 <style scoped>

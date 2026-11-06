@@ -24,15 +24,15 @@ type SupplyOrder struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID uint64 `json:"account_id,omitempty"`
-	// 下游单号（账户内幂等锚点）
+	// 下游單號（賬户內冪等錨點）
 	DownstreamOrderNo string `json:"downstream_order_no,omitempty"`
-	// 商品行快照（上游商品/SKU/数量/单价）
+	// 商品行快照（上游商品/SKU/數量/單價）
 	Items []map[string]interface{} `json:"items,omitempty"`
-	// 应付（分，供货价口径）
+	// 應付（分，供貨價口徑）
 	Amount int64 `json:"amount,omitempty"`
 	// Status holds the value of the "status" field.
 	Status supplyorder.Status `json:"status,omitempty"`
-	// 转本地订单（复用交付出口时回填）
+	// 轉本地訂單（複用交付出口時回填）
 	LocalOrderID uint64 `json:"local_order_id,omitempty"`
 	// PaidAt holds the value of the "paid_at" field.
 	PaidAt time.Time `json:"paid_at,omitempty"`

@@ -1,14 +1,14 @@
-// Package supplier 对外供货模块（ 完整落地，本站作上游）：
-// - Supply API v2 全端点：ping/categories/products/stock/orders 查创退（HMAC 四头）
-// - HMAC 鉴权中间件：±300s 时间窗 + nonce 防重放（DB UNIQUE）+ 双口径验签（常数时间）
-// - 下单链路：downstream_order_no 幂等 → 供货价（覆盖价>基础价）→ 账本扣款
-// （幂等键 supply_order:<downID>，余额不足零流水）→ inventory.Reserve 锁卡
-// （与前台同一库存池防超卖）→ MarkUsed 交付 → 卡密内存态返回 → 回调登记
-// - 供货账本：append-only 流水 + balance_cache（对账由流水重算）
-// - 回调转发：HTTPS 强制 + SSRF 防护（httpx）+ 四头签名 + 退避重试（死信可手动重发）
-// - 下游管理：申请→审核→发 key（secret 只显一次）→启停/重置/定价/充值/流水
+// Package supplier 對外供貨模塊（ 完整落地，本站作上游）：
+// - Supply API v2 全端點：ping/categories/products/stock/orders 查創退（HMAC 四頭）
+// - HMAC 鑑權中間件：±300s 時間窗 + nonce 防重放（DB UNIQUE）+ 雙口徑驗籤（常數時間）
+// - 下單鏈路：downstream_order_no 冪等 → 供貨價（覆蓋價>基礎價）→ 賬本扣款
+// （冪等鍵 supply_order:<downID>，餘額不足零流水）→ inventory.Reserve 鎖卡
+// （與前台同一庫存池防超賣）→ MarkUsed 交付 → 卡密內存態返回 → 回調登記
+// - 供貨賬本：append-only 流水 + balance_cache（對賬由流水重算）
+// - 回調轉發：HTTPS 強制 + SSRF 防護（httpx）+ 四頭簽名 + 退避重試（死信可手動重發）
+// - 下游管理：申請→審核→發 key（secret 只顯一次）→啓停/重置/定價/充值/流水
 //
 // 表：supplier_accounts / supplier_ledger_entries / supply_orders / supply_nonces /
 // supplier_product_prices / downstream_callbacks。
-// 协议对偶： zcard 适配器即本协议的客户端（eat your own dog food）。
+// 協議對偶： zcard 適配器即本協議的客户端（eat your own dog food）。
 package supplier

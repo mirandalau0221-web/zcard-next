@@ -37,31 +37,31 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminMediaService 素材库管理：分类/上传/列表/改名/移动/批量删除
-// （ref_count>0 需 confirm）/外链导入/复制链接。
-// 上传走 base64（10MB 图 ~13.7MB JSON；管理面可接受，走统一中间件栈）。
+// AdminMediaService 素材庫管理：分類/上傳/列表/改名/移動/批量刪除
+// （ref_count>0 需 confirm）/外鏈導入/複製鏈接。
+// 上傳走 base64（10MB 圖 ~13.7MB JSON；管理面可接受，走統一中間件棧）。
 type AdminMediaServiceClient interface {
-	// CreateCategory 创建分类。
+	// CreateCategory 創建分類。
 	CreateCategory(ctx context.Context, in *CreateMediaCategoryRequest, opts ...grpc.CallOption) (*MediaCategory, error)
-	// RenameCategory 分类改名。
+	// RenameCategory 分類改名。
 	RenameCategory(ctx context.Context, in *RenameMediaCategoryRequest, opts ...grpc.CallOption) (*MediaCategory, error)
-	// MoveCategory 分类移动。
+	// MoveCategory 分類移動。
 	MoveCategory(ctx context.Context, in *MoveMediaCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// DeleteCategory 删除分类（有内容拒绝）。
+	// DeleteCategory 刪除分類（有內容拒絕）。
 	DeleteCategory(ctx context.Context, in *DeleteMediaCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListCategories 分类列表。
+	// ListCategories 分類列表。
 	ListCategories(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListMediaCategoriesReply, error)
-	// Upload 上传（安全三件套：三重校验+重编码+10MB）。
+	// Upload 上傳（安全三件套：三重校驗+重編碼+10MB）。
 	Upload(ctx context.Context, in *UploadMediaRequest, opts ...grpc.CallOption) (*MediaItem, error)
-	// ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+	// ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
 	ImportFromURL(ctx context.Context, in *ImportMediaRequest, opts ...grpc.CallOption) (*MediaItem, error)
 	// ListMedia 素材列表。
 	ListMedia(ctx context.Context, in *ListMediaRequest, opts ...grpc.CallOption) (*ListMediaReply, error)
 	// RenameMedia 素材改名。
 	RenameMedia(ctx context.Context, in *RenameMediaRequest, opts ...grpc.CallOption) (*MediaItem, error)
-	// MoveMedia 素材批量移动。
+	// MoveMedia 素材批量移動。
 	MoveMedia(ctx context.Context, in *MoveMediaRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+	// DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
 	DeleteMedia(ctx context.Context, in *DeleteMediaRequest, opts ...grpc.CallOption) (*DeleteMediaReply, error)
 }
 
@@ -187,31 +187,31 @@ func (c *adminMediaServiceClient) DeleteMedia(ctx context.Context, in *DeleteMed
 // All implementations must embed UnimplementedAdminMediaServiceServer
 // for forward compatibility.
 //
-// AdminMediaService 素材库管理：分类/上传/列表/改名/移动/批量删除
-// （ref_count>0 需 confirm）/外链导入/复制链接。
-// 上传走 base64（10MB 图 ~13.7MB JSON；管理面可接受，走统一中间件栈）。
+// AdminMediaService 素材庫管理：分類/上傳/列表/改名/移動/批量刪除
+// （ref_count>0 需 confirm）/外鏈導入/複製鏈接。
+// 上傳走 base64（10MB 圖 ~13.7MB JSON；管理面可接受，走統一中間件棧）。
 type AdminMediaServiceServer interface {
-	// CreateCategory 创建分类。
+	// CreateCategory 創建分類。
 	CreateCategory(context.Context, *CreateMediaCategoryRequest) (*MediaCategory, error)
-	// RenameCategory 分类改名。
+	// RenameCategory 分類改名。
 	RenameCategory(context.Context, *RenameMediaCategoryRequest) (*MediaCategory, error)
-	// MoveCategory 分类移动。
+	// MoveCategory 分類移動。
 	MoveCategory(context.Context, *MoveMediaCategoryRequest) (*emptypb.Empty, error)
-	// DeleteCategory 删除分类（有内容拒绝）。
+	// DeleteCategory 刪除分類（有內容拒絕）。
 	DeleteCategory(context.Context, *DeleteMediaCategoryRequest) (*emptypb.Empty, error)
-	// ListCategories 分类列表。
+	// ListCategories 分類列表。
 	ListCategories(context.Context, *emptypb.Empty) (*ListMediaCategoriesReply, error)
-	// Upload 上传（安全三件套：三重校验+重编码+10MB）。
+	// Upload 上傳（安全三件套：三重校驗+重編碼+10MB）。
 	Upload(context.Context, *UploadMediaRequest) (*MediaItem, error)
-	// ImportFromURL 外链导入（httpx SSRF 防护 + 同三件套）。
+	// ImportFromURL 外鏈導入（httpx SSRF 防護 + 同三件套）。
 	ImportFromURL(context.Context, *ImportMediaRequest) (*MediaItem, error)
 	// ListMedia 素材列表。
 	ListMedia(context.Context, *ListMediaRequest) (*ListMediaReply, error)
 	// RenameMedia 素材改名。
 	RenameMedia(context.Context, *RenameMediaRequest) (*MediaItem, error)
-	// MoveMedia 素材批量移动。
+	// MoveMedia 素材批量移動。
 	MoveMedia(context.Context, *MoveMediaRequest) (*emptypb.Empty, error)
-	// DeleteMedia 批量删除（被引用未 confirm → 409 + 引用清单）。
+	// DeleteMedia 批量刪除（被引用未 confirm → 409 + 引用清單）。
 	DeleteMedia(context.Context, *DeleteMediaRequest) (*DeleteMediaReply, error)
 	mustEmbedUnimplementedAdminMediaServiceServer()
 }

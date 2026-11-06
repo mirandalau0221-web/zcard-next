@@ -29,14 +29,14 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreCatalogService 顾客前台商品目录（游客可访问；隐藏商品对游客 404，规划)。
-// ； 骨架先打通「租户上下文 → Ent 查询 → 薄 service」链路。
+// StoreCatalogService 顧客前台商品目錄（遊客可訪問；隱藏商品對遊客 404，規劃)。
+// ； 骨架先打通「租户上下文 → Ent 查詢 → 薄 service」鏈路。
 type StoreCatalogServiceClient interface {
-	// ListProducts 商品列表（上架 + 按排序；库存数用于购买校验，stock_visible 仅控制展示）。
+	// ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
 	ListProducts(ctx context.Context, in *ListProductsRequest, opts ...grpc.CallOption) (*ListProductsReply, error)
-	// GetProduct 商品详情（下架/隐藏商品返回 NOT_FOUND）。
+	// GetProduct 商品詳情（下架/隱藏商品返回 NOT_FOUND）。
 	GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*Product, error)
-	// ListCategories 可见分类列表（hide=false + 分站白名单；导航/筛选用）。
+	// ListCategories 可見分類列表（hide=false + 分站白名單；導航/篩選用）。
 	ListCategories(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListCategoriesReply, error)
 }
 
@@ -82,14 +82,14 @@ func (c *storeCatalogServiceClient) ListCategories(ctx context.Context, in *empt
 // All implementations must embed UnimplementedStoreCatalogServiceServer
 // for forward compatibility.
 //
-// StoreCatalogService 顾客前台商品目录（游客可访问；隐藏商品对游客 404，规划)。
-// ； 骨架先打通「租户上下文 → Ent 查询 → 薄 service」链路。
+// StoreCatalogService 顧客前台商品目錄（遊客可訪問；隱藏商品對遊客 404，規劃)。
+// ； 骨架先打通「租户上下文 → Ent 查詢 → 薄 service」鏈路。
 type StoreCatalogServiceServer interface {
-	// ListProducts 商品列表（上架 + 按排序；库存数用于购买校验，stock_visible 仅控制展示）。
+	// ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsReply, error)
-	// GetProduct 商品详情（下架/隐藏商品返回 NOT_FOUND）。
+	// GetProduct 商品詳情（下架/隱藏商品返回 NOT_FOUND）。
 	GetProduct(context.Context, *GetProductRequest) (*Product, error)
-	// ListCategories 可见分类列表（hide=false + 分站白名单；导航/筛选用）。
+	// ListCategories 可見分類列表（hide=false + 分站白名單；導航/篩選用）。
 	ListCategories(context.Context, *emptypb.Empty) (*ListCategoriesReply, error)
 	mustEmbedUnimplementedStoreCatalogServiceServer()
 }

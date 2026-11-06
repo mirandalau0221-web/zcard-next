@@ -1,7 +1,7 @@
 package schema
 
-// 所有权：mods/audit（T5 访问统计——PV/UV 明细 + 在线会话心跳；
-// visit_logs 为按小时聚合表，page_views 为逐请求明细，二者并存互补）
+// 所有權：mods/audit（T5 訪問統計——PV/UV 明細 + 在線會話心跳；
+// visit_logs 為按小時聚合表，page_views 為逐請求明細，二者並存互補）
 
 import (
 	"entgo.io/ent"
@@ -9,8 +9,8 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// PageView 访问明细（每请求一行：PV 计数 + UV 按 ip 去重）。
-// 保留 90 天（cron audit.visit_cleanup 清理）；埋点失败不阻断业务请求。
+// PageView 訪問明細（每請求一行：PV 計數 + UV 按 ip 去重）。
+// 保留 90 天（cron audit.visit_cleanup 清理）；埋點失敗不阻斷業務請求。
 type PageView struct {
 	ent.Schema
 }
@@ -22,9 +22,9 @@ func (PageView) Mixin() []ent.Mixin {
 func (PageView) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.String("day").MaxLen(8).Comment("统计日 yyyymmdd（UTC）"),
-		field.String("path").MaxLen(255).Comment("请求路径"),
-		field.Uint64("user_id").Optional().Comment("登录用户（游客为 0）"),
+		field.String("day").MaxLen(8).Comment("統計日 yyyymmdd（UTC）"),
+		field.String("path").MaxLen(255).Comment("請求路徑"),
+		field.Uint64("user_id").Optional().Comment("登錄用户（遊客為 0）"),
 		field.String("ip").MaxLen(64).Comment("客户端 IP"),
 	}
 }
@@ -36,8 +36,8 @@ func (PageView) Indexes() []ent.Index {
 	}
 }
 
-// UserSession 在线会话心跳（每登录用户一行，活跃即 upsert last_active_at）。
-// 在线口径 = last_active_at 距今 ≤ 5 分钟；清理阈值 24 小时（cron）。
+// UserSession 在線會話心跳（每登錄用户一行，活躍即 upsert last_active_at）。
+// 在線口徑 = last_active_at 距今 ≤ 5 分鐘；清理閾值 24 小時（cron）。
 type UserSession struct {
 	ent.Schema
 }
@@ -50,8 +50,8 @@ func (UserSession) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.Uint64("user_id"),
-		field.String("ip").MaxLen(64).Comment("最近活跃 IP"),
-		field.Time("last_active_at").SchemaType(mysqlTime).Comment("最近活跃时间（在线判定基准）"),
+		field.String("ip").MaxLen(64).Comment("最近活躍 IP"),
+		field.Time("last_active_at").SchemaType(mysqlTime).Comment("最近活躍時間（在線判定基準）"),
 	}
 }
 

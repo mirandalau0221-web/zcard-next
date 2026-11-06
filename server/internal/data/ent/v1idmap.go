@@ -17,7 +17,7 @@ type V1IDMap struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// 1.x 表名（列名 table 为保留字，取 table_name）
+	// 1.x 表名（列名 table 為保留字，取 table_name）
 	TableName string `json:"table_name,omitempty"`
 	// OldID holds the value of the "old_id" field.
 	OldID uint64 `json:"old_id,omitempty"`

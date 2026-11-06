@@ -27,11 +27,11 @@ import (
 func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64, req *adminv1.CreateRefundRequest) (*ent.RefundOrder, error) {
 	var allocations []map[string]int64
 	if json.Unmarshal([]byte(req.ItemAllocationsJson), &allocations) != nil || len(allocations) > 100 || req.ExpectedRefundedCents == nil || !money.ValidCents(req.AmountCents) || !money.ValidCents(req.FeeCents) || len([]rune(req.Reason)) > 180 {
-		return nil, refundInvalid("请填写有效的商品退款分摊并刷新订单金额")
+		return nil, refundInvalid("請填寫有效的商品退款分攤並刷新訂單金額")
 	}
 	noMoney := req.AmountCents == 0 && req.FeeCents == 0
 	if (noMoney && req.RequestKey == "") || (req.RequestKey != "" && (len(req.RequestKey) < 8 || len(req.RequestKey) > 100)) {
-		return nil, refundInvalid("请刷新页面后重试，取消数量必须携带有效请求标识")
+		return nil, refundInvalid("請刷新頁面後重試，取消數量必須攜帶有效請求標識")
 	}
 	var requestKey, requestHash string
 	if req.RequestKey != "" {
@@ -45,7 +45,7 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 		externalReference = ""
 	}
 	if req.Channel != "wallet" && !(req.Channel == "gateway" && (noMoney || req.ExternalConfirmed && strings.TrimSpace(req.ExternalReference) != "" && len(req.ExternalReference) <= 64)) {
-		return nil, refundInvalid("请选择退至余额，或核实线下退款成功后填写退款凭证")
+		return nil, refundInvalid("請選擇退至餘額，或核實線下退款成功後填寫退款憑證")
 	}
 	var result *ent.RefundOrder
 	err := data.Tx(ctx, r.data, func(ctx context.Context) error {
@@ -58,13 +58,13 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 			return refundInvalid(err.Error())
 		}
 		if o.CommerceVersion != 1 {
-			return refundInvalid("订单版本不支持商品退款")
+			return refundInvalid("訂單版本不支持商品退款")
 		}
 		if requestKey != "" {
 			previous, err := c.RefundOrder.Query().Where(refundorder.RequestKey(requestKey)).Only(ctx)
 			if err == nil {
 				if previous.OrderID != oid || previous.RequestHash != requestHash {
-					return refundInvalid("同一退款请求不能更改内容，请刷新核对后重新操作")
+					return refundInvalid("同一退款請求不能更改內容，請刷新核對後重新操作")
 				}
 				result = previous
 				return nil
@@ -74,12 +74,12 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 			}
 		}
 		if req.Channel == "wallet" && o.UserID == 0 && !noMoney {
-			return refundInvalid("游客订单不能退至会员余额")
+			return refundInvalid("遊客訂單不能退至會員餘額")
 		}
 		switch o.Status {
 		case order.StatusPaid, order.StatusFulfilling, order.StatusPartiallyDelivered, order.StatusDelivered, order.StatusCompleted, order.StatusRefunded:
 		default:
-			return refundInvalid("当前订单状态不支持退款")
+			return refundInvalid("當前訂單狀態不支持退款")
 		}
 		receipts, e := c.RefundOrder.Query().Where(refundorder.OrderID(oid)).All(ctx)
 		if e != nil {
@@ -88,10 +88,10 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 		var refunded, feeRefunded int64
 		for _, rf := range receipts {
 			if !noMoney && req.Channel == "gateway" && rf.Channel == refundorder.ChannelGateway && strings.TrimSpace(rf.UpstreamRefundID) == externalReference && rf.Status != refundorder.StatusFailed {
-				return refundInvalid("该外部退款凭证已登记，请核对退款记录")
+				return refundInvalid("該外部退款憑證已登記，請核對退款記錄")
 			}
 			if rf.Status == refundorder.StatusCreated || rf.Status == refundorder.StatusProcessing {
-				return refundInvalid("存在待核对退款，请先核对")
+				return refundInvalid("存在待核對退款，請先核對")
 			}
 			if rf.Status == refundorder.StatusSucceeded {
 				refunded += rf.Amount
@@ -99,7 +99,7 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 			}
 		}
 		if refunded != req.GetExpectedRefundedCents() || refunded > o.TotalAmount || req.AmountCents > o.TotalAmount-refunded {
-			return refundInvalid("可退金额已变化，请刷新后确认")
+			return refundInvalid("可退金額已變化，請刷新後確認")
 		}
 		paid, e := c.Payment.Query().Where(payment.OrderID(oid), payment.StatusEQ(payment.StatusSuccess), payment.ReviewReasonEQ("")).Order(ent.Asc(payment.FieldID)).First(ctx)
 		if e != nil && !ent.IsNotFound(e) {
@@ -110,7 +110,7 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 			fee = paid.Fee
 		}
 		if req.FeeCents > fee-feeRefunded || (req.FeeCents > 0 && req.ExpectedRefundedFeeCents == nil) || (req.ExpectedRefundedFeeCents != nil && req.GetExpectedRefundedFeeCents() != feeRefunded) {
-			return refundInvalid("支付手续费可退金额已变化")
+			return refundInvalid("支付手續費可退金額已變化")
 		}
 		// Order CAS uses the same lock as shipping and digital delivery.
 		n, e := c.Order.Update().Where(order.ID(oid), order.Version(o.Version), order.StatusEQ(o.Status)).AddVersion(1).Save(ctx)
@@ -118,7 +118,7 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 			return e
 		}
 		if n != 1 {
-			return refundInvalid("订单已变化，请刷新重试")
+			return refundInvalid("訂單已變化，請刷新重試")
 		}
 		items, e := c.OrderItem.Query().Where(orderitem.OrderID(oid)).All(ctx)
 		if e != nil {
@@ -136,11 +136,11 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 			it := byID[id]
 			amount, ship, qty := a["amount_cents"], a["shipping_cents"], a["cancel_quantity"]
 			if it == nil || seen[id] || !money.ValidCents(amount) || !money.ValidCents(ship) || qty < 0 || qty > int64(it.Quantity-it.CanceledQuantity) {
-				return refundInvalid("商品退款分摊无效")
+				return refundInvalid("商品退款分攤無效")
 			}
 			seen[id] = true
 			if amount > it.PaidAmount-it.RefundedAmount || ship > it.ShippingAmount-it.RefundedShipping {
-				return refundInvalid("商品或运费退款超过剩余可退金额")
+				return refundInvalid("商品或運費退款超過剩餘可退金額")
 			}
 			if (amount > 0 || qty > 0) && it.FulfillmentType == orderitem.FulfillmentTypeUpstream && it.FulfillmentStatus != "delivered" {
 				busy, err := c.ProcurementOrder.Query().Where(procurementorder.OrderItemID(it.ID), procurementorder.StatusNotIn("rejected", "refunded")).Exist(ctx)
@@ -148,22 +148,22 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 					return err
 				}
 				if busy {
-					return refundInvalid("上游采购已提交或结果待核对，请先核实采购结果再退款")
+					return refundInvalid("上游採購已提交或結果待核對，請先核實採購結果再退款")
 				}
 			}
 			if qty > 0 {
 				if it.GoodsType == "physical" {
 					if qty > int64(it.Quantity-it.CanceledQuantity-it.ShippedQuantity) {
-						return refundInvalid("已发货数量不能取消，退货需另行验收入库")
+						return refundInvalid("已發貨數量不能取消，退貨需另行驗收入庫")
 					}
 				} else {
 					if qty != int64(it.Quantity-it.CanceledQuantity) || it.FulfillmentStatus != "pending" {
-						return refundInvalid("虚拟商品只能整项取消尚未交付且尚未采购的数量")
+						return refundInvalid("虛擬商品只能整項取消尚未交付且尚未採購的數量")
 					}
 				}
 			}
 			if sum > money.MaxCents-amount-ship {
-				return refundInvalid("退款金额超限")
+				return refundInvalid("退款金額超限")
 			}
 			sum += amount + ship
 			shippingSum += ship
@@ -184,12 +184,12 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 					remaining = 0
 				}
 				if int64(remaining) > cancel {
-					return refundInvalid("退清整单金额时，请同时取消所有尚未交付的商品数量")
+					return refundInvalid("退清整單金額時，請同時取消所有尚未交付的商品數量")
 				}
 			}
 		}
 		if sum != req.AmountCents || (sum == 0 && req.FeeCents == 0 && canceled == 0) {
-			return refundInvalid("退款金额与商品分摊不一致，或没有退款/取消内容")
+			return refundInvalid("退款金額與商品分攤不一致，或沒有退款/取消內容")
 		}
 		returnCoupon := refunded+sum == o.TotalAmount
 		for _, it := range items {
@@ -213,9 +213,9 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 		}
 		if req.Channel == "wallet" && sum+req.FeeCents > 0 {
 			if r.wallet == nil {
-				return refundInvalid("余额退款服务不可用")
+				return refundInvalid("餘額退款服務不可用")
 			}
-			if e = r.wallet.CreditInTx(ctx, walletport.Entry{UserID: o.UserID, Direction: "in", Type: "refund", Amount: money.Cents(sum + req.FeeCents), OrderID: oid, Reference: fmt.Sprintf("order_refund:%d", result.ID), Remark: "订单 " + o.OrderNo + " 商品退款"}); e != nil {
+			if e = r.wallet.CreditInTx(ctx, walletport.Entry{UserID: o.UserID, Direction: "in", Type: "refund", Amount: money.Cents(sum + req.FeeCents), OrderID: oid, Reference: fmt.Sprintf("order_refund:%d", result.ID), Remark: "訂單 " + o.OrderNo + " 商品退款"}); e != nil {
 				return e
 			}
 		}
@@ -230,7 +230,7 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 				return e
 			}
 			if qty > 0 && it.GoodsType == "physical" && it.InventoryTracked {
-				if e = data.MovePhysicalStock(ctx, r.data, it.SubsiteID, it.ProductID, it.SkuID, oid, int64(qty), fmt.Sprintf("refund:%d:%d", result.ID, it.ID), "退款取消未发货数量"); e != nil {
+				if e = data.MovePhysicalStock(ctx, r.data, it.SubsiteID, it.ProductID, it.SkuID, oid, int64(qty), fmt.Sprintf("refund:%d:%d", result.ID, it.ID), "退款取消未發貨數量"); e != nil {
 					return e
 				}
 			}
@@ -268,11 +268,11 @@ func (r *PaymentRepoImpl) RefundPhysical(ctx context.Context, oid, actor uint64,
 				return "system"
 			}
 			return "admin"
-		}(), actor, fmt.Sprintf("退款凭证 %d；商品 %d 分；运费 %d 分；支付手续费 %d 分；%s", result.ID, sum-shippingSum, shippingSum, req.FeeCents, req.Reason)); e != nil {
+		}(), actor, fmt.Sprintf("退款憑證 %d；商品 %d 分；運費 %d 分；支付手續費 %d 分；%s", result.ID, sum-shippingSum, shippingSum, req.FeeCents, req.Reason)); e != nil {
 			return e
 		}
 		if r.outbox == nil {
-			return refundInvalid("退款事件服务不可用")
+			return refundInvalid("退款事件服務不可用")
 		}
 		raw, _ := json.Marshal(map[string]any{"order_id": oid, "order_no": o.OrderNo, "refund_id": result.ID, "commerce_version": 1, "amount": sum, "shipping_amount": shippingSum, "user_id": o.UserID})
 		return r.outbox.Write(ctx, "order", events.OrderRefunded, o.OrderNo, fmt.Sprintf("order:%s:refund:%d", o.OrderNo, result.ID), raw)

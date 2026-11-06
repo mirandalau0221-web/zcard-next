@@ -29,11 +29,11 @@ type SupplyConnection struct {
 	Name               string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Driver             string                 `protobuf:"bytes,3,opt,name=driver,proto3" json:"driver,omitempty"` // zcard | dujiao_next | acg_faka
 	BaseUrl            string                 `protobuf:"bytes,4,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
-	CredentialsSet     bool                   `protobuf:"varint,5,opt,name=credentials_set,json=credentialsSet,proto3" json:"credentials_set,omitempty"` // 凭据已配置（密文不回显）
+	CredentialsSet     bool                   `protobuf:"varint,5,opt,name=credentials_set,json=credentialsSet,proto3" json:"credentials_set,omitempty"` // 憑據已配置（密文不回顯）
 	Status             string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`                                        // active | disabled
 	CallbackUrl        string                 `protobuf:"bytes,7,opt,name=callback_url,json=callbackUrl,proto3" json:"callback_url,omitempty"`
 	RetryMax           int32                  `protobuf:"varint,8,opt,name=retry_max,json=retryMax,proto3" json:"retry_max,omitempty"`
-	RetryIntervals     string                 `protobuf:"bytes,9,opt,name=retry_intervals,json=retryIntervals,proto3" json:"retry_intervals,omitempty"` // JSON 数组 [30,60,300]
+	RetryIntervals     string                 `protobuf:"bytes,9,opt,name=retry_intervals,json=retryIntervals,proto3" json:"retry_intervals,omitempty"` // JSON 數組 [30,60,300]
 	ExchangeRate       float64                `protobuf:"fixed64,10,opt,name=exchange_rate,json=exchangeRate,proto3" json:"exchange_rate,omitempty"`
 	PriceMarkupPercent float64                `protobuf:"fixed64,11,opt,name=price_markup_percent,json=priceMarkupPercent,proto3" json:"price_markup_percent,omitempty"`
 	PriceRoundingMode  string                 `protobuf:"bytes,12,opt,name=price_rounding_mode,json=priceRoundingMode,proto3" json:"price_rounding_mode,omitempty"` // none | ceil_int | ceil_tenth
@@ -42,7 +42,7 @@ type SupplyConnection struct {
 	Settings           string                 `protobuf:"bytes,15,opt,name=settings,proto3" json:"settings,omitempty"`                    // JSON
 	LowStockScannedAt  int64                  `protobuf:"varint,29,opt,name=low_stock_scanned_at,json=lowStockScannedAt,proto3" json:"low_stock_scanned_at,omitempty"`
 	LowStockMessage    string                 `protobuf:"bytes,30,opt,name=low_stock_message,json=lowStockMessage,proto3" json:"low_stock_message,omitempty"`
-	PriceMarkupAmount  int64                  `protobuf:"varint,28,opt,name=price_markup_amount,json=priceMarkupAmount,proto3" json:"price_markup_amount,omitempty"` // 固定加价（分；与加价% 组合：×(1+%) 后再加）
+	PriceMarkupAmount  int64                  `protobuf:"varint,28,opt,name=price_markup_amount,json=priceMarkupAmount,proto3" json:"price_markup_amount,omitempty"` // 固定加價（分；與加價% 組合：×(1+%) 後再加）
 	LastPingAt         int64                  `protobuf:"varint,16,opt,name=last_ping_at,json=lastPingAt,proto3" json:"last_ping_at,omitempty"`
 	LastPingOk         bool                   `protobuf:"varint,17,opt,name=last_ping_ok,json=lastPingOk,proto3" json:"last_ping_ok,omitempty"`
 	LastSyncedAt       int64                  `protobuf:"varint,18,opt,name=last_synced_at,json=lastSyncedAt,proto3" json:"last_synced_at,omitempty"`
@@ -50,12 +50,12 @@ type SupplyConnection struct {
 	BalanceCache       int64                  `protobuf:"varint,20,opt,name=balance_cache,json=balanceCache,proto3" json:"balance_cache,omitempty"`
 	CreatedAt          int64                  `protobuf:"varint,21,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt          int64                  `protobuf:"varint,22,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	// S2/S3：调度锚点与限流状态（界面展示/倒计时）
+	// S2/S3：調度錨點與限流狀態（界面展示/倒計時）
 	LastCollectAt    int64  `protobuf:"varint,23,opt,name=last_collect_at,json=lastCollectAt,proto3" json:"last_collect_at,omitempty"`
 	LastPriceSyncAt  int64  `protobuf:"varint,24,opt,name=last_price_sync_at,json=lastPriceSyncAt,proto3" json:"last_price_sync_at,omitempty"`
 	LastStatusSyncAt int64  `protobuf:"varint,25,opt,name=last_status_sync_at,json=lastStatusSyncAt,proto3" json:"last_status_sync_at,omitempty"`
-	RateState        string `protobuf:"bytes,26,opt,name=rate_state,json=rateState,proto3" json:"rate_state,omitempty"`                   // JSON（节奏器状态：当前间隔/封锁计数/冷却时长）
-	RateLimitUntil   int64  `protobuf:"varint,27,opt,name=rate_limit_until,json=rateLimitUntil,proto3" json:"rate_limit_until,omitempty"` // 熔断冷却截止（秒；0=未熔断）
+	RateState        string `protobuf:"bytes,26,opt,name=rate_state,json=rateState,proto3" json:"rate_state,omitempty"`                   // JSON（節奏器狀態：當前間隔/封鎖計數/冷卻時長）
+	RateLimitUntil   int64  `protobuf:"varint,27,opt,name=rate_limit_until,json=rateLimitUntil,proto3" json:"rate_limit_until,omitempty"` // 熔斷冷卻截止（秒；0=未熔斷）
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -305,7 +305,7 @@ type CreateConnectionRequest struct {
 	Name               string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Driver             string                 `protobuf:"bytes,2,opt,name=driver,proto3" json:"driver,omitempty"`
 	BaseUrl            string                 `protobuf:"bytes,3,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
-	Credentials        string                 `protobuf:"bytes,4,opt,name=credentials,proto3" json:"credentials,omitempty"` // 驱动结构 JSON 明文（仅此接口）
+	Credentials        string                 `protobuf:"bytes,4,opt,name=credentials,proto3" json:"credentials,omitempty"` // 驅動結構 JSON 明文（僅此接口）
 	CallbackUrl        string                 `protobuf:"bytes,5,opt,name=callback_url,json=callbackUrl,proto3" json:"callback_url,omitempty"`
 	RetryMax           int32                  `protobuf:"varint,6,opt,name=retry_max,json=retryMax,proto3" json:"retry_max,omitempty"`
 	RetryIntervals     string                 `protobuf:"bytes,7,opt,name=retry_intervals,json=retryIntervals,proto3" json:"retry_intervals,omitempty"`
@@ -315,7 +315,7 @@ type CreateConnectionRequest struct {
 	AutoSyncPrice      bool                   `protobuf:"varint,11,opt,name=auto_sync_price,json=autoSyncPrice,proto3" json:"auto_sync_price,omitempty"`
 	StockMode          string                 `protobuf:"bytes,12,opt,name=stock_mode,json=stockMode,proto3" json:"stock_mode,omitempty"`
 	Settings           string                 `protobuf:"bytes,13,opt,name=settings,proto3" json:"settings,omitempty"`
-	PriceMarkupAmount  int64                  `protobuf:"varint,14,opt,name=price_markup_amount,json=priceMarkupAmount,proto3" json:"price_markup_amount,omitempty"` // 固定加价（分）
+	PriceMarkupAmount  int64                  `protobuf:"varint,14,opt,name=price_markup_amount,json=priceMarkupAmount,proto3" json:"price_markup_amount,omitempty"` // 固定加價（分）
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -463,8 +463,8 @@ type UpdateConnectionRequest struct {
 	AutoSyncPrice      *bool                  `protobuf:"varint,11,opt,name=auto_sync_price,json=autoSyncPrice,proto3,oneof" json:"auto_sync_price,omitempty"`
 	StockMode          string                 `protobuf:"bytes,12,opt,name=stock_mode,json=stockMode,proto3" json:"stock_mode,omitempty"`
 	Status             string                 `protobuf:"bytes,13,opt,name=status,proto3" json:"status,omitempty"`
-	Settings           string                 `protobuf:"bytes,14,opt,name=settings,proto3" json:"settings,omitempty"`                                                     // JSON（定时计划/导入默认价；非空整体替换）
-	PriceMarkupAmount  *int64                 `protobuf:"varint,15,opt,name=price_markup_amount,json=priceMarkupAmount,proto3,oneof" json:"price_markup_amount,omitempty"` // 固定加价（分）
+	Settings           string                 `protobuf:"bytes,14,opt,name=settings,proto3" json:"settings,omitempty"`                                                     // JSON（定時計劃/導入默認價；非空整體替換）
+	PriceMarkupAmount  *int64                 `protobuf:"varint,15,opt,name=price_markup_amount,json=priceMarkupAmount,proto3,oneof" json:"price_markup_amount,omitempty"` // 固定加價（分）
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -898,7 +898,7 @@ type SupplyMapping struct {
 	LocalProductId   uint64                 `protobuf:"varint,6,opt,name=local_product_id,json=localProductId,proto3" json:"local_product_id,omitempty"`
 	UpstreamSku      string                 `protobuf:"bytes,7,opt,name=upstream_sku,json=upstreamSku,proto3" json:"upstream_sku,omitempty"`
 	LocalSkuId       uint64                 `protobuf:"varint,8,opt,name=local_sku_id,json=localSkuId,proto3" json:"local_sku_id,omitempty"`
-	UpStock          int32                  `protobuf:"varint,9,opt,name=up_stock,json=upStock,proto3" json:"up_stock,omitempty"`                         // -1 = 无限
+	UpStock          int32                  `protobuf:"varint,9,opt,name=up_stock,json=upStock,proto3" json:"up_stock,omitempty"`                         // -1 = 無限
 	PricingOverride  string                 `protobuf:"bytes,10,opt,name=pricing_override,json=pricingOverride,proto3" json:"pricing_override,omitempty"` // JSON
 	CreatedAt        int64                  `protobuf:"varint,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt        int64                  `protobuf:"varint,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -1297,7 +1297,7 @@ type SupplySyncTask struct {
 	Id                uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	ConnectionId      uint64                 `protobuf:"varint,2,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
 	Mode              string                 `protobuf:"bytes,3,opt,name=mode,proto3" json:"mode,omitempty"`   // full | incremental
-	Scope             string                 `protobuf:"bytes,4,opt,name=scope,proto3" json:"scope,omitempty"` // collect | price | status（空 = collect 兼容历史任务）
+	Scope             string                 `protobuf:"bytes,4,opt,name=scope,proto3" json:"scope,omitempty"` // collect | price | status（空 = collect 兼容歷史任務）
 	ForceReprice      bool                   `protobuf:"varint,5,opt,name=force_reprice,json=forceReprice,proto3" json:"force_reprice,omitempty"`
 	Status            string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"` // pending | processing | done | failed | canceled
 	Total             int64                  `protobuf:"varint,7,opt,name=total,proto3" json:"total,omitempty"`
@@ -1555,8 +1555,8 @@ func (x *SupplySyncTask) GetNextRetryAt() int64 {
 type CreateSyncTaskRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ConnectionId  uint64                 `protobuf:"varint,1,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
-	Mode          string                 `protobuf:"bytes,2,opt,name=mode,proto3" json:"mode,omitempty"`   // full | incremental（默认 full；驱动不支持增量时引擎自动回落全量）
-	Scope         string                 `protobuf:"bytes,3,opt,name=scope,proto3" json:"scope,omitempty"` // collect=采集（默认，含删除对账）| price=仅刷价格 | status=仅刷上下架与库存
+	Mode          string                 `protobuf:"bytes,2,opt,name=mode,proto3" json:"mode,omitempty"`   // full | incremental（默認 full；驅動不支持增量時引擎自動回落全量）
+	Scope         string                 `protobuf:"bytes,3,opt,name=scope,proto3" json:"scope,omitempty"` // collect=採集（默認，含刪除對賬）| price=僅刷價格 | status=僅刷上下架與庫存
 	ForceReprice  bool                   `protobuf:"varint,4,opt,name=force_reprice,json=forceReprice,proto3" json:"force_reprice,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1623,12 +1623,12 @@ func (x *CreateSyncTaskRequest) GetForceReprice() bool {
 type PreviewProductsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ConnectionId  uint64                 `protobuf:"varint,1,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
-	QuoteCode     string                 `protobuf:"bytes,2,opt,name=quote_code,json=quoteCode,proto3" json:"quote_code,omitempty"`    // 非空时仅返回该商品，并实时获取账号单件报价（含各规格）
-	Async         bool                   `protobuf:"varint,3,opt,name=async,proto3" json:"async,omitempty"`                            // 后台加载目录，短轮询读取状态
-	SnapshotId    string                 `protobuf:"bytes,4,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"` // 已加载目录凭证，报价与导入均复用
+	QuoteCode     string                 `protobuf:"bytes,2,opt,name=quote_code,json=quoteCode,proto3" json:"quote_code,omitempty"`    // 非空時僅返回該商品，並實時獲取賬號單件報價（含各規格）
+	Async         bool                   `protobuf:"varint,3,opt,name=async,proto3" json:"async,omitempty"`                            // 後台加載目錄，短輪詢讀取狀態
+	SnapshotId    string                 `protobuf:"bytes,4,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"` // 已加載目錄憑證，報價與導入均複用
 	Page          int32                  `protobuf:"varint,6,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,7,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	Refresh       bool                   `protobuf:"varint,5,opt,name=refresh,proto3" json:"refresh,omitempty"` // 明确重试或刷新；不覆盖其他窗口持有的快照
+	Refresh       bool                   `protobuf:"varint,5,opt,name=refresh,proto3" json:"refresh,omitempty"` // 明確重試或刷新；不覆蓋其他窗口持有的快照
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1719,19 +1719,19 @@ type PreviewProduct struct {
 	SmsProduct        map[string]string      `protobuf:"bytes,17,rep,name=sms_product,json=smsProduct,proto3" json:"sms_product,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Code              string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
 	Name              string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	PriceCents        int64                  `protobuf:"varint,3,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"` // 上游价（分）
+	PriceCents        int64                  `protobuf:"varint,3,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"` // 上游價（分）
 	FactoryPriceCents int64                  `protobuf:"varint,4,opt,name=factory_price_cents,json=factoryPriceCents,proto3" json:"factory_price_cents,omitempty"`
 	CategoryCode      string                 `protobuf:"bytes,5,opt,name=category_code,json=categoryCode,proto3" json:"category_code,omitempty"`
 	CategoryName      string                 `protobuf:"bytes,6,opt,name=category_name,json=categoryName,proto3" json:"category_name,omitempty"`
 	IsActive          bool                   `protobuf:"varint,7,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
-	Stock             int32                  `protobuf:"varint,8,opt,name=stock,proto3" json:"stock,omitempty"`                                            // -1 = 无限/未知
-	AlreadyImported   bool                   `protobuf:"varint,9,opt,name=already_imported,json=alreadyImported,proto3" json:"already_imported,omitempty"` // 已存在映射（勾选导入 = 更新）
-	QuoteStatus       string                 `protobuf:"bytes,10,opt,name=quote_status,json=quoteStatus,proto3" json:"quote_status,omitempty"`             // pending | ready | failed；未确认时不能使用目录原价作为成本
-	CostPriceCents    int64                  `protobuf:"varint,11,opt,name=cost_price_cents,json=costPriceCents,proto3" json:"cost_price_cents,omitempty"` // 本地币种成本，账号单件报价乘汇率，不含加价；未知=-1
+	Stock             int32                  `protobuf:"varint,8,opt,name=stock,proto3" json:"stock,omitempty"`                                            // -1 = 無限/未知
+	AlreadyImported   bool                   `protobuf:"varint,9,opt,name=already_imported,json=alreadyImported,proto3" json:"already_imported,omitempty"` // 已存在映射（勾選導入 = 更新）
+	QuoteStatus       string                 `protobuf:"bytes,10,opt,name=quote_status,json=quoteStatus,proto3" json:"quote_status,omitempty"`             // pending | ready | failed；未確認時不能使用目錄原價作為成本
+	CostPriceCents    int64                  `protobuf:"varint,11,opt,name=cost_price_cents,json=costPriceCents,proto3" json:"cost_price_cents,omitempty"` // 本地幣種成本，賬號單件報價乘匯率，不含加價；未知=-1
 	IsLocked          bool                   `protobuf:"varint,13,opt,name=is_locked,json=isLocked,proto3" json:"is_locked,omitempty"`
 	CategoryProtected bool                   `protobuf:"varint,14,opt,name=category_protected,json=categoryProtected,proto3" json:"category_protected,omitempty"`
 	LocalCategoryId   uint64                 `protobuf:"varint,15,opt,name=local_category_id,json=localCategoryId,proto3" json:"local_category_id,omitempty"`
-	CostIsMinimum     bool                   `protobuf:"varint,12,opt,name=cost_is_minimum,json=costIsMinimum,proto3" json:"cost_is_minimum,omitempty"` // 多规格商品显示最低规格成本
+	CostIsMinimum     bool                   `protobuf:"varint,12,opt,name=cost_is_minimum,json=costIsMinimum,proto3" json:"cost_is_minimum,omitempty"` // 多規格商品顯示最低規格成本
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -2088,18 +2088,18 @@ type ImportProductsRequest struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
 	ConnectionId           uint64                 `protobuf:"varint,1,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
 	Codes                  []string               `protobuf:"bytes,2,rep,name=codes,proto3" json:"codes,omitempty"`
-	PricingMode            string                 `protobuf:"bytes,3,opt,name=pricing_mode,json=pricingMode,proto3" json:"pricing_mode,omitempty"`                                                                                               // channel | percent | fixed | equal | pending（默认跟随渠道，兼容已保存导入策略）
-	MarkupPercent          float64                `protobuf:"fixed64,4,opt,name=markup_percent,json=markupPercent,proto3" json:"markup_percent,omitempty"`                                                                                       // percent 模式加价 %（0 = 不加价）
-	MarkupAmountCents      int64                  `protobuf:"varint,5,opt,name=markup_amount_cents,json=markupAmountCents,proto3" json:"markup_amount_cents,omitempty"`                                                                          // fixed 模式加价金额（分）
-	SaveDefault            bool                   `protobuf:"varint,6,opt,name=save_default,json=saveDefault,proto3" json:"save_default,omitempty"`                                                                                              // 把本次策略存为连接默认（settings.import_pricing）
-	CategoryMap            map[string]uint64      `protobuf:"bytes,7,rep,name=category_map,json=categoryMap,proto3" json:"category_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`                    // 缺省沿用；0 显式清除；正数指定本地分类
-	ProductCategories      map[string]uint64      `protobuf:"bytes,10,rep,name=product_categories,json=productCategories,proto3" json:"product_categories,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"` // 单品明确选择，仅限本次选中商品
+	PricingMode            string                 `protobuf:"bytes,3,opt,name=pricing_mode,json=pricingMode,proto3" json:"pricing_mode,omitempty"`                                                                                               // channel | percent | fixed | equal | pending（默認跟隨渠道，兼容已保存導入策略）
+	MarkupPercent          float64                `protobuf:"fixed64,4,opt,name=markup_percent,json=markupPercent,proto3" json:"markup_percent,omitempty"`                                                                                       // percent 模式加價 %（0 = 不加價）
+	MarkupAmountCents      int64                  `protobuf:"varint,5,opt,name=markup_amount_cents,json=markupAmountCents,proto3" json:"markup_amount_cents,omitempty"`                                                                          // fixed 模式加價金額（分）
+	SaveDefault            bool                   `protobuf:"varint,6,opt,name=save_default,json=saveDefault,proto3" json:"save_default,omitempty"`                                                                                              // 把本次策略存為連接默認（settings.import_pricing）
+	CategoryMap            map[string]uint64      `protobuf:"bytes,7,rep,name=category_map,json=categoryMap,proto3" json:"category_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`                    // 缺省沿用；0 顯式清除；正數指定本地分類
+	ProductCategories      map[string]uint64      `protobuf:"bytes,10,rep,name=product_categories,json=productCategories,proto3" json:"product_categories,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"` // 單品明確選擇，僅限本次選中商品
 	CategoryRules          []*ProductCategoryRule `protobuf:"bytes,11,rep,name=category_rules,json=categoryRules,proto3" json:"category_rules,omitempty"`
 	SaveCategoryRules      bool                   `protobuf:"varint,12,opt,name=save_category_rules,json=saveCategoryRules,proto3" json:"save_category_rules,omitempty"`
-	SelectedCategoriesOnly bool                   `protobuf:"varint,13,opt,name=selected_categories_only,json=selectedCategoriesOnly,proto3" json:"selected_categories_only,omitempty"` // 不修改整个上游分类的默认映射
-	RequestKey             string                 `protobuf:"bytes,9,opt,name=request_key,json=requestKey,proto3" json:"request_key,omitempty"`                                         // 同一次提交/网络重试使用同一键
+	SelectedCategoriesOnly bool                   `protobuf:"varint,13,opt,name=selected_categories_only,json=selectedCategoriesOnly,proto3" json:"selected_categories_only,omitempty"` // 不修改整個上游分類的默認映射
+	RequestKey             string                 `protobuf:"bytes,9,opt,name=request_key,json=requestKey,proto3" json:"request_key,omitempty"`                                         // 同一次提交/網絡重試使用同一鍵
 	SnapshotId             string                 `protobuf:"bytes,14,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"`
-	CategoryDrafts         []*ImportCategoryDraft `protobuf:"bytes,8,rep,name=category_drafts,json=categoryDrafts,proto3" json:"category_drafts,omitempty"` // 仅在提交时创建，限所选商品涉及分类
+	CategoryDrafts         []*ImportCategoryDraft `protobuf:"bytes,8,rep,name=category_drafts,json=categoryDrafts,proto3" json:"category_drafts,omitempty"` // 僅在提交時創建，限所選商品涉及分類
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -2236,7 +2236,7 @@ type ImportCategoryDraft struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UpstreamCode  string                 `protobuf:"bytes,1,opt,name=upstream_code,json=upstreamCode,proto3" json:"upstream_code,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	ParentId      uint64                 `protobuf:"varint,3,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"` // 0 = 顶级分类
+	ParentId      uint64                 `protobuf:"varint,3,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"` // 0 = 頂級分類
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2294,13 +2294,13 @@ func (x *ImportCategoryDraft) GetParentId() uint64 {
 
 type ImportProductsReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *SupplySyncTask        `protobuf:"bytes,7,opt,name=task,proto3" json:"task,omitempty"`          // 已受理后台任务，请查询任务接口获取结果
+	Task          *SupplySyncTask        `protobuf:"bytes,7,opt,name=task,proto3" json:"task,omitempty"`          // 已受理後台任務，請查詢任務接口獲取結果
 	Imported      int32                  `protobuf:"varint,1,opt,name=imported,proto3" json:"imported,omitempty"` // 新建
-	Updated       int32                  `protobuf:"varint,2,opt,name=updated,proto3" json:"updated,omitempty"`   // 更新（已导入重导）
+	Updated       int32                  `protobuf:"varint,2,opt,name=updated,proto3" json:"updated,omitempty"`   // 更新（已導入重導）
 	Failed        int32                  `protobuf:"varint,3,opt,name=failed,proto3" json:"failed,omitempty"`
 	ErrorContext  string                 `protobuf:"bytes,4,opt,name=error_context,json=errorContext,proto3" json:"error_context,omitempty"`
 	FailedCodes   []string               `protobuf:"bytes,5,rep,name=failed_codes,json=failedCodes,proto3" json:"failed_codes,omitempty"`
-	CategoryMap   map[string]uint64      `protobuf:"bytes,6,rep,name=category_map,json=categoryMap,proto3" json:"category_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"` // 本次已保存映射，失败重试时复用
+	CategoryMap   map[string]uint64      `protobuf:"bytes,6,rep,name=category_map,json=categoryMap,proto3" json:"category_map,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"` // 本次已保存映射，失敗重試時複用
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3044,7 +3044,7 @@ type RetryImportTaskRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Scope         string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`                                       // failed | stock | remaining
-	ConfirmConfig bool                   `protobuf:"varint,3,opt,name=confirm_config,json=confirmConfig,proto3" json:"confirm_config,omitempty"` // 已确认使用当前货源配置继续未完成部分
+	ConfirmConfig bool                   `protobuf:"varint,3,opt,name=confirm_config,json=confirmConfig,proto3" json:"confirm_config,omitempty"` // 已確認使用當前貨源配置繼續未完成部分
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

@@ -1,7 +1,7 @@
 package schema
 
-// 所有权：mods/supplier（P2-03 对外供货：本站作上游）
-// 字段对齐《数据库架构设计.md》§4.7/§5；HMAC 四头协议见主文档 §5.8。
+// 所有權：mods/supplier（P2-03 對外供貨：本站作上游）
+// 字段對齊《數據庫架構設計.md》§4.7/§5；HMAC 四頭協議見主文檔 §5.8。
 
 import (
 	"entgo.io/ent"
@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// SupplierAccount 下游账户（申请→审核→发 key；secret 只显示一次）。
+// SupplierAccount 下游賬户（申請→審核→發 key；secret 只顯示一次）。
 type SupplierAccount struct {
 	ent.Schema
 }
@@ -20,26 +20,26 @@ func (SupplierAccount) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.String("name").MaxLen(100),
-		field.String("api_key").MaxLen(64).Unique().Comment("下游识别 key（可索引明文）"),
+		field.String("api_key").MaxLen(64).Unique().Comment("下游識別 key（可索引明文）"),
 		field.Bytes("api_secret").Comment("AES-256-GCM 加密 secret"),
-		field.String("contact").MaxLen(255).Optional().Comment("联系方式（申请审核用）"),
+		field.String("contact").MaxLen(255).Optional().Comment("聯繫方式（申請審核用）"),
 		field.Enum("status").Values("applying", "approved", "rejected", "disabled").Default("applying"),
-		field.Int64("balance_cache").Default(0).Comment("供货余额缓存（可由流水重算）"),
-		field.String("notify_url").MaxLen(500).Optional().Comment("交付回调地址（HTTPS 强制）"),
+		field.Int64("balance_cache").Default(0).Comment("供貨餘額緩存（可由流水重算）"),
+		field.String("notify_url").MaxLen(500).Optional().Comment("交付回調地址（HTTPS 強制）"),
 		field.Time("reviewed_at").SchemaType(mysqlTime).Optional(),
-		// P2-10 B/C：该账号对外说话用的协议（决定兼容层凭据形态与回调签名器）。
-		// dujiao_next：api_key=Api-Key、secret=签名密钥；acg_faka：api_key=数字
-		// app_id、secret=32 位 app_key（MD5 验签时解密参与）。
+		// P2-10 B/C：該賬號對外説話用的協議（決定兼容層憑據形態與回調簽名器）。
+		// dujiao_next：api_key=Api-Key、secret=簽名密鑰；acg_faka：api_key=數字
+		// app_id、secret=32 位 app_key（MD5 驗籤時解密參與）。
 		field.Enum("protocol").Values("zcard", "dujiao_next", "acg_faka").Default("zcard"),
-		field.String("display_name").MaxLen(100).Optional().Comment("connect/ping 回显的店铺名（shopName/site_name）"),
-		// 前台对接申请（P3-xx）：owner=前台用户 id（admin 手动建号恒 0）；
-		// apply_reason 申请理由、review_note 审核意见（驳回时必填）。
-		field.Uint64("owner_user_id").Optional().Default(0).Comment("申请归属前台用户（0=admin 建号）"),
-		field.String("apply_reason").MaxLen(500).Optional().Comment("申请理由（审核用）"),
-		field.String("review_note").MaxLen(500).Optional().Comment("审核意见/驳回理由"),
-		// IP 白名单（申请通过后可配置）：空数组 = 所有 IP 放行；非空 = 仅命中（精确 IP
-		// 或 CIDR 网段）的请求可调供货/兼容接口。鉴权层（三协议统一）强制。
-		field.JSON("ip_whitelist", []string{}).Optional().Comment("IP 白名单（空=不限；支持精确 IP 与 CIDR）"),
+		field.String("display_name").MaxLen(100).Optional().Comment("connect/ping 回顯的店鋪名（shopName/site_name）"),
+		// 前台對接申請（P3-xx）：owner=前台用户 id（admin 手動建號恆 0）；
+		// apply_reason 申請理由、review_note 審核意見（駁回時必填）。
+		field.Uint64("owner_user_id").Optional().Default(0).Comment("申請歸屬前台用户（0=admin 建號）"),
+		field.String("apply_reason").MaxLen(500).Optional().Comment("申請理由（審核用）"),
+		field.String("review_note").MaxLen(500).Optional().Comment("審核意見/駁回理由"),
+		// IP 白名單（申請通過後可配置）：空數組 = 所有 IP 放行；非空 = 僅命中（精確 IP
+		// 或 CIDR 網段）的請求可調供貨/兼容接口。鑑權層（三協議統一）強制。
+		field.JSON("ip_whitelist", []string{}).Optional().Comment("IP 白名單（空=不限；支持精確 IP 與 CIDR）"),
 	}
 }
 
@@ -49,7 +49,7 @@ func (SupplierAccount) Indexes() []ent.Index {
 	}
 }
 
-// SupplierLedgerEntry 供货余额账本（幂等键 supply_order:<downID>；append-only）。
+// SupplierLedgerEntry 供貨餘額賬本（冪等鍵 supply_order:<downID>；append-only）。
 type SupplierLedgerEntry struct {
 	ent.Schema
 }
@@ -60,9 +60,9 @@ func (SupplierLedgerEntry) Fields() []ent.Field {
 		field.Uint64("account_id"),
 		field.Uint64("supply_order_id").Optional(),
 		field.String("type").MaxLen(40).Comment("recharge/supply_pay/supply_refund/adjust"),
-		field.Int64("amount").Comment("有符号（分）"),
+		field.Int64("amount").Comment("有符號（分）"),
 		field.String("currency").MaxLen(3).Default("CNY"),
-		field.String("reference").MaxLen(120).Unique().Comment("幂等键"),
+		field.String("reference").MaxLen(120).Unique().Comment("冪等鍵"),
 		field.String("remark").MaxLen(255).Optional(),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
 	}
@@ -74,7 +74,7 @@ func (SupplierLedgerEntry) Indexes() []ent.Index {
 	}
 }
 
-// SupplyOrder 下游订单（downstream_order_no 幂等；复用 inventory 锁卡）。
+// SupplyOrder 下游訂單（downstream_order_no 冪等；複用 inventory 鎖卡）。
 type SupplyOrder struct {
 	ent.Schema
 }
@@ -85,13 +85,13 @@ func (SupplyOrder) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.Uint64("account_id"),
-		field.String("downstream_order_no").MaxLen(64).Comment("下游单号（账户内幂等锚点）"),
-		field.JSON("items", []map[string]any{}).Comment("商品行快照（上游商品/SKU/数量/单价）"),
-		field.Int64("amount").Comment("应付（分，供货价口径）"),
+		field.String("downstream_order_no").MaxLen(64).Comment("下游單號（賬户內冪等錨點）"),
+		field.JSON("items", []map[string]any{}).Comment("商品行快照（上游商品/SKU/數量/單價）"),
+		field.Int64("amount").Comment("應付（分，供貨價口徑）"),
 		field.Enum("status").
 			Values("pending", "paid", "fulfilling", "fulfilled", "rejected", "refunded").
 			Default("pending"),
-		field.Uint64("local_order_id").Optional().Comment("转本地订单（复用交付出口时回填）"),
+		field.Uint64("local_order_id").Optional().Comment("轉本地訂單（複用交付出口時回填）"),
 		field.Time("paid_at").SchemaType(mysqlTime).Optional(),
 		field.Time("fulfilled_at").SchemaType(mysqlTime).Optional(),
 	}
@@ -105,7 +105,7 @@ func (SupplyOrder) Indexes() []ent.Index {
 	}
 }
 
-// SupplyNonce 供货 API nonce 防重放（Redis 优先，DB 兜底；过期清理 cron）。
+// SupplyNonce 供貨 API nonce 防重放（Redis 優先，DB 兜底；過期清理 cron）。
 type SupplyNonce struct {
 	ent.Schema
 }
@@ -113,7 +113,7 @@ type SupplyNonce struct {
 func (SupplyNonce) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.String("key").MaxLen(64).Comment("api_key（命名空间隔离）"),
+		field.String("key").MaxLen(64).Comment("api_key（命名空間隔離）"),
 		field.String("nonce").MaxLen(64),
 		field.Time("expires_at").SchemaType(mysqlTime),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
@@ -127,7 +127,7 @@ func (SupplyNonce) Indexes() []ent.Index {
 	}
 }
 
-// SupplierProductPrice 对外供货定价（本站→下游差异化定价；区别于 supply_mappings 的上游→本地）。
+// SupplierProductPrice 對外供貨定價（本站→下游差異化定價；區別於 supply_mappings 的上游→本地）。
 type SupplierProductPrice struct {
 	ent.Schema
 }
@@ -139,11 +139,11 @@ func (SupplierProductPrice) Fields() []ent.Field {
 		field.Uint64("id"),
 		field.Uint64("supplier_account_id"),
 		field.Uint64("product_id"),
-		field.Uint64("sku_id").Default(0).Comment("0=商品级（哨兵，参与唯一索引）"),
-		field.Int64("price").Comment("供货价（分）"),
-		field.String("scope").Default("product").Comment("product 固定价 / category 分类折扣 / global 整站折扣"),
+		field.Uint64("sku_id").Default(0).Comment("0=商品級（哨兵，參與唯一索引）"),
+		field.Int64("price").Comment("供貨價（分）"),
+		field.String("scope").Default("product").Comment("product 固定價 / category 分類折扣 / global 整站折扣"),
 		field.Uint64("category_id").Default(0),
-		field.Int32("discount_bps").Default(0).Comment("折后比例，9000=9折"),
+		field.Int32("discount_bps").Default(0).Comment("折後比例，9000=9折"),
 	}
 }
 
@@ -153,7 +153,7 @@ func (SupplierProductPrice) Indexes() []ent.Index {
 	}
 }
 
-// DownstreamCallback 下游回调转发重试（交付完成 → POST notify_url；死信可手动重发）。
+// DownstreamCallback 下游回調轉發重試（交付完成 → POST notify_url；死信可手動重發）。
 type DownstreamCallback struct {
 	ent.Schema
 }

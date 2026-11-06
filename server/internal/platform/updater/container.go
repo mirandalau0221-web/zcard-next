@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var ErrContainerUpdate = errors.New("Docker 在线更新助手尚未配置，请在原部署目录执行 bash deploy/docker-install.sh --online；容器内不直接替换程序")
+var ErrContainerUpdate = errors.New("Docker 在線更新助手尚未配置，請在原部署目錄執行 bash deploy/docker-install.sh --online；容器內不直接替換程序")
 
 // IsContainer checks an image marker and common Docker/Podman/Kubernetes markers.
 // Keep this independent of the user-selected process supervisor.

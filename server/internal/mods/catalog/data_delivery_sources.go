@@ -38,7 +38,7 @@ func (s *AdminCatalogService) GetDeliverySources(ctx context.Context, req *admin
 	}
 	for _, sk := range slots {
 		id := uint64(0)
-		name := "默认规格"
+		name := "默認規格"
 		if sk != nil {
 			id = sk.ID
 			name = sk.Name
@@ -89,14 +89,14 @@ func (s *AdminCatalogService) GetDeliverySources(ctx context.Context, req *admin
 			continue
 		}
 		for i := range rows[0].ReceivedContent {
-			reply.Receipts = append(reply.Receipts, &adminv1.DeliveryReceiptOption{ProcurementId: po.ID, ContentIndex: int32(i), SkuId: it.SkuID, PurchasedAt: po.CreatedAt.Unix(), Label: fmt.Sprintf("采购 #%d · 第 %d 份 · %s", po.ID, i+1, po.CreatedAt.Format("2006-01-02 15:04"))})
+			reply.Receipts = append(reply.Receipts, &adminv1.DeliveryReceiptOption{ProcurementId: po.ID, ContentIndex: int32(i), SkuId: it.SkuID, PurchasedAt: po.CreatedAt.Unix(), Label: fmt.Sprintf("採購 #%d · 第 %d 份 · %s", po.ID, i+1, po.CreatedAt.Format("2006-01-02 15:04"))})
 		}
 	}
 	return reply, nil
 }
 func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv1.SetDeliverySourceRequest) (*adminv1.DeliverySourcesReply, error) {
 	if req.ExpiresAt < 0 || req.MaxDeliveries < 0 || req.MaxDeliveries > 100000000 || len(req.Content) > 60000 {
-		return nil, fmt.Errorf("有效期、发放次数或内容长度无效")
+		return nil, fmt.Errorf("有效期、發放次數或內容長度無效")
 	}
 	err := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		c := data.Client(ctx, s.repo.data)
@@ -105,13 +105,13 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 			return e
 		}
 		if p.ProductKind == "sms_channel" || p.DeliveryKind == "social_service" {
-			return fmt.Errorf("渠道接码不能改为本地发货")
+			return fmt.Errorf("渠道接碼不能改為本地發貨")
 		}
 		if p.GoodsType == "physical" {
-			return fmt.Errorf("实体商品只支持快递发货")
+			return fmt.Errorf("實體商品只支持快遞發貨")
 		}
 		if p.LockVersion != req.ExpectedRevision {
-			return fmt.Errorf("商品设置已变化，请刷新后重试")
+			return fmt.Errorf("商品設置已變化，請刷新後重試")
 		}
 		sk, e := data.DeliverySKU(ctx, c, p, req.SkuId)
 		if e != nil {
@@ -123,7 +123,7 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 				return e
 			}
 			if n > 0 {
-				return fmt.Errorf("请为每个规格分别设置发货来源")
+				return fmt.Errorf("請為每個規格分別設置發貨來源")
 			}
 		}
 		src, e := data.CurrentDeliverySource(ctx, c, p, req.SkuId)
@@ -132,59 +132,59 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 		}
 		if req.Action != "" && req.Action != "configure" {
 			if src == nil {
-				return fmt.Errorf("没有已配置的复用内容")
+				return fmt.Errorf("沒有已配置的複用內容")
 			}
 			switch req.Action {
 			case "pause":
 				if src.Status == "submitting" || src.Status == "polling" || src.Status == "uncertain" {
-					return fmt.Errorf("首次采购结果尚未核实，请先核实原采购单；可先下架商品停止新订单")
+					return fmt.Errorf("首次採購結果尚未核實，請先核實原採購單；可先下架商品停止新訂單")
 				}
 				if e := c.ProductDeliverySource.UpdateOneID(src.ID).SetStatus("paused").Exec(ctx); e != nil {
 					return e
 				}
 			case "resume":
 				if src.Status != "paused" || len(src.Content) == 0 {
-					return fmt.Errorf("仅能恢复已有有效内容；未完成采购请先核实")
+					return fmt.Errorf("僅能恢復已有有效內容；未完成採購請先核實")
 				}
 				if src.ExpiresAt > 0 && src.ExpiresAt <= time.Now().Unix() {
-					return fmt.Errorf("内容已过期，请更换内容")
+					return fmt.Errorf("內容已過期，請更換內容")
 				}
 				if e := c.ProductDeliverySource.UpdateOneID(src.ID).SetStatus("ready").Exec(ctx); e != nil {
 					return e
 				}
 			case "reconcile":
 				if src.Status != "uncertain" || strings.TrimSpace(req.UpstreamOrderId) == "" || len(req.UpstreamOrderId) > 128 {
-					return fmt.Errorf("请填写原上游订单号，核查不会重新采购")
+					return fmt.Errorf("請填寫原上游訂單號，核查不會重新採購")
 				}
 				if src.UpstreamOrderID != "" && src.UpstreamOrderID != strings.TrimSpace(req.UpstreamOrderId) {
-					return fmt.Errorf("已记录原采购订单号，不能替换为其他订单")
+					return fmt.Errorf("已記錄原採購訂單號，不能替換為其他訂單")
 				}
 				conn, e := c.SupplyConnection.Get(ctx, src.ConnectionID)
 				if e != nil {
 					return e
 				}
 				if data.ConnectionRevision(conn) != src.ConnectionRevision {
-					return fmt.Errorf("货源账号配置与首次采购时不同，请恢复原货源账号后核查原单")
+					return fmt.Errorf("貨源賬號配置與首次採購時不同，請恢復原貨源賬號後核查原單")
 				}
 				if e := c.ProductDeliverySource.UpdateOneID(src.ID).SetUpstreamOrderID(strings.TrimSpace(req.UpstreamOrderId)).SetStatus("polling").SetNextCheckAt(0).SetLastError("").Exec(ctx); e != nil {
 					return e
 				}
 			default:
-				return fmt.Errorf("无效的操作")
+				return fmt.Errorf("無效的操作")
 			}
 			return c.Product.UpdateOneID(p.ID).AddLockVersion(1).Exec(ctx)
 		}
 		if req.Mode != "upstream" && req.Mode != "local" && req.Mode != "reuse" {
-			return fmt.Errorf("无效的发货来源")
+			return fmt.Errorf("無效的發貨來源")
 		}
 		if req.Mode == "upstream" && p.UpstreamSourceID == 0 {
-			return fmt.Errorf("该商品没有上游绑定")
+			return fmt.Errorf("該商品沒有上游綁定")
 		}
 		if req.Mode == "local" && p.StockType != "card" {
-			return fmt.Errorf("一次性卡密需要卡密库存类型")
+			return fmt.Errorf("一次性卡密需要卡密庫存類型")
 		}
 		if src != nil && (src.Status == "submitting" || src.Status == "polling" || src.Status == "uncertain") {
-			return fmt.Errorf("请先核实正在处理的首次采购，不能更换来源后重复采购")
+			return fmt.Errorf("請先核實正在處理的首次採購，不能更換來源後重復採購")
 		}
 		if src != nil && src.Status == "empty" {
 			n, e := data.SourceAllocations(ctx, c, src.ID, s.repo.data.Dialect.Capabilities().SupportsSkipLocked)
@@ -192,19 +192,19 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 				return e
 			}
 			if n > 0 {
-				return fmt.Errorf("已有订单等待首次采购，请先处理这些订单")
+				return fmt.Errorf("已有訂單等待首次採購，請先處理這些訂單")
 			}
 		}
 		if req.Mode == "reuse" && src != nil && len(src.Content) > 0 && !req.FirstPurchase && req.Content == "" && req.ProcurementId == 0 {
 			if req.ExpiresAt > 0 && req.ExpiresAt <= time.Now().Unix() {
-				return fmt.Errorf("有效期必须晚于当前时间")
+				return fmt.Errorf("有效期必須晚於當前時間")
 			}
 			n, e := data.SourceAllocations(ctx, c, src.ID, s.repo.data.Dialect.Capabilities().SupportsSkipLocked)
 			if e != nil {
 				return e
 			}
 			if req.MaxDeliveries > 0 && req.MaxDeliveries < int64(n) {
-				return fmt.Errorf("发放次数不能少于已发放及预占数量")
+				return fmt.Errorf("發放次數不能少於已發放及預佔數量")
 			}
 			if e := c.ProductDeliverySource.UpdateOneID(src.ID).SetExpiresAt(req.ExpiresAt).SetMaxDeliveries(req.MaxDeliveries).Exec(ctx); e != nil {
 				return e
@@ -213,7 +213,7 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 		}
 		if req.Mode == "reuse" {
 			if req.ExpiresAt > 0 && req.ExpiresAt <= time.Now().Unix() {
-				return fmt.Errorf("有效期必须晚于当前时间")
+				return fmt.Errorf("有效期必須晚於當前時間")
 			}
 			options := 0
 			if req.Content != "" {
@@ -226,38 +226,38 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 				options++
 			}
 			if options != 1 {
-				return fmt.Errorf("请选择一种内容来源：填写、历史采购或首次自动采购")
+				return fmt.Errorf("請選擇一種內容來源：填寫、歷史採購或首次自動採購")
 			}
 			controls, e := c.ProductControl.Query().Where(productcontrol.ProductID(p.ID)).Count(ctx)
 			if e != nil {
 				return e
 			}
 			if controls > 0 {
-				return fmt.Errorf("包含客户填写字段的商品不能自动复用，请先确认并移除专属字段")
+				return fmt.Errorf("包含客户填寫字段的商品不能自動複用，請先確認並移除專屬字段")
 			}
 			create := c.ProductDeliverySource.Create().SetProductID(p.ID).SetSkuID(req.SkuId).SetSubsiteID(p.SubsiteID).SetExpiresAt(req.ExpiresAt).SetMaxDeliveries(req.MaxDeliveries)
 			if req.FirstPurchase {
 				if p.UpstreamSourceID == 0 || p.UpstreamProductCode == "" {
-					return fmt.Errorf("缺少上游商品绑定")
+					return fmt.Errorf("缺少上游商品綁定")
 				}
 				conn, e := c.SupplyConnection.Get(ctx, p.UpstreamSourceID)
 				if e != nil {
 					return e
 				}
 				if conn.Status != "active" {
-					return fmt.Errorf("请先启用货源")
+					return fmt.Errorf("請先啓用貨源")
 				}
 				upstreamSKU := ""
 				if sk != nil {
 					upstreamSKU = sk.UpstreamSkuID
 					if upstreamSKU == "" {
-						return fmt.Errorf("缺少上游规格绑定")
+						return fmt.Errorf("缺少上游規格綁定")
 					}
 				}
 				create.SetPurchaseKey("reuse:" + uuid.NewString()).SetExchangeRate(conn.ExchangeRate).SetConnectionID(conn.ID).SetConnectionRevision(data.ConnectionRevision(conn)).SetUpstreamProduct(p.UpstreamProductCode).SetUpstreamSku(upstreamSKU).SetStatus("empty")
 			} else {
 				if s.cipher == nil {
-					return fmt.Errorf("内容加密组件未配置")
+					return fmt.Errorf("內容加密組件未配置")
 				}
 				plain := req.Content
 				if req.ProcurementId > 0 {
@@ -274,7 +274,7 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 						return e
 					}
 					if po.Status != "fulfilled" || it.SubsiteID != p.SubsiteID || it.ProductID != p.ID || it.SkuID != req.SkuId || it.FulfillmentType != "upstream" || len(it.FormAnswers) > 0 || o.Status == "refund_pending" || o.Status == "refunded" || o.Status == "canceled" || o.Status == "expired" || it.FulfillmentStatus == "refunded" {
-						return fmt.Errorf("只能复用本商品同一规格未退款的成功采购内容")
+						return fmt.Errorf("只能複用本商品同一規格未退款的成功採購內容")
 					}
 					receipt, e := c.ProcurementItem.Query().Where(procurementitem.ProcurementID(po.ID)).Only(ctx)
 					if e != nil {
@@ -282,21 +282,21 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 					}
 					i := int(req.ContentIndex)
 					if i < 0 || i >= len(receipt.ReceivedContent) {
-						return fmt.Errorf("请选择有效的采购内容")
+						return fmt.Errorf("請選擇有效的採購內容")
 					}
 					ciphertext, e := base64.StdEncoding.DecodeString(receipt.ReceivedContent[i])
 					if e != nil {
-						return fmt.Errorf("原采购内容不可读取")
+						return fmt.Errorf("原採購內容不可讀取")
 					}
 					plaintext, e := s.cipher.Open(ciphertext, p.ID, p.SubsiteID)
 					if e != nil {
-						return fmt.Errorf("原采购内容不可解密")
+						return fmt.Errorf("原採購內容不可解密")
 					}
 					plain = string(plaintext)
 					create.SetOriginProcurementID(po.ID)
 				}
 				if strings.TrimSpace(plain) == "" {
-					return fmt.Errorf("发货内容不能为空")
+					return fmt.Errorf("發貨內容不能為空")
 				}
 				sealed, e := s.cipher.Seal(plain, p.ID, p.SubsiteID)
 				if e != nil {
@@ -332,7 +332,7 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 		}
 		update := c.Product.UpdateOneID(p.ID).AddLockVersion(1)
 		if mode == "local" || mode == "reuse" {
-			update.SetAutoListing(false).SetListingChangedAt(time.Now().UnixMilli()).SetListingZeroSince(0).SetListingRestocked(false).SetListingMessage("已切换本地发货，自动上下架已暂停")
+			update.SetAutoListing(false).SetListingChangedAt(time.Now().UnixMilli()).SetListingZeroSince(0).SetListingRestocked(false).SetListingMessage("已切換本地發貨，自動上下架已暫停")
 		}
 		return update.Exec(ctx)
 	})

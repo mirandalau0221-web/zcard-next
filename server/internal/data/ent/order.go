@@ -22,29 +22,29 @@ type Order struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
-	// 乐观锁版本号
+	// 樂觀鎖版本號
 	Version int32 `json:"version,omitempty"`
-	// 对外单号（雪花 ID，platform/id 生成）
+	// 對外單號（雪花 ID，platform/id 生成）
 	OrderNo string `json:"order_no,omitempty"`
 	// 分站域名快照
 	SubsiteDomain string `json:"subsite_domain,omitempty"`
-	// 分站利润快照（分）
+	// 分站利潤快照（分）
 	SubsiteProfit int64 `json:"subsite_profit,omitempty"`
-	// 是否产生分站利润（自购/上级链命中则 false）
+	// 是否產生分站利潤（自購/上級鏈命中則 false）
 	ProfitEligible bool `json:"profit_eligible,omitempty"`
-	// 下单用户（NULL=游客）
+	// 下單用户（NULL=遊客）
 	UserID uint64 `json:"user_id,omitempty"`
-	// 游客联系方式
+	// 遊客聯繫方式
 	GuestContact string `json:"guest_contact,omitempty"`
 	// QueryPasswordHash holds the value of the "query_password_hash" field.
 	QueryPasswordHash string `json:"query_password_hash,omitempty"`
 	// OrderAccessTokenHash holds the value of the "order_access_token_hash" field.
 	OrderAccessTokenHash string `json:"order_access_token_hash,omitempty"`
-	// 订单访问凭证密文，仅创建重放使用
+	// 訂單訪問憑證密文，僅創建重放使用
 	OrderAccessTokenSecret []byte `json:"order_access_token_secret,omitempty"`
-	// 状态机见规划 §5.3；每次迁移落 order_status_events
+	// 狀態機見規劃 §5.3；每次遷移落 order_status_events
 	Status order.Status `json:"status,omitempty"`
 	// CommerceVersion holds the value of the "commerce_version" field.
 	CommerceVersion int32 `json:"commerce_version,omitempty"`
@@ -56,49 +56,49 @@ type Order struct {
 	ShippingAddress map[string]string `json:"shipping_address,omitempty"`
 	// RequestHash holds the value of the "request_hash" field.
 	RequestHash string `json:"request_hash,omitempty"`
-	// 应付总额（分）
+	// 應付總額（分）
 	TotalAmount int64 `json:"total_amount,omitempty"`
 	// 成本快照（分）
 	Cost int64 `json:"cost,omitempty"`
-	// 基础货币（默认 CNY）
+	// 基礎貨幣（默認 CNY）
 	BaseCurrency string `json:"base_currency,omitempty"`
-	// 展示货币（下单快照）
+	// 展示貨幣（下單快照）
 	DisplayCurrency string `json:"display_currency,omitempty"`
-	// 汇率快照（仅快照，换算中间过程用 decimal 库）
+	// 匯率快照（僅快照，換算中間過程用 decimal 庫）
 	ExchangeRate float64 `json:"exchange_rate,omitempty"`
-	// 展示货币金额（最小单位）
+	// 展示貨幣金額（最小單位）
 	AmountDisplay int64 `json:"amount_display,omitempty"`
-	// 支付渠道码快照
+	// 支付渠道碼快照
 	PaymentChannel string `json:"payment_channel,omitempty"`
-	// 联系方式
+	// 聯繫方式
 	Contact string `json:"contact,omitempty"`
-	// 下单 IP
+	// 下單 IP
 	ClientIP string `json:"client_ip,omitempty"`
-	// 规范化风控 IP（IPv6 按 /64 聚合）
+	// 規範化風控 IP（IPv6 按 /64 聚合）
 	RiskIP string `json:"risk_ip,omitempty"`
-	// 风控标记（M3 填充）
+	// 風控標記（M3 填充）
 	RiskFlags map[string]interface{} `json:"risk_flags,omitempty"`
-	// 子单归属父单（父子单模型）
+	// 子單歸屬父單（父子單模型）
 	ParentID uint64 `json:"parent_id,omitempty"`
-	// 担保交易关联（商业版，M4）
+	// 擔保交易關聯（商業版，M4）
 	EscrowID uint64 `json:"escrow_id,omitempty"`
-	// 三级分销归因链快照（下单瞬间锁定）
+	// 三級分銷歸因鏈快照（下單瞬間鎖定）
 	InviteL1 uint64 `json:"invite_l1,omitempty"`
 	// InviteL2 holds the value of the "invite_l2" field.
 	InviteL2 uint64 `json:"invite_l2,omitempty"`
 	// InviteL3 holds the value of the "invite_l3" field.
 	InviteL3 uint64 `json:"invite_l3,omitempty"`
-	// 扩展预留（控件答案等，加字段先进 extra）
+	// 擴展預留（控件答案等，加字段先進 extra）
 	Extra map[string]interface{} `json:"extra,omitempty"`
-	// 下单幂等键哈希（P1-03：同 key 返回首单）
+	// 下單冪等鍵哈希（P1-03：同 key 返回首單）
 	IdempotencyKey string `json:"idempotency_key,omitempty"`
 	// PaidAt holds the value of the "paid_at" field.
 	PaidAt time.Time `json:"paid_at,omitempty"`
 	// ClosedAt holds the value of the "closed_at" field.
 	ClosedAt time.Time `json:"closed_at,omitempty"`
-	// 管理列表软删除时间；保留订单、支付及审计记录
+	// 管理列表軟刪除時間；保留訂單、支付及審計記錄
 	AdminDeletedAt *time.Time `json:"admin_deleted_at,omitempty"`
-	// 原始支付截止时间
+	// 原始支付截止時間
 	ExpiredAt time.Time `json:"expired_at,omitempty"`
 	// ExpiryRetryAt holds the value of the "expiry_retry_at" field.
 	ExpiryRetryAt time.Time `json:"expiry_retry_at,omitempty"`
@@ -116,17 +116,17 @@ type Order struct {
 
 // OrderEdges holds the relations/edges for other nodes in the graph.
 type OrderEdges struct {
-	// 订单子项（每商品一行）
+	// 訂單子項（每商品一行）
 	Items []*OrderItem `json:"items,omitempty"`
-	// 行式金额明细
+	// 行式金額明細
 	AmountLines []*OrderAmountLine `json:"amount_lines,omitempty"`
-	// 状态事件溯源
+	// 狀態事件溯源
 	StatusEvents []*OrderStatusEvent `json:"status_events,omitempty"`
-	// 支付单
+	// 支付單
 	Payments []*Payment `json:"payments,omitempty"`
-	// 交付记录
+	// 交付記錄
 	Deliveries []*OrderDelivery `json:"deliveries,omitempty"`
-	// 退款单
+	// 退款單
 	Refunds []*RefundOrder `json:"refunds,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.

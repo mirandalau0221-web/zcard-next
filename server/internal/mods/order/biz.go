@@ -1,10 +1,10 @@
-// Package order 订单模块（M1a）：下单用例、父子订单、状态机、价格计算管线、
-// 查询密码、取货三重门。M0 落地状态机纯逻辑（白名单迁移 + 审计语义）。
+// Package order 訂單模塊（M1a）：下單用例、父子訂單、狀態機、價格計算管線、
+// 查詢密碼、取貨三重門。M0 落地狀態機純邏輯（白名單遷移 + 審計語義）。
 package order
 
 import "errors"
 
-// 订单状态（§5.3 状态机；与 ent schema orders.status 枚举一一对应）。
+// 訂單狀態（§5.3 狀態機；與 ent schema orders.status 枚舉一一對應）。
 const (
 	StatusPendingPayment     = "pending_payment"
 	StatusPaid               = "paid"
@@ -16,10 +16,10 @@ const (
 	StatusExpired            = "expired"
 	StatusRefundPending      = "refund_pending"
 	StatusRefunded           = "refunded"
-	StatusManualPending      = "manual_pending" // 全部人工发货（父状态聚合用）
+	StatusManualPending      = "manual_pending" // 全部人工發貨（父狀態聚合用）
 )
 
-// transitions 状态机白名单（Allow(from, to)）。paid 之后禁止回 canceled（退款走独立路径）。
+// transitions 狀態機白名單（Allow(from, to)）。paid 之後禁止回 canceled（退款走獨立路徑）。
 var transitions = map[string]map[string]bool{
 	StatusPendingPayment: {
 		StatusPaid: true, StatusCanceled: true, StatusExpired: true,
@@ -40,7 +40,7 @@ var transitions = map[string]map[string]bool{
 		StatusFulfilling: true, StatusDelivered: true, StatusRefundPending: true,
 	},
 	StatusRefundPending: {
-		StatusRefunded: true, StatusPaid: true, // 退款被拒/撤销回 paid
+		StatusRefunded: true, StatusPaid: true, // 退款被拒/撤銷回 paid
 	},
 	StatusCompleted: {},
 	StatusCanceled:  {},
@@ -48,10 +48,10 @@ var transitions = map[string]map[string]bool{
 	StatusRefunded:  {},
 }
 
-// ErrTransitionNotAllowed 非法状态迁移（状态机红灯，必测项 §5.3）。
+// ErrTransitionNotAllowed 非法狀態遷移（狀態機紅燈，必測項 §5.3）。
 var ErrTransitionNotAllowed = errors.New("order.TRANSITION_NOT_ALLOWED")
 
-// Allow 判定状态迁移是否合法（每次迁移落 order_status_events，事件溯源）。
+// Allow 判定狀態遷移是否合法（每次遷移落 order_status_events，事件溯源）。
 func Allow(from, to string) bool {
 	allowed, ok := transitions[from]
 	if !ok {
@@ -60,11 +60,11 @@ func Allow(from, to string) bool {
 	return allowed[to]
 }
 
-// CalcParentStatus 父状态由子项履约状态聚合（优先级：refunded > canceled >
+// CalcParentStatus 父狀態由子項履約狀態聚合（優先級：refunded > canceled >
 // manual_pending > partially_delivered > fulfilling > delivered > completed > paid）。
-// M1 交付完整实现（此处先固定优先级口径供 data 层引用）。
+// M1 交付完整實現（此處先固定優先級口徑供 data 層引用）。
 func CalcParentStatus(itemStatuses []string) string {
-	// 优先级从高到低扫描，任一子项命中即取该状态
+	// 優先級從高到低掃描，任一子項命中即取該狀態
 	priority := []string{StatusRefunded, StatusCanceled, StatusManualPending, StatusPartiallyDelivered, StatusFulfilling, StatusDelivered, StatusPaid}
 	counts := map[string]int{}
 	for _, s := range itemStatuses {
@@ -72,7 +72,7 @@ func CalcParentStatus(itemStatuses []string) string {
 	}
 	for _, p := range priority {
 		if counts[p] > 0 {
-			// 部分 vs 全部：子项存在 delivered 且存在未 delivered → partially_delivered
+			// 部分 vs 全部：子項存在 delivered 且存在未 delivered → partially_delivered
 			if p == StatusDelivered && counts[StatusDelivered] < len(itemStatuses) {
 				return StatusPartiallyDelivered
 			}

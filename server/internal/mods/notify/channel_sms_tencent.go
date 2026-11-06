@@ -1,16 +1,16 @@
 package notify
 
-// 腾讯云短信（API 3.0 / sms.tencentcloudapi.com）——零 SDK REST + TC3-HMAC-SHA256 签名。
-// 模板变量注意：腾讯云 TemplateParamSet 是位置数组（{1}{2}...）——本通道按变量名
-// 字典序排列（code/minutes/site），运营建模板时 {1}{2}{3} 依次对应。
-// TC3 签名（腾讯云官方算法）：
+// 騰訊雲短信（API 3.0 / sms.tencentcloudapi.com）——零 SDK REST + TC3-HMAC-SHA256 簽名。
+// 模板變量注意：騰訊雲 TemplateParamSet 是位置數組（{1}{2}...）——本通道按變量名
+// 字典序排列（code/minutes/site），運營建模板時 {1}{2}{3} 依次對應。
+// TC3 簽名（騰訊雲官方算法）：
 //   canonicalRequest = "POST" \n "/" \n "" \n canonicalHeaders \n signedHeaders \n sha256hex(payload)
 //   stringToSign     = "TC3-HMAC-SHA256" \n timestamp \n date/sms/tc3_request \n sha256hex(canonicalRequest)
 //   SecretDate = HMAC-SHA256("TC3"+SecretKey, date)
 //   SecretService = HMAC-SHA256(SecretDate, "sms")
 //   SecretSigning = HMAC-SHA256(SecretService, "tc3_request")
 //   Signature = hex(HMAC-SHA256(SecretSigning, stringToSign))
-// golden vector 见 data_notify_test.go（Python 独立计算固化）。
+// golden vector 見 data_notify_test.go（Python 獨立計算固化）。
 
 import (
 	"context"
@@ -33,7 +33,7 @@ const (
 	tencentSMSVersion  = "2021-01-11"
 )
 
-// tencentSendSmsPayload SendSms 请求体（API 3.0 JSON）。
+// tencentSendSmsPayload SendSms 請求體（API 3.0 JSON）。
 type tencentSendSmsPayload struct {
 	PhoneNumberSet   []string `json:"PhoneNumberSet"`
 	SmsSdkAppId      string   `json:"SmsSdkAppId"`
@@ -42,7 +42,7 @@ type tencentSendSmsPayload struct {
 	TemplateParamSet []string `json:"TemplateParamSet,omitempty"`
 }
 
-// deliverTencent 腾讯云 SendSms（缺 SDK AppID/模板 ID → skipped）。
+// deliverTencent 騰訊雲 SendSms（缺 SDK AppID/模板 ID → skipped）。
 func (c *SMSChannel) deliverTencent(ctx context.Context, cfg *SMSConfig, phone string, params map[string]string) error {
 	if cfg.TemplateCode == "" || cfg.SdkAppID == "" {
 		return ErrSkipped
@@ -75,7 +75,7 @@ func (c *SMSChannel) deliverTencent(ctx context.Context, cfg *SMSConfig, phone s
 	req.Header.Set("Authorization", auth)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("notify: SMS 请求失败: %w", err)
+		return fmt.Errorf("notify: SMS 請求失敗: %w", err)
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
@@ -94,16 +94,16 @@ func (c *SMSChannel) deliverTencent(ctx context.Context, cfg *SMSConfig, phone s
 	}
 	_ = json.Unmarshal(body, &out)
 	if out.Response.Error != nil {
-		return fmt.Errorf("notify: SMS 发送失败 %s: %s", out.Response.Error.Code, out.Response.Error.Message)
+		return fmt.Errorf("notify: SMS 發送失敗 %s: %s", out.Response.Error.Code, out.Response.Error.Message)
 	}
 	if len(out.Response.SendStatusSet) > 0 && out.Response.SendStatusSet[0].Code != "Ok" {
-		return fmt.Errorf("notify: SMS 发送失败 %s: %s",
+		return fmt.Errorf("notify: SMS 發送失敗 %s: %s",
 			out.Response.SendStatusSet[0].Code, out.Response.SendStatusSet[0].Message)
 	}
 	return nil
 }
 
-// tencentPhone 手机号补国际区号（国内号 +86）。
+// tencentPhone 手機號補國際區號（國內號 +86）。
 func tencentPhone(phone string) string {
 	if strings.HasPrefix(phone, "+") {
 		return phone
@@ -111,7 +111,7 @@ func tencentPhone(phone string) string {
 	return "+86" + phone
 }
 
-// tencentParamSet 模板变量转位置数组（变量名字典序——与模板 {1}{2}{3} 对应）。
+// tencentParamSet 模板變量轉位置數組（變量名字典序——與模板 {1}{2}{3} 對應）。
 func tencentParamSet(params map[string]string) []string {
 	keys := make([]string, 0, len(params))
 	for k := range params {
@@ -125,7 +125,7 @@ func tencentParamSet(params map[string]string) []string {
 	return out
 }
 
-// tencentSign TC3-HMAC-SHA256 签名（Authorization 头）。
+// tencentSign TC3-HMAC-SHA256 簽名（Authorization 頭）。
 func tencentSign(secretID, secretKey string, timestamp int64, payload []byte) (string, error) {
 	date := time.Unix(timestamp, 0).UTC().Format("2006-01-02")
 	canonicalHeaders := "content-type:application/json; charset=utf-8\nhost:" + tencentSMSHost + "\n"
@@ -141,14 +141,14 @@ func tencentSign(secretID, secretKey string, timestamp int64, payload []byte) (s
 		", SignedHeaders=" + signedHeaders + ", Signature=" + signature, nil
 }
 
-// hmacSHA256 HMAC-SHA256（hex 化在调用方）。
+// hmacSHA256 HMAC-SHA256（hex 化在調用方）。
 func hmacSHA256(key []byte, data string) []byte {
 	mac := hmac.New(sha256.New, key)
 	mac.Write([]byte(data))
 	return mac.Sum(nil)
 }
 
-// sha256Hex 内容 SHA-256 hex。
+// sha256Hex 內容 SHA-256 hex。
 func sha256Hex(data []byte) string {
 	sum := sha256.Sum256(data)
 	return hex.EncodeToString(sum[:])

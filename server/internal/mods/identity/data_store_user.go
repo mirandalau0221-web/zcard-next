@@ -1,7 +1,7 @@
 package identity
 
-// StoreUserService 用户中心（ 前置）：注册/登录/Me（user realm JWT）。
-// 归因链：invite_code=<user_id> → l1=邀请人 l2=邀请人.l1 l3=邀请人.l2（环状拒绝）。
+// StoreUserService 用户中心（ 前置）：註冊/登錄/Me（user realm JWT）。
+// 歸因鏈：invite_code=<user_id> → l1=邀請人 l2=邀請人.l1 l3=邀請人.l2（環狀拒絕）。
 
 import (
 	"context"
@@ -23,32 +23,32 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// stdErr 便捷别名（本文件 stdErrors 与 kratos errors 双包共存）
+// stdErr 便捷別名（本文件 stdErrors 與 kratos errors 雙包共存）
 
-// StoreUserService 用户中心服务。
+// StoreUserService 用户中心服務。
 type StoreUserService struct {
 	storefrontv1.UnimplementedStoreUserServiceServer
 	repo    *UserRepo
 	signer  *authn.Signer
 	data    *data.Data
-	pwd     *PasswordService      // 自服务（找回/改密/改资料）
-	regCode *RegisterCodeService  // 注册验证码（email/phone 通道）
-	regCfg  *RegisterCodeSettings // security 组注册开关/方式
-	captcha *captcha.Service      // 图形验证码（scene: login/register/reset）
+	pwd     *PasswordService      // 自服務（找回/改密/改資料）
+	regCode *RegisterCodeService  // 註冊驗證碼（email/phone 通道）
+	regCfg  *RegisterCodeSettings // security 組註冊開關/方式
+	captcha *captcha.Service      // 圖形驗證碼（scene: login/register/reset）
 }
 
-// NewStoreUserService 构造。
+// NewStoreUserService 構造。
 func NewStoreUserService(repo *UserRepo, signer *authn.Signer, d *data.Data, pwd *PasswordService, regCode *RegisterCodeService, regCfg *RegisterCodeSettings, cap *captcha.Service) *StoreUserService {
 	return &StoreUserService{repo: repo, signer: signer, data: d, pwd: pwd, regCode: regCode, regCfg: regCfg, captcha: cap}
 }
 
-// UserRepo 用户仓储。
+// UserRepo 用户倉儲。
 type UserRepo struct{ data *data.Data }
 
-// NewUserRepo 构造。
+// NewUserRepo 構造。
 func NewUserRepo(d *data.Data) *UserRepo { return &UserRepo{data: d} }
 
-// Username 按 ID 取用户名（port.UserReader 实现；audit 安全日志主体富化用）。
+// Username 按 ID 取用户名（port.UserReader 實現；audit 安全日誌主體富化用）。
 func (r *UserRepo) Username(ctx context.Context, id uint64) (string, error) {
 	u, err := data.Client(ctx, r.data).User.Get(ctx, id)
 	if err != nil {
@@ -57,7 +57,7 @@ func (r *UserRepo) Username(ctx context.Context, id uint64) (string, error) {
 	return u.Username, nil
 }
 
-// RegisterInput 注册入参。
+// RegisterInput 註冊入參。
 type RegisterInput struct {
 	Username   string
 	Password   string
@@ -66,7 +66,7 @@ type RegisterInput struct {
 	InviteCode string
 }
 
-// Register 注册（归因链写入；username 唯一）。
+// Register 註冊（歸因鏈寫入；username 唯一）。
 func (r *UserRepo) Register(ctx context.Context, in RegisterInput) (*ent.User, error) {
 	if len(in.Username) < 3 || len(in.Username) > 30 {
 		return nil, stdErrors.New("identity.USERNAME_INVALID: 3-30 字符")
@@ -78,7 +78,7 @@ func (r *UserRepo) Register(ctx context.Context, in RegisterInput) (*ent.User, e
 	if err != nil {
 		return nil, err
 	}
-	// 注册、邀请链和获赠资格同事务写入。唯一冲突在完整回滚后重试，兼容 PostgreSQL。
+	// 註冊、邀請鏈和獲贈資格同事務寫入。唯一衝突在完整回滾後重試，兼容 PostgreSQL。
 	var result *ent.User
 	for attempt := 0; attempt < 2; attempt++ {
 		err = data.Tx(ctx, r.data, func(ctx context.Context) error {
@@ -90,9 +90,9 @@ func (r *UserRepo) Register(ctx context.Context, in RegisterInput) (*ent.User, e
 					return e
 				}
 				if inviter == nil {
-					return errors.BadRequest("identity.INVITER_NOT_FOUND", "推荐码无效，请检查或清空后重试")
+					return errors.BadRequest("identity.INVITER_NOT_FOUND", "推薦碼無效，請檢查或清空後重試")
 				}
-				// 锁顺序与后台配置一致：等级 → 推荐人；拿锁后使用当前读重新校验配置。
+				// 鎖順序與後台配置一致：等級 → 推薦人；拿鎖後使用當前讀重新校驗配置。
 				expectedLevel := inviter.InviteLevelID
 				if expectedLevel > 0 {
 					// MySQL changed-row counts cannot establish existence for a no-op update.
@@ -109,7 +109,7 @@ func (r *UserRepo) Register(ctx context.Context, in RegisterInput) (*ent.User, e
 						if !ent.IsNotFound(e) {
 							return e
 						}
-						return errors.BadRequest("identity.INVITE_LEVEL_INVALID", "推荐赠送等级已失效，请联系管理员")
+						return errors.BadRequest("identity.INVITE_LEVEL_INVALID", "推薦贈送等級已失效，請聯繫管理員")
 					}
 				}
 				if r.data.Dialect == db.SQLite {
@@ -126,10 +126,10 @@ func (r *UserRepo) Register(ctx context.Context, in RegisterInput) (*ent.User, e
 					return e
 				}
 				if inviter.Status != user.StatusActive {
-					return errors.BadRequest("identity.INVITER_UNAVAILABLE", "推荐人已停用，请清空推荐码后重试")
+					return errors.BadRequest("identity.INVITER_UNAVAILABLE", "推薦人已停用，請清空推薦碼後重試")
 				}
 				if inviter.InviteLevelID != expectedLevel {
-					return errors.Conflict("identity.INVITE_CHANGED", "推荐权益已调整，请刷新后重试")
+					return errors.Conflict("identity.INVITE_CHANGED", "推薦權益已調整，請刷新後重試")
 				}
 				l1, l2, l3, granted = inviter.ID, inviter.InviteL1, inviter.InviteL2, expectedLevel
 			}
@@ -161,7 +161,7 @@ func (r *UserRepo) Register(ctx context.Context, in RegisterInput) (*ent.User, e
 			return result, err
 		}
 	}
-	return nil, errors.BadRequest("identity.USERNAME_TAKEN", "用户名、邮箱或手机号已被注册")
+	return nil, errors.BadRequest("identity.USERNAME_TAKEN", "用户名、郵箱或手機號已被註冊")
 }
 
 // FindByUsername 按用户名查。
@@ -177,8 +177,8 @@ func (r *UserRepo) FindByUsername(ctx context.Context, username string) (*ent.Us
 	return u, nil
 }
 
-// FindByLoginIdentifier 登录混输（用户名/邮箱/手机号三标识一次查询——
-// acg-faka 同款体验：单输入框自动识别）。唯一索引三选一，无歧义。
+// FindByLoginIdentifier 登錄混輸（用户名/郵箱/手機號三標識一次查詢——
+// acg-faka 同款體驗：單輸入框自動識別）。唯一索引三選一，無歧義。
 func (r *UserRepo) FindByLoginIdentifier(ctx context.Context, identifier string) (*ent.User, error) {
 	u, err := data.Client(ctx, r.data).User.Query().
 		Where(
@@ -197,23 +197,23 @@ func (r *UserRepo) FindByLoginIdentifier(ctx context.Context, identifier string)
 	return u, nil
 }
 
-// Register API（security.register_method 驱动：username=免验证 / email=邮箱码 / phone=短信码）。
+// Register API（security.register_method 驅動：username=免驗證 / email=郵箱碼 / phone=短信碼）。
 func (s *StoreUserService) Register(ctx context.Context, req *storefrontv1.RegisterRequest) (*storefrontv1.RegisterReply, error) {
-	// 图形验证码（captcha_register 开启时前置）
+	// 圖形驗證碼（captcha_register 開啓時前置）
 	if s.captcha != nil {
 		if err := s.captcha.VerifyScene(ctx, captcha.SceneRegister, req.GetCaptchaId(), req.GetCaptchaCode()); err != nil {
 			return nil, err
 		}
 	}
-	// 注册开关（security.register_enabled）
+	// 註冊開關（security.register_enabled）
 	if s.regCfg != nil && !s.regCfg.RegisterEnabled(ctx) {
-		return nil, stdErrors.New("identity.REGISTER_DISABLED: 站点暂未开放注册")
+		return nil, stdErrors.New("identity.REGISTER_DISABLED: 站點暫未開放註冊")
 	}
-	// 注册方式（多选）：email/phone 通道启用时对应目标必填 + 验码（一次性）
+	// 註冊方式（多選）：email/phone 通道啓用時對應目標必填 + 驗碼（一次性）
 	if s.regCfg != nil {
 		if s.regCfg.MethodEnabled(ctx, "email") {
 			if req.GetEmail() == "" {
-				return nil, stdErrors.New("identity.EMAIL_REQUIRED: 请填写邮箱并完成验证")
+				return nil, stdErrors.New("identity.EMAIL_REQUIRED: 請填寫郵箱並完成驗證")
 			}
 			if err := s.regCode.VerifyRegisterCode(ctx, req.GetEmail(), req.GetCode(), "email"); err != nil {
 				return nil, err
@@ -221,7 +221,7 @@ func (s *StoreUserService) Register(ctx context.Context, req *storefrontv1.Regis
 		}
 		if s.regCfg.MethodEnabled(ctx, "phone") {
 			if req.GetPhone() == "" {
-				return nil, stdErrors.New("identity.PHONE_REQUIRED: 请填写手机号并完成验证")
+				return nil, stdErrors.New("identity.PHONE_REQUIRED: 請填寫手機號並完成驗證")
 			}
 			if err := s.regCode.VerifyRegisterCode(ctx, req.GetPhone(), req.GetCode(), "phone"); err != nil {
 				return nil, err
@@ -242,9 +242,9 @@ func (s *StoreUserService) Register(ctx context.Context, req *storefrontv1.Regis
 	return &storefrontv1.RegisterReply{UserId: u.ID, Token: token, ExpiresAt: exp.Unix(), PromoCode: u.PromoCode}, nil
 }
 
-// SendRegisterCode API（发码：60s 冷却 + 已注册拒绝 + 通道格式校验）。
+// SendRegisterCode API（發碼：60s 冷卻 + 已註冊拒絕 + 通道格式校驗）。
 func (s *StoreUserService) SendRegisterCode(ctx context.Context, req *storefrontv1.SendRegisterCodeRequest) (*storefrontv1.SendRegisterCodeReply, error) {
-	// 图形验证码（captcha_register 场景——发码前防机器人，acg-faka 同款纪律）
+	// 圖形驗證碼（captcha_register 場景——發碼前防機器人，acg-faka 同款紀律）
 	if s.captcha != nil {
 		if err := s.captcha.VerifyScene(ctx, captcha.SceneRegister, req.GetCaptchaId(), req.GetCaptchaCode()); err != nil {
 			return nil, err
@@ -256,27 +256,27 @@ func (s *StoreUserService) SendRegisterCode(ctx context.Context, req *storefront
 	return &storefrontv1.SendRegisterCodeReply{}, nil
 }
 
-// mapStoreAuthErr storefront 认证错误映射（登录/找回密码/改密）：
-// 普通 error → kratos 带状态码与中文 message（前端直接展示 message）。
+// mapStoreAuthErr storefront 認證錯誤映射（登錄/找回密碼/改密）：
+// 普通 error → kratos 帶狀態碼與中文 message（前端直接展示 message）。
 func mapStoreAuthErr(err error) error {
 	msg := err.Error()
 	switch {
 	case msg == "identity.BAD_CREDENTIALS":
-		return errors.Unauthorized("identity.BAD_CREDENTIALS", "用户名或密码错误")
+		return errors.Unauthorized("identity.BAD_CREDENTIALS", "用户名或密碼錯誤")
 	case msg == "identity.USER_DISABLED":
-		return errors.Forbidden("identity.USER_DISABLED", "账号已被禁用，请联系管理员")
+		return errors.Forbidden("identity.USER_DISABLED", "賬號已被禁用，請聯繫管理員")
 	case msg == "identity.USERNAME_TAKEN":
-		return errors.BadRequest("identity.USERNAME_TAKEN", "用户名已被注册")
+		return errors.BadRequest("identity.USERNAME_TAKEN", "用户名已被註冊")
 	case msg == "identity.PASSWORD_TOO_SHORT" || strings.HasPrefix(msg, "identity.PASSWORD_TOO_SHORT"):
-		return errors.BadRequest("identity.PASSWORD_TOO_SHORT", "密码至少 6 位")
+		return errors.BadRequest("identity.PASSWORD_TOO_SHORT", "密碼至少 6 位")
 	case msg == "identity.UNAUTHORIZED" || msg == "identity.SESSION_INVALID":
-		return errors.Unauthorized("identity.UNAUTHORIZED", "登录状态已失效，请重新登录")
+		return errors.Unauthorized("identity.UNAUTHORIZED", "登錄狀態已失效，請重新登錄")
 	case msg == "identity.USER_NOT_FOUND":
-		return errors.NotFound("identity.USER_NOT_FOUND", "账号不存在")
+		return errors.NotFound("identity.USER_NOT_FOUND", "賬號不存在")
 	case msg == "identity.RESET_CODE_INVALID" || msg == "identity.CODE_INVALID":
-		return errors.BadRequest("identity.CODE_INVALID", "验证码错误或已过期")
+		return errors.BadRequest("identity.CODE_INVALID", "驗證碼錯誤或已過期")
 	default:
-		// 已是 kratos errors（验证码等）原样透传
+		// 已是 kratos errors（驗證碼等）原樣透傳
 		if se, ok := err.(*errors.Error); ok {
 			return se
 		}
@@ -284,9 +284,9 @@ func mapStoreAuthErr(err error) error {
 	}
 }
 
-// Login API（username 字段混输：用户名/邮箱/手机号）。
+// Login API（username 字段混輸：用户名/郵箱/手機號）。
 func (s *StoreUserService) Login(ctx context.Context, req *storefrontv1.LoginRequest) (*storefrontv1.LoginReply, error) {
-	// 图形验证码（captcha_login 开启时前置；未启用直接放行）
+	// 圖形驗證碼（captcha_login 開啓時前置；未啓用直接放行）
 	if s.captcha != nil {
 		if err := s.captcha.VerifyScene(ctx, captcha.SceneLogin, req.GetCaptchaId(), req.GetCaptchaCode()); err != nil {
 			return nil, mapStoreAuthErr(err)
@@ -311,7 +311,7 @@ func (s *StoreUserService) Login(ctx context.Context, req *storefrontv1.LoginReq
 	}, nil
 }
 
-// Me API（登录态；推广码懒生成——存量用户首次访问即补）。
+// Me API（登錄態；推廣碼懶生成——存量用户首次訪問即補）。
 func (s *StoreUserService) Me(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.MeReply, error) {
 	claims := ClaimsFromContext(ctx)
 	if claims == nil {
@@ -339,11 +339,11 @@ func (s *StoreUserService) Me(ctx context.Context, _ *emptypb.Empty) (*storefron
 	return reply, nil
 }
 
-// ── 自服务 API（薄 transport：委托 PasswordService）──────────
+// ── 自服務 API（薄 transport：委託 PasswordService）──────────
 
-// ForgotPassword 发送找回密码验证码（防枚举：任何输入都成功）。
+// ForgotPassword 發送找回密碼驗證碼（防枚舉：任何輸入都成功）。
 func (s *StoreUserService) ForgotPassword(ctx context.Context, req *storefrontv1.ForgotPasswordRequest) (*storefrontv1.ForgotPasswordReply, error) {
-	// 图形验证码（captcha_reset 开启时前置——发码前防爆破）
+	// 圖形驗證碼（captcha_reset 開啓時前置——發碼前防爆破）
 	if s.captcha != nil {
 		if err := s.captcha.VerifyScene(ctx, captcha.SceneReset, req.GetCaptchaId(), req.GetCaptchaCode()); err != nil {
 			return nil, err
@@ -355,7 +355,7 @@ func (s *StoreUserService) ForgotPassword(ctx context.Context, req *storefrontv1
 	return &storefrontv1.ForgotPasswordReply{}, nil
 }
 
-// ResetPassword 验码重置（一次性；吊销 session；重置即登录）。
+// ResetPassword 驗碼重置（一次性；吊銷 session；重置即登錄）。
 func (s *StoreUserService) ResetPassword(ctx context.Context, req *storefrontv1.ResetPasswordRequest) (*storefrontv1.ResetPasswordReply, error) {
 	u, err := s.pwd.ResetPassword(ctx, req.GetEmail(), req.GetCode(), req.GetNewPassword())
 	if err != nil {
@@ -368,7 +368,7 @@ func (s *StoreUserService) ResetPassword(ctx context.Context, req *storefrontv1.
 	return &storefrontv1.ResetPasswordReply{Token: token, ExpiresAt: exp.Unix()}, nil
 }
 
-// ChangePassword 登录态改密（新 token 保当前会话）。
+// ChangePassword 登錄態改密（新 token 保當前會話）。
 func (s *StoreUserService) ChangePassword(ctx context.Context, req *storefrontv1.ChangePasswordRequest) (*storefrontv1.ChangePasswordReply, error) {
 	claims := ClaimsFromContext(ctx)
 	if claims == nil {
@@ -385,7 +385,7 @@ func (s *StoreUserService) ChangePassword(ctx context.Context, req *storefrontv1
 	return &storefrontv1.ChangePasswordReply{Token: token, ExpiresAt: exp.Unix()}, nil
 }
 
-// UpdateProfile 改邮箱（Me 语义响应）。
+// UpdateProfile 改郵箱（Me 語義響應）。
 func (s *StoreUserService) UpdateProfile(ctx context.Context, req *storefrontv1.UpdateProfileRequest) (*storefrontv1.MeReply, error) {
 	claims := ClaimsFromContext(ctx)
 	if claims == nil {

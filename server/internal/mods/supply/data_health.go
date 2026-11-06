@@ -1,8 +1,8 @@
 package supply
 
-// 货源连接健康度（）：Ping 探活（更新 last_ping_at/last_ping_ok/
-// balance_cache + settings.ping_history 累计统计）、健康列表（成功率/平均延迟）。
-// 累计统计是 M4 供应商评分的基础数据（：从现在记）。
+// 貨源連接健康度（）：Ping 探活（更新 last_ping_at/last_ping_ok/
+// balance_cache + settings.ping_history 累計統計）、健康列表（成功率/平均延遲）。
+// 累計統計是 M4 供應商評分的基礎數據（：從現在記）。
 
 import (
 	"context"
@@ -14,8 +14,8 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/supply/adapter"
 )
 
-// PingConnection 探活单个连接（API 手动触发 + cron 周期探活共用）。
-// 凭据解密失败 → 返回明确错误（提示重配），不中断其余连接。
+// PingConnection 探活單個連接（API 手動觸發 + cron 週期探活共用）。
+// 憑據解密失敗 → 返回明確錯誤（提示重配），不中斷其餘連接。
 func (s *SyncService) PingConnection(ctx context.Context, connectionID uint64) (*adapter.PingResult, error) {
 	conn, err := s.repo.GetConnection(ctx, connectionID)
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *SyncService) pingOne(ctx context.Context, conn *ent.SupplyConnection) (
 	return res, nil
 }
 
-// HealthItem 连接健康快照（ListHealth 输出）。
+// HealthItem 連接健康快照（ListHealth 輸出）。
 type HealthItem struct {
 	ConnectionID    uint64
 	Name            string
@@ -70,7 +70,7 @@ type HealthItem struct {
 	AvgLatencyMs    int64
 }
 
-// ListHealth 全量健康列表（含 disabled；统计自 settings.ping_history）。
+// ListHealth 全量健康列表（含 disabled；統計自 settings.ping_history）。
 func (s *SyncService) ListHealth(ctx context.Context) ([]HealthItem, error) {
 	conns, _, err := s.repo.ListConnections(ctx, 1, 100000)
 	if err != nil {
@@ -108,7 +108,7 @@ func (s *SyncService) ListHealth(ctx context.Context) ([]HealthItem, error) {
 	return out, nil
 }
 
-// PingAllActive 周期探活全部 active 连接（cron 注册；单连接失败不阻断）。
+// PingAllActive 週期探活全部 active 連接（cron 註冊；單連接失敗不阻斷）。
 func (s *SyncService) PingAllActive(ctx context.Context) {
 	conns, err := s.repo.ListActiveConnections(ctx)
 	if err != nil {

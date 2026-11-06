@@ -29,17 +29,17 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminInstallService 在线安装（Public——仅未安装时可用；已安装后 status 只读、install 拒绝）。
-// 部署形态：SQLite 零依赖起步（无需数据库/Redis 配置），浏览器打开 → 设管理员 → 完成。
-// 数据库/Redis 属部署层配置（config.yaml / env），不进安装向导。
+// AdminInstallService 在線安裝（Public——僅未安裝時可用；已安裝後 status 只讀、install 拒絕）。
+// 部署形態：SQLite 零依賴起步（無需數據庫/Redis 配置），瀏覽器打開 → 設管理員 → 完成。
+// 數據庫/Redis 屬部署層配置（config.yaml / env），不進安裝嚮導。
 type AdminInstallServiceClient interface {
-	// GetInstallStatus 安装状态 + 环境自检（公开）。
+	// GetInstallStatus 安裝狀態 + 環境自檢（公開）。
 	GetInstallStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InstallStatusReply, error)
-	// PerformInstall 执行安装（公开；写管理员 + 站点信息 + 种子；已安装返回 409）。
-	// dialect=sqlite → 当前库直接装；mysql/postgres → 校验连接后写库切换覆盖配置
-	// + 待安装凭据文件，响应 restart_required 并自重启（新库上补装完成）。
+	// PerformInstall 執行安裝（公開；寫管理員 + 站點信息 + 種子；已安裝返回 409）。
+	// dialect=sqlite → 當前庫直接裝；mysql/postgres → 校驗連接後寫庫切換覆蓋配置
+	// + 待安裝憑據文件，響應 restart_required 並自重啓（新庫上補裝完成）。
 	PerformInstall(ctx context.Context, in *PerformInstallRequest, opts ...grpc.CallOption) (*InstallStatusReply, error)
-	// TestInstallConnection 测试数据库/Redis 连接（公开；库不存在时自动创建）。
+	// TestInstallConnection 測試數據庫/Redis 連接（公開；庫不存在時自動創建）。
 	TestInstallConnection(ctx context.Context, in *TestInstallConnectionRequest, opts ...grpc.CallOption) (*TestInstallConnectionReply, error)
 }
 
@@ -85,17 +85,17 @@ func (c *adminInstallServiceClient) TestInstallConnection(ctx context.Context, i
 // All implementations must embed UnimplementedAdminInstallServiceServer
 // for forward compatibility.
 //
-// AdminInstallService 在线安装（Public——仅未安装时可用；已安装后 status 只读、install 拒绝）。
-// 部署形态：SQLite 零依赖起步（无需数据库/Redis 配置），浏览器打开 → 设管理员 → 完成。
-// 数据库/Redis 属部署层配置（config.yaml / env），不进安装向导。
+// AdminInstallService 在線安裝（Public——僅未安裝時可用；已安裝後 status 只讀、install 拒絕）。
+// 部署形態：SQLite 零依賴起步（無需數據庫/Redis 配置），瀏覽器打開 → 設管理員 → 完成。
+// 數據庫/Redis 屬部署層配置（config.yaml / env），不進安裝嚮導。
 type AdminInstallServiceServer interface {
-	// GetInstallStatus 安装状态 + 环境自检（公开）。
+	// GetInstallStatus 安裝狀態 + 環境自檢（公開）。
 	GetInstallStatus(context.Context, *emptypb.Empty) (*InstallStatusReply, error)
-	// PerformInstall 执行安装（公开；写管理员 + 站点信息 + 种子；已安装返回 409）。
-	// dialect=sqlite → 当前库直接装；mysql/postgres → 校验连接后写库切换覆盖配置
-	// + 待安装凭据文件，响应 restart_required 并自重启（新库上补装完成）。
+	// PerformInstall 執行安裝（公開；寫管理員 + 站點信息 + 種子；已安裝返回 409）。
+	// dialect=sqlite → 當前庫直接裝；mysql/postgres → 校驗連接後寫庫切換覆蓋配置
+	// + 待安裝憑據文件，響應 restart_required 並自重啓（新庫上補裝完成）。
 	PerformInstall(context.Context, *PerformInstallRequest) (*InstallStatusReply, error)
-	// TestInstallConnection 测试数据库/Redis 连接（公开；库不存在时自动创建）。
+	// TestInstallConnection 測試數據庫/Redis 連接（公開；庫不存在時自動創建）。
 	TestInstallConnection(context.Context, *TestInstallConnectionRequest) (*TestInstallConnectionReply, error)
 	mustEmbedUnimplementedAdminInstallServiceServer()
 }

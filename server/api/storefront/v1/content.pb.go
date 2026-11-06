@@ -77,9 +77,9 @@ func (x *ListBannersRequest) GetLocale() string {
 type StoreBanner struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"` // 按语言回落后
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"` // 按語言回落後
 	Image         string                 `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"`
-	MobileImage   string                 `protobuf:"bytes,4,opt,name=mobile_image,json=mobileImage,proto3" json:"mobile_image,omitempty"` // 缺省回落 PC 图
+	MobileImage   string                 `protobuf:"bytes,4,opt,name=mobile_image,json=mobileImage,proto3" json:"mobile_image,omitempty"` // 缺省回落 PC 圖
 	LinkType      string                 `protobuf:"bytes,5,opt,name=link_type,json=linkType,proto3" json:"link_type,omitempty"`
 	LinkValue     string                 `protobuf:"bytes,6,opt,name=link_value,json=linkValue,proto3" json:"link_value,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -208,7 +208,7 @@ type ListPostsRequest struct {
 	Locale        string                 `protobuf:"bytes,2,opt,name=locale,proto3" json:"locale,omitempty"`
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	CategoryId    uint64                 `protobuf:"varint,5,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // 栏目过滤；0 = 全部
+	CategoryId    uint64                 `protobuf:"varint,5,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // 欄目過濾；0 = 全部
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -501,7 +501,7 @@ func (x *GetPostRequest) GetLocale() string {
 type GetPostReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Post          *StorePost             `protobuf:"bytes,1,opt,name=post,proto3" json:"post,omitempty"`
-	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"` // 按语言回落后（sanitize 后的 HTML）
+	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"` // 按語言回落後（sanitize 後的 HTML）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

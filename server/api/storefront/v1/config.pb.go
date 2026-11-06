@@ -23,7 +23,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// PublicConfig 公开配置条目列表。
+// PublicConfig 公開配置條目列表。
 type PublicConfig struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Entries       []*PublicConfigEntry   `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
@@ -68,7 +68,7 @@ func (x *PublicConfig) GetEntries() []*PublicConfigEntry {
 	return nil
 }
 
-// PublicConfigEntry 单键（key 形如 "site.name"；value 为 JSON 文档字符串）。
+// PublicConfigEntry 單鍵（key 形如 "site.name"；value 為 JSON 文檔字符串）。
 type PublicConfigEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
@@ -121,7 +121,7 @@ func (x *PublicConfigEntry) GetValueJson() string {
 	return ""
 }
 
-// Currencies 货币列表。
+// Currencies 貨幣列表。
 type Currencies struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Currencies    []*Currency            `protobuf:"bytes,1,rep,name=currencies,proto3" json:"currencies,omitempty"`
@@ -166,7 +166,7 @@ func (x *Currencies) GetCurrencies() []*Currency {
 	return nil
 }
 
-// Currency 货币（rate 为 decimal 字符串——前端 decimal 换算，杜绝浮点误差入口）。
+// Currency 貨幣（rate 為 decimal 字符串——前端 decimal 換算，杜絕浮點誤差入口）。
 type Currency struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`

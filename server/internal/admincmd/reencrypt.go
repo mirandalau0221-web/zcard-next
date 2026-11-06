@@ -1,8 +1,8 @@
 package admincmd
 
-// reencrypt-cards 密钥轮换子命令（ 骨架）：
-// 旧 key 解密 → 新 key 重加密 → 同事务重算 content_hash（+ 靓号 number_hash），分批 1000。
-// 幂等：旧 key 解不开但新 key 能解的行视为已轮换跳过（中断可续跑）。
+// reencrypt-cards 密鑰輪換子命令（ 骨架）：
+// 舊 key 解密 → 新 key 重加密 → 同事務重算 content_hash（+ 靚號 number_hash），分批 1000。
+// 冪等：舊 key 解不開但新 key 能解的行視為已輪換跳過（中斷可續跑）。
 
 import (
 	"context"
@@ -17,14 +17,14 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// RunReencrypt reencrypt-cards 子命令入口（main 分发调用）。
+// RunReencrypt reencrypt-cards 子命令入口（main 分發調用）。
 //
 //	zcard reencrypt-cards --new-key <64 hex> [--conf configs] [--batch 1000]
 func RunReencrypt(args []string) error {
 	fs := flag.NewFlagSet("reencrypt-cards", flag.ExitOnError)
-	confDir := fs.String("conf", "configs", "配置目录")
-	newKeyHex := fs.String("new-key", "", "新密钥（64 hex 字符 = 32 字节）")
-	batchSize := fs.Int("batch", 1000, "每批行数")
+	confDir := fs.String("conf", "configs", "配置目錄")
+	newKeyHex := fs.String("new-key", "", "新密鑰（64 hex 字符 = 32 字節）")
+	batchSize := fs.Int("batch", 1000, "每批行數")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func RunReencrypt(args []string) error {
 		return err
 	}
 
-	// 旧 key：env ZCARD_CARD_KEY > conf.security.card_key
+	// 舊 key：env ZCARD_CARD_KEY > conf.security.card_key
 	bc := &conf.Bootstrap{}
 	if err := scanConf(*confDir, bc); err != nil {
 		return err
@@ -49,11 +49,11 @@ func RunReencrypt(args []string) error {
 		oldRaw = bc.Security.CardKey
 	}
 	if oldRaw == "" {
-		return fmt.Errorf("未找到旧卡密密钥（设置 ZCARD_CARD_KEY 或 conf.security.card_key）")
+		return fmt.Errorf("未找到舊卡密密鑰（設置 ZCARD_CARD_KEY 或 conf.security.card_key）")
 	}
 	oldKey, err := crypto.ParseHexKey(oldRaw)
 	if err != nil {
-		return fmt.Errorf("旧密钥非法: %w", err)
+		return fmt.Errorf("舊密鑰非法: %w", err)
 	}
 
 	client, cleanup, err := open(*confDir)
@@ -66,12 +66,12 @@ func RunReencrypt(args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("密钥轮换完成：重加密 %d，跳过（已轮换）%d，失败 %d\n", rotated, skipped, failed)
+	fmt.Printf("密鑰輪換完成：重加密 %d，跳過（已輪換）%d，失敗 %d\n", rotated, skipped, failed)
 	return nil
 }
 
-// ReencryptCards 分批轮换（可测试内核）：返回（重加密数, 已跳过数, 失败数）。
-// 每批一个事务：重加密 + 重算 content_hash（及靓号 number_hash）原子提交。
+// ReencryptCards 分批輪換（可測試內核）：返回（重加密數, 已跳過數, 失敗數）。
+// 每批一個事務：重加密 + 重算 content_hash（及靚號 number_hash）原子提交。
 func ReencryptCards(ctx context.Context, client *ent.Client, oldKey, newKey []byte, batchSize int) (rotated, skipped, failed int, err error) {
 	if batchSize <= 0 {
 		batchSize = 1000
@@ -107,7 +107,7 @@ func ReencryptCards(ctx context.Context, client *ent.Client, oldKey, newKey []by
 		for _, row := range rows {
 			plain, err := oldCipher.Open(row.Content, row.ProductID, row.SubsiteID)
 			if err != nil {
-				// 旧 key 解不开 → 尝试新 key；能解说明已轮换过，跳过（幂等续跑）
+				// 舊 key 解不開 → 嘗試新 key；能解説明已輪換過，跳過（冪等續跑）
 				if p2, err2 := newCipher.Open(row.Content, row.ProductID, row.SubsiteID); err2 == nil {
 					_ = p2
 					skipped++
@@ -125,7 +125,7 @@ func ReencryptCards(ctx context.Context, client *ent.Client, oldKey, newKey []by
 				SetContent(enc).
 				SetContentHash(newCipher.ContentHash(plain))
 			if row.NumberHash != "" {
-				// 靓号 number_hash = HMAC(key, "number:"+plain)，随 key 变一并重算
+				// 靚號 number_hash = HMAC(key, "number:"+plain)，隨 key 變一併重算
 				u.SetNumberHash(newCipher.ContentHash("number:" + plain))
 			}
 			if _, err := u.Save(ctx); err != nil {

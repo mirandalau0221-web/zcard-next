@@ -30,25 +30,25 @@ const OperationAdminResellerServiceUpsertPricing = "/zcard.api.admin.v1.AdminRes
 const OperationAdminResellerServiceVerifySite = "/zcard.api.admin.v1.AdminResellerService/VerifySite"
 
 type AdminResellerServiceHTTPServer interface {
-	// AddSite AddSite 分站主：登记域名（生成验证 token）。
+	// AddSite AddSite 分站主：登記域名（生成驗證 token）。
 	AddSite(context.Context, *AddSiteRequest) (*ResellerSiteItem, error)
-	// Balance Balance 分站余额（缓存 + 重算对账）。
+	// Balance Balance 分站餘額（緩存 + 重算對賬）。
 	Balance(context.Context, *BalanceRequest) (*BalanceReply, error)
-	// CreateProduct CreateProduct 分站主：自营商品上架（subsite_id = 本人分站；等级权限位自助上架）。
+	// CreateProduct CreateProduct 分站主：自營商品上架（subsite_id = 本人分站；等級權限位自助上架）。
 	CreateProduct(context.Context, *CreateResellerProductRequest) (*ResellerProduct, error)
-	// Ledger Ledger 分站账本流水。
+	// Ledger Ledger 分站賬本流水。
 	Ledger(context.Context, *LedgerRequest) (*LedgerReply, error)
-	// ListProfiles ListProfiles 申请/分站列表。
+	// ListProfiles ListProfiles 申請/分站列表。
 	ListProfiles(context.Context, *ListProfilesRequest) (*ListProfilesReply, error)
 	// MySites MySites 分站主：名下域名列表。
 	MySites(context.Context, *MySitesRequest) (*MySitesReply, error)
-	// ReviewApply ReviewApply 审核申请（通过设加价率区间与冻结天数）。
+	// ReviewApply ReviewApply 審核申請（通過設加價率區間與凍結天數）。
 	ReviewApply(context.Context, *ReviewApplyRequest) (*ResellerProfile, error)
-	// SetWhitelabel SetWhitelabel 分站主：白标设置（站名/LOGO/favicon）。
+	// SetWhitelabel SetWhitelabel 分站主：白標設置（站名/LOGO/favicon）。
 	SetWhitelabel(context.Context, *SetWhitelabelRequest) (*emptypb.Empty, error)
-	// UpsertPricing UpsertPricing 分站定价规则（SKU>商品>默认）。
+	// UpsertPricing UpsertPricing 分站定價規則（SKU>商品>默認）。
 	UpsertPricing(context.Context, *UpsertPricingRequest) (*emptypb.Empty, error)
-	// VerifySite VerifySite 分站主：触发域名验证（DNS TXT / HTTP well-known 双方案）。
+	// VerifySite VerifySite 分站主：觸發域名驗證（DNS TXT / HTTP well-known 雙方案）。
 	VerifySite(context.Context, *VerifySiteRequest) (*VerifySiteReply, error)
 }
 
@@ -266,25 +266,25 @@ func _AdminResellerService_Balance0_HTTP_Handler(srv AdminResellerServiceHTTPSer
 }
 
 type AdminResellerServiceHTTPClient interface {
-	// AddSite AddSite 分站主：登记域名（生成验证 token）。
+	// AddSite AddSite 分站主：登記域名（生成驗證 token）。
 	AddSite(ctx context.Context, req *AddSiteRequest, opts ...http.CallOption) (rsp *ResellerSiteItem, err error)
-	// Balance Balance 分站余额（缓存 + 重算对账）。
+	// Balance Balance 分站餘額（緩存 + 重算對賬）。
 	Balance(ctx context.Context, req *BalanceRequest, opts ...http.CallOption) (rsp *BalanceReply, err error)
-	// CreateProduct CreateProduct 分站主：自营商品上架（subsite_id = 本人分站；等级权限位自助上架）。
+	// CreateProduct CreateProduct 分站主：自營商品上架（subsite_id = 本人分站；等級權限位自助上架）。
 	CreateProduct(ctx context.Context, req *CreateResellerProductRequest, opts ...http.CallOption) (rsp *ResellerProduct, err error)
-	// Ledger Ledger 分站账本流水。
+	// Ledger Ledger 分站賬本流水。
 	Ledger(ctx context.Context, req *LedgerRequest, opts ...http.CallOption) (rsp *LedgerReply, err error)
-	// ListProfiles ListProfiles 申请/分站列表。
+	// ListProfiles ListProfiles 申請/分站列表。
 	ListProfiles(ctx context.Context, req *ListProfilesRequest, opts ...http.CallOption) (rsp *ListProfilesReply, err error)
 	// MySites MySites 分站主：名下域名列表。
 	MySites(ctx context.Context, req *MySitesRequest, opts ...http.CallOption) (rsp *MySitesReply, err error)
-	// ReviewApply ReviewApply 审核申请（通过设加价率区间与冻结天数）。
+	// ReviewApply ReviewApply 審核申請（通過設加價率區間與凍結天數）。
 	ReviewApply(ctx context.Context, req *ReviewApplyRequest, opts ...http.CallOption) (rsp *ResellerProfile, err error)
-	// SetWhitelabel SetWhitelabel 分站主：白标设置（站名/LOGO/favicon）。
+	// SetWhitelabel SetWhitelabel 分站主：白標設置（站名/LOGO/favicon）。
 	SetWhitelabel(ctx context.Context, req *SetWhitelabelRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// UpsertPricing UpsertPricing 分站定价规则（SKU>商品>默认）。
+	// UpsertPricing UpsertPricing 分站定價規則（SKU>商品>默認）。
 	UpsertPricing(ctx context.Context, req *UpsertPricingRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// VerifySite VerifySite 分站主：触发域名验证（DNS TXT / HTTP well-known 双方案）。
+	// VerifySite VerifySite 分站主：觸發域名驗證（DNS TXT / HTTP well-known 雙方案）。
 	VerifySite(ctx context.Context, req *VerifySiteRequest, opts ...http.CallOption) (rsp *VerifySiteReply, err error)
 }
 
@@ -296,7 +296,7 @@ func NewAdminResellerServiceHTTPClient(client *http.Client) AdminResellerService
 	return &AdminResellerServiceHTTPClientImpl{client}
 }
 
-// AddSite AddSite 分站主：登记域名（生成验证 token）。
+// AddSite AddSite 分站主：登記域名（生成驗證 token）。
 func (c *AdminResellerServiceHTTPClientImpl) AddSite(ctx context.Context, in *AddSiteRequest, opts ...http.CallOption) (*ResellerSiteItem, error) {
 	var out ResellerSiteItem
 	pattern := "/api/v1/admin/reseller/my/sites"
@@ -314,7 +314,7 @@ func (c *AdminResellerServiceHTTPClientImpl) AddSite(ctx context.Context, in *Ad
 	return &out, nil
 }
 
-// Balance Balance 分站余额（缓存 + 重算对账）。
+// Balance Balance 分站餘額（緩存 + 重算對賬）。
 func (c *AdminResellerServiceHTTPClientImpl) Balance(ctx context.Context, in *BalanceRequest, opts ...http.CallOption) (*BalanceReply, error) {
 	var out BalanceReply
 	pattern := "/api/v1/admin/reseller/balance"
@@ -331,7 +331,7 @@ func (c *AdminResellerServiceHTTPClientImpl) Balance(ctx context.Context, in *Ba
 	return &out, nil
 }
 
-// CreateProduct CreateProduct 分站主：自营商品上架（subsite_id = 本人分站；等级权限位自助上架）。
+// CreateProduct CreateProduct 分站主：自營商品上架（subsite_id = 本人分站；等級權限位自助上架）。
 func (c *AdminResellerServiceHTTPClientImpl) CreateProduct(ctx context.Context, in *CreateResellerProductRequest, opts ...http.CallOption) (*ResellerProduct, error) {
 	var out ResellerProduct
 	pattern := "/api/v1/admin/reseller/products"
@@ -349,7 +349,7 @@ func (c *AdminResellerServiceHTTPClientImpl) CreateProduct(ctx context.Context, 
 	return &out, nil
 }
 
-// Ledger Ledger 分站账本流水。
+// Ledger Ledger 分站賬本流水。
 func (c *AdminResellerServiceHTTPClientImpl) Ledger(ctx context.Context, in *LedgerRequest, opts ...http.CallOption) (*LedgerReply, error) {
 	var out LedgerReply
 	pattern := "/api/v1/admin/reseller/ledger"
@@ -366,7 +366,7 @@ func (c *AdminResellerServiceHTTPClientImpl) Ledger(ctx context.Context, in *Led
 	return &out, nil
 }
 
-// ListProfiles ListProfiles 申请/分站列表。
+// ListProfiles ListProfiles 申請/分站列表。
 func (c *AdminResellerServiceHTTPClientImpl) ListProfiles(ctx context.Context, in *ListProfilesRequest, opts ...http.CallOption) (*ListProfilesReply, error) {
 	var out ListProfilesReply
 	pattern := "/api/v1/admin/reseller/profiles"
@@ -400,7 +400,7 @@ func (c *AdminResellerServiceHTTPClientImpl) MySites(ctx context.Context, in *My
 	return &out, nil
 }
 
-// ReviewApply ReviewApply 审核申请（通过设加价率区间与冻结天数）。
+// ReviewApply ReviewApply 審核申請（通過設加價率區間與凍結天數）。
 func (c *AdminResellerServiceHTTPClientImpl) ReviewApply(ctx context.Context, in *ReviewApplyRequest, opts ...http.CallOption) (*ResellerProfile, error) {
 	var out ResellerProfile
 	pattern := "/api/v1/admin/reseller/apply/{id}/review"
@@ -418,7 +418,7 @@ func (c *AdminResellerServiceHTTPClientImpl) ReviewApply(ctx context.Context, in
 	return &out, nil
 }
 
-// SetWhitelabel SetWhitelabel 分站主：白标设置（站名/LOGO/favicon）。
+// SetWhitelabel SetWhitelabel 分站主：白標設置（站名/LOGO/favicon）。
 func (c *AdminResellerServiceHTTPClientImpl) SetWhitelabel(ctx context.Context, in *SetWhitelabelRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/reseller/my/sites/{site_id}/whitelabel"
@@ -436,7 +436,7 @@ func (c *AdminResellerServiceHTTPClientImpl) SetWhitelabel(ctx context.Context, 
 	return &out, nil
 }
 
-// UpsertPricing UpsertPricing 分站定价规则（SKU>商品>默认）。
+// UpsertPricing UpsertPricing 分站定價規則（SKU>商品>默認）。
 func (c *AdminResellerServiceHTTPClientImpl) UpsertPricing(ctx context.Context, in *UpsertPricingRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/reseller/pricing"
@@ -454,7 +454,7 @@ func (c *AdminResellerServiceHTTPClientImpl) UpsertPricing(ctx context.Context, 
 	return &out, nil
 }
 
-// VerifySite VerifySite 分站主：触发域名验证（DNS TXT / HTTP well-known 双方案）。
+// VerifySite VerifySite 分站主：觸發域名驗證（DNS TXT / HTTP well-known 雙方案）。
 func (c *AdminResellerServiceHTTPClientImpl) VerifySite(ctx context.Context, in *VerifySiteRequest, opts ...http.CallOption) (*VerifySiteReply, error) {
 	var out VerifySiteReply
 	pattern := "/api/v1/admin/reseller/my/sites/{site_id}/verify"

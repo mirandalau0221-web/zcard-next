@@ -1,6 +1,6 @@
 declare namespace Api {
   namespace Auth {
-    /** Kratos 登录响应（snake_case） */
+    /** Kratos 登錄響應（snake_case） */
     interface LoginToken {
       requires_totp?: boolean;
       challenge?: string;
@@ -12,7 +12,7 @@ declare namespace Api {
       admin: AdminProfile;
     }
 
-    /** Kratos 管理员信息 */
+    /** Kratos 管理員信息 */
     interface AdminProfile {
       id: number;
       username: string;
@@ -24,11 +24,11 @@ declare namespace Api {
       last_login_ip: string;
     }
 
-    /** Kratos profile 响应 */
+    /** Kratos profile 響應 */
     interface UserInfo {
       admin?: AdminProfile;
       permissions?: string[];
-      /** 运行时会话字段（login 后填充） */
+      /** 運行時會話字段（login 後填充） */
       userId: string;
       userName: string;
       roles: string[];

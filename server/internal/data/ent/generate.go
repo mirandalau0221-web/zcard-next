@@ -1,4 +1,4 @@
-// Package ent 为 Ent 生成代码根（生成物提交仓库，CI 校验 go generate 无 diff）。
+// Package ent 為 Ent 生成代碼根（生成物提交倉庫，CI 校驗 go generate 無 diff）。
 package ent
 
 //go:generate go run -mod=mod entc.go

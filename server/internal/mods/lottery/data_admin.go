@@ -26,52 +26,52 @@ type AdminService struct {
 func NewAdminService(r *Repo) *AdminService { return &AdminService{repo: r} }
 func validConfig(v *adminv1.LotteryActivity) error {
 	if strings.TrimSpace(v.Name) == "" || len([]rune(v.Name)) > 100 || len([]rune(v.Description)) > 5000 || len(v.Image) > 2048 || !validImage(v.Image) {
-		return bad("活动名称、说明或图片地址不正确")
+		return bad("活動名稱、説明或圖片地址不正確")
 	}
 	if v.EndAt <= v.StartAt || v.StartAt <= 0 {
-		return bad("结束时间必须晚于开始时间")
+		return bad("結束時間必須晚於開始時間")
 	}
 	if _, e := time.LoadLocation(v.Timezone); e != nil {
-		return bad("活动时区无效")
+		return bad("活動時區無效")
 	}
 	if v.ChanceMode != "once" && v.ChanceMode != "daily" && v.ChanceMode != "manual" {
-		return bad("次数规则无效")
+		return bad("次數規則無效")
 	}
 	if v.ChanceCount < 0 || v.ChanceCount > 1000 || (v.ChanceMode != "manual" && v.ChanceCount == 0) {
-		return bad("自动赠送次数应为 1～1000")
+		return bad("自動贈送次數應為 1～1000")
 	}
 	if len(v.Prizes) == 0 || len(v.Prizes) > 12 {
-		return bad("请配置 1～12 种奖品")
+		return bad("請配置 1～12 種獎品")
 	}
 	total := int64(0)
 	seen := map[uint64]bool{}
 	for _, p := range v.Prizes {
 		if p == nil || strings.TrimSpace(p.Name) == "" || len([]rune(p.Name)) > 100 || len(p.Image) > 2048 || !validImage(p.Image) {
-			return bad("奖品名称或图片无效")
+			return bad("獎品名稱或圖片無效")
 		}
 		if p.Id != 0 && seen[p.Id] {
-			return bad("奖品重复")
+			return bad("獎品重複")
 		}
 		seen[p.Id] = true
 		if p.Quantity < 1 || p.Quantity > 1000000 || p.Probability < 0 || p.Probability > 10000 {
-			return bad("奖品数量应为 1～1000000，中奖概率应为 0～100%")
+			return bad("獎品數量應為 1～1000000，中獎概率應為 0～100%")
 		}
 		total += int64(p.Probability)
 		if p.Mode != "card" && p.Mode != "text" && p.Mode != "manual" {
-			return bad("奖品发放方式无效")
+			return bad("獎品發放方式無效")
 		}
 		if p.Mode == "card" {
 			if p.ProductId == 0 {
-				return bad("自动发卡需要选择商品")
+				return bad("自動髮卡需要選擇商品")
 			}
 		} else {
 			if strings.TrimSpace(p.Content) == "" || len([]rune(p.Content)) > 10000 {
-				return bad("请填写发放内容或领取说明，最多 10000 字")
+				return bad("請填寫發放內容或領取説明，最多 10000 字")
 			}
 		}
 	}
 	if total <= 0 || total > 10000 {
-		return bad("奖品概率合计须大于 0 且不超过 100%")
+		return bad("獎品概率合計須大於 0 且不超過 100%")
 	}
 	return nil
 }
@@ -92,13 +92,13 @@ func (s *AdminService) SaveLotteryActivity(ctx context.Context, v *adminv1.Lotte
 				return e
 			}
 			if a.Revision != v.Revision {
-				return bad("活动已被修改，请刷新后重试")
+				return bad("活動已被修改，請刷新後重試")
 			}
 			if a.Status == "live" || a.Status == "archived" || state(a, s.repo.now()) == "ended" {
-				return bad("请先暂停活动再编辑；已结束活动请新建或复制")
+				return bad("請先暫停活動再編輯；已結束活動請新建或複製")
 			}
 			if a.Published && (v.ChanceMode != a.ChanceMode || v.ChanceCount != a.ChanceCount || v.Timezone != a.Timezone || v.StartAt != a.StartAt.Unix()) {
-				return bad("发布后不能更改次数规则、时区或开始时间，请复制为新活动")
+				return bad("發佈後不能更改次數規則、時區或開始時間，請複製為新活動")
 			}
 		}
 		if e != nil {
@@ -148,15 +148,15 @@ func (s *AdminService) SaveLotteryActivity(ctx context.Context, v *adminv1.Lotte
 			}
 			if e != nil {
 				if ent.IsNotFound(e) {
-					return bad("奖品不属于该活动")
+					return bad("獎品不屬於該活動")
 				}
 				return e
 			}
 			if p.Quantity < row.Issued {
-				return bad("奖品总量不能少于已发数量")
+				return bad("獎品總量不能少於已發數量")
 			}
 			if row.Issued > 0 && (row.Mode != p.Mode || row.ProductID != p.ProductId || row.SkuID != p.SkuId) {
-				return bad("已发放奖品不能更换来源，请新增奖品")
+				return bad("已發放獎品不能更換來源，請新增獎品")
 			}
 			sealed := []byte(nil)
 			if p.Mode != "card" {
@@ -247,7 +247,7 @@ func (s *AdminService) ListLotteryActivities(ctx context.Context, v *adminv1.Lot
 }
 func (s *AdminService) SetLotteryStatus(ctx context.Context, v *adminv1.LotteryStatusRequest) (*adminv1.LotteryActivity, error) {
 	if v.Status != "live" && v.Status != "paused" && v.Status != "ended" && v.Status != "archived" {
-		return nil, bad("活动状态无效")
+		return nil, bad("活動狀態無效")
 	}
 	e := data.Tx(ctx, s.repo.Data, func(ctx context.Context) error {
 		a, e := s.repo.activity(ctx, v.Id, true)
@@ -255,13 +255,13 @@ func (s *AdminService) SetLotteryStatus(ctx context.Context, v *adminv1.LotteryS
 			return e
 		}
 		if a.Revision != v.Revision {
-			return bad("活动已被修改，请刷新后重试")
+			return bad("活動已被修改，請刷新後重試")
 		}
 		if state(a, s.repo.now()) == "ended" && v.Status != "ended" && v.Status != "archived" {
-			return bad("已结束活动不能恢复，请新建或复制活动")
+			return bad("已結束活動不能恢復，請新建或複製活動")
 		}
 		if a.Status == "archived" {
-			return bad("已归档活动不能恢复")
+			return bad("已歸檔活動不能恢復")
 		}
 		ps, e := s.repo.prizes(ctx, a.ID)
 		if e != nil {
@@ -269,7 +269,7 @@ func (s *AdminService) SetLotteryStatus(ctx context.Context, v *adminv1.LotteryS
 		}
 		if v.Status == "live" {
 			if a.Status == "ended" || !s.repo.now().Before(a.EndAt) {
-				return bad("活动已结束，请复制为新活动")
+				return bad("活動已結束，請複製為新活動")
 			}
 			if e = s.repo.ready(ctx, ps); e != nil {
 				return e

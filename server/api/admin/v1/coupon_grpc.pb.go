@@ -37,26 +37,26 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminCouponService 优惠券管理(基础版：批量生成/列表/作废）。
+// AdminCouponService 優惠券管理(基礎版：批量生成/列表/作廢）。
 type AdminCouponServiceClient interface {
-	// GrantCoupon 批次赠送指定用户。
+	// GrantCoupon 批次贈送指定用户。
 	GrantCoupon(ctx context.Context, in *GrantCouponRequest, opts ...grpc.CallOption) (*GrantCouponReply, error)
-	// CreateFlashSale 创建秒杀。
+	// CreateFlashSale 創建秒殺。
 	CreateFlashSale(ctx context.Context, in *CreateFlashSaleRequest, opts ...grpc.CallOption) (*FlashSaleItem, error)
-	// ListFlashSales 秒杀列表。
+	// ListFlashSales 秒殺列表。
 	ListFlashSales(ctx context.Context, in *ListFlashSalesRequest, opts ...grpc.CallOption) (*ListFlashSalesReply, error)
-	// DeleteFlashSale 删除秒杀。
+	// DeleteFlashSale 刪除秒殺。
 	DeleteFlashSale(ctx context.Context, in *DeleteFlashSaleRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// UpsertPromotion 创建/更新促销。
+	// UpsertPromotion 創建/更新促銷。
 	UpsertPromotion(ctx context.Context, in *UpsertPromotionRequest, opts ...grpc.CallOption) (*PromotionItem, error)
-	// ListPromotions 促销列表。
+	// ListPromotions 促銷列表。
 	ListPromotions(ctx context.Context, in *ListPromotionsRequest, opts ...grpc.CallOption) (*ListPromotionsReply, error)
 	ListCoupons(ctx context.Context, in *ListCouponsRequest, opts ...grpc.CallOption) (*CouponList, error)
 	CreateCouponBatch(ctx context.Context, in *CreateCouponBatchRequest, opts ...grpc.CallOption) (*CreateCouponBatchReply, error)
 	DisableCoupon(ctx context.Context, in *DisableCouponRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// DeleteCoupons 批量删除券（仅未使用；可按 id 列表或整批未使用）。
+	// DeleteCoupons 批量刪除券（僅未使用；可按 id 列表或整批未使用）。
 	DeleteCoupons(ctx context.Context, in *DeleteCouponsRequest, opts ...grpc.CallOption) (*DeleteCouponsReply, error)
-	// ExportCoupons 导出券码 CSV（按状态/批次，含表头）。
+	// ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
 	ExportCoupons(ctx context.Context, in *ExportCouponsRequest, opts ...grpc.CallOption) (*ExportCouponsReply, error)
 }
 
@@ -182,26 +182,26 @@ func (c *adminCouponServiceClient) ExportCoupons(ctx context.Context, in *Export
 // All implementations must embed UnimplementedAdminCouponServiceServer
 // for forward compatibility.
 //
-// AdminCouponService 优惠券管理(基础版：批量生成/列表/作废）。
+// AdminCouponService 優惠券管理(基礎版：批量生成/列表/作廢）。
 type AdminCouponServiceServer interface {
-	// GrantCoupon 批次赠送指定用户。
+	// GrantCoupon 批次贈送指定用户。
 	GrantCoupon(context.Context, *GrantCouponRequest) (*GrantCouponReply, error)
-	// CreateFlashSale 创建秒杀。
+	// CreateFlashSale 創建秒殺。
 	CreateFlashSale(context.Context, *CreateFlashSaleRequest) (*FlashSaleItem, error)
-	// ListFlashSales 秒杀列表。
+	// ListFlashSales 秒殺列表。
 	ListFlashSales(context.Context, *ListFlashSalesRequest) (*ListFlashSalesReply, error)
-	// DeleteFlashSale 删除秒杀。
+	// DeleteFlashSale 刪除秒殺。
 	DeleteFlashSale(context.Context, *DeleteFlashSaleRequest) (*emptypb.Empty, error)
-	// UpsertPromotion 创建/更新促销。
+	// UpsertPromotion 創建/更新促銷。
 	UpsertPromotion(context.Context, *UpsertPromotionRequest) (*PromotionItem, error)
-	// ListPromotions 促销列表。
+	// ListPromotions 促銷列表。
 	ListPromotions(context.Context, *ListPromotionsRequest) (*ListPromotionsReply, error)
 	ListCoupons(context.Context, *ListCouponsRequest) (*CouponList, error)
 	CreateCouponBatch(context.Context, *CreateCouponBatchRequest) (*CreateCouponBatchReply, error)
 	DisableCoupon(context.Context, *DisableCouponRequest) (*emptypb.Empty, error)
-	// DeleteCoupons 批量删除券（仅未使用；可按 id 列表或整批未使用）。
+	// DeleteCoupons 批量刪除券（僅未使用；可按 id 列表或整批未使用）。
 	DeleteCoupons(context.Context, *DeleteCouponsRequest) (*DeleteCouponsReply, error)
-	// ExportCoupons 导出券码 CSV（按状态/批次，含表头）。
+	// ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
 	ExportCoupons(context.Context, *ExportCouponsRequest) (*ExportCouponsReply, error)
 	mustEmbedUnimplementedAdminCouponServiceServer()
 }

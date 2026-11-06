@@ -22,9 +22,9 @@ type Category struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
-	// 父分类（NULL=根）
+	// 父分類（NULL=根）
 	ParentID uint64 `json:"parent_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
@@ -34,7 +34,7 @@ type Category struct {
 	Hide bool `json:"hide,omitempty"`
 	// Sort holds the value of the "sort" field.
 	Sort int32 `json:"sort,omitempty"`
-	// 分站可见性白名单（空=全部可见）
+	// 分站可見性白名單（空=全部可見）
 	VisibleSubsites []uint64 `json:"visible_subsites,omitempty"`
 	// PlacementVersion holds the value of the "placement_version" field.
 	PlacementVersion int64 `json:"placement_version,omitempty"`

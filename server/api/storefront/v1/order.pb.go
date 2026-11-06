@@ -33,13 +33,13 @@ type CreateOrderRequest struct {
 	QueryPassword   string                 `protobuf:"bytes,3,opt,name=query_password,json=queryPassword,proto3" json:"query_password,omitempty"`
 	Contact         string                 `protobuf:"bytes,4,opt,name=contact,proto3" json:"contact,omitempty"`
 	CouponCode      string                 `protobuf:"bytes,5,opt,name=coupon_code,json=couponCode,proto3" json:"coupon_code,omitempty"`
-	// 控件答案（key=控件 ID 字符串，value=答案；多选用逗号分隔）
+	// 控件答案（key=控件 ID 字符串，value=答案；多選用逗號分隔）
 	ControlAnswers map[string]string `protobuf:"bytes,6,rep,name=control_answers,json=controlAnswers,proto3" json:"control_answers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// 积分兑换下单（：全部商品须为积分商品；积分同事务扣款，订单直落 paid）
+	// 積分兑換下單（：全部商品須為積分商品；積分同事務扣款，訂單直落 paid）
 	UsePoints bool `protobuf:"varint,7,opt,name=use_points,json=usePoints,proto3" json:"use_points,omitempty"`
-	// 推广归因码（可空）：游客/无链用户下单时实时解析推广者 → 订单级归因快照
+	// 推廣歸因碼（可空）：遊客/無鏈用户下單時實時解析推廣者 → 訂單級歸因快照
 	RefCode string `protobuf:"bytes,8,opt,name=ref_code,json=refCode,proto3" json:"ref_code,omitempty"`
-	// 图形验证码（captcha_order 开启时游客必填）
+	// 圖形驗證碼（captcha_order 開啓時遊客必填）
 	CaptchaId     string `protobuf:"bytes,9,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`
 	CaptchaCode   string `protobuf:"bytes,10,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -402,7 +402,7 @@ type GetOrderReply struct {
 	TotalCents       int64                  `protobuf:"varint,3,opt,name=total_cents,json=totalCents,proto3" json:"total_cents,omitempty"`
 	Items            []*OrderItemReply      `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty"`
 	CreatedAt        int64                  `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	ExpiresAt        int64                  `protobuf:"varint,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // 订单过期时间（倒计时；0=无过期）
+	ExpiresAt        int64                  `protobuf:"varint,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // 訂單過期時間（倒計時；0=無過期）
 	PaidTotalCents   int64                  `protobuf:"varint,7,opt,name=paid_total_cents,json=paidTotalCents,proto3" json:"paid_total_cents,omitempty"`
 	PaidFeeCents     int64                  `protobuf:"varint,8,opt,name=paid_fee_cents,json=paidFeeCents,proto3" json:"paid_fee_cents,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -555,7 +555,7 @@ type OrderItemReply struct {
 	ShippedQuantity   int32                  `protobuf:"varint,14,opt,name=shipped_quantity,json=shippedQuantity,proto3" json:"shipped_quantity,omitempty"`
 	ReceivedQuantity  int32                  `protobuf:"varint,15,opt,name=received_quantity,json=receivedQuantity,proto3" json:"received_quantity,omitempty"`
 	CanceledQuantity  int32                  `protobuf:"varint,16,opt,name=canceled_quantity,json=canceledQuantity,proto3" json:"canceled_quantity,omitempty"`
-	ReturnedQuantity  int32                  `protobuf:"varint,17,opt,name=returned_quantity,json=returnedQuantity,proto3" json:"returned_quantity,omitempty"` // 已验收退回并入库数量，与已取消数量分别累计
+	ReturnedQuantity  int32                  `protobuf:"varint,17,opt,name=returned_quantity,json=returnedQuantity,proto3" json:"returned_quantity,omitempty"` // 已驗收退回併入庫數量，與已取消數量分別累計
 	Id                uint64                 `protobuf:"varint,5,opt,name=id,proto3" json:"id,omitempty"`
 	SkuName           string                 `protobuf:"bytes,6,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`
 	FulfillmentType   string                 `protobuf:"bytes,7,opt,name=fulfillment_type,json=fulfillmentType,proto3" json:"fulfillment_type,omitempty"`
@@ -742,7 +742,7 @@ func (x *OrderItemReply) GetUnitPriceCents() int64 {
 
 type ListGuestOrdersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Contact       string                 `protobuf:"bytes,1,opt,name=contact,proto3" json:"contact,omitempty"` // 下单时留的邮箱/手机号
+	Contact       string                 `protobuf:"bytes,1,opt,name=contact,proto3" json:"contact,omitempty"` // 下單時留的郵箱/手機號
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -908,7 +908,7 @@ type ListMyOrdersRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	Page     int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// 状态筛选（可选：pending_payment/paid/delivered/completed/canceled/expired/refunded）
+	// 狀態篩選（可選：pending_payment/paid/delivered/completed/canceled/expired/refunded）
 	Status        string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1017,7 +1017,7 @@ func (x *ListMyOrdersReply) GetTotal() int64 {
 	return 0
 }
 
-// MyOrderItem 我的订单行（金额/状态/时间；卡密取回走 GetOrder）。
+// MyOrderItem 我的訂單行（金額/狀態/時間；卡密取回走 GetOrder）。
 type MyOrderItem struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	ShippingStatus     string                 `protobuf:"bytes,9,opt,name=shipping_status,json=shippingStatus,proto3" json:"shipping_status,omitempty"`

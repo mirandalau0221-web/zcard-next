@@ -16,8 +16,8 @@ var ProviderSet = wire.NewSet(
 	NewStoreSocialProductService,
 	NewStoreCartService,
 	NewAdminOrderService,
-	// 破环点：OrderLifecycle 端口（payment 回调消费；适配器返回接口类型）
+	// 破環點：OrderLifecycle 端口（payment 回調消費；適配器返回接口類型）
 	ProvideOrderLifecycle,
-	// 管理列表已售聚合（catalog 消费，通道 A）
+	// 管理列表已售聚合（catalog 消費，通道 A）
 	wire.Bind(new(port.SoldCounter), new(*OrderUsecase)),
 )

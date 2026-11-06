@@ -23,19 +23,19 @@ type WalletTransaction struct {
 	Direction string `json:"direction,omitempty"`
 	// order_pay/order_refund/recharge/commission/adjust...
 	Type string `json:"type,omitempty"`
-	// 金额（分，正数）
+	// 金額（分，正數）
 	Amount int64 `json:"amount,omitempty"`
-	// 变动前快照
+	// 變動前快照
 	BalanceBefore int64 `json:"balance_before,omitempty"`
-	// 变动后快照
+	// 變動後快照
 	BalanceAfter int64 `json:"balance_after,omitempty"`
 	// Currency holds the value of the "currency" field.
 	Currency string `json:"currency,omitempty"`
-	// 幂等键（重复入账直接返回成功）
+	// 冪等鍵（重複入賬直接返回成功）
 	Reference string `json:"reference,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uint64 `json:"order_id,omitempty"`
-	// 手动调账操作管理员
+	// 手動調賬操作管理員
 	OperatorID uint64 `json:"operator_id,omitempty"`
 	// Remark holds the value of the "remark" field.
 	Remark string `json:"remark,omitempty"`

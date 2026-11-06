@@ -37,37 +37,37 @@ const OperationAdminSupplyServiceUpdateConnection = "/zcard.api.admin.v1.AdminSu
 const OperationAdminSupplyServiceUpsertMapping = "/zcard.api.admin.v1.AdminSupplyService/UpsertMapping"
 
 type AdminSupplyServiceHTTPServer interface {
-	// CancelSyncTask CancelSyncTask 请求取消（分批间检查标志）。
+	// CancelSyncTask CancelSyncTask 請求取消（分批間檢查標誌）。
 	CancelSyncTask(context.Context, *CancelSyncTaskRequest) (*SupplySyncTask, error)
-	// CreateConnection CreateConnection 创建上游连接（凭据 AES-GCM 加密入库；base_url SSRF 校验）。
+	// CreateConnection CreateConnection 創建上游連接（憑據 AES-GCM 加密入庫；base_url SSRF 校驗）。
 	CreateConnection(context.Context, *CreateConnectionRequest) (*SupplyConnection, error)
-	// CreateSyncTask CreateSyncTask 创建同步任务（full=全量 / incremental=增量；low 队列执行）。
+	// CreateSyncTask CreateSyncTask 創建同步任務（full=全量 / incremental=增量；low 隊列執行）。
 	CreateSyncTask(context.Context, *CreateSyncTaskRequest) (*SupplySyncTask, error)
-	// DeleteConnection DeleteConnection 删除连接（存在映射时拒绝）。
+	// DeleteConnection DeleteConnection 刪除連接（存在映射時拒絕）。
 	DeleteConnection(context.Context, *DeleteConnectionRequest) (*emptypb.Empty, error)
-	// DeleteMapping DeleteMapping 删除映射。
+	// DeleteMapping DeleteMapping 刪除映射。
 	DeleteMapping(context.Context, *DeleteMappingRequest) (*emptypb.Empty, error)
-	// GetSyncTask GetSyncTask 任务详情（心跳/统计/错误上下文）。
+	// GetSyncTask GetSyncTask 任務詳情（心跳/統計/錯誤上下文）。
 	GetSyncTask(context.Context, *GetSyncTaskRequest) (*SupplySyncTask, error)
-	// ImportProducts ImportProducts 勾选导入（定价策略 + 类目映射 + 存为连接默认； D）。
+	// ImportProducts ImportProducts 勾選導入（定價策略 + 類目映射 + 存為連接默認； D）。
 	ImportProducts(context.Context, *ImportProductsRequest) (*ImportProductsReply, error)
-	// ListConnections ListConnections 连接列表（凭据零回显）。
+	// ListConnections ListConnections 連接列表（憑據零回顯）。
 	ListConnections(context.Context, *ListConnectionsRequest) (*ListConnectionsReply, error)
 	ListHealth(context.Context, *ListHealthRequest) (*ListHealthReply, error)
 	ListImportItems(context.Context, *ListImportItemsRequest) (*ListImportItemsReply, error)
-	// ListMappings ListMappings 商品映射列表（按连接过滤）。
+	// ListMappings ListMappings 商品映射列表（按連接過濾）。
 	ListMappings(context.Context, *ListMappingsRequest) (*ListMappingsReply, error)
-	// ListSyncTasks ListSyncTasks 同步任务列表。
+	// ListSyncTasks ListSyncTasks 同步任務列表。
 	ListSyncTasks(context.Context, *ListSyncTasksRequest) (*ListSyncTasksReply, error)
 	// PingConnection PingConnection 探活（更新 last_ping_at/last_ping_ok/balance_cache）。
 	PingConnection(context.Context, *PingConnectionRequest) (*PingConnectionReply, error)
-	// PreviewProducts ListHealth 连接健康列表（探活结果 + 最近错误 + 同步时间）。
-	// PreviewProducts 轻量目录预览；quote_code 按需查询一个商品的账号报价。
+	// PreviewProducts ListHealth 連接健康列表（探活結果 + 最近錯誤 + 同步時間）。
+	// PreviewProducts 輕量目錄預覽；quote_code 按需查詢一個商品的賬號報價。
 	PreviewProducts(context.Context, *PreviewProductsRequest) (*PreviewProductsReply, error)
 	RetryImportTask(context.Context, *RetryImportTaskRequest) (*SupplySyncTask, error)
-	// UpdateConnection UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+	// UpdateConnection UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
 	UpdateConnection(context.Context, *UpdateConnectionRequest) (*SupplyConnection, error)
-	// UpsertMapping UpsertMapping 创建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
+	// UpsertMapping UpsertMapping 創建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
 	UpsertMapping(context.Context, *UpsertMappingRequest) (*SupplyMapping, error)
 }
 
@@ -446,37 +446,37 @@ func _AdminSupplyService_ListHealth0_HTTP_Handler(srv AdminSupplyServiceHTTPServ
 }
 
 type AdminSupplyServiceHTTPClient interface {
-	// CancelSyncTask CancelSyncTask 请求取消（分批间检查标志）。
+	// CancelSyncTask CancelSyncTask 請求取消（分批間檢查標誌）。
 	CancelSyncTask(ctx context.Context, req *CancelSyncTaskRequest, opts ...http.CallOption) (rsp *SupplySyncTask, err error)
-	// CreateConnection CreateConnection 创建上游连接（凭据 AES-GCM 加密入库；base_url SSRF 校验）。
+	// CreateConnection CreateConnection 創建上游連接（憑據 AES-GCM 加密入庫；base_url SSRF 校驗）。
 	CreateConnection(ctx context.Context, req *CreateConnectionRequest, opts ...http.CallOption) (rsp *SupplyConnection, err error)
-	// CreateSyncTask CreateSyncTask 创建同步任务（full=全量 / incremental=增量；low 队列执行）。
+	// CreateSyncTask CreateSyncTask 創建同步任務（full=全量 / incremental=增量；low 隊列執行）。
 	CreateSyncTask(ctx context.Context, req *CreateSyncTaskRequest, opts ...http.CallOption) (rsp *SupplySyncTask, err error)
-	// DeleteConnection DeleteConnection 删除连接（存在映射时拒绝）。
+	// DeleteConnection DeleteConnection 刪除連接（存在映射時拒絕）。
 	DeleteConnection(ctx context.Context, req *DeleteConnectionRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// DeleteMapping DeleteMapping 删除映射。
+	// DeleteMapping DeleteMapping 刪除映射。
 	DeleteMapping(ctx context.Context, req *DeleteMappingRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// GetSyncTask GetSyncTask 任务详情（心跳/统计/错误上下文）。
+	// GetSyncTask GetSyncTask 任務詳情（心跳/統計/錯誤上下文）。
 	GetSyncTask(ctx context.Context, req *GetSyncTaskRequest, opts ...http.CallOption) (rsp *SupplySyncTask, err error)
-	// ImportProducts ImportProducts 勾选导入（定价策略 + 类目映射 + 存为连接默认； D）。
+	// ImportProducts ImportProducts 勾選導入（定價策略 + 類目映射 + 存為連接默認； D）。
 	ImportProducts(ctx context.Context, req *ImportProductsRequest, opts ...http.CallOption) (rsp *ImportProductsReply, err error)
-	// ListConnections ListConnections 连接列表（凭据零回显）。
+	// ListConnections ListConnections 連接列表（憑據零回顯）。
 	ListConnections(ctx context.Context, req *ListConnectionsRequest, opts ...http.CallOption) (rsp *ListConnectionsReply, err error)
 	ListHealth(ctx context.Context, req *ListHealthRequest, opts ...http.CallOption) (rsp *ListHealthReply, err error)
 	ListImportItems(ctx context.Context, req *ListImportItemsRequest, opts ...http.CallOption) (rsp *ListImportItemsReply, err error)
-	// ListMappings ListMappings 商品映射列表（按连接过滤）。
+	// ListMappings ListMappings 商品映射列表（按連接過濾）。
 	ListMappings(ctx context.Context, req *ListMappingsRequest, opts ...http.CallOption) (rsp *ListMappingsReply, err error)
-	// ListSyncTasks ListSyncTasks 同步任务列表。
+	// ListSyncTasks ListSyncTasks 同步任務列表。
 	ListSyncTasks(ctx context.Context, req *ListSyncTasksRequest, opts ...http.CallOption) (rsp *ListSyncTasksReply, err error)
 	// PingConnection PingConnection 探活（更新 last_ping_at/last_ping_ok/balance_cache）。
 	PingConnection(ctx context.Context, req *PingConnectionRequest, opts ...http.CallOption) (rsp *PingConnectionReply, err error)
-	// PreviewProducts ListHealth 连接健康列表（探活结果 + 最近错误 + 同步时间）。
-	// PreviewProducts 轻量目录预览；quote_code 按需查询一个商品的账号报价。
+	// PreviewProducts ListHealth 連接健康列表（探活結果 + 最近錯誤 + 同步時間）。
+	// PreviewProducts 輕量目錄預覽；quote_code 按需查詢一個商品的賬號報價。
 	PreviewProducts(ctx context.Context, req *PreviewProductsRequest, opts ...http.CallOption) (rsp *PreviewProductsReply, err error)
 	RetryImportTask(ctx context.Context, req *RetryImportTaskRequest, opts ...http.CallOption) (rsp *SupplySyncTask, err error)
-	// UpdateConnection UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+	// UpdateConnection UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
 	UpdateConnection(ctx context.Context, req *UpdateConnectionRequest, opts ...http.CallOption) (rsp *SupplyConnection, err error)
-	// UpsertMapping UpsertMapping 创建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
+	// UpsertMapping UpsertMapping 創建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
 	UpsertMapping(ctx context.Context, req *UpsertMappingRequest, opts ...http.CallOption) (rsp *SupplyMapping, err error)
 }
 
@@ -488,7 +488,7 @@ func NewAdminSupplyServiceHTTPClient(client *http.Client) AdminSupplyServiceHTTP
 	return &AdminSupplyServiceHTTPClientImpl{client}
 }
 
-// CancelSyncTask CancelSyncTask 请求取消（分批间检查标志）。
+// CancelSyncTask CancelSyncTask 請求取消（分批間檢查標誌）。
 func (c *AdminSupplyServiceHTTPClientImpl) CancelSyncTask(ctx context.Context, in *CancelSyncTaskRequest, opts ...http.CallOption) (*SupplySyncTask, error) {
 	var out SupplySyncTask
 	pattern := "/api/v1/admin/supply/sync-tasks/{id}/cancel"
@@ -506,7 +506,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) CancelSyncTask(ctx context.Context, i
 	return &out, nil
 }
 
-// CreateConnection CreateConnection 创建上游连接（凭据 AES-GCM 加密入库；base_url SSRF 校验）。
+// CreateConnection CreateConnection 創建上游連接（憑據 AES-GCM 加密入庫；base_url SSRF 校驗）。
 func (c *AdminSupplyServiceHTTPClientImpl) CreateConnection(ctx context.Context, in *CreateConnectionRequest, opts ...http.CallOption) (*SupplyConnection, error) {
 	var out SupplyConnection
 	pattern := "/api/v1/admin/supply/connections"
@@ -524,7 +524,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) CreateConnection(ctx context.Context,
 	return &out, nil
 }
 
-// CreateSyncTask CreateSyncTask 创建同步任务（full=全量 / incremental=增量；low 队列执行）。
+// CreateSyncTask CreateSyncTask 創建同步任務（full=全量 / incremental=增量；low 隊列執行）。
 func (c *AdminSupplyServiceHTTPClientImpl) CreateSyncTask(ctx context.Context, in *CreateSyncTaskRequest, opts ...http.CallOption) (*SupplySyncTask, error) {
 	var out SupplySyncTask
 	pattern := "/api/v1/admin/supply/sync-tasks"
@@ -542,7 +542,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) CreateSyncTask(ctx context.Context, i
 	return &out, nil
 }
 
-// DeleteConnection DeleteConnection 删除连接（存在映射时拒绝）。
+// DeleteConnection DeleteConnection 刪除連接（存在映射時拒絕）。
 func (c *AdminSupplyServiceHTTPClientImpl) DeleteConnection(ctx context.Context, in *DeleteConnectionRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/supply/connections/{id}"
@@ -559,7 +559,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) DeleteConnection(ctx context.Context,
 	return &out, nil
 }
 
-// DeleteMapping DeleteMapping 删除映射。
+// DeleteMapping DeleteMapping 刪除映射。
 func (c *AdminSupplyServiceHTTPClientImpl) DeleteMapping(ctx context.Context, in *DeleteMappingRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/supply/mappings/{id}"
@@ -576,7 +576,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) DeleteMapping(ctx context.Context, in
 	return &out, nil
 }
 
-// GetSyncTask GetSyncTask 任务详情（心跳/统计/错误上下文）。
+// GetSyncTask GetSyncTask 任務詳情（心跳/統計/錯誤上下文）。
 func (c *AdminSupplyServiceHTTPClientImpl) GetSyncTask(ctx context.Context, in *GetSyncTaskRequest, opts ...http.CallOption) (*SupplySyncTask, error) {
 	var out SupplySyncTask
 	pattern := "/api/v1/admin/supply/sync-tasks/{id}"
@@ -593,7 +593,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) GetSyncTask(ctx context.Context, in *
 	return &out, nil
 }
 
-// ImportProducts ImportProducts 勾选导入（定价策略 + 类目映射 + 存为连接默认； D）。
+// ImportProducts ImportProducts 勾選導入（定價策略 + 類目映射 + 存為連接默認； D）。
 func (c *AdminSupplyServiceHTTPClientImpl) ImportProducts(ctx context.Context, in *ImportProductsRequest, opts ...http.CallOption) (*ImportProductsReply, error) {
 	var out ImportProductsReply
 	pattern := "/api/v1/admin/supply/connections/{connection_id}/import"
@@ -611,7 +611,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) ImportProducts(ctx context.Context, i
 	return &out, nil
 }
 
-// ListConnections ListConnections 连接列表（凭据零回显）。
+// ListConnections ListConnections 連接列表（憑據零回顯）。
 func (c *AdminSupplyServiceHTTPClientImpl) ListConnections(ctx context.Context, in *ListConnectionsRequest, opts ...http.CallOption) (*ListConnectionsReply, error) {
 	var out ListConnectionsReply
 	pattern := "/api/v1/admin/supply/connections"
@@ -660,7 +660,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) ListImportItems(ctx context.Context, 
 	return &out, nil
 }
 
-// ListMappings ListMappings 商品映射列表（按连接过滤）。
+// ListMappings ListMappings 商品映射列表（按連接過濾）。
 func (c *AdminSupplyServiceHTTPClientImpl) ListMappings(ctx context.Context, in *ListMappingsRequest, opts ...http.CallOption) (*ListMappingsReply, error) {
 	var out ListMappingsReply
 	pattern := "/api/v1/admin/supply/mappings"
@@ -677,7 +677,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) ListMappings(ctx context.Context, in 
 	return &out, nil
 }
 
-// ListSyncTasks ListSyncTasks 同步任务列表。
+// ListSyncTasks ListSyncTasks 同步任務列表。
 func (c *AdminSupplyServiceHTTPClientImpl) ListSyncTasks(ctx context.Context, in *ListSyncTasksRequest, opts ...http.CallOption) (*ListSyncTasksReply, error) {
 	var out ListSyncTasksReply
 	pattern := "/api/v1/admin/supply/sync-tasks"
@@ -712,8 +712,8 @@ func (c *AdminSupplyServiceHTTPClientImpl) PingConnection(ctx context.Context, i
 	return &out, nil
 }
 
-// PreviewProducts ListHealth 连接健康列表（探活结果 + 最近错误 + 同步时间）。
-// PreviewProducts 轻量目录预览；quote_code 按需查询一个商品的账号报价。
+// PreviewProducts ListHealth 連接健康列表（探活結果 + 最近錯誤 + 同步時間）。
+// PreviewProducts 輕量目錄預覽；quote_code 按需查詢一個商品的賬號報價。
 func (c *AdminSupplyServiceHTTPClientImpl) PreviewProducts(ctx context.Context, in *PreviewProductsRequest, opts ...http.CallOption) (*PreviewProductsReply, error) {
 	var out PreviewProductsReply
 	pattern := "/api/v1/admin/supply/connections/{connection_id}/preview"
@@ -747,7 +747,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) RetryImportTask(ctx context.Context, 
 	return &out, nil
 }
 
-// UpdateConnection UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+// UpdateConnection UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
 func (c *AdminSupplyServiceHTTPClientImpl) UpdateConnection(ctx context.Context, in *UpdateConnectionRequest, opts ...http.CallOption) (*SupplyConnection, error) {
 	var out SupplyConnection
 	pattern := "/api/v1/admin/supply/connections/{id}"
@@ -765,7 +765,7 @@ func (c *AdminSupplyServiceHTTPClientImpl) UpdateConnection(ctx context.Context,
 	return &out, nil
 }
 
-// UpsertMapping UpsertMapping 创建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
+// UpsertMapping UpsertMapping 創建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
 func (c *AdminSupplyServiceHTTPClientImpl) UpsertMapping(ctx context.Context, in *UpsertMappingRequest, opts ...http.CallOption) (*SupplyMapping, error) {
 	var out SupplyMapping
 	pattern := "/api/v1/admin/supply/mappings"

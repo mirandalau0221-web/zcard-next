@@ -1,9 +1,9 @@
 <template>
   <div>
-    <!-- Hero 搜索区（深蓝渐变） -->
+    <!-- Hero 搜索區（深藍漸變） -->
     <section class="query-hero">
-      <h1 class="query-title">{{ $t('订单与交付查询') }}</h1>
-      <p class="query-sub">{{ $t('输入订单号查看进度，游客可通过下单邮箱验证找回') }}</p>
+      <h1 class="query-title">{{ $t('訂單與交付查詢') }}</h1>
+      <p class="query-sub">{{ $t('輸入訂單號查看進度，遊客可通過下單郵箱驗證找回') }}</p>
 
       <form class="query-form" @submit.prevent="fetch">
         <div class="query-input-row">
@@ -12,64 +12,64 @@
             v-model="orderNo"
             type="text"
             class="query-input"
-            :placeholder="$t('订单号 / 邮箱 / 手机号')"
+            :placeholder="$t('訂單號 / 郵箱 / 手機號')"
             autocomplete="off"
           />
           <button type="submit" class="query-btn" :disabled="loading">
-            {{ loading ? $t('查询中…') : $t('查询') }}
+            {{ loading ? $t('查詢中…') : $t('查詢') }}
           </button>
         </div>
-        <details><summary>{{ $t('虚拟商品或历史订单：使用查询密码') }}</summary><div class="query-pwd-row">
-          <span class="query-pwd-label">{{ $t('查询密码') }}</span>
+        <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼') }}</summary><div class="query-pwd-row">
+          <span class="query-pwd-label">{{ $t('查詢密碼') }}</span>
           <input
             v-model="queryPassword"
             type="password"
             class="query-pwd-input"
-            :placeholder="$t('下单时设置的查询密码')"
+            :placeholder="$t('下單時設置的查詢密碼')"
           />
         </div></details>
       </form>
 
 <OrderAccessRecovery :order-no="looksLikeContact(orderNo) ? undefined : orderNo" @recovered="pickOrder" />
-      <p v-if="queryPassword" class="query-sub">{{ $t('同一网络下，同一订单连续查询失败 5 次将锁定 30 分钟；验证成功后重新计数。') }}</p>
+      <p v-if="queryPassword" class="query-sub">{{ $t('同一網絡下，同一訂單連續查詢失敗 5 次將鎖定 30 分鐘；驗證成功後重新計數。') }}</p>
       <div v-if="error" class="query-error" role="alert">{{ uiText(error) }}</div>
     </section>
 
-    <!-- 未搜索：三步引导 -->
+    <!-- 未搜索：三步引導 -->
     <div v-if="!result && !error" class="guide-card">
-      <div class="guide-title">{{ $t('三步查询订单') }}</div>
+      <div class="guide-title">{{ $t('三步查詢訂單') }}</div>
       <div class="guide-steps">
         <div class="guide-step">
           <span class="guide-num">1</span>
           <div>
-            <b>{{ $t('下单购买') }}</b>
-            <span class="muted">{{ $t('选择商品并完成支付，保存订单信息') }}</span>
+            <b>{{ $t('下單購買') }}</b>
+            <span class="muted">{{ $t('選擇商品並完成支付，保存訂單信息') }}</span>
           </div>
         </div>
         <div class="guide-step">
           <span class="guide-num">2</span>
           <div>
-            <b>{{ $t('输入信息') }}</b>
-            <span class="muted">{{ $t('使用账户、订单访问链接或邮箱验证码') }}</span>
+            <b>{{ $t('輸入信息') }}</b>
+            <span class="muted">{{ $t('使用賬户、訂單訪問鏈接或郵箱驗證碼') }}</span>
           </div>
         </div>
         <div class="guide-step">
           <span class="guide-num">3</span>
           <div>
-            <b>{{ $t('查看交付结果') }}</b>
-            <span class="muted">{{ $t('查看卡密、服务进度或实体商品物流') }}</span>
+            <b>{{ $t('查看交付結果') }}</b>
+            <span class="muted">{{ $t('查看卡密、服務進度或實體商品物流') }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 联系方式模式：订单列表（逐单取货） -->
+    <!-- 聯繫方式模式：訂單列表（逐單取貨） -->
     <div v-if="guestOrders.length" class="result-wrap">
       <div class="result-card">
         <div class="result-head">
           <div>
-            <div class="result-order">{{ $t('找到') }} {{ guestOrders.length }} {{ $t('笔订单') }}</div>
-            <div class="result-meta"><span class="muted">{{ $t('输入查询密码后点击对应订单查看') }}</span></div>
+            <div class="result-order">{{ $t('找到') }} {{ guestOrders.length }} {{ $t('筆訂單') }}</div>
+            <div class="result-meta"><span class="muted">{{ $t('輸入查詢密碼後點擊對應訂單查看') }}</span></div>
           </div>
         </div>
         <div v-for="o in guestOrders" :key="o.order_no" class="guest-order-row">
@@ -80,19 +80,19 @@
           <span class="guest-order-amount">{{ formatMoney(o.total_cents) }}</span>
           <span class="muted guest-order-time">{{ fmtTime(o.created_at) }}</span>
           <button class="btn btn-primary guest-order-btn" :disabled="loading" @click="pickOrder(o.order_no)">
-            {{ loading ? "…" : $t('查看订单') }}
+            {{ loading ? "…" : $t('查看訂單') }}
           </button>
         </div>
       </div>
     </div>
-    <div v-if="listLoading" class="muted" style="text-align: center; padding: 16px;">{{ $t('查询订单中…') }}</div>
+    <div v-if="listLoading" class="muted" style="text-align: center; padding: 16px;">{{ $t('查詢訂單中…') }}</div>
 
-    <!-- 取货结果 -->
+    <!-- 取貨結果 -->
     <div v-if="result" class="result-wrap">
       <div class="result-card">
         <div class="result-head">
           <div>
-            <div class="result-order">{{ $t('订单号：') }}{{ result.order_no }}</div>
+            <div class="result-order">{{ $t('訂單號：') }}{{ result.order_no }}</div>
             <div class="result-meta">
               <span :class="statusBadge(result.status)">{{ statusText(result.status) }}</span>
               <span v-if="!physicalOnly" class="muted">{{ $t('已取') }} {{ result.fetch_count || 0 }} {{ $t('次') }}</span>
@@ -101,23 +101,23 @@
         </div>
 
         <ShippingDetails v-if="shippingOrder" :order="shippingOrder" :password="queryPassword" @refresh="pickOrder(result.order_no)" />
-        <div v-if="physicalOnly" class="card-list">{{ result.status === 'pending_payment' ? $t('订单尚未付款，请在订单详情中继续支付。') : ['canceled', 'expired', 'refunded'].includes(result.status) ? $t('订单已关闭或退款，请查看上方配送及取消记录。') : $t('此订单通过快递配送，请查看上方包裹进度。') }}</div>
+        <div v-if="physicalOnly" class="card-list">{{ result.status === 'pending_payment' ? $t('訂單尚未付款，請在訂單詳情中繼續支付。') : ['canceled', 'expired', 'refunded'].includes(result.status) ? $t('訂單已關閉或退款，請查看上方配送及取消記錄。') : $t('此訂單通過快遞配送，請查看上方包裹進度。') }}</div>
         <div v-else-if="['paid', 'fulfilling', 'partially_delivered'].includes(result.status)" class="card-list">
-          <p>{{ result.items.length ? $t('已付款，部分商品已发货，其余商品正在安排发货。无需再次支付，也无需注册；稍后用此订单号和查询密码刷新取货。') : $t('已付款，商品正在安排发货。无需再次支付，也无需注册；稍后用此订单号和查询密码刷新取货。') }}</p>
-          <p>{{ $t('人工服务请在订单详情查看处理进度，需帮助时凭订单号联系客服。') }}</p>
-          <button class="btn btn-primary" :disabled="loading" @click="pickOrder(result.order_no)">{{ $t('刷新发货结果') }}</button>
+          <p>{{ result.items.length ? $t('已付款，部分商品已發貨，其餘商品正在安排發貨。無需再次支付，也無需註冊；稍後用此訂單號和查詢密碼刷新取貨。') : $t('已付款，商品正在安排發貨。無需再次支付，也無需註冊；稍後用此訂單號和查詢密碼刷新取貨。') }}</p>
+          <p>{{ $t('人工服務請在訂單詳情查看處理進度，需幫助時憑訂單號聯繫客服。') }}</p>
+          <button class="btn btn-primary" :disabled="loading" @click="pickOrder(result.order_no)">{{ $t('刷新發貨結果') }}</button>
         </div>
         <div v-else-if="result.status === 'pending_payment'" class="card-list">
-          <p>{{ $t('订单尚未付款，付款后即可查看交付进度。') }}</p>
-          <router-link class="btn btn-primary" :to="`/payment/${result.order_no}`">{{ $t('继续支付') }}</router-link>
+          <p>{{ $t('訂單尚未付款，付款後即可查看交付進度。') }}</p>
+          <router-link class="btn btn-primary" :to="`/payment/${result.order_no}`">{{ $t('繼續支付') }}</router-link>
         </div>
-        <div v-else-if="['canceled', 'expired'].includes(result.status)" class="card-list">{{ $t('订单已关闭，无法继续付款，请重新选购。') }}</div>
-        <div v-else-if="!result.items.length" class="card-list">{{ result.status === 'refunded' ? $t('订单已退款，请核对退款记录。') : $t('暂无可领取内容，请查看订单状态或联系客服。') }}</div>
+        <div v-else-if="['canceled', 'expired'].includes(result.status)" class="card-list">{{ $t('訂單已關閉，無法繼續付款，請重新選購。') }}</div>
+        <div v-else-if="!result.items.length" class="card-list">{{ result.status === 'refunded' ? $t('訂單已退款，請核對退款記錄。') : $t('暫無可領取內容，請查看訂單狀態或聯繫客服。') }}</div>
         <DeliveryResults v-if="result.items.length" :items="result.items" />
       </div>
 
       <div class="result-actions">
-        <router-link class="btn btn-outline" :to="`/order/${result.order_no}`">{{ $t('查看订单详情') }}</router-link>
+        <router-link class="btn btn-outline" :to="`/order/${result.order_no}`">{{ $t('查看訂單詳情') }}</router-link>
       </div>
     </div>
   </div>
@@ -145,11 +145,11 @@ const shippingOrder = ref<any>(null);
 const physicalOnly = computed(() => shippingOrder.value?.items?.length > 0 && shippingOrder.value.items.every((it: any) => it.goods_type === 'physical'));
 const copied = ref<number | null>(null);
 const copiedAll = ref(false);
-// 联系方式模式：游客按下单邮箱/手机号查订单列表
+// 聯繫方式模式：遊客按下單郵箱/手機號查訂單列表
 const guestOrders = ref<GuestOrderItem[]>([]);
 const listLoading = ref(false);
 
-// 支付成功/订单列表跳转时预填订单号
+// 支付成功/訂單列表跳轉時預填訂單號
 onMounted(() => {
   const q = route.query.order_no;
   if (typeof q === 'string' && q) { consumeOrderAccessLink(q); orderNo.value = q; queryPassword.value = getOrderPassword(q); if (queryPassword.value || getToken() || getOrderAccessToken(q)) pickOrder(q); }
@@ -158,7 +158,7 @@ onMounted(() => {
 async function fetch() {
   const ident = orderNo.value.trim();
   if (!ident) {
-    error.value = $t("请输入订单号或下单时留的邮箱/手机号");
+    error.value = $t("請輸入訂單號或下單時留的郵箱/手機號");
     return;
   }
   error.value = '';
@@ -166,7 +166,7 @@ async function fetch() {
   shippingOrder.value = null;
   guestOrders.value = [];
 
-  // 联系方式模式（邮箱/手机号）：先查订单列表，密码逐单验证取货
+  // 聯繫方式模式（郵箱/手機號）：先查訂單列表，密碼逐單驗證取貨
   if (looksLikeContact(ident)) {
     listLoading.value = true;
     const { data, error: err } = await listGuestOrders(ident);
@@ -174,23 +174,23 @@ async function fetch() {
     if (err) { error.value = err; return; }
     guestOrders.value = data?.orders || [];
     if (!guestOrders.value.length) {
-      error.value = $t("未找到用该联系方式下的订单");
+      error.value = $t("未找到用該聯繫方式下的訂單");
     }
     return;
   }
 
-  // 订单号模式：密码 + 直接取货
+  // 訂單號模式：密碼 + 直接取貨
   if (!queryPassword.value && !getToken() && !getOrderAccessToken(ident)) {
-    error.value = $t("请验证下单邮箱或使用订单访问链接");
+    error.value = $t("請驗證下單郵箱或使用訂單訪問鏈接");
     return;
   }
   await pickOrder(ident);
 }
 
-/** 列表/直连取货：订单号 + 查询密码 → 卡密 */
+/** 列表/直連取貨：訂單號 + 查詢密碼 → 卡密 */
 async function pickOrder(no: string) {
   if (!queryPassword.value && !getToken() && !getOrderAccessToken(no)) {
-    error.value = $t("请验证下单邮箱或使用订单访问链接");
+    error.value = $t("請驗證下單郵箱或使用訂單訪問鏈接");
     return;
   }
   loading.value = true;
@@ -198,7 +198,7 @@ async function pickOrder(no: string) {
   result.value = null;
   shippingOrder.value = null;
   const detail = await getOrder(no, queryPassword.value);
-  if (detail.error || !detail.data) { loading.value=false; error.value=detail.error || $t('订单不存在或无权查看'); return; }
+  if (detail.error || !detail.data) { loading.value=false; error.value=detail.error || $t('訂單不存在或無權查看'); return; }
   if (detail.data.commerce_version === 1) shippingOrder.value=detail.data;
   if (detail.data.items?.length && detail.data.items.every(i=>i.goods_type==='physical')) {
     result.value={order_no:no,status:detail.data.status,items:[],fetch_count:0};
@@ -209,17 +209,17 @@ async function pickOrder(no: string) {
     if(data)rememberOrderPassword(no,queryPassword.value);
   }
   loading.value=false;
-  guestOrders.value = []; // 取货成功收起列表
-  orderNo.value = no;     // 结果区显示该单号
+  guestOrders.value = []; // 取貨成功收起列表
+  orderNo.value = no;     // 結果區顯示該單號
 }
 
-// 复制（navigator.clipboard；按钮文案切换反馈）
+// 複製（navigator.clipboard；按鈕文案切換反饋）
 async function copyOne(content: string, index: number) {
   try {
     await navigator.clipboard.writeText(content);
     copied.value = index;
     setTimeout(() => { if (copied.value === index) copied.value = null; }, 1500);
-  } catch { /* 剪贴板不可用时忽略 */ }
+  } catch { /* 剪貼板不可用時忽略 */ }
 }
 async function copyAll() {
   if (!result.value) return;
@@ -236,9 +236,9 @@ function fmtTime(ts: number): string {
 
 function statusText(s: string): string {
   return ({
-    get pending_payment() { return $t("待支付"); }, get paid() { return $t("已支付"); }, get fulfilling() { return $t("履约中"); }, get partially_delivered() { return $t("部分发货"); },
-    get delivered() { return $t("已发货"); }, get completed() { return $t("已完成"); }, get canceled() { return $t("已取消"); }, get expired() { return $t("已过期"); },
-    get refund_pending() { return $t("退款中"); }, get refunded() { return $t("已退款"); }, get manual_pending() { return $t("待人工发货"); },
+    get pending_payment() { return $t("待支付"); }, get paid() { return $t("已支付"); }, get fulfilling() { return $t("履約中"); }, get partially_delivered() { return $t("部分發貨"); },
+    get delivered() { return $t("已發貨"); }, get completed() { return $t("已完成"); }, get canceled() { return $t("已取消"); }, get expired() { return $t("已過期"); },
+    get refund_pending() { return $t("退款中"); }, get refunded() { return $t("已退款"); }, get manual_pending() { return $t("待人工發貨"); },
   } as Record<string, string>)[s] || s;
 }
 function statusBadge(s: string): string {
@@ -251,7 +251,7 @@ function statusBadge(s: string): string {
 </script>
 
 <style scoped>
-/* ── Hero 搜索区 ── */
+/* ── Hero 搜索區 ── */
 .query-hero {
   background: linear-gradient(135deg, var(--zc-primary-hover), var(--zc-primary), var(--zc-primary-bright));
   border-radius: 14px;
@@ -304,7 +304,7 @@ function statusBadge(s: string): string {
   font-size: 13px; border-radius: 999px;
 }
 
-/* ── 引导卡 ── */
+/* ── 引導卡 ── */
 .guide-card {
   background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
   padding: 24px;
@@ -319,7 +319,7 @@ function statusBadge(s: string): string {
 }
 .guide-step b { display: block; font-size: 14px; margin-bottom: 2px; }
 
-/* ── 结果区 ── */
+/* ── 結果區 ── */
 .result-wrap { display: flex; flex-direction: column; gap: 14px; }
 .result-card {
   background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;

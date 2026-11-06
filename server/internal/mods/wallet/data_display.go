@@ -18,12 +18,12 @@ func (r *WalletRepoImpl) DisplayReferences(ctx context.Context, rows []*ent.Wall
 	out := make(map[uint64]string, len(rows))
 	orderIDs, refundIDs := []uint64{}, []uint64{}
 	rowOrders, rowRefunds := map[uint64]uint64{}, map[uint64]uint64{}
-	labels := map[string]string{"order_pay": "订单", "order_refund": "退款记录", "recharge": "充值支付记录", "giftcard": "礼品卡", "commission": "佣金记录", "commission_debt": "佣金欠款记录", "adjust": "调账记录"}
+	labels := map[string]string{"order_pay": "訂單", "order_refund": "退款記錄", "recharge": "充值支付記錄", "giftcard": "禮品卡", "commission": "佣金記錄", "commission_debt": "佣金欠款記錄", "adjust": "調賬記錄"}
 	for _, row := range rows {
 		out[row.ID] = fmt.Sprintf("流水 #%d", row.ID)
 		kind, value, found := strings.Cut(row.Reference, ":")
 		if found && kind == "ticket_urgent" {
-			out[row.ID] = "工单 " + value
+			out[row.ID] = "工單 " + value
 		}
 		id, err := strconv.ParseUint(value, 10, 64)
 		if err == nil && id > 0 {

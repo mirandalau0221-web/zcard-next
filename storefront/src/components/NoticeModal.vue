@@ -4,19 +4,19 @@
       <div class="notice-head">
         <span class="notice-horn"><ThemeIcon name="announcement" /></span>
         <span class="notice-head-title">{{ headTitle }}</span>
-        <button class="notice-close" :aria-label="$t('关闭公告')" @click="close">✕</button>
+        <button class="notice-close" :aria-label="$t('關閉公告')" @click="close">✕</button>
       </div>
       <div class="notice-body">
-        <!-- 设置公告：文本 -->
+        <!-- 設置公告：文本 -->
         <template v-if="announcement && announcement.type === 'text'">
           <div v-if="announcement.html !== undefined" class="notice-content notice-markdown" v-html="announcement.html"></div>
           <div v-else class="notice-content">{{ announcement.text }}</div>
         </template>
-        <!-- 设置公告：单图 / 轮播（指示点 + 自动播放，hover 暂停） -->
+        <!-- 設置公告：單圖 / 輪播（指示點 + 自動播放，hover 暫停） -->
         <div v-else-if="announcement && announcement.images.length" class="ann-slider" @mouseenter="stopAuto" @mouseleave="startAuto">
           <div class="ann-track" :style="{ transform: `translateX(-${idx * 100}%)` }">
             <div v-for="(img, i) in announcement.images" :key="i" class="ann-slide">
-              <img :src="img" :alt="$t('公告图片')" />
+              <img :src="img" :alt="$t('公告圖片')" />
             </div>
           </div>
           <div v-if="announcement.images.length > 1" class="ann-dots">
@@ -29,9 +29,9 @@
             ></span>
           </div>
         </div>
-        <!-- 文章公告（内容为后端 sanitize 后的富文本，与文章详情页同口径） -->
+        <!-- 文章公告（內容為後端 sanitize 後的富文本，與文章詳情頁同口徑） -->
         <template v-else>
-          <div class="notice-date muted" v-if="post?.published_at">{{ $t('发布于') }} {{ formatDate(post.published_at) }}</div>
+          <div class="notice-date muted" v-if="post?.published_at">{{ $t('發佈於') }} {{ formatDate(post.published_at) }}</div>
           <div class="notice-content" v-html="content"></div>
         </template>
       </div>
@@ -58,9 +58,9 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ (e: 'update:show', v: boolean): void }>();
 
-const headTitle = computed(() => (props.announcement ? $t("系统公告") : props.post?.title || $t("系统公告")));
+const headTitle = computed(() => (props.announcement ? $t("系統公告") : props.post?.title || $t("系統公告")));
 
-// 设置公告图片轮播：自动播放 4s，指示点切换，hover 暂停
+// 設置公告圖片輪播：自動播放 4s，指示點切換，hover 暫停
 const idx = ref(0);
 let timer: ReturnType<typeof setInterval> | null = null;
 function startAuto() {
@@ -133,7 +133,7 @@ function formatDate(unix?: number): string {
 .notice-content :deep(pre) { background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; margin: 10px 0; }
 .notice-content :deep(blockquote) { margin: 10px 0; padding: 8px 12px; border-left: 4px solid var(--zc-primary); background: var(--zc-primary-soft); border-radius: 0 8px 8px 0; }
 
-/* 设置公告图片轮播 */
+/* 設置公告圖片輪播 */
 .ann-slider { position: relative; border-radius: 10px; overflow: hidden; }
 .ann-track { display: flex; transition: transform 0.4s ease; }
 .ann-slide { flex: 0 0 100%; }
@@ -161,7 +161,7 @@ function formatDate(unix?: number): string {
   .notice-foot { padding: 16px 24px; }
 }
 
-/* 移动端：弹窗收紧不铺满屏——图片限高、按钮整宽纵排（主按钮靠拇指） */
+/* 移動端：彈窗收緊不鋪滿屏——圖片限高、按鈕整寬縱排（主按鈕靠拇指） */
 @media (max-width: 640px) {
   .notice-mask { padding: 12px; }
   .notice-modal { max-height: 76vh; }

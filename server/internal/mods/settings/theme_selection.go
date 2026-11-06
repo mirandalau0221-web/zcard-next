@@ -147,10 +147,10 @@ func normalizeThemeWrites(items []port.Item) ([]port.Item, error) {
 		}
 		var key string
 		if json.Unmarshal(it.Value, &key) != nil || key == "" {
-			return nil, errors.BadRequest("settings.INVALID_VALUE", "主题键必须是非空字符串")
+			return nil, errors.BadRequest("settings.INVALID_VALUE", "主題鍵必須是非空字符串")
 		}
 		if selected != "" && selected != key {
-			return nil, errors.BadRequest("settings.TEMPLATE_CONFLICT", "PC 和手机端已合并为一个响应式主题，请选择同一个主题")
+			return nil, errors.BadRequest("settings.TEMPLATE_CONFLICT", "PC 和手機端已合併為一個響應式主題，請選擇同一個主題")
 		}
 		selected = key
 	}
@@ -159,7 +159,7 @@ func normalizeThemeWrites(items []port.Item) ([]port.Item, error) {
 		if selected != "classic" {
 			t, err := theme.Resolve(selected)
 			if err != nil {
-				return nil, errors.BadRequest("settings.TEMPLATE_NOT_FOUND", "主题不存在或已损坏，请重新安装")
+				return nil, errors.BadRequest("settings.TEMPLATE_NOT_FOUND", "主題不存在或已損壞，請重新安裝")
 			}
 			selection.Revision = t.Revision
 		}

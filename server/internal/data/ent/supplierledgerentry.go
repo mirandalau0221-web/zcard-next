@@ -23,11 +23,11 @@ type SupplierLedgerEntry struct {
 	SupplyOrderID uint64 `json:"supply_order_id,omitempty"`
 	// recharge/supply_pay/supply_refund/adjust
 	Type string `json:"type,omitempty"`
-	// 有符号（分）
+	// 有符號（分）
 	Amount int64 `json:"amount,omitempty"`
 	// Currency holds the value of the "currency" field.
 	Currency string `json:"currency,omitempty"`
-	// 幂等键
+	// 冪等鍵
 	Reference string `json:"reference,omitempty"`
 	// Remark holds the value of the "remark" field.
 	Remark string `json:"remark,omitempty"`

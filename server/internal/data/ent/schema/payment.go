@@ -1,6 +1,6 @@
 package schema
 
-// 所有权：mods/payment（M1；表结构 M0 落地）
+// 所有權：mods/payment（M1；表結構 M0 落地）
 
 import (
 	"entgo.io/ent/dialect"
@@ -13,8 +13,8 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// PaymentChannel 渠道配置（《数据库架构设计.md》§4.4）。
-// 凭据 AES-GCM 加密存储；解密失败必须降级为空并提示重配，列表接口绝不 500（铁律 5）。
+// PaymentChannel 渠道配置（《數據庫架構設計.md》§4.4）。
+// 憑據 AES-GCM 加密存儲；解密失敗必須降級為空並提示重配，列表接口絕不 500（鐵律 5）。
 type PaymentChannel struct {
 	ent.Schema
 }
@@ -25,25 +25,25 @@ func (PaymentChannel) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.String("name").MaxLen(60),
-		field.String("code").MaxLen(30).Comment("渠道码（alipay/wechat/epay/wallet...）"),
-		field.String("driver").MaxLen(100).Comment("驱动类型（适配器按 (provider, channel) 注册表路由）"),
-		field.Bytes("config").Comment("AES-256-GCM 加密凭据（结构随 driver）"),
-		field.Int64("fee").Default(0).Comment("手续费（分 或 万分比，按 fee_type）"),
+		field.String("code").MaxLen(30).Comment("渠道碼（alipay/wechat/epay/wallet...）"),
+		field.String("driver").MaxLen(100).Comment("驅動類型（適配器按 (provider, channel) 註冊表路由）"),
+		field.Bytes("config").Comment("AES-256-GCM 加密憑據（結構隨 driver）"),
+		field.Int64("fee").Default(0).Comment("手續費（分 或 萬分比，按 fee_type）"),
 		field.Enum("fee_type").Values("percent", "fixed").Default("fixed"),
-		field.Enum("fee_bearer").Values("merchant", "user").Default("merchant").Comment("手续费承担方"),
+		field.Enum("fee_bearer").Values("merchant", "user").Default("merchant").Comment("手續費承擔方"),
 		field.Bool("recommended").Default(false),
 		field.String("recommend_label").MaxLen(24).Default(""),
 		field.String("recommend_description").MaxLen(180).Default(""),
 		field.Int32("sort").Default(0),
 		field.Bool("enabled").Default(true),
-		field.Time("deleted_at").SchemaType(mysqlTime).Optional().Comment("已删除渠道从管理列表隐藏；保留历史支付回调凭据"),
+		field.Time("deleted_at").SchemaType(mysqlTime).Optional().Comment("已刪除渠道從管理列表隱藏；保留歷史支付回調憑據"),
 		field.Bool("allow_purchase").Default(true),
 		field.Bool("allow_member_recharge").Default(true),
 		field.Bool("allow_supply_recharge").Default(true),
-		// 方式级收银台（大厂模式：渠道=网关凭据单位，支付方式=顾客看到的选项）：
-		// icon 渠道级自定义图标（素材库 URL，空=回落内置徽标）；methods 方式列表
-		// [{code,name,icon,enabled,params}]——params 承载网关参数（易支付 type / USDT network+token）。
-		// 空 methods = 单方式渠道（旧语义，收银台显示渠道本身）。
+		// 方式級收銀台（大廠模式：渠道=網關憑據單位，支付方式=顧客看到的選項）：
+		// icon 渠道級自定義圖標（素材庫 URL，空=回落內置徽標）；methods 方式列表
+		// [{code,name,icon,enabled,params}]——params 承載網關參數（易支付 type / USDT network+token）。
+		// 空 methods = 單方式渠道（舊語義，收銀台顯示渠道本身）。
 		field.String("icon").MaxLen(500).Default(""),
 		field.JSON("methods", []map[string]any{}).Optional(),
 	}
@@ -55,10 +55,10 @@ func (PaymentChannel) Indexes() []ent.Index {
 	}
 }
 
-// Payment 支付单（§4.4）。channel_order_no 隔离下游回传格式；
-// UNIQUE(channel, channel_order_no) 为回调幂等核对锚点之一（回调幂等三层：状态机/行锁二次校验/业务幂等键）。
-// order_id 与 recharge_order_id 二选一：订单支付单关联 orders，充值支付单关联
-// recharge_orders（M1b 充值走支付管线；回调按关联类型分流）。
+// Payment 支付單（§4.4）。channel_order_no 隔離下游回傳格式；
+// UNIQUE(channel, channel_order_no) 為回調冪等核對錨點之一（回調冪等三層：狀態機/行鎖二次校驗/業務冪等鍵）。
+// order_id 與 recharge_order_id 二選一：訂單支付單關聯 orders，充值支付單關聯
+// recharge_orders（M1b 充值走支付管線；回調按關聯類型分流）。
 type Payment struct {
 	ent.Schema
 }
@@ -68,36 +68,36 @@ func (Payment) Mixin() []ent.Mixin { return []ent.Mixin{TimeMixin{}, TenantMixin
 func (Payment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.Uint64("order_id").Optional().Comment("关联订单（订单支付单；充值支付单为空）"),
-		field.Uint64("recharge_order_id").Optional().Comment("关联充值单（充值支付单；订单支付单为空）"),
-		field.String("channel").MaxLen(50).Comment("渠道码"),
-		field.Uint64("channel_id").Default(0).Comment("发起时渠道身份；0 为历史流水"),
+		field.Uint64("order_id").Optional().Comment("關聯訂單（訂單支付單；充值支付單為空）"),
+		field.Uint64("recharge_order_id").Optional().Comment("關聯充值單（充值支付單；訂單支付單為空）"),
+		field.String("channel").MaxLen(50).Comment("渠道碼"),
+		field.Uint64("channel_id").Default(0).Comment("發起時渠道身份；0 為歷史流水"),
 		field.String("driver_snapshot").MaxLen(100).Default(""),
 		field.Time("expires_at").SchemaType(mysqlTime).Optional(),
 		field.String("review_reason").MaxLen(255).Default(""),
-		field.String("gateway_order_ref").MaxLen(64).Optional().Comment("支付尝试的稳定网关订单号；旧流水保持 NULL"),
-		field.JSON("gateway_context", json.RawMessage{}).Optional().Comment("非敏感网关请求快照、租约及收银台地址"),
-		field.String("channel_order_no").MaxLen(80).Optional().Comment("网关单号（回调时回填）"),
-		field.Int64("amount").Comment("应收（分，基础货币）"),
-		field.Int64("charged_amount").Default(0).Comment("实收（分，回调核对；金额核对永远对基础货币）"),
-		// ── 币种快照（P2-09 T2：跨境渠道下单瞬间固化，回调按快照核对零二次换算）──
-		// 同币直收（CNY）路径三列零写：charged_units=0 即走旧核对（fact.Amount==amount）
-		field.String("charged_currency").MaxLen(8).Optional().Comment("渠道币种 ISO 码（空=CNY 同币直收）"),
+		field.String("gateway_order_ref").MaxLen(64).Optional().Comment("支付嘗試的穩定網關訂單號；舊流水保持 NULL"),
+		field.JSON("gateway_context", json.RawMessage{}).Optional().Comment("非敏感網關請求快照、租約及收銀台地址"),
+		field.String("channel_order_no").MaxLen(80).Optional().Comment("網關單號（回調時回填）"),
+		field.Int64("amount").Comment("應收（分，基礎貨幣）"),
+		field.Int64("charged_amount").Default(0).Comment("實收（分，回調核對；金額核對永遠對基礎貨幣）"),
+		// ── 幣種快照（P2-09 T2：跨境渠道下單瞬間固化，回調按快照核對零二次換算）──
+		// 同幣直收（CNY）路徑三列零寫：charged_units=0 即走舊核對（fact.Amount==amount）
+		field.String("charged_currency").MaxLen(8).Optional().Comment("渠道幣種 ISO 碼（空=CNY 同幣直收）"),
 		field.Float("exchange_rate").Default(0).
 			SchemaType(map[string]string{
 				dialect.MySQL:    "decimal(20,8)",
 				dialect.Postgres: "numeric(20,8)",
 				dialect.SQLite:   "real",
 			}).
-			Comment("快照汇率（1 基础货币=rate 渠道币；0=未换算）"),
-		field.Int32("charged_precision").Default(-1).Comment("渠道金额单位精度快照；-1 为历史未记录，不能使用显示精度推断"),
-		field.Int64("charged_units").Default(0).Comment("渠道币种应收最小单位（发适配器金额；回调精确核对）"),
-		field.Int64("fee").Default(0).Comment("用户支付手续费（分）"),
-		field.JSON("pricing_snapshot", json.RawMessage{}).Optional().Comment("支付本金、费率、承担方及方式快照；空为历史流水"),
+			Comment("快照匯率（1 基礎貨幣=rate 渠道幣；0=未換算）"),
+		field.Int32("charged_precision").Default(-1).Comment("渠道金額單位精度快照；-1 為歷史未記錄，不能使用顯示精度推斷"),
+		field.Int64("charged_units").Default(0).Comment("渠道幣種應收最小單位（發適配器金額；回調精確核對）"),
+		field.Int64("fee").Default(0).Comment("用户支付手續費（分）"),
+		field.JSON("pricing_snapshot", json.RawMessage{}).Optional().Comment("支付本金、費率、承擔方及方式快照；空為歷史流水"),
 		field.Enum("status").Values("pending", "success", "failed").Default("pending"),
 		field.Time("paid_at").SchemaType(mysqlTime).Optional(),
-		field.JSON("raw", json.RawMessage{}).Optional().Comment("回调原文（审计；不含敏感凭据）"),
-		field.String("idempotency_key").MaxLen(64).Optional().Comment("业务幂等键（写接口 Idempotency-Key 头）"),
+		field.JSON("raw", json.RawMessage{}).Optional().Comment("回調原文（審計；不含敏感憑據）"),
+		field.String("idempotency_key").MaxLen(64).Optional().Comment("業務冪等鍵（寫接口 Idempotency-Key 頭）"),
 	}
 }
 
@@ -112,7 +112,7 @@ func (Payment) Indexes() []ent.Index {
 
 func (Payment) Edges() []ent.Edge {
 	return []ent.Edge{
-		// 软外键 → orders（订单支付单；充值支付单不关联）
+		// 軟外鍵 → orders（訂單支付單；充值支付單不關聯）
 		edge.From("order", Order.Type).
 			Ref("payments").
 			Field("order_id").
@@ -120,7 +120,7 @@ func (Payment) Edges() []ent.Edge {
 	}
 }
 
-// RefundOrder 退款单——2.0 新增退款编排（§5.5.4）：渠道原路 / 钱包 / 上游传导三通道。
+// RefundOrder 退款單——2.0 新增退款編排（§5.5.4）：渠道原路 / 錢包 / 上游傳導三通道。
 type RefundOrder struct {
 	ent.Schema
 }
@@ -133,15 +133,15 @@ func (RefundOrder) Fields() []ent.Field {
 		field.Uint64("order_id"),
 		field.Int64("amount").Comment("退款本金（分，可部分退款）"),
 		field.JSON("item_allocations", []map[string]int64{}).Optional(),
-		field.String("request_key").MaxLen(64).Optional().Unique().Comment("订单范围内的退款请求幂等摘要；历史记录为空"),
-		field.String("request_hash").MaxLen(64).Optional().Comment("退款请求内容摘要"),
+		field.String("request_key").MaxLen(64).Optional().Unique().Comment("訂單範圍內的退款請求冪等摘要；歷史記錄為空"),
+		field.String("request_hash").MaxLen(64).Optional().Comment("退款請求內容摘要"),
 		field.Int64("shipping_amount").Default(0),
-		field.Int64("fee_amount").Default(0).Comment("本次退还的支付手续费（分）"),
+		field.Int64("fee_amount").Default(0).Comment("本次退還的支付手續費（分）"),
 		field.Enum("channel").Values("gateway", "wallet", "upstream").Comment("退款通道"),
 		field.Enum("status").Values("created", "processing", "succeeded", "failed").Default("created"),
 		field.Text("reason").Optional(),
-		field.Uint64("operator_id").Optional().Comment("操作者（需 order:refund 权限 + 二次确认 + 审计）"),
-		field.String("upstream_refund_id").MaxLen(64).Optional().Comment("上游退款单号（传导，M2）"),
+		field.Uint64("operator_id").Optional().Comment("操作者（需 order:refund 權限 + 二次確認 + 審計）"),
+		field.String("upstream_refund_id").MaxLen(64).Optional().Comment("上游退款單號（傳導，M2）"),
 	}
 }
 

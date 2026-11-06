@@ -8,90 +8,90 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// RoleService 角色与权限管理（自建 RBAC，规划 ；）。
-// 权限目录由模块声明式生成（authz.Declare），本服务只读下发供前端勾选与动态路由。
+// RoleService 角色與權限管理（自建 RBAC，規劃 ；）。
+// 權限目錄由模塊聲明式生成（authz.Declare），本服務只讀下發供前端勾選與動態路由。
 service RoleService {
-  // ListRoles 角色列表（含权限点数量）。
+  // ListRoles 角色列表（含權限點數量）。
   rpc ListRoles(google.protobuf.Empty) returns (ListRolesReply) {
     option (google.api.http) = { get: "/api/v1/admin/authz/roles" };
   }
-  // GetRole 角色详情（含权限点清单）。
+  // GetRole 角色詳情（含權限點清單）。
   rpc GetRole(GetRoleRequest) returns (Role) {
     option (google.api.http) = { get: "/api/v1/admin/authz/roles/{id}" };
   }
-  // CreateRole 创建角色。
+  // CreateRole 創建角色。
   rpc CreateRole(CreateRoleRequest) returns (Role) {
     option (google.api.http) = {
       post: "/api/v1/admin/authz/roles"
       body: "*"
     };
   }
-  // UpdateRole 修改角色（名称/描述；内置角色 code 不可改）。
+  // UpdateRole 修改角色（名稱/描述；內置角色 code 不可改）。
   rpc UpdateRole(UpdateRoleRequest) returns (Role) {
     option (google.api.http) = {
       put: "/api/v1/admin/authz/roles/{id}"
       body: "*"
     };
   }
-  // DeleteRole 删除角色（内置角色拒绝；仍有员工挂载拒绝）。
+  // DeleteRole 刪除角色（內置角色拒絕；仍有員工掛載拒絕）。
   rpc DeleteRole(DeleteRoleRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { delete: "/api/v1/admin/authz/roles/{id}" };
   }
-  // UpdateRolePermissions 全量替换角色权限点集（变更实时生效）。
+  // UpdateRolePermissions 全量替換角色權限點集（變更實時生效）。
   rpc UpdateRolePermissions(UpdateRolePermissionsRequest) returns (Role) {
     option (google.api.http) = {
       put: "/api/v1/admin/authz/roles/{id}/permissions"
       body: "*"
     };
   }
-  // GetPermissionTree 权限目录树（域分组 + 中文描述；前端勾选与菜单数据源）。
+  // GetPermissionTree 權限目錄樹（域分組 + 中文描述；前端勾選與菜單數據源）。
   rpc GetPermissionTree(google.protobuf.Empty) returns (PermissionTree) {
     option (google.api.http) = { get: "/api/v1/admin/authz/permissions" };
   }
 }
 
-// AdminUserService 员工管理（数据层归 identity，API 面在此；）。
+// AdminUserService 員工管理（數據層歸 identity，API 面在此；）。
 service AdminUserService {
-  // ListAdmins 员工列表。
+  // ListAdmins 員工列表。
   rpc ListAdmins(google.protobuf.Empty) returns (ListAdminsReply) {
     option (google.api.http) = { get: "/api/v1/admin/admins" };
   }
-  // CreateAdmin 创建员工（密码 bcrypt）。
+  // CreateAdmin 創建員工（密碼 bcrypt）。
   rpc CreateAdmin(CreateAdminRequest) returns (Admin) {
     option (google.api.http) = {
       post: "/api/v1/admin/admins"
       body: "*"
     };
   }
-  // UpdateAdmin 修改员工（昵称/头像/角色）。
+  // UpdateAdmin 修改員工（暱稱/頭像/角色）。
   rpc UpdateAdmin(UpdateAdminRequest) returns (Admin) {
     option (google.api.http) = {
       put: "/api/v1/admin/admins/{id}"
       body: "*"
     };
   }
-  // ToggleAdmin 启用/禁用员工。
+  // ToggleAdmin 啓用/禁用員工。
   rpc ToggleAdmin(ToggleAdminRequest) returns (Admin) {
     option (google.api.http) = {
       put: "/api/v1/admin/admins/{id}/toggle"
       body: "*"
     };
   }
-  // ResetAdminPassword 重置员工密码（≥8 位 bcrypt；吊销其全部管理面会话强制重登）。
+  // ResetAdminPassword 重置員工密碼（≥8 位 bcrypt；吊銷其全部管理面會話強制重登）。
   rpc ResetAdminPassword(ResetAdminPasswordRequest) returns (Admin) {
     option (google.api.http) = {
       put: "/api/v1/admin/admins/{id}/reset-password"
       body: "*"
     };
   }
-  // ResetAdminTOTP 解绑员工 TOTP（吊销其全部管理面会话强制重登）。
+  // ResetAdminTOTP 解綁員工 TOTP（吊銷其全部管理面會話強制重登）。
   rpc ResetAdminTOTP(ResetAdminTOTPRequest) returns (Admin) {
     option (google.api.http) = {
       put: "/api/v1/admin/admins/{id}/totp-reset"
       body: "*"
     };
   }
-  // DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话一并清除）。
+  // DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話一併清除）。
   rpc DeleteAdmin(DeleteAdminRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { delete: "/api/v1/admin/admins/{id}" };
   }
@@ -127,7 +127,7 @@ message UpdateRolePermissionsRequest {
   repeated string permissions = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
-// Role 角色详情。
+// Role 角色詳情。
 message Role {
   uint64 id = 1;
   string name = 2;
@@ -137,19 +137,19 @@ message Role {
   repeated string permissions = 6;
 }
 
-// PermissionTree 权限目录树。
+// PermissionTree 權限目錄樹。
 message PermissionTree {
   repeated Group groups = 1;
 }
 
-// Group 域分组。
+// Group 域分組。
 message Group {
   string domain = 1;
   string label = 2;
   repeated Perm perms = 3;
 }
 
-// Perm 权限点。
+// Perm 權限點。
 message Perm {
   string code = 1;
   string desc = 2;
@@ -161,7 +161,7 @@ message ListAdminsReply {
   repeated Admin admins = 1;
 }
 
-// Admin 员工（不含密码哈希等敏感字段）。
+// Admin 員工（不含密碼哈希等敏感字段）。
 message Admin {
   uint64 id = 1;
   string username = 2;
@@ -192,7 +192,7 @@ message UpdateAdminRequest {
 
 message ToggleAdminRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
-  bool enabled = 2; // 不标 REQUIRED:false=禁用是合法值(零值会被当未传拒绝,同 batch-status status 坑)
+  bool enabled = 2; // 不標 REQUIRED:false=禁用是合法值(零值會被當未傳拒絕,同 batch-status status 坑)
 }
 
 message ResetAdminPasswordRequest {

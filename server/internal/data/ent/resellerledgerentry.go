@@ -24,7 +24,7 @@ type ResellerLedgerEntry struct {
 	OrderID uint64 `json:"order_id,omitempty"`
 	// Type holds the value of the "type" field.
 	Type resellerledgerentry.Type `json:"type,omitempty"`
-	// 有符号（分）
+	// 有符號（分）
 	Amount int64 `json:"amount,omitempty"`
 	// Currency holds the value of the "currency" field.
 	Currency string `json:"currency,omitempty"`

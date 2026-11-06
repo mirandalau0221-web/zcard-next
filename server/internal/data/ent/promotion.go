@@ -22,7 +22,7 @@ type Promotion struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
@@ -30,9 +30,9 @@ type Promotion struct {
 	Scope map[string]interface{} `json:"scope,omitempty"`
 	// Type holds the value of the "type" field.
 	Type promotion.Type `json:"type,omitempty"`
-	// 满 X（分）
+	// 滿 X（分）
 	Threshold int64 `json:"threshold,omitempty"`
-	// fixed=分；percent=万分比
+	// fixed=分；percent=萬分比
 	Discount int64 `json:"discount,omitempty"`
 	// special_price=分
 	SpecialPrice int64 `json:"special_price,omitempty"`

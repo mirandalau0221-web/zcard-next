@@ -8,12 +8,13 @@ import (
 )
 
 // Normalize maps supported language tags to the keys used by the language packs.
+// All Chinese variants resolve to Traditional Chinese (zh_TW).
 func Normalize(value string) Locale {
 	value = strings.ToLower(strings.ReplaceAll(strings.TrimSpace(value), "_", "-"))
-	switch value {
-	case "zh", "zh-cn", "zh-hans", "zh-hans-cn":
-		return ZhCN
-	case "en":
+	if value == "zh" || strings.HasPrefix(value, "zh-") {
+		return ZhTW
+	}
+	if value == "en" {
 		return En
 	}
 	if strings.HasPrefix(value, "en-") {
@@ -115,7 +116,7 @@ func HTMLLanguage(locale Locale) string {
 	if locale == En {
 		return "en"
 	}
-	return "zh-CN"
+	return "zh-TW"
 }
 
 // Value selects merchant-authored translations, then Chinese, then a stable nonempty value.
@@ -128,7 +129,7 @@ func Value(values map[string]string, locale string) string {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
-	for _, preferred := range []Locale{Normalize(locale), ZhCN} {
+	for _, preferred := range []Locale{Normalize(locale), ZhTW} {
 		if preferred == "" {
 			continue
 		}

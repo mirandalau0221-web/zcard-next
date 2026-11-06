@@ -32,7 +32,7 @@ func (uc *OrderUsecase) freezeSMSSelection(ctx context.Context, it *ent.OrderIte
 		return err
 	}
 	if p.UpstreamProductCode != q.ProductID || p.DeliveryKind != supplyport.SMSDelivery || p.UpstreamSourceID != q.ConnectionID || data.SMSConnectionIdentity(conn) != q.Identity {
-		return fmt.Errorf("order.FORM_INVALID: 接码商品或货源已变化")
+		return fmt.Errorf("order.FORM_INVALID: 接碼商品或貨源已變化")
 	}
 	request := supplyport.SMSPurchase{ProductID: p.UpstreamProductCode, Quantity: 1, DownstreamOrderNo: "sms_" + uuid.NewString(), RequiredCapability: supplyport.SMSCapability, MaxSupplyAmountCents: supplyport.Integer(q.Amount), Currency: "CNY"}
 	metadata := p.SmsProduct
@@ -98,17 +98,17 @@ func (uc *OrderUsecase) validateSMSPayment(ctx context.Context, orderID uint64) 
 		return nil
 	}
 	if !data.SMSSalesEnabled() {
-		return fmt.Errorf("接码新购已关闭")
+		return fmt.Errorf("接碼新購已關閉")
 	}
 	g, ok := uc.StockGate.(supplyport.SMSGateway)
 	if !ok {
-		return fmt.Errorf("接码服务未就绪")
+		return fmt.Errorf("接碼服務未就緒")
 	}
 	for _, it := range items {
 		var f data.FrozenSMS
 		var req supplyport.SMSPurchase
 		if json.Unmarshal([]byte(it.SmsPurchaseSnapshot), &f) != nil || json.Unmarshal([]byte(f.Request), &req) != nil {
-			return fmt.Errorf("接码购买意图异常")
+			return fmt.Errorf("接碼購買意圖異常")
 		}
 		if req.RequiredCapability == supplyport.SMSProductPurchase {
 			o, e := c.Order.Get(ctx, it.OrderID)
@@ -117,7 +117,7 @@ func (uc *OrderUsecase) validateSMSPayment(ctx context.Context, orderID uint64) 
 			}
 			quote, e := c.SMSRetailQuote.Query().Where(smsretailquote.ConsumedBy(o.OrderNo), smsretailquote.ProductID(it.ProductID), smsretailquote.UserID(o.UserID), smsretailquote.SubsiteID(o.SubsiteID)).Only(ctx)
 			if e != nil || quote.ExpiresAt <= time.Now().Unix() {
-				return fmt.Errorf("接码报价已过期，请取消未付款订单后重新选价")
+				return fmt.Errorf("接碼報價已過期，請取消未付款訂單後重新選價")
 			}
 			continue
 		}
@@ -126,7 +126,7 @@ func (uc *OrderUsecase) validateSMSPayment(ctx context.Context, orderID uint64) 
 			return e
 		}
 		if q.Identity != f.Identity || q.Amount > int64(req.MaxSupplyAmountCents) {
-			return fmt.Errorf("接码报价或账号已变化，请重新下单")
+			return fmt.Errorf("接碼報價或賬號已變化，請重新下單")
 		}
 	}
 	return nil

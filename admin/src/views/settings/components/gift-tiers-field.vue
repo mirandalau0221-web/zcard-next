@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// 充值赠送档位可视化编辑器（recharge.gift_tiers / supplier_recharge.gift_tiers）：
-// 结构 [{amount, gift_balance, gift_points?}]（金额一律分存储，界面以元编辑）。
-// 供货档位（supplier）无积分列；买家端档位按钮与支付到账均按此展示/入账。
+// 充值贈送檔位可視化編輯器（recharge.gift_tiers / supplier_recharge.gift_tiers）：
+// 結構 [{amount, gift_balance, gift_points?}]（金額一律分存儲，界面以元編輯）。
+// 供貨檔位（supplier）無積分列；買家端檔位按鈕與支付到賬均按此展示/入賬。
 import { ref, watch } from "vue";
 import { NButton, NInputNumber } from "naive-ui";
 import { currencyUnit } from "@/utils/money";
@@ -31,7 +31,7 @@ function parse(v: string | null) {
       }
     }
   } catch {
-    /* 非法 JSON 按空处理 */
+    /* 非法 JSON 按空處理 */
   }
   tiers.value = out;
 }
@@ -67,9 +67,9 @@ function removeRow(i: number) {
   <div class="gift-tiers-field w-full">
     <div v-if="tiers.length" class="flex flex-col gap-6px">
       <div class="gift-tier-grid text-12px text-gray-400" :class="{ supplier }">
-        <span class="tier-input text-center">单笔充值满</span>
-        <span class="tier-input text-center">赠送余额</span>
-        <span v-if="!supplier" class="tier-input text-center">赠送积分</span>
+        <span class="tier-input text-center">單筆充值滿</span>
+        <span class="tier-input text-center">贈送餘額</span>
+        <span v-if="!supplier" class="tier-input text-center">贈送積分</span>
         <span class="w-40px" />
       </div>
       <div v-for="(t, i) in tiers" :key="i" class="gift-tier-grid" :class="{ supplier }">
@@ -82,18 +82,18 @@ function removeRow(i: number) {
         <NInputNumber v-if="!supplier" v-model:value="t.giftPoints" :show-button="false" size="medium" :min="0" class="tier-input" placeholder="0" @update:value="push">
           <template #suffix>分</template>
         </NInputNumber>
-        <NButton size="tiny" quaternary type="error" class="w-40px" @click="removeRow(i)">删</NButton>
+        <NButton size="tiny" quaternary type="error" class="w-40px" @click="removeRow(i)">刪</NButton>
       </div>
     </div>
     <div v-else class="mb-8px text-12px text-gray-400">
-      未配置赠送——买家按实付金额到账；添加档位后买家充值页会展示「充 X 送 Y」引导
+      未配置贈送——買家按實付金額到賬；添加檔位後買家充值頁會展示「充 X 送 Y」引導
     </div>
     <div class="mt-8px flex items-center gap-8px">
-      <NButton size="tiny" dashed @click="addRow">+ 添加档位</NButton>
+      <NButton size="tiny" dashed @click="addRow">+ 添加檔位</NButton>
       <span v-if="!supplier" class="text-11px text-gray-400">
-        想按「累计充值」自动打折/升级？到 营销管理 → 会员等级 设置升级阈值与折扣（与本档位赠送可叠加）
+        想按「累計充值」自動打折/升級？到 營銷管理 → 會員等級 設置升級閾值與折扣（與本檔位贈送可疊加）
       </span>
-      <span v-else class="text-11px text-gray-400">供货账户充值满额赠送余额，到账 = 本金 + 赠送（采购提货通用）</span>
+      <span v-else class="text-11px text-gray-400">供貨賬户充值滿額贈送餘額，到賬 = 本金 + 贈送（採購提貨通用）</span>
     </div>
   </div>
 </template>

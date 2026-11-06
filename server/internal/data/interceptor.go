@@ -1,12 +1,12 @@
 package data
 
-// Ent 租户拦截器（ 预留）：框架级 subsite_id 行级隔离。
-// 落地：需要 ent feature intercept + runtime 注册——当前 data 层的显式条件
-// （product.SubsiteID(tc.SubsiteID)）已保证隔离，拦截器作为 框架级强化项。
-// 专项测试：两租户数据互不可见（随拦截器交付）。
+// Ent 租户攔截器（ 預留）：框架級 subsite_id 行級隔離。
+// 落地：需要 ent feature intercept + runtime 註冊——當前 data 層的顯式條件
+// （product.SubsiteID(tc.SubsiteID)）已保證隔離，攔截器作為 框架級強化項。
+// 專項測試：兩租户數據互不可見（隨攔截器交付）。
 //
-// 接入计划：
+// 接入計劃：
 // 1. ent feature: intercept（生成 interceptors 包）
-// 2. internal/data/ent/runtime.go 注册 DomainInterceptor
-// 3. 拦截器读 tenancy.Context 自动追加过滤
-// 4. 移除 data 层显式条件（保留拦截器为唯一租户入口）
+// 2. internal/data/ent/runtime.go 註冊 DomainInterceptor
+// 3. 攔截器讀 tenancy.Context 自動追加過濾
+// 4. 移除 data 層顯式條件（保留攔截器為唯一租户入口）

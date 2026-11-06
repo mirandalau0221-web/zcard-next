@@ -24,11 +24,11 @@ type TicketMessage struct {
 	SenderType ticketmessage.SenderType `json:"sender_type,omitempty"`
 	// SenderID holds the value of the "sender_id" field.
 	SenderID uint64 `json:"sender_id,omitempty"`
-	// sanitize 后
+	// sanitize 後
 	Content string `json:"content,omitempty"`
 	// media ids
 	Attachments []uint64 `json:"attachments,omitempty"`
-	// 内部备注（用户不可见）
+	// 內部備註（用户不可見）
 	IsInternal bool `json:"is_internal,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt    time.Time `json:"created_at,omitempty"`

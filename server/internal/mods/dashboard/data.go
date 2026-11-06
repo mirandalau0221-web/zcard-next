@@ -1,6 +1,6 @@
 package dashboard
 
-// 工作台按北京时间聚合可见订单；支付与成功退款分别按发生时间统计。
+// 工作台按北京時間聚合可見訂單；支付與成功退款分別按發生時間統計。
 
 import (
 	"context"
@@ -19,7 +19,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/tenancy"
 )
 
-// Metric 统计项。
+// Metric 統計項。
 type Metric struct {
 	Orders            int64
 	Revenue           int64
@@ -32,7 +32,7 @@ type Metric struct {
 	NewUsers          int64
 }
 
-// TrendPoint 趋势点。
+// TrendPoint 趨勢點。
 type TrendPoint struct {
 	Refunds    int64
 	NetRevenue int64
@@ -64,18 +64,18 @@ type TopChannel struct {
 	FailedCount  int64
 }
 
-// DashboardRepoImpl 报表仓储。
+// DashboardRepoImpl 報表倉儲。
 type DashboardRepoImpl struct {
 	data *data.Data
 	now  func() time.Time
 }
 
-// NewDashboardRepoImpl 构造。
+// NewDashboardRepoImpl 構造。
 func NewDashboardRepoImpl(d *data.Data) *DashboardRepoImpl {
 	return &DashboardRepoImpl{data: d, now: time.Now}
 }
 
-// GetLowStockCount 库存预警商品数：上架商品（status=1）按本地/上游分别统计有限库存 < threshold。
+// GetLowStockCount 庫存預警商品數：上架商品（status=1）按本地/上游分別統計有限庫存 < threshold。
 func (r *DashboardRepoImpl) GetLowStockCount(ctx context.Context, threshold int) (int64, error) {
 	if threshold < 1 {
 		threshold = 5
@@ -128,7 +128,7 @@ func (r *DashboardRepoImpl) GetPending(ctx context.Context) (withdrawals, refund
 
 }
 
-// ReconciliationSummary 对账汇总（：订单×支付×充值×佣金四向基础核对）。
+// ReconciliationSummary 對賬彙總（：訂單×支付×充值×佣金四向基礎核對）。
 type ReconciliationSummary struct {
 	Date                string
 	OrderPaidTotal      int64
@@ -139,7 +139,7 @@ type ReconciliationSummary struct {
 	MismatchCount       int64
 }
 
-// GetReconciliation 当日对账（口径：本地时区日界——运营对账口径；金额一律分）。
+// GetReconciliation 當日對賬（口徑：本地時區日界——運營對賬口徑；金額一律分）。
 func (r *DashboardRepoImpl) GetReconciliation(ctx context.Context, date string) (*ReconciliationSummary, error) {
 	var day time.Time
 	if d, err := time.ParseInLocation("20060102", date, businessday.Location); err == nil {
@@ -154,7 +154,7 @@ func (r *DashboardRepoImpl) GetReconciliation(ctx context.Context, date string) 
 	client := data.Client(ctx, r.data)
 	out := &ReconciliationSummary{Date: day.Format("20060102")}
 
-	// 1) 当日已支付订单
+	// 1) 當日已支付訂單
 	orders, err := client.Order.Query().
 		Where(order.PaidAtGTE(start), order.PaidAtLT(end)).
 		All(ctx)
@@ -166,7 +166,7 @@ func (r *DashboardRepoImpl) GetReconciliation(ctx context.Context, date string) 
 		out.OrderCount++
 	}
 
-	// 2) 当日支付单成功额
+	// 2) 當日支付單成功額
 	pays, err := client.Payment.Query().
 		Where(payment.PaidAtGTE(start), payment.PaidAtLT(end)).
 		All(ctx)
@@ -177,7 +177,7 @@ func (r *DashboardRepoImpl) GetReconciliation(ctx context.Context, date string) 
 		out.PaymentSuccessTotal += p.ChargedAmount
 	}
 
-	// 3) 当日钱包充值（direction=in & type=recharge）
+	// 3) 當日錢包充值（direction=in & type=recharge）
 	recharges, err := client.WalletTransaction.Query().
 		Where(
 			wallettransaction.CreatedAtGTE(start),
@@ -193,7 +193,7 @@ func (r *DashboardRepoImpl) GetReconciliation(ctx context.Context, date string) 
 		out.WalletRechargeTotal += w.Amount
 	}
 
-	// 4) 当日佣金计提（正佣金）
+	// 4) 當日佣金計提（正佣金）
 	commissions, err := client.AffiliateCommission.Query().
 		Where(
 			affiliatecommission.CreatedAtGTE(start),
@@ -208,14 +208,14 @@ func (r *DashboardRepoImpl) GetReconciliation(ctx context.Context, date string) 
 		out.CommissionTotal += c.Amount
 	}
 
-	// 5) 差异：订单额 vs 支付单额（余额支付订单会天然差异——差额 = 余额支付部分 + 手续费；
-	// 报表层只报差异数，人工判读）
+	// 5) 差異：訂單額 vs 支付單額（餘額支付訂單會天然差異——差額 = 餘額支付部分 + 手續費；
+	// 報表層只報差異數，人工判讀）
 	diff := out.OrderPaidTotal - out.PaymentSuccessTotal - out.WalletRechargeTotal
 	if diff < 0 {
 		diff = -diff
 	}
 	if diff > 0 {
-		out.MismatchCount = 1 // 汇总级差异标记（明细级对账 M4 reconciliation_jobs）
+		out.MismatchCount = 1 // 彙總級差異標記（明細級對賬 M4 reconciliation_jobs）
 	}
 	return out, nil
 }

@@ -26,11 +26,11 @@ const (
 type PingReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Protocol      string                 `protobuf:"bytes,1,opt,name=protocol,proto3" json:"protocol,omitempty"`                        // 固定 "zcard-supply-v2"
-	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`                          // 服务端版本
+	Version       string                 `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`                          // 服務端版本
 	ServerTime    int64                  `protobuf:"varint,3,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"` // unix 秒
 	Ok            bool                   `protobuf:"varint,4,opt,name=ok,proto3" json:"ok,omitempty"`
-	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`        // 站点名
-	Balance       int64                  `protobuf:"varint,6,opt,name=balance,proto3" json:"balance,omitempty"` // 下游余额（分，鉴权后）
+	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`        // 站點名
+	Balance       int64                  `protobuf:"varint,6,opt,name=balance,proto3" json:"balance,omitempty"` // 下游餘額（分，鑑權後）
 	Currency      string                 `protobuf:"bytes,7,opt,name=currency,proto3" json:"currency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -481,7 +481,7 @@ func (x *GetStockRequest) GetId() string {
 
 type GetStockReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Stock         int32                  `protobuf:"varint,1,opt,name=stock,proto3" json:"stock,omitempty"` // -1 = 无限
+	Stock         int32                  `protobuf:"varint,1,opt,name=stock,proto3" json:"stock,omitempty"` // -1 = 無限
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -527,13 +527,13 @@ type SupplyProduct struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`                                   // 分（供货价口径：定价覆盖 > 基础价）
+	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`                                   // 分（供貨價口徑：定價覆蓋 > 基礎價）
 	FactoryPrice  int64                  `protobuf:"varint,4,opt,name=factory_price,json=factoryPrice,proto3" json:"factory_price,omitempty"` // 分（成本快照）
 	CategoryId    string                 `protobuf:"bytes,5,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
 	Cover         string                 `protobuf:"bytes,7,opt,name=cover,proto3" json:"cover,omitempty"`
 	IsActive      bool                   `protobuf:"varint,8,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
-	Stock         int32                  `protobuf:"varint,9,opt,name=stock,proto3" json:"stock,omitempty"` // -1 = 无限
+	Stock         int32                  `protobuf:"varint,9,opt,name=stock,proto3" json:"stock,omitempty"` // -1 = 無限
 	Skus          []*SupplySku           `protobuf:"bytes,10,rep,name=skus,proto3" json:"skus,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -717,11 +717,11 @@ func (x *SupplySku) GetIsActive() bool {
 
 type CreateSupplyOrderRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	ProductId         string                 `protobuf:"bytes,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"` // 商品标识（本地商品 id）
-	SkuId             string                 `protobuf:"bytes,2,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`             // 可选
+	ProductId         string                 `protobuf:"bytes,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"` // 商品標識（本地商品 id）
+	SkuId             string                 `protobuf:"bytes,2,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`             // 可選
 	Quantity          int32                  `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	DownstreamOrderNo string                 `protobuf:"bytes,4,opt,name=downstream_order_no,json=downstreamOrderNo,proto3" json:"downstream_order_no,omitempty"` // 幂等键（必填）
-	CallbackUrl       string                 `protobuf:"bytes,5,opt,name=callback_url,json=callbackUrl,proto3" json:"callback_url,omitempty"`                     // 可选（交付完成回调）
+	DownstreamOrderNo string                 `protobuf:"bytes,4,opt,name=downstream_order_no,json=downstreamOrderNo,proto3" json:"downstream_order_no,omitempty"` // 冪等鍵（必填）
+	CallbackUrl       string                 `protobuf:"bytes,5,opt,name=callback_url,json=callbackUrl,proto3" json:"callback_url,omitempty"`                     // 可選（交付完成回調）
 	TraceId           string                 `protobuf:"bytes,6,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
@@ -883,11 +883,11 @@ func (x *CreateSupplyOrderReply) GetErrorMessage() string {
 	return ""
 }
 
-// ListSupplyOrdersRequest 订单列表（时间窗；对账数据源）。
+// ListSupplyOrdersRequest 訂單列表（時間窗；對賬數據源）。
 type ListSupplyOrdersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Start         int64                  `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"` // 创建时间起点（unix 秒）
-	End           int64                  `protobuf:"varint,2,opt,name=end,proto3" json:"end,omitempty"`     // 创建时间终点（unix 秒）
+	Start         int64                  `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"` // 創建時間起點（unix 秒）
+	End           int64                  `protobuf:"varint,2,opt,name=end,proto3" json:"end,omitempty"`     // 創建時間終點（unix 秒）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1371,7 +1371,7 @@ func (x *RefundSupplyOrderReply) GetErrorMessage() string {
 type SupplyFulfillment struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"` // delivered | pending
-	Cards         []string               `protobuf:"bytes,2,rep,name=cards,proto3" json:"cards,omitempty"`   // 已交付卡密（明文，经 TLS 传输）
+	Cards         []string               `protobuf:"bytes,2,rep,name=cards,proto3" json:"cards,omitempty"`   // 已交付卡密（明文，經 TLS 傳輸）
 	Instructions  string                 `protobuf:"bytes,3,opt,name=instructions,proto3" json:"instructions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

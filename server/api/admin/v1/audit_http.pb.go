@@ -25,15 +25,15 @@ const OperationAdminAuditServiceListVisitStats = "/zcard.api.admin.v1.AdminAudit
 const OperationAdminAuditServiceSetBlacklist = "/zcard.api.admin.v1.AdminAuditService/SetBlacklist"
 
 type AdminAuditServiceHTTPServer interface {
-	// GetBlacklist GetBlacklist IP 黑名单。
+	// GetBlacklist GetBlacklist IP 黑名單。
 	GetBlacklist(context.Context, *emptypb.Empty) (*GetBlacklistReply, error)
-	// ListOpLogs ListOpLogs 操作审计。
+	// ListOpLogs ListOpLogs 操作審計。
 	ListOpLogs(context.Context, *ListOpLogsRequest) (*ListOpLogsReply, error)
-	// ListSecurityLogs ListSecurityLogs 安全审计。
+	// ListSecurityLogs ListSecurityLogs 安全審計。
 	ListSecurityLogs(context.Context, *ListSecurityLogsRequest) (*ListSecurityLogsReply, error)
-	// ListVisitStats ListVisitStats 访问统计。
+	// ListVisitStats ListVisitStats 訪問統計。
 	ListVisitStats(context.Context, *ListVisitStatsRequest) (*ListVisitStatsReply, error)
-	// SetBlacklist SetBlacklist 设置黑名单（精确 IP 或 CIDR 段，逗号分隔）。
+	// SetBlacklist SetBlacklist 設置黑名單（精確 IP 或 CIDR 段，逗號分隔）。
 	SetBlacklist(context.Context, *SetBlacklistRequest) (*emptypb.Empty, error)
 }
 
@@ -142,15 +142,15 @@ func _AdminAuditService_SetBlacklist0_HTTP_Handler(srv AdminAuditServiceHTTPServ
 }
 
 type AdminAuditServiceHTTPClient interface {
-	// GetBlacklist GetBlacklist IP 黑名单。
+	// GetBlacklist GetBlacklist IP 黑名單。
 	GetBlacklist(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetBlacklistReply, err error)
-	// ListOpLogs ListOpLogs 操作审计。
+	// ListOpLogs ListOpLogs 操作審計。
 	ListOpLogs(ctx context.Context, req *ListOpLogsRequest, opts ...http.CallOption) (rsp *ListOpLogsReply, err error)
-	// ListSecurityLogs ListSecurityLogs 安全审计。
+	// ListSecurityLogs ListSecurityLogs 安全審計。
 	ListSecurityLogs(ctx context.Context, req *ListSecurityLogsRequest, opts ...http.CallOption) (rsp *ListSecurityLogsReply, err error)
-	// ListVisitStats ListVisitStats 访问统计。
+	// ListVisitStats ListVisitStats 訪問統計。
 	ListVisitStats(ctx context.Context, req *ListVisitStatsRequest, opts ...http.CallOption) (rsp *ListVisitStatsReply, err error)
-	// SetBlacklist SetBlacklist 设置黑名单（精确 IP 或 CIDR 段，逗号分隔）。
+	// SetBlacklist SetBlacklist 設置黑名單（精確 IP 或 CIDR 段，逗號分隔）。
 	SetBlacklist(ctx context.Context, req *SetBlacklistRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
@@ -162,7 +162,7 @@ func NewAdminAuditServiceHTTPClient(client *http.Client) AdminAuditServiceHTTPCl
 	return &AdminAuditServiceHTTPClientImpl{client}
 }
 
-// GetBlacklist GetBlacklist IP 黑名单。
+// GetBlacklist GetBlacklist IP 黑名單。
 func (c *AdminAuditServiceHTTPClientImpl) GetBlacklist(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetBlacklistReply, error) {
 	var out GetBlacklistReply
 	pattern := "/api/v1/admin/audit/blacklist"
@@ -179,7 +179,7 @@ func (c *AdminAuditServiceHTTPClientImpl) GetBlacklist(ctx context.Context, in *
 	return &out, nil
 }
 
-// ListOpLogs ListOpLogs 操作审计。
+// ListOpLogs ListOpLogs 操作審計。
 func (c *AdminAuditServiceHTTPClientImpl) ListOpLogs(ctx context.Context, in *ListOpLogsRequest, opts ...http.CallOption) (*ListOpLogsReply, error) {
 	var out ListOpLogsReply
 	pattern := "/api/v1/admin/audit/op-logs"
@@ -196,7 +196,7 @@ func (c *AdminAuditServiceHTTPClientImpl) ListOpLogs(ctx context.Context, in *Li
 	return &out, nil
 }
 
-// ListSecurityLogs ListSecurityLogs 安全审计。
+// ListSecurityLogs ListSecurityLogs 安全審計。
 func (c *AdminAuditServiceHTTPClientImpl) ListSecurityLogs(ctx context.Context, in *ListSecurityLogsRequest, opts ...http.CallOption) (*ListSecurityLogsReply, error) {
 	var out ListSecurityLogsReply
 	pattern := "/api/v1/admin/audit/security-logs"
@@ -213,7 +213,7 @@ func (c *AdminAuditServiceHTTPClientImpl) ListSecurityLogs(ctx context.Context, 
 	return &out, nil
 }
 
-// ListVisitStats ListVisitStats 访问统计。
+// ListVisitStats ListVisitStats 訪問統計。
 func (c *AdminAuditServiceHTTPClientImpl) ListVisitStats(ctx context.Context, in *ListVisitStatsRequest, opts ...http.CallOption) (*ListVisitStatsReply, error) {
 	var out ListVisitStatsReply
 	pattern := "/api/v1/admin/audit/visit-stats"
@@ -230,7 +230,7 @@ func (c *AdminAuditServiceHTTPClientImpl) ListVisitStats(ctx context.Context, in
 	return &out, nil
 }
 
-// SetBlacklist SetBlacklist 设置黑名单（精确 IP 或 CIDR 段，逗号分隔）。
+// SetBlacklist SetBlacklist 設置黑名單（精確 IP 或 CIDR 段，逗號分隔）。
 func (c *AdminAuditServiceHTTPClientImpl) SetBlacklist(ctx context.Context, in *SetBlacklistRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/audit/blacklist"

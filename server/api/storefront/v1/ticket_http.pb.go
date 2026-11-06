@@ -26,17 +26,17 @@ const OperationStoreTicketServiceRateTicket = "/zcard.api.storefront.v1.StoreTic
 const OperationStoreTicketServiceReplyTicket = "/zcard.api.storefront.v1.StoreTicketService/ReplyTicket"
 
 type StoreTicketServiceHTTPServer interface {
-	// CreateTicket CreateTicket 创建工单（登录用户或游客）。
+	// CreateTicket CreateTicket 創建工單（登錄用户或遊客）。
 	CreateTicket(context.Context, *CreateTicketRequest) (*Ticket, error)
-	// GetTicket GetTicket 工单详情（消息流；内部备注过滤）。
+	// GetTicket GetTicket 工單詳情（消息流；內部備註過濾）。
 	GetTicket(context.Context, *GetTicketRequest) (*GetTicketReply, error)
-	// ListMyTickets ListMyTickets 我的工单列表。
+	// ListMyTickets ListMyTickets 我的工單列表。
 	ListMyTickets(context.Context, *ListMyTicketsRequest) (*ListMyTicketsReply, error)
-	// PayUrgent PayUrgent 付费加急（余额支付 urgent_fee；成功即 priority=urgent_paid）。
+	// PayUrgent PayUrgent 付費加急（餘額支付 urgent_fee；成功即 priority=urgent_paid）。
 	PayUrgent(context.Context, *PayUrgentRequest) (*PayUrgentReply, error)
-	// RateTicket RateTicket 评价（resolved 后 1-5）。
+	// RateTicket RateTicket 評價（resolved 後 1-5）。
 	RateTicket(context.Context, *RateTicketRequest) (*emptypb.Empty, error)
-	// ReplyTicket ReplyTicket 追加回复。
+	// ReplyTicket ReplyTicket 追加回復。
 	ReplyTicket(context.Context, *ReplyTicketRequest) (*emptypb.Empty, error)
 }
 
@@ -177,17 +177,17 @@ func _StoreTicketService_PayUrgent0_HTTP_Handler(srv StoreTicketServiceHTTPServe
 }
 
 type StoreTicketServiceHTTPClient interface {
-	// CreateTicket CreateTicket 创建工单（登录用户或游客）。
+	// CreateTicket CreateTicket 創建工單（登錄用户或遊客）。
 	CreateTicket(ctx context.Context, req *CreateTicketRequest, opts ...http.CallOption) (rsp *Ticket, err error)
-	// GetTicket GetTicket 工单详情（消息流；内部备注过滤）。
+	// GetTicket GetTicket 工單詳情（消息流；內部備註過濾）。
 	GetTicket(ctx context.Context, req *GetTicketRequest, opts ...http.CallOption) (rsp *GetTicketReply, err error)
-	// ListMyTickets ListMyTickets 我的工单列表。
+	// ListMyTickets ListMyTickets 我的工單列表。
 	ListMyTickets(ctx context.Context, req *ListMyTicketsRequest, opts ...http.CallOption) (rsp *ListMyTicketsReply, err error)
-	// PayUrgent PayUrgent 付费加急（余额支付 urgent_fee；成功即 priority=urgent_paid）。
+	// PayUrgent PayUrgent 付費加急（餘額支付 urgent_fee；成功即 priority=urgent_paid）。
 	PayUrgent(ctx context.Context, req *PayUrgentRequest, opts ...http.CallOption) (rsp *PayUrgentReply, err error)
-	// RateTicket RateTicket 评价（resolved 后 1-5）。
+	// RateTicket RateTicket 評價（resolved 後 1-5）。
 	RateTicket(ctx context.Context, req *RateTicketRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ReplyTicket ReplyTicket 追加回复。
+	// ReplyTicket ReplyTicket 追加回復。
 	ReplyTicket(ctx context.Context, req *ReplyTicketRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
@@ -199,7 +199,7 @@ func NewStoreTicketServiceHTTPClient(client *http.Client) StoreTicketServiceHTTP
 	return &StoreTicketServiceHTTPClientImpl{client}
 }
 
-// CreateTicket CreateTicket 创建工单（登录用户或游客）。
+// CreateTicket CreateTicket 創建工單（登錄用户或遊客）。
 func (c *StoreTicketServiceHTTPClientImpl) CreateTicket(ctx context.Context, in *CreateTicketRequest, opts ...http.CallOption) (*Ticket, error) {
 	var out Ticket
 	pattern := "/api/v1/storefront/tickets"
@@ -217,7 +217,7 @@ func (c *StoreTicketServiceHTTPClientImpl) CreateTicket(ctx context.Context, in 
 	return &out, nil
 }
 
-// GetTicket GetTicket 工单详情（消息流；内部备注过滤）。
+// GetTicket GetTicket 工單詳情（消息流；內部備註過濾）。
 func (c *StoreTicketServiceHTTPClientImpl) GetTicket(ctx context.Context, in *GetTicketRequest, opts ...http.CallOption) (*GetTicketReply, error) {
 	var out GetTicketReply
 	pattern := "/api/v1/storefront/tickets/{ticket_no}"
@@ -234,7 +234,7 @@ func (c *StoreTicketServiceHTTPClientImpl) GetTicket(ctx context.Context, in *Ge
 	return &out, nil
 }
 
-// ListMyTickets ListMyTickets 我的工单列表。
+// ListMyTickets ListMyTickets 我的工單列表。
 func (c *StoreTicketServiceHTTPClientImpl) ListMyTickets(ctx context.Context, in *ListMyTicketsRequest, opts ...http.CallOption) (*ListMyTicketsReply, error) {
 	var out ListMyTicketsReply
 	pattern := "/api/v1/storefront/tickets"
@@ -251,7 +251,7 @@ func (c *StoreTicketServiceHTTPClientImpl) ListMyTickets(ctx context.Context, in
 	return &out, nil
 }
 
-// PayUrgent PayUrgent 付费加急（余额支付 urgent_fee；成功即 priority=urgent_paid）。
+// PayUrgent PayUrgent 付費加急（餘額支付 urgent_fee；成功即 priority=urgent_paid）。
 func (c *StoreTicketServiceHTTPClientImpl) PayUrgent(ctx context.Context, in *PayUrgentRequest, opts ...http.CallOption) (*PayUrgentReply, error) {
 	var out PayUrgentReply
 	pattern := "/api/v1/storefront/tickets/{ticket_no}/urgent"
@@ -269,7 +269,7 @@ func (c *StoreTicketServiceHTTPClientImpl) PayUrgent(ctx context.Context, in *Pa
 	return &out, nil
 }
 
-// RateTicket RateTicket 评价（resolved 后 1-5）。
+// RateTicket RateTicket 評價（resolved 後 1-5）。
 func (c *StoreTicketServiceHTTPClientImpl) RateTicket(ctx context.Context, in *RateTicketRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/storefront/tickets/{ticket_no}/rate"
@@ -287,7 +287,7 @@ func (c *StoreTicketServiceHTTPClientImpl) RateTicket(ctx context.Context, in *R
 	return &out, nil
 }
 
-// ReplyTicket ReplyTicket 追加回复。
+// ReplyTicket ReplyTicket 追加回復。
 func (c *StoreTicketServiceHTTPClientImpl) ReplyTicket(ctx context.Context, in *ReplyTicketRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/storefront/tickets/{ticket_no}/reply"

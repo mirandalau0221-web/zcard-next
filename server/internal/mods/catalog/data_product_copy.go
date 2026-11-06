@@ -22,16 +22,16 @@ func (r *ProductRepoImpl) copyProductConfiguration(ctx context.Context, target *
 	}
 	source, err := q.Only(ctx)
 	if ent.IsNotFound(err) {
-		return errors.NotFound("catalog.COPY_SOURCE_NOT_FOUND", "原商品不存在或已删除")
+		return errors.NotFound("catalog.COPY_SOURCE_NOT_FOUND", "原商品不存在或已刪除")
 	}
 	if err != nil {
 		return err
 	}
 	if source.ProductKind == "sms_channel" || source.ProductKind == "social_service" || source.DeliveryKind == "social_service" {
-		return errors.BadRequest("catalog.COPY_SOURCE_INVALID", "动态报价商品请从货源管理添加")
+		return errors.BadRequest("catalog.COPY_SOURCE_INVALID", "動態報價商品請從貨源管理添加")
 	}
 	if source.GoodsType != target.GoodsType {
-		return errors.BadRequest("catalog.COPY_TYPE_MISMATCH", "复制规格或控件时，请保留原商品的虚拟或实体属性")
+		return errors.BadRequest("catalog.COPY_TYPE_MISMATCH", "複製規格或控件時，請保留原商品的虛擬或實體屬性")
 	}
 	if copySKUs {
 		q := c.ProductSku.Query().Where(productsku.ProductID(source.ID), productsku.SubsiteID(source.SubsiteID)).Order(ent.Asc(productsku.FieldID))

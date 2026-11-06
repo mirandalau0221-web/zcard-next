@@ -55,7 +55,7 @@ func CurrencyChargeUnit(driver, code string) (ChargeUnit, error) {
 			return unit, nil
 		}
 	}
-	return ChargeUnit{}, fmt.Errorf("payment.CURRENCY_UNSUPPORTED: %s 不支持币种 %s", driver, code)
+	return ChargeUnit{}, fmt.Errorf("payment.CURRENCY_UNSUPPORTED: %s 不支持幣種 %s", driver, code)
 }
 
 // ParseChargeAmount parses the provider's decimal string without rounding or

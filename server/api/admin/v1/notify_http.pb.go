@@ -31,26 +31,26 @@ const OperationAdminNotifyServiceTestTelegram = "/zcard.api.admin.v1.AdminNotify
 const OperationAdminNotifyServiceUpsertTemplate = "/zcard.api.admin.v1.AdminNotifyService/UpsertTemplate"
 
 type AdminNotifyServiceHTTPServer interface {
-	// CancelBroadcast CancelBroadcast 取消群发（仅 pending）。
+	// CancelBroadcast CancelBroadcast 取消羣發（僅 pending）。
 	CancelBroadcast(context.Context, *CancelBroadcastRequest) (*Broadcast, error)
-	// CreateBroadcast CreateBroadcast 创建群发任务。
+	// CreateBroadcast CreateBroadcast 創建羣發任務。
 	CreateBroadcast(context.Context, *CreateBroadcastRequest) (*Broadcast, error)
-	// EstimateBroadcast EstimateBroadcast 覆盖人数预估。
+	// EstimateBroadcast EstimateBroadcast 覆蓋人數預估。
 	EstimateBroadcast(context.Context, *EstimateBroadcastRequest) (*EstimateBroadcastReply, error)
-	// ListBroadcasts ListBroadcasts 群发任务列表。
+	// ListBroadcasts ListBroadcasts 羣發任務列表。
 	ListBroadcasts(context.Context, *ListBroadcastsRequest) (*ListBroadcastsReply, error)
-	// ListLogs ListLogs 发送日志（按状态/事件筛选）。
+	// ListLogs ListLogs 發送日誌（按狀態/事件篩選）。
 	ListLogs(context.Context, *ListNotifyLogsRequest) (*ListNotifyLogsReply, error)
 	// ListTemplates ListTemplates 模板列表。
 	ListTemplates(context.Context, *emptypb.Empty) (*ListNotifyTemplatesReply, error)
-	// PreviewTemplate PreviewTemplate 模板预览（变量样例渲染；不发送）。
+	// PreviewTemplate PreviewTemplate 模板預覽（變量樣例渲染；不發送）。
 	PreviewTemplate(context.Context, *PreviewTemplateRequest) (*PreviewTemplateReply, error)
-	// ResendLog ResendLog 重发失败日志（原变量重投）。
+	// ResendLog ResendLog 重發失敗日誌（原變量重投）。
 	ResendLog(context.Context, *ResendNotifyLogRequest) (*emptypb.Empty, error)
 	// TestEmail TestEmail submits one message synchronously using saved SMTP settings.
 	TestEmail(context.Context, *TestEmailRequest) (*emptypb.Empty, error)
 	TestTelegram(context.Context, *TestTelegramRequest) (*TestTelegramReply, error)
-	// UpsertTemplate UpsertTemplate 创建/更新模板（事件 × 通道 × 语言）。
+	// UpsertTemplate UpsertTemplate 創建/更新模板（事件 × 通道 × 語言）。
 	UpsertTemplate(context.Context, *UpsertNotifyTemplateRequest) (*NotifyTemplate, error)
 }
 
@@ -285,26 +285,26 @@ func _AdminNotifyService_CancelBroadcast0_HTTP_Handler(srv AdminNotifyServiceHTT
 }
 
 type AdminNotifyServiceHTTPClient interface {
-	// CancelBroadcast CancelBroadcast 取消群发（仅 pending）。
+	// CancelBroadcast CancelBroadcast 取消羣發（僅 pending）。
 	CancelBroadcast(ctx context.Context, req *CancelBroadcastRequest, opts ...http.CallOption) (rsp *Broadcast, err error)
-	// CreateBroadcast CreateBroadcast 创建群发任务。
+	// CreateBroadcast CreateBroadcast 創建羣發任務。
 	CreateBroadcast(ctx context.Context, req *CreateBroadcastRequest, opts ...http.CallOption) (rsp *Broadcast, err error)
-	// EstimateBroadcast EstimateBroadcast 覆盖人数预估。
+	// EstimateBroadcast EstimateBroadcast 覆蓋人數預估。
 	EstimateBroadcast(ctx context.Context, req *EstimateBroadcastRequest, opts ...http.CallOption) (rsp *EstimateBroadcastReply, err error)
-	// ListBroadcasts ListBroadcasts 群发任务列表。
+	// ListBroadcasts ListBroadcasts 羣發任務列表。
 	ListBroadcasts(ctx context.Context, req *ListBroadcastsRequest, opts ...http.CallOption) (rsp *ListBroadcastsReply, err error)
-	// ListLogs ListLogs 发送日志（按状态/事件筛选）。
+	// ListLogs ListLogs 發送日誌（按狀態/事件篩選）。
 	ListLogs(ctx context.Context, req *ListNotifyLogsRequest, opts ...http.CallOption) (rsp *ListNotifyLogsReply, err error)
 	// ListTemplates ListTemplates 模板列表。
 	ListTemplates(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListNotifyTemplatesReply, err error)
-	// PreviewTemplate PreviewTemplate 模板预览（变量样例渲染；不发送）。
+	// PreviewTemplate PreviewTemplate 模板預覽（變量樣例渲染；不發送）。
 	PreviewTemplate(ctx context.Context, req *PreviewTemplateRequest, opts ...http.CallOption) (rsp *PreviewTemplateReply, err error)
-	// ResendLog ResendLog 重发失败日志（原变量重投）。
+	// ResendLog ResendLog 重發失敗日誌（原變量重投）。
 	ResendLog(ctx context.Context, req *ResendNotifyLogRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	// TestEmail TestEmail submits one message synchronously using saved SMTP settings.
 	TestEmail(ctx context.Context, req *TestEmailRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	TestTelegram(ctx context.Context, req *TestTelegramRequest, opts ...http.CallOption) (rsp *TestTelegramReply, err error)
-	// UpsertTemplate UpsertTemplate 创建/更新模板（事件 × 通道 × 语言）。
+	// UpsertTemplate UpsertTemplate 創建/更新模板（事件 × 通道 × 語言）。
 	UpsertTemplate(ctx context.Context, req *UpsertNotifyTemplateRequest, opts ...http.CallOption) (rsp *NotifyTemplate, err error)
 }
 
@@ -316,7 +316,7 @@ func NewAdminNotifyServiceHTTPClient(client *http.Client) AdminNotifyServiceHTTP
 	return &AdminNotifyServiceHTTPClientImpl{client}
 }
 
-// CancelBroadcast CancelBroadcast 取消群发（仅 pending）。
+// CancelBroadcast CancelBroadcast 取消羣發（僅 pending）。
 func (c *AdminNotifyServiceHTTPClientImpl) CancelBroadcast(ctx context.Context, in *CancelBroadcastRequest, opts ...http.CallOption) (*Broadcast, error) {
 	var out Broadcast
 	pattern := "/api/v1/admin/notify/broadcasts/{id}/cancel"
@@ -334,7 +334,7 @@ func (c *AdminNotifyServiceHTTPClientImpl) CancelBroadcast(ctx context.Context, 
 	return &out, nil
 }
 
-// CreateBroadcast CreateBroadcast 创建群发任务。
+// CreateBroadcast CreateBroadcast 創建羣發任務。
 func (c *AdminNotifyServiceHTTPClientImpl) CreateBroadcast(ctx context.Context, in *CreateBroadcastRequest, opts ...http.CallOption) (*Broadcast, error) {
 	var out Broadcast
 	pattern := "/api/v1/admin/notify/broadcasts"
@@ -352,7 +352,7 @@ func (c *AdminNotifyServiceHTTPClientImpl) CreateBroadcast(ctx context.Context, 
 	return &out, nil
 }
 
-// EstimateBroadcast EstimateBroadcast 覆盖人数预估。
+// EstimateBroadcast EstimateBroadcast 覆蓋人數預估。
 func (c *AdminNotifyServiceHTTPClientImpl) EstimateBroadcast(ctx context.Context, in *EstimateBroadcastRequest, opts ...http.CallOption) (*EstimateBroadcastReply, error) {
 	var out EstimateBroadcastReply
 	pattern := "/api/v1/admin/notify/broadcasts/estimate"
@@ -370,7 +370,7 @@ func (c *AdminNotifyServiceHTTPClientImpl) EstimateBroadcast(ctx context.Context
 	return &out, nil
 }
 
-// ListBroadcasts ListBroadcasts 群发任务列表。
+// ListBroadcasts ListBroadcasts 羣發任務列表。
 func (c *AdminNotifyServiceHTTPClientImpl) ListBroadcasts(ctx context.Context, in *ListBroadcastsRequest, opts ...http.CallOption) (*ListBroadcastsReply, error) {
 	var out ListBroadcastsReply
 	pattern := "/api/v1/admin/notify/broadcasts"
@@ -387,7 +387,7 @@ func (c *AdminNotifyServiceHTTPClientImpl) ListBroadcasts(ctx context.Context, i
 	return &out, nil
 }
 
-// ListLogs ListLogs 发送日志（按状态/事件筛选）。
+// ListLogs ListLogs 發送日誌（按狀態/事件篩選）。
 func (c *AdminNotifyServiceHTTPClientImpl) ListLogs(ctx context.Context, in *ListNotifyLogsRequest, opts ...http.CallOption) (*ListNotifyLogsReply, error) {
 	var out ListNotifyLogsReply
 	pattern := "/api/v1/admin/notify/logs"
@@ -421,7 +421,7 @@ func (c *AdminNotifyServiceHTTPClientImpl) ListTemplates(ctx context.Context, in
 	return &out, nil
 }
 
-// PreviewTemplate PreviewTemplate 模板预览（变量样例渲染；不发送）。
+// PreviewTemplate PreviewTemplate 模板預覽（變量樣例渲染；不發送）。
 func (c *AdminNotifyServiceHTTPClientImpl) PreviewTemplate(ctx context.Context, in *PreviewTemplateRequest, opts ...http.CallOption) (*PreviewTemplateReply, error) {
 	var out PreviewTemplateReply
 	pattern := "/api/v1/admin/notify/templates/preview"
@@ -439,7 +439,7 @@ func (c *AdminNotifyServiceHTTPClientImpl) PreviewTemplate(ctx context.Context, 
 	return &out, nil
 }
 
-// ResendLog ResendLog 重发失败日志（原变量重投）。
+// ResendLog ResendLog 重發失敗日誌（原變量重投）。
 func (c *AdminNotifyServiceHTTPClientImpl) ResendLog(ctx context.Context, in *ResendNotifyLogRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/notify/logs/{id}/resend"
@@ -492,7 +492,7 @@ func (c *AdminNotifyServiceHTTPClientImpl) TestTelegram(ctx context.Context, in 
 	return &out, nil
 }
 
-// UpsertTemplate UpsertTemplate 创建/更新模板（事件 × 通道 × 语言）。
+// UpsertTemplate UpsertTemplate 創建/更新模板（事件 × 通道 × 語言）。
 func (c *AdminNotifyServiceHTTPClientImpl) UpsertTemplate(ctx context.Context, in *UpsertNotifyTemplateRequest, opts ...http.CallOption) (*NotifyTemplate, error) {
 	var out NotifyTemplate
 	pattern := "/api/v1/admin/notify/templates"

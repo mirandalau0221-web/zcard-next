@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * 自定义控件管理（ 前端面）：
- * 下单收集字段（text|password|select|number|checkbox|radio）+ 必填 + 选项。
+ * 自定義控件管理（ 前端面）：
+ * 下單收集字段（text|password|select|number|checkbox|radio）+ 必填 + 選項。
  */
 import { ref, reactive, computed, watch, h } from "vue";
 import { NButton, NTag, NSpace, NPopconfirm } from "naive-ui";
@@ -32,11 +32,11 @@ defineExpose({ hasPending, saving });
 
 const typeOptions = [
   { label: "文本", value: "text" },
-  { label: "密码", value: "password" },
-  { label: "下拉选择", value: "select" },
-  { label: "数字", value: "number" },
-  { label: "多选", value: "checkbox" },
-  { label: "单选", value: "radio" },
+  { label: "密碼", value: "password" },
+  { label: "下拉選擇", value: "select" },
+  { label: "數字", value: "number" },
+  { label: "多選", value: "checkbox" },
+  { label: "單選", value: "radio" },
 ];
 
 const needOptions = computed(() => ["select", "checkbox", "radio"].includes(formData.type));
@@ -45,7 +45,7 @@ const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 56 },
   { title: "字段名", key: "name", minWidth: 120 },
   {
-    title: "类型",
+    title: "類型",
     key: "type",
     width: 90,
     render: (row) =>
@@ -63,11 +63,11 @@ const columns: DataTableColumns<any> = [
       h(
         NTag,
         { size: "small", type: row.required ? "error" : "default" },
-        { default: () => (row.required ? "必填" : "选填") },
+        { default: () => (row.required ? "必填" : "選填") },
       ),
   },
   {
-    title: "选项",
+    title: "選項",
     key: "options",
     minWidth: 180,
     render: (row) =>
@@ -99,7 +99,7 @@ const columns: DataTableColumns<any> = [
               ? h(
                   NButton,
                   { size: "small", onClick: () => handleEdit(row) },
-                  { default: () => "编辑" },
+                  { default: () => "編輯" },
                 )
               : null,
             (!props.readonly && checkAuth("catalog:control_delete"))
@@ -108,8 +108,8 @@ const columns: DataTableColumns<any> = [
                   { onPositiveClick: () => handleDelete(row.id) },
                   {
                     trigger: () =>
-                      h(NButton, { size: "small", type: "error" }, { default: () => "删除" }),
-                    default: () => "确定删除该控件？",
+                      h(NButton, { size: "small", type: "error" }, { default: () => "刪除" }),
+                    default: () => "確定刪除該控件？",
                   },
                 )
               : null,
@@ -165,7 +165,7 @@ async function handleSave() {
   if (saving.value) return;
   if (!formData.name) return;
   if (needOptions.value && !formData.options_text.trim()) {
-    window.$message?.error("该类型必须提供选项（逗号分隔）");
+    window.$message?.error("該類型必須提供選項（逗號分隔）");
     return;
   }
   saving.value = true;
@@ -186,7 +186,7 @@ async function handleSave() {
       ? await updateControl(editingId.value, payload)
       : await createControl(props.productId, payload);
     if (!error) {
-      window.$message?.success(editingId.value ? "控件已更新" : "控件已创建");
+      window.$message?.success(editingId.value ? "控件已更新" : "控件已創建");
       emit("persisted");
       resetForm();
       load();
@@ -203,7 +203,7 @@ async function handleDelete(id: number) {
     const { error } = await deleteControl(id);
     if (!error) {
       emit("persisted");
-      window.$message?.success("已删除");
+      window.$message?.success("已刪除");
       load();
     }
   } finally { saving.value = false; }
@@ -218,20 +218,20 @@ async function handleDelete(id: number) {
       </NButton>
     </div>
 
-    <!-- 控件编辑（大厂表单风格：顶部标签 + 弹性行，杜绝截断） -->
+    <!-- 控件編輯（大廠表單風格：頂部標籤 + 彈性行，杜絕截斷） -->
     <NCard
       v-if="showForm"
       size="small"
       class="mb-12px"
-      :title="editingId ? '编辑控件' : '新增控件'"
+      :title="editingId ? '編輯控件' : '新增控件'"
     >
       <NForm :disabled="props.readonly" :model="formData" label-placement="top" class="mb-4px">
         <div class="flex flex-wrap items-end gap-x-16px gap-y-4px">
           <NFormItem label="字段名（必填）" class="min-w-180px flex-1">
-            <NInput v-model:value="formData.name" placeholder="如：充值账号" />
+            <NInput v-model:value="formData.name" placeholder="如：充值賬號" />
           </NFormItem>
-          <NFormItem label="类型" class="w-150px">
-            <!-- 菜单宽度不随输入框（consistent-menu-width=false）——选项文字完整 -->
+          <NFormItem label="類型" class="w-150px">
+            <!-- 菜單寬度不隨輸入框（consistent-menu-width=false）——選項文字完整 -->
             <NSelect
               v-model:value="formData.type"
               :options="typeOptions"
@@ -245,19 +245,19 @@ async function handleDelete(id: number) {
             <NInputNumber v-model:value="formData.sort" :precision="0" class="w-full" />
           </NFormItem>
         </div>
-        <NFormItem label="填写提示"><NInput v-model:value="formData.placeholder" placeholder="如：https://t.me/channel 或接收地址" /></NFormItem>
-        <NFormItem label="内容校验"><NSelect v-model:value="formData.validation" :options="[{label:'普通文本',value:'text'},{label:'完整链接',value:'url'},{label:'用户名',value:'username'},{label:'TRON 地址',value:'tron'}]" /></NFormItem>
+        <NFormItem label="填寫提示"><NInput v-model:value="formData.placeholder" placeholder="如：https://t.me/channel 或接收地址" /></NFormItem>
+        <NFormItem label="內容校驗"><NSelect v-model:value="formData.validation" :options="[{label:'普通文本',value:'text'},{label:'完整鏈接',value:'url'},{label:'用户名',value:'username'},{label:'TRON 地址',value:'tron'}]" /></NFormItem>
         <NFormItem label="最多字符"><NInputNumber v-model:value="formData.max_length" :min="1" :max="4000" :precision="0" /></NFormItem>
-        <NFormItem v-if="needOptions" label="选项（逗号分隔）">
-          <NInput v-model:value="formData.options_text" placeholder="如：微信,QQ,邮箱" />
+        <NFormItem v-if="needOptions" label="選項（逗號分隔）">
+          <NInput v-model:value="formData.options_text" placeholder="如：微信,QQ,郵箱" />
         </NFormItem>
       </NForm>
       <div class="flex items-center justify-between">
-        <span class="text-12px text-gray-400">控件在下单表单渲染，答案随订单落库</span>
+        <span class="text-12px text-gray-400">控件在下單表單渲染，答案隨訂單落庫</span>
         <NSpace>
-          <NButton size="small" @click="resetForm">取消编辑</NButton>
+          <NButton size="small" @click="resetForm">取消編輯</NButton>
           <NButton :disabled="props.readonly" v-auth="'catalog:control_write'" type="primary" size="small" :loading="saving" @click="handleSave">
-            {{ editingId ? "更新控件" : "创建控件" }}
+            {{ editingId ? "更新控件" : "創建控件" }}
           </NButton>
         </NSpace>
       </div>
@@ -275,7 +275,7 @@ async function handleDelete(id: number) {
       v-if="!controls.length && !loading"
       size="small"
       class="mt-16px"
-      description="暂无控件——如「充值账号」「选择联系方式」等下单收集字段"
+      description="暫無控件——如「充值賬號」「選擇聯繫方式」等下單收集字段"
     />
   </div>
 </template>

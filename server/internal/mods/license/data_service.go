@@ -1,6 +1,6 @@
 package license
 
-// 管理面 API（M3）：许可证安装/查询/清除（license:read 查询 / license:write 超管专属）。
+// 管理面 API（M3）：許可證安裝/查詢/清除（license:read 查詢 / license:write 超管專屬）。
 
 import (
 	"context"
@@ -12,37 +12,37 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminLicenseService 许可证管理。
+// AdminLicenseService 許可證管理。
 type AdminLicenseService struct {
 	adminv1.UnimplementedAdminLicenseServiceServer
 	repo *LicenseRepo
 }
 
-// NewAdminLicenseService 构造。
+// NewAdminLicenseService 構造。
 func NewAdminLicenseService(repo *LicenseRepo) *AdminLicenseService {
 	return &AdminLicenseService{repo: repo}
 }
 
-// GetLicenseStatus 状态查询。
+// GetLicenseStatus 狀態查詢。
 func (s *AdminLicenseService) GetLicenseStatus(ctx context.Context, _ *emptypb.Empty) (*adminv1.LicenseStatus, error) {
 	return toStatusPB(s.repo.Status(ctx)), nil
 }
 
-// InstallLicense 安装（校验失败不落库）。
+// InstallLicense 安裝（校驗失敗不落庫）。
 func (s *AdminLicenseService) InstallLicense(ctx context.Context, req *adminv1.InstallLicenseRequest) (*adminv1.LicenseStatus, error) {
 	if req.GetContent() == "" {
-		return nil, errors.BadRequest("license.CONTENT_REQUIRED", "许可证内容必填")
+		return nil, errors.BadRequest("license.CONTENT_REQUIRED", "許可證內容必填")
 	}
 	if err := s.repo.Install(ctx, req.GetContent()); err != nil {
-		return nil, errors.BadRequest("license.INVALID", "许可证无效（签名/绑定/到期任一失败）")
+		return nil, errors.BadRequest("license.INVALID", "許可證無效（簽名/綁定/到期任一失敗）")
 	}
 	return toStatusPB(s.repo.Status(ctx)), nil
 }
 
-// ClearLicense 清除（回到社区版）。
+// ClearLicense 清除（回到社區版）。
 func (s *AdminLicenseService) ClearLicense(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	if err := s.repo.Clear(ctx); err != nil {
-		return nil, errors.InternalServer("license.CLEAR_FAILED", "清除失败")
+		return nil, errors.InternalServer("license.CLEAR_FAILED", "清除失敗")
 	}
 	return &emptypb.Empty{}, nil
 }

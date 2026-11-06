@@ -135,12 +135,12 @@ func (x *CreateGiftcardBatchRequest) GetQuantity() int32 {
 	return 0
 }
 
-// CreateGiftcardBatchReply 批次 + 明文码（仅创建响应一次性返回；此后任何端点
-// 不可再取——库内无明文，铁律 11；同 一次性明文交付纪律）。
+// CreateGiftcardBatchReply 批次 + 明文碼（僅創建響應一次性返回；此後任何端點
+// 不可再取——庫內無明文，鐵律 11；同 一次性明文交付紀律）。
 type CreateGiftcardBatchReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Batch         *GiftcardBatchItem     `protobuf:"bytes,1,opt,name=batch,proto3" json:"batch,omitempty"`
-	Codes         []string               `protobuf:"bytes,2,rep,name=codes,proto3" json:"codes,omitempty"` // 明文兑换码（当次响应后仅存于管理员侧）
+	Codes         []string               `protobuf:"bytes,2,rep,name=codes,proto3" json:"codes,omitempty"` // 明文兑換碼（當次響應後僅存於管理員側）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -497,15 +497,15 @@ type WithdrawalItem struct {
 	AmountCents   int64                  `protobuf:"varint,3,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
 	FeeCents      int64                  `protobuf:"varint,4,opt,name=fee_cents,json=feeCents,proto3" json:"fee_cents,omitempty"`
 	MethodType    string                 `protobuf:"bytes,5,opt,name=method_type,json=methodType,proto3" json:"method_type,omitempty"`
-	MethodName    string                 `protobuf:"bytes,13,opt,name=method_name,json=methodName,proto3" json:"method_name,omitempty"` // 收款方式显示名
+	MethodName    string                 `protobuf:"bytes,13,opt,name=method_name,json=methodName,proto3" json:"method_name,omitempty"` // 收款方式顯示名
 	Account       string                 `protobuf:"bytes,6,opt,name=account,proto3" json:"account,omitempty"`
-	QrCodeUrl     string                 `protobuf:"bytes,14,opt,name=qr_code_url,json=qrCodeUrl,proto3" json:"qr_code_url,omitempty"` // 收款码图片（微信/支付宝；审核展示）
+	QrCodeUrl     string                 `protobuf:"bytes,14,opt,name=qr_code_url,json=qrCodeUrl,proto3" json:"qr_code_url,omitempty"` // 收款碼圖片（微信/支付寶；審核展示）
 	Status        string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`                           // pending | approved | paid | rejected
 	RejectReason  string                 `protobuf:"bytes,8,opt,name=reject_reason,json=rejectReason,proto3" json:"reject_reason,omitempty"`
 	ReviewedAt    int64                  `protobuf:"varint,9,opt,name=reviewed_at,json=reviewedAt,proto3" json:"reviewed_at,omitempty"`
 	PaidAt        int64                  `protobuf:"varint,10,opt,name=paid_at,json=paidAt,proto3" json:"paid_at,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Receipt       string                 `protobuf:"bytes,15,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回执（流水号/备注）
+	Receipt       string                 `protobuf:"bytes,15,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回執（流水號/備註）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -649,7 +649,7 @@ type ReviewWithdrawalRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Approve       bool                   `protobuf:"varint,2,opt,name=approve,proto3" json:"approve,omitempty"`
-	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"` // 驳回必填
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"` // 駁回必填
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -708,7 +708,7 @@ func (x *ReviewWithdrawalRequest) GetReason() string {
 type PayWithdrawalRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Receipt       string                 `protobuf:"bytes,2,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回执（交易流水号/凭证备注；客户可见）
+	Receipt       string                 `protobuf:"bytes,2,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回執（交易流水號/憑證備註；客户可見）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -872,7 +872,7 @@ func (x *Balance) GetTotalCents() int64 {
 type AdjustRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AmountCents   int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"` // 正=入账 负=扣减
+	AmountCents   int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"` // 正=入賬 負=扣減
 	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -932,7 +932,7 @@ func (x *AdjustRequest) GetReason() string {
 type AdjustPointsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Points        int64                  `protobuf:"varint,2,opt,name=points,proto3" json:"points,omitempty"` // 正=增加 负=扣减
+	Points        int64                  `protobuf:"varint,2,opt,name=points,proto3" json:"points,omitempty"` // 正=增加 負=扣減
 	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1043,7 +1043,7 @@ func (x *PointsBalance) GetPoints() int64 {
 
 type ListWalletTxRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// 指定用户流水；0 = 全站流水（账单管理）。不能标 REQUIRED——proto3 零值 0 会被网关判缺失。
+	// 指定用户流水；0 = 全站流水（賬單管理）。不能標 REQUIRED——proto3 零值 0 會被網關判缺失。
 	UserId        uint64 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Page          int32  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
@@ -1165,9 +1165,9 @@ type WalletTx struct {
 	Reference          string                 `protobuf:"bytes,7,opt,name=reference,proto3" json:"reference,omitempty"`
 	Remark             string                 `protobuf:"bytes,8,opt,name=remark,proto3" json:"remark,omitempty"`
 	CreatedAt          int64                  `protobuf:"varint,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UserId             uint64                 `protobuf:"varint,10,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                              // 归属用户（全站流水场景展示）
-	Username           string                 `protobuf:"bytes,11,opt,name=username,proto3" json:"username,omitempty"`                                         // 归属用户名（全站流水批量回填，可空）
-	DisplayReference   string                 `protobuf:"bytes,12,opt,name=display_reference,json=displayReference,proto3" json:"display_reference,omitempty"` // 展示用业务单号，reference 保留原始幂等键
+	UserId             uint64                 `protobuf:"varint,10,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                              // 歸屬用户（全站流水場景展示）
+	Username           string                 `protobuf:"bytes,11,opt,name=username,proto3" json:"username,omitempty"`                                         // 歸屬用户名（全站流水批量回填，可空）
+	DisplayReference   string                 `protobuf:"bytes,12,opt,name=display_reference,json=displayReference,proto3" json:"display_reference,omitempty"` // 展示用業務單號，reference 保留原始冪等鍵
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }

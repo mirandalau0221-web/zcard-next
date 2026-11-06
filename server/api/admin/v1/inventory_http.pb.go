@@ -36,27 +36,27 @@ const OperationAdminInventoryServiceViewCardContent = "/zcard.api.admin.v1.Admin
 type AdminInventoryServiceHTTPServer interface {
 	AssignCards(context.Context, *AssignCardsRequest) (*AssignCardsReply, error)
 	AssignPreview(context.Context, *AssignPreviewRequest) (*AssignPreviewReply, error)
-	// CancelImport CancelImport 撤销批次（删除本批 available 卡）。
+	// CancelImport CancelImport 撤銷批次（刪除本批 available 卡）。
 	CancelImport(context.Context, *CancelImportRequest) (*emptypb.Empty, error)
-	// ExportCards ExportCards 导出卡密（card:export 权限 + 审计 + 限流 + CsvSafe）。
+	// ExportCards ExportCards 導出卡密（card:export 權限 + 審計 + 限流 + CsvSafe）。
 	ExportCards(context.Context, *ExportCardsRequest) (*ExportCardsReply, error)
 	GetTargets(context.Context, *InventoryTargetsRequest) (*InventoryTargetsReply, error)
-	// ImportConfirm ImportConfirm 确认导入（分片写入 + 批次追踪）。
+	// ImportConfirm ImportConfirm 確認導入（分片寫入 + 批次追蹤）。
 	ImportConfirm(context.Context, *ImportConfirmRequest) (*ImportBatch, error)
-	// ImportPreview ImportPreview 上传预览（去重统计 + 样本预览）。
+	// ImportPreview ImportPreview 上傳預覽（去重統計 + 樣本預覽）。
 	ImportPreview(context.Context, *ImportPreviewRequest) (*ImportPreviewReply, error)
-	// ListCards ListCards 卡密列表（掩码默认；card:view_content 权限才可见完整内容）。
+	// ListCards ListCards 卡密列表（掩碼默認；card:view_content 權限才可見完整內容）。
 	ListCards(context.Context, *ListCardsRequest) (*ListCardsReply, error)
-	// ListImports ListImports 导入批次列表。
+	// ListImports ListImports 導入批次列表。
 	ListImports(context.Context, *ListImportsRequest) (*ListImportsReply, error)
-	// ListPremiumCards ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限）。
+	// ListPremiumCards ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限）。
 	ListPremiumCards(context.Context, *ListPremiumCardsRequest) (*ListPremiumCardsReply, error)
 	PreviewCancelImport(context.Context, *CancelImportRequest) (*CancelImportPreviewReply, error)
-	// ToggleCard ToggleCard 禁用/启用单张卡。
+	// ToggleCard ToggleCard 禁用/啓用單張卡。
 	ToggleCard(context.Context, *ToggleCardRequest) (*emptypb.Empty, error)
-	// UpdateCardContent UpdateCardContent 编辑未使用的单张卡密（独立敏感权限；版本冲突时不覆盖）。
+	// UpdateCardContent UpdateCardContent 編輯未使用的單張卡密（獨立敏感權限；版本衝突時不覆蓋）。
 	UpdateCardContent(context.Context, *UpdateCardContentRequest) (*UpdateCardContentReply, error)
-	// ViewCardContent ViewCardContent 查看完整卡密（card:view_content 权限 + 安全审计）。
+	// ViewCardContent ViewCardContent 查看完整卡密（card:view_content 權限 + 安全審計）。
 	ViewCardContent(context.Context, *ViewCardContentRequest) (*ViewCardContentReply, error)
 }
 
@@ -362,27 +362,27 @@ func _AdminInventoryService_ListPremiumCards0_HTTP_Handler(srv AdminInventorySer
 type AdminInventoryServiceHTTPClient interface {
 	AssignCards(ctx context.Context, req *AssignCardsRequest, opts ...http.CallOption) (rsp *AssignCardsReply, err error)
 	AssignPreview(ctx context.Context, req *AssignPreviewRequest, opts ...http.CallOption) (rsp *AssignPreviewReply, err error)
-	// CancelImport CancelImport 撤销批次（删除本批 available 卡）。
+	// CancelImport CancelImport 撤銷批次（刪除本批 available 卡）。
 	CancelImport(ctx context.Context, req *CancelImportRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ExportCards ExportCards 导出卡密（card:export 权限 + 审计 + 限流 + CsvSafe）。
+	// ExportCards ExportCards 導出卡密（card:export 權限 + 審計 + 限流 + CsvSafe）。
 	ExportCards(ctx context.Context, req *ExportCardsRequest, opts ...http.CallOption) (rsp *ExportCardsReply, err error)
 	GetTargets(ctx context.Context, req *InventoryTargetsRequest, opts ...http.CallOption) (rsp *InventoryTargetsReply, err error)
-	// ImportConfirm ImportConfirm 确认导入（分片写入 + 批次追踪）。
+	// ImportConfirm ImportConfirm 確認導入（分片寫入 + 批次追蹤）。
 	ImportConfirm(ctx context.Context, req *ImportConfirmRequest, opts ...http.CallOption) (rsp *ImportBatch, err error)
-	// ImportPreview ImportPreview 上传预览（去重统计 + 样本预览）。
+	// ImportPreview ImportPreview 上傳預覽（去重統計 + 樣本預覽）。
 	ImportPreview(ctx context.Context, req *ImportPreviewRequest, opts ...http.CallOption) (rsp *ImportPreviewReply, err error)
-	// ListCards ListCards 卡密列表（掩码默认；card:view_content 权限才可见完整内容）。
+	// ListCards ListCards 卡密列表（掩碼默認；card:view_content 權限才可見完整內容）。
 	ListCards(ctx context.Context, req *ListCardsRequest, opts ...http.CallOption) (rsp *ListCardsReply, err error)
-	// ListImports ListImports 导入批次列表。
+	// ListImports ListImports 導入批次列表。
 	ListImports(ctx context.Context, req *ListImportsRequest, opts ...http.CallOption) (rsp *ListImportsReply, err error)
-	// ListPremiumCards ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限）。
+	// ListPremiumCards ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限）。
 	ListPremiumCards(ctx context.Context, req *ListPremiumCardsRequest, opts ...http.CallOption) (rsp *ListPremiumCardsReply, err error)
 	PreviewCancelImport(ctx context.Context, req *CancelImportRequest, opts ...http.CallOption) (rsp *CancelImportPreviewReply, err error)
-	// ToggleCard ToggleCard 禁用/启用单张卡。
+	// ToggleCard ToggleCard 禁用/啓用單張卡。
 	ToggleCard(ctx context.Context, req *ToggleCardRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// UpdateCardContent UpdateCardContent 编辑未使用的单张卡密（独立敏感权限；版本冲突时不覆盖）。
+	// UpdateCardContent UpdateCardContent 編輯未使用的單張卡密（獨立敏感權限；版本衝突時不覆蓋）。
 	UpdateCardContent(ctx context.Context, req *UpdateCardContentRequest, opts ...http.CallOption) (rsp *UpdateCardContentReply, err error)
-	// ViewCardContent ViewCardContent 查看完整卡密（card:view_content 权限 + 安全审计）。
+	// ViewCardContent ViewCardContent 查看完整卡密（card:view_content 權限 + 安全審計）。
 	ViewCardContent(ctx context.Context, req *ViewCardContentRequest, opts ...http.CallOption) (rsp *ViewCardContentReply, err error)
 }
 
@@ -428,7 +428,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) AssignPreview(ctx context.Context,
 	return &out, nil
 }
 
-// CancelImport CancelImport 撤销批次（删除本批 available 卡）。
+// CancelImport CancelImport 撤銷批次（刪除本批 available 卡）。
 func (c *AdminInventoryServiceHTTPClientImpl) CancelImport(ctx context.Context, in *CancelImportRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/inventory/imports/{id}/cancel"
@@ -446,7 +446,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) CancelImport(ctx context.Context, 
 	return &out, nil
 }
 
-// ExportCards ExportCards 导出卡密（card:export 权限 + 审计 + 限流 + CsvSafe）。
+// ExportCards ExportCards 導出卡密（card:export 權限 + 審計 + 限流 + CsvSafe）。
 func (c *AdminInventoryServiceHTTPClientImpl) ExportCards(ctx context.Context, in *ExportCardsRequest, opts ...http.CallOption) (*ExportCardsReply, error) {
 	var out ExportCardsReply
 	pattern := "/api/v1/admin/inventory/export"
@@ -480,7 +480,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) GetTargets(ctx context.Context, in
 	return &out, nil
 }
 
-// ImportConfirm ImportConfirm 确认导入（分片写入 + 批次追踪）。
+// ImportConfirm ImportConfirm 確認導入（分片寫入 + 批次追蹤）。
 func (c *AdminInventoryServiceHTTPClientImpl) ImportConfirm(ctx context.Context, in *ImportConfirmRequest, opts ...http.CallOption) (*ImportBatch, error) {
 	var out ImportBatch
 	pattern := "/api/v1/admin/inventory/import"
@@ -498,7 +498,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) ImportConfirm(ctx context.Context,
 	return &out, nil
 }
 
-// ImportPreview ImportPreview 上传预览（去重统计 + 样本预览）。
+// ImportPreview ImportPreview 上傳預覽（去重統計 + 樣本預覽）。
 func (c *AdminInventoryServiceHTTPClientImpl) ImportPreview(ctx context.Context, in *ImportPreviewRequest, opts ...http.CallOption) (*ImportPreviewReply, error) {
 	var out ImportPreviewReply
 	pattern := "/api/v1/admin/inventory/preview"
@@ -516,7 +516,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) ImportPreview(ctx context.Context,
 	return &out, nil
 }
 
-// ListCards ListCards 卡密列表（掩码默认；card:view_content 权限才可见完整内容）。
+// ListCards ListCards 卡密列表（掩碼默認；card:view_content 權限才可見完整內容）。
 func (c *AdminInventoryServiceHTTPClientImpl) ListCards(ctx context.Context, in *ListCardsRequest, opts ...http.CallOption) (*ListCardsReply, error) {
 	var out ListCardsReply
 	pattern := "/api/v1/admin/inventory/cards"
@@ -533,7 +533,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) ListCards(ctx context.Context, in 
 	return &out, nil
 }
 
-// ListImports ListImports 导入批次列表。
+// ListImports ListImports 導入批次列表。
 func (c *AdminInventoryServiceHTTPClientImpl) ListImports(ctx context.Context, in *ListImportsRequest, opts ...http.CallOption) (*ListImportsReply, error) {
 	var out ListImportsReply
 	pattern := "/api/v1/admin/inventory/imports"
@@ -550,7 +550,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) ListImports(ctx context.Context, i
 	return &out, nil
 }
 
-// ListPremiumCards ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限）。
+// ListPremiumCards ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限）。
 func (c *AdminInventoryServiceHTTPClientImpl) ListPremiumCards(ctx context.Context, in *ListPremiumCardsRequest, opts ...http.CallOption) (*ListPremiumCardsReply, error) {
 	var out ListPremiumCardsReply
 	pattern := "/api/v1/admin/inventory/cards/premium"
@@ -583,7 +583,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) PreviewCancelImport(ctx context.Co
 	return &out, nil
 }
 
-// ToggleCard ToggleCard 禁用/启用单张卡。
+// ToggleCard ToggleCard 禁用/啓用單張卡。
 func (c *AdminInventoryServiceHTTPClientImpl) ToggleCard(ctx context.Context, in *ToggleCardRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/inventory/cards/{id}/toggle"
@@ -601,7 +601,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) ToggleCard(ctx context.Context, in
 	return &out, nil
 }
 
-// UpdateCardContent UpdateCardContent 编辑未使用的单张卡密（独立敏感权限；版本冲突时不覆盖）。
+// UpdateCardContent UpdateCardContent 編輯未使用的單張卡密（獨立敏感權限；版本衝突時不覆蓋）。
 func (c *AdminInventoryServiceHTTPClientImpl) UpdateCardContent(ctx context.Context, in *UpdateCardContentRequest, opts ...http.CallOption) (*UpdateCardContentReply, error) {
 	var out UpdateCardContentReply
 	pattern := "/api/v1/admin/inventory/cards/{id}/content"
@@ -619,7 +619,7 @@ func (c *AdminInventoryServiceHTTPClientImpl) UpdateCardContent(ctx context.Cont
 	return &out, nil
 }
 
-// ViewCardContent ViewCardContent 查看完整卡密（card:view_content 权限 + 安全审计）。
+// ViewCardContent ViewCardContent 查看完整卡密（card:view_content 權限 + 安全審計）。
 func (c *AdminInventoryServiceHTTPClientImpl) ViewCardContent(ctx context.Context, in *ViewCardContentRequest, opts ...http.CallOption) (*ViewCardContentReply, error) {
 	var out ViewCardContentReply
 	pattern := "/api/v1/admin/inventory/cards/{id}/content"

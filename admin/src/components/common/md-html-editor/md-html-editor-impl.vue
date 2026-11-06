@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /**
- * MD/HTML 三模式文档编辑器：
- *   - 「所见即所得」：wangEditor 富文本（HTML，插图走素材库，服务端白名单 sanitize）
- *   - 「Markdown」：md-editor-v3（开源 MIT，编辑 + 分屏预览 + 工具栏 + 素材库插图）
- *   - 「HTML源码」：等宽 textarea 直接编辑 HTML
- *   - 模式切换双向转换（turndown html→md / marked md→html）——
- *     v-model 恒为 HTML（前台 v-html 渲染的事实标准），MD/HTML 只是编辑态
+ * MD/HTML 三模式文檔編輯器：
+ *   - 「所見即所得」：wangEditor 富文本（HTML，插圖走素材庫，服務端白名單 sanitize）
+ *   - 「Markdown」：md-editor-v3（開源 MIT，編輯 + 分屏預覽 + 工具欄 + 素材庫插圖）
+ *   - 「HTML源碼」：等寬 textarea 直接編輯 HTML
+ *   - 模式切換雙向轉換（turndown html→md / marked md→html）——
+ *     v-model 恆為 HTML（前台 v-html 渲染的事實標準），MD/HTML 只是編輯態
  */
 import { ref, watch, h, Fragment } from "vue";
 import { NRadioButton, NRadioGroup, NInput } from "naive-ui";
@@ -42,11 +42,11 @@ const turndown = new TurndownService({
 turndown.keep(["video", "source"]);
 marked.setOptions({ breaks: true, gfm: true });
 
-// 外部值变化同步：
-// - 与 html 一致 = 编辑器自身 emit 回流，忽略（避免打断 MD/HTML 编辑态）
-// - 不一致 = 弹窗重开加载新内容（display-directive=show 下编辑器不销毁重建，
-//   须在此重置模式与草稿，否则停留在上次的 MD/HTML 模式看到旧草稿——
-//   「编辑内容丢失」的根因之一）
+// 外部值變化同步：
+// - 與 html 一致 = 編輯器自身 emit 迴流，忽略（避免打斷 MD/HTML 編輯態）
+// - 不一致 = 彈窗重開加載新內容（display-directive=show 下編輯器不銷燬重建，
+//   須在此重置模式與草稿，否則停留在上次的 MD/HTML 模式看到舊草稿——
+//   「編輯內容丟失」的根因之一）
 watch(
   () => props.modelValue,
   (v) => {
@@ -66,7 +66,7 @@ function switchMode(m: "wysiwyg" | "markdown" | "html") {
   } else if (m === "html") {
     htmlDraft.value = html.value || "";
   } else {
-    // 切回所见即所得：按来源模式回填（md 经 marked 转 HTML；html 直用源码）
+    // 切回所見即所得：按來源模式回填（md 經 marked 轉 HTML；html 直用源碼）
     const back = prev === "markdown" ? (marked.parse(mdDraft.value || "") as string) : htmlDraft.value;
     html.value = back;
     emit("update:modelValue", back);
@@ -75,7 +75,7 @@ function switchMode(m: "wysiwyg" | "markdown" | "html") {
 }
 
 function onMdChange() {
-  // md-editor-v3 已通过 v-model 更新 mdDraft；同步 html 事实源并实时转 HTML 对外输出
+  // md-editor-v3 已通過 v-model 更新 mdDraft；同步 html 事實源並實時轉 HTML 對外輸出
   const out = marked.parse(mdDraft.value || "") as string;
   html.value = out;
   emit("update:modelValue", out);
@@ -92,7 +92,7 @@ function onHtmlInput(v: string) {
   emit("update:modelValue", v);
 }
 
-// ── md-editor-v3 配置：精简工具栏（禁图片上传——图片一律素材库；自定义素材按钮由库注入 insert）──
+// ── md-editor-v3 配置：精簡工具欄（禁圖片上傳——圖片一律素材庫；自定義素材按鈕由庫注入 insert）──
 const mdToolbars: ToolbarNames[] = [
   "bold",
   "italic",
@@ -106,8 +106,8 @@ const mdToolbars: ToolbarNames[] = [
   "codeRow",
   "code",
   "link",
-  0, // 素材库图片（defToolbars 中第 0 个按钮）
-  1, // 视频
+  0, // 素材庫圖片（defToolbars 中第 0 個按鈕）
+  1, // 視頻
   "table",
   "-",
   "revoke",
@@ -117,29 +117,29 @@ const mdToolbars: ToolbarNames[] = [
   "htmlPreview",
   "fullscreen",
 ];
-// 自定义工具栏按钮：defToolbars 传 Fragment（children 为按钮数组），toolbars 数字下标引用
-const defToolbars = h(Fragment, [h(MediaToolbar, { title: "素材库图片" }), h(MediaToolbar, {title:"插入视频", video:true})]);
+// 自定義工具欄按鈕：defToolbars 傳 Fragment（children 為按鈕數組），toolbars 數字下標引用
+const defToolbars = h(Fragment, [h(MediaToolbar, { title: "素材庫圖片" }), h(MediaToolbar, {title:"插入視頻", video:true})]);
 </script>
 
 <template>
   <div class="md-html-editor">
     <div class="mb-8px flex items-center justify-between">
       <NRadioGroup size="small" :value="mode" @update:value="(v: any) => switchMode(v)">
-        <NRadioButton value="wysiwyg">所见即所得</NRadioButton>
+        <NRadioButton value="wysiwyg">所見即所得</NRadioButton>
         <NRadioButton value="markdown">Markdown</NRadioButton>
-        <NRadioButton value="html">HTML源码</NRadioButton>
+        <NRadioButton value="html">HTML源碼</NRadioButton>
       </NRadioGroup>
       <span class="text-11px text-gray-400">
         {{
           mode === "wysiwyg"
-            ? "富文本（支持图片和视频）"
+            ? "富文本（支持圖片和視頻）"
             : mode === "markdown"
-              ? "Markdown 代码模式（分屏预览，保存时自动转 HTML）"
-              : "HTML 源码（保存时经服务端白名单清洗）"
+              ? "Markdown 代碼模式（分屏預覽，保存時自動轉 HTML）"
+              : "HTML 源碼（保存時經服務端白名單清洗）"
         }}
       </span>
     </div>
-    <!-- wangEditor 常驻（v-show）：销毁重建会崩（Slate 实例冲突），MD/HTML 走 v-if 重建 -->
+    <!-- wangEditor 常駐（v-show）：銷燬重建會崩（Slate 實例衝突），MD/HTML 走 v-if 重建 -->
     <RichEditor v-show="mode === 'wysiwyg'" :model-value="html" :height="height" @update:model-value="onWysiwygInput" />
     <MdEditor
       v-if="mode === 'markdown'"
@@ -148,12 +148,12 @@ const defToolbars = h(Fragment, [h(MediaToolbar, { title: "素材库图片" }), 
       :def-toolbars="defToolbars"
       preview-theme="github"
       code-theme="github"
-      language="zh-CN"
+      language="zh-TW"
       :preview="true"
       :no-upload-img="true"
       :no-prettier="false"
       :style="{ height }"
-      placeholder="支持 GFM：标题/列表/代码块/表格/图片…"
+      placeholder="支持 GFM：標題/列表/代碼塊/表格/圖片…"
       @on-change="onMdChange"
     />
     <NInput
@@ -162,7 +162,7 @@ const defToolbars = h(Fragment, [h(MediaToolbar, { title: "素材库图片" }), 
       type="textarea"
       :style="{ height }"
       class="font-mono"
-      placeholder="直接编辑 HTML：&lt;h2&gt;标题&lt;/h2&gt;&lt;p&gt;正文&lt;/p&gt;&lt;img src=&quot;素材库URL&quot;&gt;…"
+      placeholder="直接編輯 HTML：&lt;h2&gt;標題&lt;/h2&gt;&lt;p&gt;正文&lt;/p&gt;&lt;img src=&quot;素材庫URL&quot;&gt;…"
       @update:value="onHtmlInput"
     />
   </div>

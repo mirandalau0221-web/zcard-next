@@ -27,11 +27,11 @@ const OperationAdminFulfillmentServiceStartService = "/zcard.api.admin.v1.AdminF
 const OperationAdminFulfillmentServiceUpdateShipping = "/zcard.api.admin.v1.AdminFulfillmentService/UpdateShipping"
 
 type AdminFulfillmentServiceHTTPServer interface {
-	// ListDeliveries ListDeliveries 交付记录列表（掩码默认）。
+	// ListDeliveries ListDeliveries 交付記錄列表（掩碼默認）。
 	ListDeliveries(context.Context, *ListDeliveriesRequest) (*ListDeliveriesReply, error)
-	// ListPending ListPending 待发货列表（实体快递配送及人工交付）。
+	// ListPending ListPending 待發貨列表（實體快遞配送及人工交付）。
 	ListPending(context.Context, *ListPendingRequest) (*ListPendingReply, error)
-	// ManualDeliver ManualDeliver 手动交付（卡密内容或物流单号）。
+	// ManualDeliver ManualDeliver 手動交付（卡密內容或物流單號）。
 	ManualDeliver(context.Context, *ManualDeliverRequest) (*emptypb.Empty, error)
 	RestockReturn(context.Context, *RestockReturnRequest) (*emptypb.Empty, error)
 	ShipOrder(context.Context, *ShipOrderRequest) (*emptypb.Empty, error)
@@ -199,11 +199,11 @@ func _AdminFulfillmentService_ListDeliveries0_HTTP_Handler(srv AdminFulfillmentS
 }
 
 type AdminFulfillmentServiceHTTPClient interface {
-	// ListDeliveries ListDeliveries 交付记录列表（掩码默认）。
+	// ListDeliveries ListDeliveries 交付記錄列表（掩碼默認）。
 	ListDeliveries(ctx context.Context, req *ListDeliveriesRequest, opts ...http.CallOption) (rsp *ListDeliveriesReply, err error)
-	// ListPending ListPending 待发货列表（实体快递配送及人工交付）。
+	// ListPending ListPending 待發貨列表（實體快遞配送及人工交付）。
 	ListPending(ctx context.Context, req *ListPendingRequest, opts ...http.CallOption) (rsp *ListPendingReply, err error)
-	// ManualDeliver ManualDeliver 手动交付（卡密内容或物流单号）。
+	// ManualDeliver ManualDeliver 手動交付（卡密內容或物流單號）。
 	ManualDeliver(ctx context.Context, req *ManualDeliverRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	RestockReturn(ctx context.Context, req *RestockReturnRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	ShipOrder(ctx context.Context, req *ShipOrderRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
@@ -219,7 +219,7 @@ func NewAdminFulfillmentServiceHTTPClient(client *http.Client) AdminFulfillmentS
 	return &AdminFulfillmentServiceHTTPClientImpl{client}
 }
 
-// ListDeliveries ListDeliveries 交付记录列表（掩码默认）。
+// ListDeliveries ListDeliveries 交付記錄列表（掩碼默認）。
 func (c *AdminFulfillmentServiceHTTPClientImpl) ListDeliveries(ctx context.Context, in *ListDeliveriesRequest, opts ...http.CallOption) (*ListDeliveriesReply, error) {
 	var out ListDeliveriesReply
 	pattern := "/api/v1/admin/fulfillment"
@@ -236,7 +236,7 @@ func (c *AdminFulfillmentServiceHTTPClientImpl) ListDeliveries(ctx context.Conte
 	return &out, nil
 }
 
-// ListPending ListPending 待发货列表（实体快递配送及人工交付）。
+// ListPending ListPending 待發貨列表（實體快遞配送及人工交付）。
 func (c *AdminFulfillmentServiceHTTPClientImpl) ListPending(ctx context.Context, in *ListPendingRequest, opts ...http.CallOption) (*ListPendingReply, error) {
 	var out ListPendingReply
 	pattern := "/api/v1/admin/fulfillment/pending"
@@ -253,7 +253,7 @@ func (c *AdminFulfillmentServiceHTTPClientImpl) ListPending(ctx context.Context,
 	return &out, nil
 }
 
-// ManualDeliver ManualDeliver 手动交付（卡密内容或物流单号）。
+// ManualDeliver ManualDeliver 手動交付（卡密內容或物流單號）。
 func (c *AdminFulfillmentServiceHTTPClientImpl) ManualDeliver(ctx context.Context, in *ManualDeliverRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/fulfillment/{order_no}/deliver"

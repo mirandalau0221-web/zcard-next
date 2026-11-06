@@ -22,41 +22,41 @@ type Card struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
-	// 乐观锁版本号
+	// 樂觀鎖版本號
 	Version int32 `json:"version,omitempty"`
-	// 所属商品（硬外键 → products）
+	// 所屬商品（硬外鍵 → products）
 	ProductID uint64 `json:"product_id,omitempty"`
-	// AES-256-GCM 密文（AAD 绑定 product_id/subsite_id）
+	// AES-256-GCM 密文（AAD 綁定 product_id/subsite_id）
 	Content []byte `json:"content,omitempty"`
-	// keyed hash = HMAC-SHA256(cardKey, plain)，商品内去重
+	// keyed hash = HMAC-SHA256(cardKey, plain)，商品內去重
 	ContentHash string `json:"content_hash,omitempty"`
-	// 靓号/卡号归一化 hash（靓号自选检索）
+	// 靚號/卡號歸一化 hash（靚號自選檢索）
 	NumberHash string `json:"number_hash,omitempty"`
 	// Status holds the value of the "status" field.
 	Status card.Status `json:"status,omitempty"`
-	// 锁定/售出订单（软外键，仅索引）
+	// 鎖定/售出訂單（軟外鍵，僅索引）
 	OrderID uint64 `json:"order_id,omitempty"`
-	// 所属 SKU（可空=商品级）
+	// 所屬 SKU（可空=商品級）
 	SkuID uint64 `json:"sku_id,omitempty"`
-	// 导入批次
+	// 導入批次
 	ImportID uint64 `json:"import_id,omitempty"`
-	// 卡密类型（月卡/周卡，对应 SKU）
+	// 卡密類型（月卡/周卡，對應 SKU）
 	CardType string `json:"card_type,omitempty"`
 	// Note holds the value of the "note" field.
 	Note string `json:"note,omitempty"`
-	// 所属会员（0=系统；会员预选/锁定靓号）
+	// 所屬會員（0=系統；會員預選/鎖定靚號）
 	OwnerID uint64 `json:"owner_id,omitempty"`
-	// 预选加价（分）
+	// 預選加價（分）
 	DraftPremium int64 `json:"draft_premium,omitempty"`
-	// 预选成本（分）
+	// 預選成本（分）
 	DraftCost int64 `json:"draft_cost,omitempty"`
-	// 靓号自选价（分，NULL=商品价）
+	// 靚號自選價（分，NULL=商品價）
 	Price int64 `json:"price,omitempty"`
-	// 锁定时间（TTL 释放）
+	// 鎖定時間（TTL 釋放）
 	LockedAt time.Time `json:"locked_at,omitempty"`
-	// 售出时间
+	// 售出時間
 	UsedAt time.Time `json:"used_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CardQuery when eager-loading is set.

@@ -1,6 +1,6 @@
 package media
 
-// 数据仓储（）：media/media_categories CRUD + 引用计数。
+// 數據倉儲（）：media/media_categories CRUD + 引用計數。
 
 import (
 	"context"
@@ -14,25 +14,25 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/media/port"
 )
 
-// 哨兵错误。
+// 哨兵錯誤。
 var (
-	ErrNotFound     = errors.New("media: 记录不存在")
-	ErrCategoryName = errors.New("media.CATEGORY_NAME_INVALID: 名称 1-30 字符")
-	ErrHasChildren  = errors.New("media: 分类存在子分类或素材，禁止删除")
-	ErrReferenced   = errors.New("media.REFERENCED: 素材被引用，删除需 confirm")
+	ErrNotFound     = errors.New("media: 記錄不存在")
+	ErrCategoryName = errors.New("media.CATEGORY_NAME_INVALID: 名稱 1-30 字符")
+	ErrHasChildren  = errors.New("media: 分類存在子分類或素材，禁止刪除")
+	ErrReferenced   = errors.New("media.REFERENCED: 素材被引用，刪除需 confirm")
 )
 
-// MediaRepo 仓储。
+// MediaRepo 倉儲。
 type MediaRepo struct {
 	data *data.Data
 }
 
-// NewMediaRepo 构造。
+// NewMediaRepo 構造。
 func NewMediaRepo(d *data.Data) *MediaRepo { return &MediaRepo{data: d} }
 
-// ── 分类 ──────────────────────────────────────────────────
+// ── 分類 ──────────────────────────────────────────────────
 
-// CreateCategory 建分类（名称 1-30 字符）。
+// CreateCategory 建分類（名稱 1-30 字符）。
 func (r *MediaRepo) CreateCategory(ctx context.Context, name string, parentID uint64, sort int32) (*ent.MediaCategory, error) {
 	if len([]rune(name)) < 1 || len([]rune(name)) > 30 {
 		return nil, ErrCategoryName
@@ -60,13 +60,13 @@ func (r *MediaRepo) RenameCategory(ctx context.Context, id uint64, name string) 
 	return c, nil
 }
 
-// MoveCategory 移动（parentID=0 移到根；环状拒绝）。
+// MoveCategory 移動（parentID=0 移到根；環狀拒絕）。
 func (r *MediaRepo) MoveCategory(ctx context.Context, id, parentID uint64) error {
 	client := data.Client(ctx, r.data)
 	if id == parentID {
 		return fmt.Errorf("media.CATEGORY_CYCLE")
 	}
-	// 环检测：向上追溯 parent 链
+	// 環檢測：向上追溯 parent 鏈
 	cur := parentID
 	for cur != 0 {
 		if cur == id {
@@ -88,7 +88,7 @@ func (r *MediaRepo) MoveCategory(ctx context.Context, id, parentID uint64) error
 	return err
 }
 
-// DeleteCategory 删除（有子分类或有素材时拒绝）。
+// DeleteCategory 刪除（有子分類或有素材時拒絕）。
 func (r *MediaRepo) DeleteCategory(ctx context.Context, id uint64) error {
 	client := data.Client(ctx, r.data)
 	children, err := client.MediaCategory.Query().Where(mediacategory.ParentID(id)).Count(ctx)
@@ -109,7 +109,7 @@ func (r *MediaRepo) DeleteCategory(ctx context.Context, id uint64) error {
 	return err
 }
 
-// ListCategories 分类树（扁平全量，前端组树）。
+// ListCategories 分類樹（扁平全量，前端組樹）。
 func (r *MediaRepo) ListCategories(ctx context.Context) ([]*ent.MediaCategory, error) {
 	return data.Client(ctx, r.data).MediaCategory.Query().
 		Order(ent.Asc(mediacategory.FieldSort)).
@@ -118,7 +118,7 @@ func (r *MediaRepo) ListCategories(ctx context.Context) ([]*ent.MediaCategory, e
 
 // ── 素材 ──────────────────────────────────────────────────
 
-// CreateMedia 入库（净化后）。
+// CreateMedia 入庫（淨化後）。
 func (r *MediaRepo) CreateMedia(ctx context.Context, in port.UploadInput, relPath, mime string, size int64, width, height int32, sha string) (*ent.Media, error) {
 	create := data.Client(ctx, r.data).Media.Create().
 		SetPath(relPath).
@@ -142,7 +142,7 @@ func (r *MediaRepo) CreateMedia(ctx context.Context, in port.UploadInput, relPat
 	return create.Save(ctx)
 }
 
-// ListMedia 列表（分类过滤/关键词/分页）。
+// ListMedia 列表（分類過濾/關鍵詞/分頁）。
 func (r *MediaRepo) ListMedia(ctx context.Context, categoryID uint64, keyword string, page, size int, kinds ...string) ([]*ent.Media, int, error) {
 	q := data.Client(ctx, r.data).Media.Query().Order(ent.Desc(media.FieldID))
 	if categoryID > 0 {
@@ -170,7 +170,7 @@ func (r *MediaRepo) ListMedia(ctx context.Context, categoryID uint64, keyword st
 	return rows, total, err
 }
 
-// ListUncategorized 仅未分类素材（category_id 为空；素材选择器「未分类」视图）。
+// ListUncategorized 僅未分類素材（category_id 為空；素材選擇器「未分類」視圖）。
 func (r *MediaRepo) ListUncategorized(ctx context.Context, keyword string, page, size int, kinds ...string) ([]*ent.Media, int, error) {
 	q := data.Client(ctx, r.data).Media.Query().
 		Where(media.CategoryIDIsNil()).
@@ -197,7 +197,7 @@ func (r *MediaRepo) ListUncategorized(ctx context.Context, keyword string, page,
 	return rows, total, err
 }
 
-// GetMedia 单个。
+// GetMedia 單個。
 func (r *MediaRepo) GetMedia(ctx context.Context, id uint64) (*ent.Media, error) {
 	m, err := data.Client(ctx, r.data).Media.Get(ctx, id)
 	if err != nil {
@@ -209,7 +209,7 @@ func (r *MediaRepo) GetMedia(ctx context.Context, id uint64) (*ent.Media, error)
 	return m, nil
 }
 
-// RenameMedia 改名（显示名）。
+// RenameMedia 改名（顯示名）。
 func (r *MediaRepo) RenameMedia(ctx context.Context, id uint64, name string) (*ent.Media, error) {
 	if name == "" || len([]rune(name)) > 255 {
 		return nil, fmt.Errorf("media.NAME_INVALID")
@@ -224,7 +224,7 @@ func (r *MediaRepo) RenameMedia(ctx context.Context, id uint64, name string) (*e
 	return m, nil
 }
 
-// MoveMedia 批量移动分类。
+// MoveMedia 批量移動分類。
 func (r *MediaRepo) MoveMedia(ctx context.Context, ids []uint64, categoryID uint64) (int, error) {
 	client := data.Client(ctx, r.data)
 	q := client.Media.Update().Where(media.IDIn(ids...))
@@ -237,14 +237,14 @@ func (r *MediaRepo) MoveMedia(ctx context.Context, ids []uint64, categoryID uint
 	return n, err
 }
 
-// ListReferenced 被引用素材清单（删除前展示）。
+// ListReferenced 被引用素材清單（刪除前展示）。
 func (r *MediaRepo) ListReferenced(ctx context.Context, ids []uint64) ([]*ent.Media, error) {
 	return data.Client(ctx, r.data).Media.Query().
 		Where(media.IDIn(ids...), media.RefCountGT(0)).
 		All(ctx)
 }
 
-// DeleteMedia 删除（ref_count>0 且未 confirm → 拒绝并返回清单语义由 service 层组装）。
+// DeleteMedia 刪除（ref_count>0 且未 confirm → 拒絕並返回清單語義由 service 層組裝）。
 func (r *MediaRepo) DeleteMedia(ctx context.Context, ids []uint64, force bool) (deleted int, refs []*ent.Media, err error) {
 	var paths []string
 	err = data.Tx(ctx, r.data, func(ctx context.Context) error {
@@ -288,7 +288,7 @@ func (r *MediaRepo) DeleteMedia(ctx context.Context, ids []uint64, force bool) (
 	return deleted, nil, nil
 }
 
-// ── 引用计数（port.Referencer 实现）──────────────────────
+// ── 引用計數（port.Referencer 實現）──────────────────────
 
 // AddRefs 引用 +1。
 func (r *MediaRepo) AddRefs(ctx context.Context, ids []uint64) error {

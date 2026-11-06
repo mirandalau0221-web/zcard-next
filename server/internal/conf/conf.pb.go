@@ -22,8 +22,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Bootstrap 为进程启动配置（config.yaml 反序列化目标）。
-// 运行时业务开关的真理源在 settings 表（铁律 7），本文件只承载部署期配置。
+// Bootstrap 為進程啓動配置（config.yaml 反序列化目標）。
+// 運行時業務開關的真理源在 settings 表（鐵律 7），本文件只承載部署期配置。
 type Bootstrap struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Server        *Server                `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty"`
@@ -104,9 +104,9 @@ type Server struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Http  *Server_HTTP           `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty"`
 	Grpc  *Server_GRPC           `protobuf:"bytes,2,opt,name=grpc,proto3" json:"grpc,omitempty"`
-	// 启动时自动应用待执行迁移（加锁串行，失败拒绝启动，规划 §10.4）。
+	// 啓動時自動應用待執行遷移（加鎖串行，失敗拒絕啓動，規劃 §10.4）。
 	MigrateOnStart bool `protobuf:"varint,3,opt,name=migrate_on_start,json=migrateOnStart,proto3" json:"migrate_on_start,omitempty"`
-	// 后台安全入口路径（可配，规划 §7.3；空 = /admin）
+	// 後台安全入口路徑（可配，規劃 §7.3；空 = /admin）
 	AdminBasePath string `protobuf:"bytes,4,opt,name=admin_base_path,json=adminBasePath,proto3" json:"admin_base_path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -173,9 +173,9 @@ func (x *Server) GetAdminBasePath() string {
 type Data struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	Database *Data_Database         `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
-	// Redis 可选：缺失时队列同步降级 + 进程内缓存（ADR-D6）
+	// Redis 可選：缺失時隊列同步降級 + 進程內緩存（ADR-D6）
 	Redis *Data_Redis `protobuf:"bytes,2,opt,name=redis,proto3" json:"redis,omitempty"`
-	// 工作进程模式（worker）独立队列并发度
+	// 工作進程模式（worker）獨立隊列併發度
 	WorkerConcurrency int32 `protobuf:"varint,3,opt,name=worker_concurrency,json=workerConcurrency,proto3" json:"worker_concurrency,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
@@ -232,17 +232,17 @@ func (x *Data) GetWorkerConcurrency() int32 {
 	return 0
 }
 
-// 四把钥匙解耦（铁律 §4.11.6）：env 注入优先，此处仅作兜底。
-// 密钥永不进 DB/日志/git；生产环境必须经环境变量（ZCARD_*_KEY）注入。
+// 四把鑰匙解耦（鐵律 §4.11.6）：env 注入優先，此處僅作兜底。
+// 密鑰永不進 DB/日誌/git；生產環境必須經環境變量（ZCARD_*_KEY）注入。
 type Security struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// admin realm JWT 签名密钥（>= 32 字节）
+	// admin realm JWT 簽名密鑰（>= 32 字節）
 	JwtAdminKey string `protobuf:"bytes,1,opt,name=jwt_admin_key,json=jwtAdminKey,proto3" json:"jwt_admin_key,omitempty"`
-	// user realm JWT 签名密钥（与 admin 独立，防提权串用）
+	// user realm JWT 簽名密鑰（與 admin 獨立，防提權串用）
 	JwtUserKey string `protobuf:"bytes,2,opt,name=jwt_user_key,json=jwtUserKey,proto3" json:"jwt_user_key,omitempty"`
-	// 卡密加密密钥（32 字节 hex；AES-256-GCM，与业务数据密钥分离）
+	// 卡密加密密鑰（32 字節 hex；AES-256-GCM，與業務數據密鑰分離）
 	CardKey string `protobuf:"bytes,3,opt,name=card_key,json=cardKey,proto3" json:"card_key,omitempty"`
-	// 业务数据加密密钥（32 字节 hex；凭据列）
+	// 業務數據加密密鑰（32 字節 hex；憑據列）
 	DataKey       string `protobuf:"bytes,4,opt,name=data_key,json=dataKey,proto3" json:"data_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -306,12 +306,12 @@ func (x *Security) GetDataKey() string {
 	return ""
 }
 
-// 多租户（开源版仅启用 Row 行级隔离；Schema/Database 属商业版，ADR-D15）
+// 多租户（開源版僅啓用 Row 行級隔離；Schema/Database 屬商業版，ADR-D15）
 type Tenancy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// row（开源版唯一取值；schema/database 为商业版预留）
+	// row（開源版唯一取值；schema/database 為商業版預留）
 	Mode string `protobuf:"bytes,1,opt,name=mode,proto3" json:"mode,omitempty"`
-	// 主站域名（Host 匹配；分站域名走 reseller_sites 验证，M3）
+	// 主站域名（Host 匹配；分站域名走 reseller_sites 驗證，M3）
 	MainDomain    string `protobuf:"bytes,2,opt,name=main_domain,json=mainDomain,proto3" json:"main_domain,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -537,13 +537,13 @@ func (x *Server_GRPC) GetTimeout() *durationpb.Duration {
 
 type Data_Database struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// sqlite | mysql | postgres（运行时检测方言，同一二进制三方言，ADR-D20）
+	// sqlite | mysql | postgres（運行時檢測方言，同一二進制三方言，ADR-D20）
 	Driver string `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
-	// DSN。SQLite 为文件路径（自动启用 WAL + busy_timeout）
+	// DSN。SQLite 為文件路徑（自動啓用 WAL + busy_timeout）
 	Source       string `protobuf:"bytes,2,opt,name=source,proto3" json:"source,omitempty"`
 	MaxOpenConns int32  `protobuf:"varint,3,opt,name=max_open_conns,json=maxOpenConns,proto3" json:"max_open_conns,omitempty"`
 	MaxIdleConns int32  `protobuf:"varint,4,opt,name=max_idle_conns,json=maxIdleConns,proto3" json:"max_idle_conns,omitempty"`
-	// 迁移目录（默认内嵌；指向磁盘便于开发期调试）
+	// 遷移目錄（默認內嵌；指向磁盤便於開發期調試）
 	MigrationsDir string `protobuf:"bytes,5,opt,name=migrations_dir,json=migrationsDir,proto3" json:"migrations_dir,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

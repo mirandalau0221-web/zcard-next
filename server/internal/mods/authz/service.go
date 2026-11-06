@@ -1,7 +1,7 @@
 package authz
 
-// 角色管理与员工管理 API（；薄 transport，业务在 biz/仓储）。
-// 员工数据经 identity/port.AdminMutator 窄接口（跨模块通道 A）。
+// 角色管理與員工管理 API（；薄 transport，業務在 biz/倉儲）。
+// 員工數據經 identity/port.AdminMutator 窄接口（跨模塊通道 A）。
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// RoleService 角色与权限服务。
+// RoleService 角色與權限服務。
 type RoleService struct {
 	adminv1.UnimplementedRoleServiceServer
 	repo RoleRepo
@@ -23,7 +23,7 @@ type RoleService struct {
 	uc   *RbacUsecase
 }
 
-// NewRoleService 构造。
+// NewRoleService 構造。
 func NewRoleService(repo RoleRepo, dir *Directory, uc *RbacUsecase) *RoleService {
 	return &RoleService{repo: repo, dir: dir, uc: uc}
 }
@@ -32,7 +32,7 @@ func NewRoleService(repo RoleRepo, dir *Directory, uc *RbacUsecase) *RoleService
 func (s *RoleService) ListRoles(ctx context.Context, _ *emptypb.Empty) (*adminv1.ListRolesReply, error) {
 	roles, err := s.repo.Roles(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("authz.LIST_FAILED", "读取角色失败")
+		return nil, errors.InternalServer("authz.LIST_FAILED", "讀取角色失敗")
 	}
 	out := make([]*adminv1.Role, 0, len(roles))
 	for _, r := range roles {
@@ -41,7 +41,7 @@ func (s *RoleService) ListRoles(ctx context.Context, _ *emptypb.Empty) (*adminv1
 	return &adminv1.ListRolesReply{Roles: out}, nil
 }
 
-// GetRole 角色详情（含权限点）。
+// GetRole 角色詳情（含權限點）。
 func (s *RoleService) GetRole(ctx context.Context, req *adminv1.GetRoleRequest) (*adminv1.Role, error) {
 	r, err := s.repo.RoleByID(ctx, req.GetId())
 	if err != nil {
@@ -50,19 +50,19 @@ func (s *RoleService) GetRole(ctx context.Context, req *adminv1.GetRoleRequest) 
 	return r.PB(), nil
 }
 
-// CreateRole 创建角色（code 唯一；权限点须在目录内）。
+// CreateRole 創建角色（code 唯一；權限點須在目錄內）。
 func (s *RoleService) CreateRole(ctx context.Context, req *adminv1.CreateRoleRequest) (*adminv1.Role, error) {
 	if err := s.dir.ValidateCodes(req.GetPermissions()); err != nil {
 		return nil, errors.BadRequest("authz.INVALID_PERM", err.Error())
 	}
 	r, err := s.repo.CreateRole(ctx, req.GetName(), req.GetCode(), req.GetDescription(), req.GetPermissions())
 	if err != nil {
-		return nil, errors.InternalServer("authz.CREATE_FAILED", "创建角色失败（code 可能重复）")
+		return nil, errors.InternalServer("authz.CREATE_FAILED", "創建角色失敗（code 可能重複）")
 	}
 	return r.PB(), nil
 }
 
-// UpdateRole 修改角色（内置角色 code 保护）。
+// UpdateRole 修改角色（內置角色 code 保護）。
 func (s *RoleService) UpdateRole(ctx context.Context, req *adminv1.UpdateRoleRequest) (*adminv1.Role, error) {
 	r, err := s.repo.UpdateRole(ctx, req.GetId(), req.GetName(), req.GetDescription())
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *RoleService) UpdateRole(ctx context.Context, req *adminv1.UpdateRoleReq
 	return r.PB(), nil
 }
 
-// DeleteRole 删除角色（内置拒绝）。
+// DeleteRole 刪除角色（內置拒絕）。
 func (s *RoleService) DeleteRole(ctx context.Context, req *adminv1.DeleteRoleRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteRole(ctx, req.GetId()); err != nil {
 		return nil, mapRoleErr(err)
@@ -81,7 +81,7 @@ func (s *RoleService) DeleteRole(ctx context.Context, req *adminv1.DeleteRoleReq
 	return &emptypb.Empty{}, nil
 }
 
-// UpdateRolePermissions 全量替换权限点（变更实时生效）。
+// UpdateRolePermissions 全量替換權限點（變更實時生效）。
 func (s *RoleService) UpdateRolePermissions(ctx context.Context, req *adminv1.UpdateRolePermissionsRequest) (*adminv1.Role, error) {
 	if err := s.dir.ValidateCodes(req.GetPermissions()); err != nil {
 		return nil, errors.BadRequest("authz.INVALID_PERM", err.Error())
@@ -94,7 +94,7 @@ func (s *RoleService) UpdateRolePermissions(ctx context.Context, req *adminv1.Up
 	return r.PB(), nil
 }
 
-// GetPermissionTree 权限目录树。
+// GetPermissionTree 權限目錄樹。
 func (s *RoleService) GetPermissionTree(_ context.Context, _ *emptypb.Empty) (*adminv1.PermissionTree, error) {
 	tree := s.dir.Tree()
 	groups := make([]*adminv1.Group, 0, len(tree))
@@ -108,7 +108,7 @@ func (s *RoleService) GetPermissionTree(_ context.Context, _ *emptypb.Empty) (*a
 	return &adminv1.PermissionTree{Groups: groups}, nil
 }
 
-// AdminUserService 员工管理服务（数据经 identity port）。
+// AdminUserService 員工管理服務（數據經 identity port）。
 type AdminUserService struct {
 	adminv1.UnimplementedAdminUserServiceServer
 	mut     identityport.AdminMutator
@@ -117,16 +117,16 @@ type AdminUserService struct {
 	repo    RoleRepo
 }
 
-// NewAdminUserService 构造。
+// NewAdminUserService 構造。
 func NewAdminUserService(mut identityport.AdminMutator, readers identityport.AdminReader, dir *Directory, repo RoleRepo) *AdminUserService {
 	return &AdminUserService{mut: mut, readers: readers, dir: dir, repo: repo}
 }
 
-// ListAdmins 员工列表（附角色名）。
+// ListAdmins 員工列表（附角色名）。
 func (s *AdminUserService) ListAdmins(ctx context.Context, _ *emptypb.Empty) (*adminv1.ListAdminsReply, error) {
 	accounts, err := s.mut.List(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("identity.LIST_FAILED", "读取员工失败")
+		return nil, errors.InternalServer("identity.LIST_FAILED", "讀取員工失敗")
 	}
 	out := make([]*adminv1.Admin, 0, len(accounts))
 	for _, a := range accounts {
@@ -142,63 +142,63 @@ func (s *AdminUserService) ListAdmins(ctx context.Context, _ *emptypb.Empty) (*a
 	return &adminv1.ListAdminsReply{Admins: out}, nil
 }
 
-// CreateAdmin 创建员工（密码 ≥8 位安全基线）。
+// CreateAdmin 創建員工（密碼 ≥8 位安全基線）。
 func (s *AdminUserService) CreateAdmin(ctx context.Context, req *adminv1.CreateAdminRequest) (*adminv1.Admin, error) {
 	if len(req.GetPassword()) < 8 {
-		return nil, errors.BadRequest("identity.WEAK_PASSWORD", "密码至少 8 位（安全基线）")
+		return nil, errors.BadRequest("identity.WEAK_PASSWORD", "密碼至少 8 位（安全基線）")
 	}
 	a, err := s.mut.Create(ctx, identityport.AdminInput{
 		Username: req.GetUsername(), Password: req.GetPassword(),
 		Nickname: req.GetNickname(), RoleID: req.GetRoleId(), Remark: req.GetRemark(),
 	})
 	if err != nil {
-		return nil, errors.InternalServer("identity.CREATE_FAILED", "创建员工失败（用户名可能重复）")
+		return nil, errors.InternalServer("identity.CREATE_FAILED", "創建員工失敗（用户名可能重複）")
 	}
 	return &adminv1.Admin{Id: a.ID, Username: a.Username, Nickname: a.Nickname, RoleId: a.RoleID, Enabled: true}, nil
 }
 
-// UpdateAdmin 修改员工。
+// UpdateAdmin 修改員工。
 func (s *AdminUserService) UpdateAdmin(ctx context.Context, req *adminv1.UpdateAdminRequest) (*adminv1.Admin, error) {
 	a, err := s.mut.Update(ctx, req.GetId(), identityport.AdminInput{
 		Nickname: req.GetNickname(), Avatar: req.GetAvatar(), RoleID: req.GetRoleId(), Remark: req.GetRemark(),
 	})
 	if err != nil {
-		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "员工不存在")
+		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "員工不存在")
 	}
 	return &adminv1.Admin{Id: a.ID, Username: a.Username, Nickname: a.Nickname, Avatar: a.Avatar, RoleId: a.RoleID, Enabled: a.Enabled, TotpEnabled: a.TOTPEnabled}, nil
 }
 
-// ToggleAdmin 启停员工（禁用即时生效——admin 鉴权中间件每请求回查 enabled；
-// 禁用最后一位启用的内置超管被拒，防全员锁死后台）。
+// ToggleAdmin 啓停員工（禁用即時生效——admin 鑑權中間件每請求回查 enabled；
+// 禁用最後一位啓用的內置超管被拒，防全員鎖死後台）。
 func (s *AdminUserService) ToggleAdmin(ctx context.Context, req *adminv1.ToggleAdminRequest) (*adminv1.Admin, error) {
 	enabled := req.GetEnabled()
 	if !enabled && s.isLastEnabledSuper(ctx, req.GetId()) {
-		return nil, errors.Forbidden("identity.LAST_SUPER_ADMIN", "不能禁用最后一位启用的超级管理员")
+		return nil, errors.Forbidden("identity.LAST_SUPER_ADMIN", "不能禁用最後一位啓用的超級管理員")
 	}
 	a, err := s.mut.Update(ctx, req.GetId(), identityport.AdminInput{Enabled: &enabled})
 	if err != nil {
-		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "员工不存在")
+		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "員工不存在")
 	}
 	return &adminv1.Admin{Id: a.ID, Username: a.Username, Nickname: a.Nickname, RoleId: a.RoleID, Enabled: a.Enabled}, nil
 }
 
-// DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话同事务清除）。
+// DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話同事務清除）。
 func (s *AdminUserService) DeleteAdmin(ctx context.Context, req *adminv1.DeleteAdminRequest) (*emptypb.Empty, error) {
 	if claims := identity.ClaimsFromContext(ctx); claims != nil && claims.Subject == req.GetId() {
-		return nil, errors.Forbidden("identity.ADMIN_SELF_DELETE", "不能删除当前登录账号")
+		return nil, errors.Forbidden("identity.ADMIN_SELF_DELETE", "不能刪除當前登錄賬號")
 	}
 	if acc, err := s.readers.Admin(ctx, req.GetId()); err == nil && acc != nil && s.repo != nil {
 		if role, err := s.repo.RoleByID(ctx, acc.RoleID); err == nil && role.Code == authzport.RoleSuperAdmin {
-			return nil, errors.Forbidden("identity.ADMIN_PROTECTED", "内置超级管理员不可删除")
+			return nil, errors.Forbidden("identity.ADMIN_PROTECTED", "內置超級管理員不可刪除")
 		}
 	}
 	if err := s.mut.Delete(ctx, req.GetId()); err != nil {
-		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "员工不存在")
+		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "員工不存在")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// isLastEnabledSuper 目标是否为最后一位启用的内置超管（防禁用后无人可管）。
+// isLastEnabledSuper 目標是否為最後一位啓用的內置超管（防禁用後無人可管）。
 func (s *AdminUserService) isLastEnabledSuper(ctx context.Context, id uint64) bool {
 	if s.repo == nil {
 		return false
@@ -213,7 +213,7 @@ func (s *AdminUserService) isLastEnabledSuper(ctx context.Context, id uint64) bo
 	}
 	list, err := s.mut.List(ctx)
 	if err != nil {
-		return false // 查询失败保守放行，由启用状态自身兜底
+		return false // 查詢失敗保守放行，由啓用狀態自身兜底
 	}
 	for _, a := range list {
 		if a.ID != acc.ID && a.Enabled && a.RoleID == acc.RoleID {
@@ -223,30 +223,30 @@ func (s *AdminUserService) isLastEnabledSuper(ctx context.Context, id uint64) bo
 	return true
 }
 
-// ResetAdminPassword 重置员工密码（≥8 位安全基线；凭据接管类操作——吊销其全部
-// 管理面会话强制重登，防旧会话在密码泄露场景下继续存活）。
+// ResetAdminPassword 重置員工密碼（≥8 位安全基線；憑據接管類操作——吊銷其全部
+// 管理面會話強制重登，防舊會話在密碼泄露場景下繼續存活）。
 func (s *AdminUserService) ResetAdminPassword(ctx context.Context, req *adminv1.ResetAdminPasswordRequest) (*adminv1.Admin, error) {
 	if len(req.GetPassword()) < 8 {
-		return nil, errors.BadRequest("identity.WEAK_PASSWORD", "密码至少 8 位（安全基线）")
+		return nil, errors.BadRequest("identity.WEAK_PASSWORD", "密碼至少 8 位（安全基線）")
 	}
 	if err := s.mut.ResetPassword(ctx, req.GetId(), req.GetPassword()); err != nil {
-		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "员工不存在")
+		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "員工不存在")
 	}
 	_ = s.mut.RevokeAdminSessions(ctx, req.GetId())
 	return s.adminByID(ctx, req.GetId())
 }
 
-// ResetAdminTOTP 解绑员工 TOTP（二因素移除属高危——吊销其全部管理面会话强制重登，
-// 员工下次登录自行重新绑定）。
+// ResetAdminTOTP 解綁員工 TOTP（二因素移除屬高危——吊銷其全部管理面會話強制重登，
+// 員工下次登錄自行重新綁定）。
 func (s *AdminUserService) ResetAdminTOTP(ctx context.Context, req *adminv1.ResetAdminTOTPRequest) (*adminv1.Admin, error) {
-	return nil, errors.BadRequest("identity.REAUTH_REQUIRED", "请使用新版身份验证流程重置，或在服务器执行 admin reset-2fa")
+	return nil, errors.BadRequest("identity.REAUTH_REQUIRED", "請使用新版身份驗證流程重置，或在服務器執行 admin reset-2fa")
 }
 
-// adminByID 回读员工最新状态（含角色名）。
+// adminByID 回讀員工最新狀態（含角色名）。
 func (s *AdminUserService) adminByID(ctx context.Context, id uint64) (*adminv1.Admin, error) {
 	a, err := s.readers.Admin(ctx, id)
 	if err != nil || a == nil {
-		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "员工不存在")
+		return nil, errors.NotFound("identity.ADMIN_NOT_FOUND", "員工不存在")
 	}
 	roleName := ""
 	if s.repo != nil {
@@ -265,10 +265,10 @@ func mapRoleErr(err error) error {
 	case errors.Is(err, ErrRoleNotFound):
 		return errors.NotFound("authz.ROLE_NOT_FOUND", "角色不存在")
 	case errors.Is(err, ErrRoleBuiltIn):
-		return errors.Forbidden("authz.ROLE_BUILTIN", "内置角色受保护")
+		return errors.Forbidden("authz.ROLE_BUILTIN", "內置角色受保護")
 	case errors.Is(err, ErrRoleInUse):
-		return errors.Conflict("authz.ROLE_IN_USE", "角色仍有员工挂载")
+		return errors.Conflict("authz.ROLE_IN_USE", "角色仍有員工掛載")
 	default:
-		return errors.InternalServer("authz.ROLE_OP_FAILED", "角色操作失败")
+		return errors.InternalServer("authz.ROLE_OP_FAILED", "角色操作失敗")
 	}
 }

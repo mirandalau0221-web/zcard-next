@@ -17,11 +17,11 @@ type Session struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
-	// 双 realm：admin_users.id 或 users.id
+	// 雙 realm：admin_users.id 或 users.id
 	Realm session.Realm `json:"realm,omitempty"`
 	// 按 realm 指向 admin_users/users
 	UserID uint64 `json:"user_id,omitempty"`
-	// refresh 令牌哈希（SHA-256，明文绝不落库）
+	// refresh 令牌哈希（SHA-256，明文絕不落庫）
 	RefreshTokenHash string `json:"refresh_token_hash,omitempty"`
 	// AuthVersion holds the value of the "auth_version" field.
 	AuthVersion int `json:"auth_version,omitempty"`

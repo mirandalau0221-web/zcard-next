@@ -30,7 +30,7 @@ func (s *AdminCatalogService) SetProductLock(ctx context.Context, req *adminv1.S
 			return e
 		}
 		if n != 1 {
-			return errors.Conflict("catalog.LOCK_STALE", "商品状态已变化，请刷新后重试")
+			return errors.Conflict("catalog.LOCK_STALE", "商品狀態已變化，請刷新後重試")
 		}
 		p, e := c.Product.Get(ctx, req.Id)
 		if e != nil {
@@ -49,7 +49,7 @@ func editableBatch(ctx context.Context, d *data.Data, ids []uint64) ([]*ent.Prod
 	slices.Sort(ids)
 	ids = slices.Compact(ids)
 	if len(ids) == 0 || len(ids) > 1000 || ids[0] == 0 {
-		return nil, 0, errors.BadRequest("catalog.BATCH_INVALID", "请选择 1～1000 件商品")
+		return nil, 0, errors.BadRequest("catalog.BATCH_INVALID", "請選擇 1～1000 件商品")
 	}
 	rows := make([]*ent.Product, 0, len(ids))
 	var skipped int32
@@ -69,7 +69,7 @@ func editableBatch(ctx context.Context, d *data.Data, ids []uint64) ([]*ent.Prod
 
 func (r *ProductRepoImpl) batchStatus(ctx context.Context, ids []uint64, status int8) (updated int, skipped int32, err error) {
 	if status < 0 || status > 2 {
-		return 0, 0, errors.BadRequest("catalog.STATUS_INVALID", "请选择有效的上下架状态")
+		return 0, 0, errors.BadRequest("catalog.STATUS_INVALID", "請選擇有效的上下架狀態")
 	}
 	err = data.Tx(ctx, r.data, func(ctx context.Context) error {
 		rows, n, e := editableBatch(ctx, r.data, ids)

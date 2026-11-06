@@ -34,7 +34,7 @@ func (s *AdminCatalogService) GetCategoryPlacements(ctx context.Context, req *ad
 	tenant := tenancy.FromContext(ctx).SubsiteID
 	cat, err := c.Category.Query().Where(category.ID(req.CategoryId), category.SubsiteID(tenant)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("catalog.CATEGORY_NOT_FOUND", "分类不存在")
+		return nil, errors.NotFound("catalog.CATEGORY_NOT_FOUND", "分類不存在")
 	}
 	if err != nil {
 		return nil, err
@@ -69,18 +69,18 @@ func (s *AdminCatalogService) GetCategoryPlacements(ctx context.Context, req *ad
 		row := byID[p.ProductID]
 		switch {
 		case row == nil || row.Status < 0:
-			item.UnavailableReason = "商品已删除，设置已失效"
+			item.UnavailableReason = "商品已刪除，設置已失效"
 		case !descendants[row.CategoryID]:
-			item.UnavailableReason = "商品已移出本分类范围，设置已失效"
+			item.UnavailableReason = "商品已移出本分類範圍，設置已失效"
 		case data.CategoryHidden(hidden, row.CategoryID):
-			item.UnavailableReason = "商品所属分类或上级分类已隐藏"
+			item.UnavailableReason = "商品所屬分類或上級分類已隱藏"
 		case row.Status != 1:
-			item.UnavailableReason = "商品未上架，恢复上架后展示"
+			item.UnavailableReason = "商品未上架，恢復上架後展示"
 		}
 		if row != nil {
 			item.Product = ToAdminPB(row)
 		} else {
-			item.Product = &adminv1.AdminProduct{Id: p.ProductID, Name: "已删除商品"}
+			item.Product = &adminv1.AdminProduct{Id: p.ProductID, Name: "已刪除商品"}
 		}
 		out.Items = append(out.Items, item)
 	}
@@ -99,10 +99,10 @@ func (s *AdminCatalogService) SetCategoryPlacements(ctx context.Context, req *ad
 	positions := map[int32]bool{}
 	for _, p := range req.Items {
 		if p == nil || p.ProductId == 0 || wanted[p.ProductId] != nil || p.Position < 0 || (!p.IsPinned && !p.IsRecommended) {
-			return nil, errors.BadRequest("catalog.PLACEMENT_INVALID", "商品重复或设置无效，请重新选择")
+			return nil, errors.BadRequest("catalog.PLACEMENT_INVALID", "商品重複或設置無效，請重新選擇")
 		}
 		if p.IsPinned && positions[p.Position] {
-			return nil, errors.BadRequest("catalog.PLACEMENT_INVALID", "置顶顺序不能重复，请重新调整")
+			return nil, errors.BadRequest("catalog.PLACEMENT_INVALID", "置頂順序不能重複，請重新調整")
 		}
 		if p.IsPinned {
 			positions[p.Position] = true
@@ -120,7 +120,7 @@ func (s *AdminCatalogService) SetCategoryPlacements(ctx context.Context, req *ad
 			return e
 		}
 		if n != 1 {
-			return errors.Conflict("catalog.PLACEMENT_STALE", "分类设置已被更新，请重新加载后调整；当前草稿已保留")
+			return errors.Conflict("catalog.PLACEMENT_STALE", "分類設置已被更新，請重新加載後調整；當前草稿已保留")
 		}
 		current, e := c.CategoryProductPlacement.Query().Where(placement.SubsiteID(tenant), placement.CategoryID(req.CategoryId)).All(ctx)
 		if e != nil {
@@ -157,14 +157,14 @@ func (s *AdminCatalogService) SetCategoryPlacements(ctx context.Context, req *ad
 				continue
 			}
 			if e != nil {
-				return errors.BadRequest("catalog.PLACEMENT_PRODUCT_MISSING", "商品不存在或不属于当前站点")
+				return errors.BadRequest("catalog.PLACEMENT_PRODUCT_MISSING", "商品不存在或不屬於當前站點")
 			}
 			p, e = data.GuardProductWrite(ctx, s.repo.data, id)
 			if e != nil {
 				return e
 			}
 			if next != nil && !descendants[p.CategoryID] {
-				return errors.BadRequest("catalog.PLACEMENT_OUTSIDE", "商品已不属于当前分类或其子分类，请重新选择")
+				return errors.BadRequest("catalog.PLACEMENT_OUTSIDE", "商品已不屬於當前分類或其子分類，請重新選擇")
 			}
 			if next == nil {
 				if e = c.CategoryProductPlacement.DeleteOneID(before.ID).Exec(ctx); e != nil {

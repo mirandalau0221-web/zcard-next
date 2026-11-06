@@ -77,7 +77,7 @@ export interface TrafficPoint {
   uv: number;
 }
 
-/** 获取工作台统计数据（金额单位为分；trendDays 趋势天数 7/14/30，默认 7） */
+/** 獲取工作台統計數據（金額單位為分；trendDays 趨勢天數 7/14/30，默認 7） */
 export function fetchDashboard(trendDays?: number) {
   return request<DashboardData>({
     url: "/api/v1/admin/dashboard",
@@ -86,7 +86,7 @@ export function fetchDashboard(trendDays?: number) {
   });
 }
 
-/** 获取流量统计（PV/UV 按天；days 7/14/30，默认 7） */
+/** 獲取流量統計（PV/UV 按天；days 7/14/30，默認 7） */
 export function fetchTraffic(days?: number) {
   return request<{ points: TrafficPoint[] }>({
     url: "/api/v1/admin/dashboard/traffic",

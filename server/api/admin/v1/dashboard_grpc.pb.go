@@ -34,24 +34,24 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminDashboardService 工作台指标(v1）。
+// AdminDashboardService 工作台指標(v1）。
 type AdminDashboardServiceClient interface {
-	// GetReconciliation 对账总览。
+	// GetReconciliation 對賬總覽。
 	GetReconciliation(ctx context.Context, in *GetReconciliationRequest, opts ...grpc.CallOption) (*GetReconciliationReply, error)
 	// ListCommissions 佣金列表(affiliate）。
 	ListCommissions(ctx context.Context, in *ListCommissionsRequest, opts ...grpc.CallOption) (*ListCommissionsReply, error)
 	GetDashboard(ctx context.Context, in *GetDashboardRequest, opts ...grpc.CallOption) (*DashboardReply, error)
-	// GetTraffic 流量统计（PV/UV 按天；page_views 明细表）。
+	// GetTraffic 流量統計（PV/UV 按天；page_views 明細表）。
 	GetTraffic(ctx context.Context, in *GetTrafficRequest, opts ...grpc.CallOption) (*GetTrafficReply, error)
-	// GetDailyStats 历史日结查询（只扫 daily_stats；分站视角自动隔离）。
+	// GetDailyStats 歷史日結查詢（只掃 daily_stats；分站視角自動隔離）。
 	GetDailyStats(ctx context.Context, in *GetDailyStatsRequest, opts ...grpc.CallOption) (*GetDailyStatsReply, error)
-	// CreateReconciliationJob 创建货源对账任务（时间窗 ≤31 天）。
+	// CreateReconciliationJob 創建貨源對賬任務（時間窗 ≤31 天）。
 	CreateReconciliationJob(ctx context.Context, in *CreateReconciliationJobRequest, opts ...grpc.CallOption) (*ReconciliationJobItem, error)
-	// GetReconciliationJob 对账任务详情（四态计数 + 状态可查）。
+	// GetReconciliationJob 對賬任務詳情（四態計數 + 狀態可查）。
 	GetReconciliationJob(ctx context.Context, in *GetReconciliationJobRequest, opts ...grpc.CallOption) (*ReconciliationJobItem, error)
-	// RunReconciliationJob 执行任务（pending → processing → done/failed）。
+	// RunReconciliationJob 執行任務（pending → processing → done/failed）。
 	RunReconciliationJob(ctx context.Context, in *RunReconciliationJobRequest, opts ...grpc.CallOption) (*ReconciliationJobItem, error)
-	// ListReconciliationItems 对账明细分页（四态筛选）。
+	// ListReconciliationItems 對賬明細分頁（四態篩選）。
 	ListReconciliationItems(ctx context.Context, in *ListReconciliationItemsRequest, opts ...grpc.CallOption) (*ListReconciliationItemsReply, error)
 }
 
@@ -157,24 +157,24 @@ func (c *adminDashboardServiceClient) ListReconciliationItems(ctx context.Contex
 // All implementations must embed UnimplementedAdminDashboardServiceServer
 // for forward compatibility.
 //
-// AdminDashboardService 工作台指标(v1）。
+// AdminDashboardService 工作台指標(v1）。
 type AdminDashboardServiceServer interface {
-	// GetReconciliation 对账总览。
+	// GetReconciliation 對賬總覽。
 	GetReconciliation(context.Context, *GetReconciliationRequest) (*GetReconciliationReply, error)
 	// ListCommissions 佣金列表(affiliate）。
 	ListCommissions(context.Context, *ListCommissionsRequest) (*ListCommissionsReply, error)
 	GetDashboard(context.Context, *GetDashboardRequest) (*DashboardReply, error)
-	// GetTraffic 流量统计（PV/UV 按天；page_views 明细表）。
+	// GetTraffic 流量統計（PV/UV 按天；page_views 明細表）。
 	GetTraffic(context.Context, *GetTrafficRequest) (*GetTrafficReply, error)
-	// GetDailyStats 历史日结查询（只扫 daily_stats；分站视角自动隔离）。
+	// GetDailyStats 歷史日結查詢（只掃 daily_stats；分站視角自動隔離）。
 	GetDailyStats(context.Context, *GetDailyStatsRequest) (*GetDailyStatsReply, error)
-	// CreateReconciliationJob 创建货源对账任务（时间窗 ≤31 天）。
+	// CreateReconciliationJob 創建貨源對賬任務（時間窗 ≤31 天）。
 	CreateReconciliationJob(context.Context, *CreateReconciliationJobRequest) (*ReconciliationJobItem, error)
-	// GetReconciliationJob 对账任务详情（四态计数 + 状态可查）。
+	// GetReconciliationJob 對賬任務詳情（四態計數 + 狀態可查）。
 	GetReconciliationJob(context.Context, *GetReconciliationJobRequest) (*ReconciliationJobItem, error)
-	// RunReconciliationJob 执行任务（pending → processing → done/failed）。
+	// RunReconciliationJob 執行任務（pending → processing → done/failed）。
 	RunReconciliationJob(context.Context, *RunReconciliationJobRequest) (*ReconciliationJobItem, error)
-	// ListReconciliationItems 对账明细分页（四态筛选）。
+	// ListReconciliationItems 對賬明細分頁（四態篩選）。
 	ListReconciliationItems(context.Context, *ListReconciliationItemsRequest) (*ListReconciliationItemsReply, error)
 	mustEmbedUnimplementedAdminDashboardServiceServer()
 }

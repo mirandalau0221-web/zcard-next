@@ -1,6 +1,6 @@
-// 在线更新模块（doc/在线更新方案.md）：更新链 service + admin API。
+// 在線更新模塊（doc/在線更新方案.md）：更新鏈 service + admin API。
 //
-// 分层：platform/updater（引擎）← 本模块（业务编排：源配置/进度/单飞/重启 hook）
+// 分層：platform/updater（引擎）← 本模塊（業務編排：源配置/進度/單飛/重啓 hook）
 // ← adminv1（HTTP 面）+ cmd CLI（self-update 共用 BackupDatabase）。
 package update
 
@@ -21,9 +21,9 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data"
 )
 
-// BackupDatabase 方言感知更新前备份（方案 §7——schema 只前滚，备份是回滚安全网）。
+// BackupDatabase 方言感知更新前備份（方案 §7——schema 只前滾，備份是回滾安全網）。
 // SQLite VACUUM INTO（WAL 一致快照零外部工具）/ mysqldump / pg_dump；
-// 失败即中止更新（fail-closed，不提供跳过——数据安全优先）。
+// 失敗即中止更新（fail-closed，不提供跳過——數據安全優先）。
 func BackupDatabase(ctx context.Context, dataCfg *conf.Data, destDir string) error {
 	if dataCfg == nil || dataCfg.Database == nil || dataCfg.Database.Driver == "" {
 		return fmt.Errorf("配置缺 data.database")
@@ -41,7 +41,7 @@ func BackupDatabase(ctx context.Context, dataCfg *conf.Data, destDir string) err
 		defer cleanup()
 		dest := filepath.Join(destDir, "zcard.db")
 		if _, err := d.DB.ExecContext(ctx, "VACUUM INTO ?", dest); err != nil {
-			return fmt.Errorf("VACUUM INTO 失败: %w", err)
+			return fmt.Errorf("VACUUM INTO 失敗: %w", err)
 		}
 		return nil
 	case "mysql":
@@ -53,17 +53,17 @@ func BackupDatabase(ctx context.Context, dataCfg *conf.Data, destDir string) err
 	}
 }
 
-// dumpMysql MySQL 备份：mysqldump 不认 URL/Go DSN（直接传会当库名且丢密码——
-// using password: NO 实测），须解析后经 --defaults-extra-file 传凭据（0600 临时
-// 文件，密码不进进程参数表 ps 可见面），用后即删。
+// dumpMysql MySQL 備份：mysqldump 不認 URL/Go DSN（直接傳會當庫名且丟密碼——
+// using password: NO 實測），須解析後經 --defaults-extra-file 傳憑據（0600 臨時
+// 文件，密碼不進進程參數表 ps 可見面），用後即刪。
 func dumpMysql(ctx context.Context, dest, dsn string) error {
 	bin, err := exec.LookPath("mysqldump")
 	if err != nil {
-		return fmt.Errorf("mysqldump 不在 PATH（apt install default-mysql-client 后重试）: %w", err)
+		return fmt.Errorf("mysqldump 不在 PATH（apt install default-mysql-client 後重試）: %w", err)
 	}
 	cfg, err := mysql.ParseDSN(dsn)
 	if err != nil {
-		return fmt.Errorf("MySQL 连接串解析失败: %w", err)
+		return fmt.Errorf("MySQL 連接串解析失敗: %w", err)
 	}
 	host, port, _ := net.SplitHostPort(cfg.Addr)
 	if host == "" {
@@ -99,20 +99,20 @@ func dumpMysql(ctx context.Context, dest, dsn string) error {
 	if err := cmd.Run(); err != nil {
 		msg := strings.TrimSpace(errBuf.String())
 		if strings.Contains(msg, "Access denied") || strings.Contains(msg, "1045") {
-			return fmt.Errorf("mysqldump 失败: 数据库认证被拒（检查 config.yaml / database.yaml 的 data.database 连接账号密码）: %s", tail(msg, 300))
+			return fmt.Errorf("mysqldump 失敗: 數據庫認證被拒（檢查 config.yaml / database.yaml 的 data.database 連接賬號密碼）: %s", tail(msg, 300))
 		}
-		return fmt.Errorf("mysqldump 失败: %v: %s", err, tail(msg, 400))
+		return fmt.Errorf("mysqldump 失敗: %v: %s", err, tail(msg, 400))
 	}
 	return nil
 }
 
-// dumpCommand mysqldump/pg_dump 落盘（外部工具缺失给明确指引；执行失败
-// 捕获 stderr 回传——pg_dump 的版本不匹配/认证失败等原因必须直达面板，
-// 不能只留一个 exit status 1 让用户猜）。
+// dumpCommand mysqldump/pg_dump 落盤（外部工具缺失給明確指引；執行失敗
+// 捕獲 stderr 回傳——pg_dump 的版本不匹配/認證失敗等原因必須直達面板，
+// 不能只留一個 exit status 1 讓用户猜）。
 func dumpCommand(ctx context.Context, dest, tool, dsn string) error {
 	bin, err := exec.LookPath(tool)
 	if err != nil {
-		return fmt.Errorf("%s 不在 PATH（%s 后重试）: %w", tool, map[string]string{
+		return fmt.Errorf("%s 不在 PATH（%s 後重試）: %w", tool, map[string]string{
 			"pg_dump":   "apt install postgresql-client",
 			"mysqldump": "apt install default-mysql-client",
 		}[tool], err)
@@ -125,22 +125,22 @@ func dumpCommand(ctx context.Context, dest, tool, dsn string) error {
 	var errBuf bytes.Buffer
 	cmd := exec.CommandContext(ctx, bin, dsn)
 	cmd.Stdout = f
-	cmd.Stderr = io.MultiWriter(os.Stderr, &errBuf) // 服务日志留全量，面板收摘要
+	cmd.Stderr = io.MultiWriter(os.Stderr, &errBuf) // 服務日誌留全量，面板收摘要
 	if err := cmd.Run(); err != nil {
 		msg := strings.TrimSpace(errBuf.String())
-		// 常见分类:服务器版本较新——客户端必须同大版本
+		// 常見分類:服務器版本較新——客户端必須同大版本
 		if strings.Contains(msg, "server version mismatch") || strings.Contains(msg, "server version") && strings.Contains(msg, "incompatible") {
-			return fmt.Errorf("%s 失败: 服务器 PostgreSQL 版本较新，需安装同大版本客户端（如 apt install postgresql-client-16 / postgresql-client-17）: %s", tool, tail(msg, 400))
+			return fmt.Errorf("%s 失敗: 服務器 PostgreSQL 版本較新，需安裝同大版本客户端（如 apt install postgresql-client-16 / postgresql-client-17）: %s", tool, tail(msg, 400))
 		}
 		if strings.Contains(msg, "password authentication") || strings.Contains(msg, "no password supplied") {
-			return fmt.Errorf("%s 失败: 数据库认证失败（检查 config.yaml 的 data.database 连接信息）: %s", tool, tail(msg, 300))
+			return fmt.Errorf("%s 失敗: 數據庫認證失敗（檢查 config.yaml 的 data.database 連接信息）: %s", tool, tail(msg, 300))
 		}
-		return fmt.Errorf("%s 失败: %v: %s", tool, err, tail(msg, 400))
+		return fmt.Errorf("%s 失敗: %v: %s", tool, err, tail(msg, 400))
 	}
 	return nil
 }
 
-// tail 截尾部 n 字节（pg_dump 错误要点在末尾；防面板超长）。
+// tail 截尾部 n 字節（pg_dump 錯誤要點在末尾；防面板超長）。
 func tail(s string, n int) string {
 	if len(s) <= n {
 		return s

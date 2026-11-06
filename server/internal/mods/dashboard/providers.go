@@ -11,8 +11,8 @@ import (
 	"github.com/google/wire"
 )
 
-// settingsReaderAdapter settings.RepoImpl → dashboardport.SettingsReader 适配
-// （低库存阈值读取；读失败走默认值，不阻断工作台统计）。
+// settingsReaderAdapter settings.RepoImpl → dashboardport.SettingsReader 適配
+// （低庫存閾值讀取；讀失敗走默認值，不阻斷工作台統計）。
 type settingsReaderAdapter struct{ repo *settings.RepoImpl }
 
 func (a settingsReaderAdapter) GetJSON(ctx context.Context, group, key string) ([]byte, error) {
@@ -23,7 +23,7 @@ func (a settingsReaderAdapter) GetJSON(ctx context.Context, group, key string) (
 	return raw, nil
 }
 
-// ProvideSettingsReader settings 适配为通用端口（通道 A）。
+// ProvideSettingsReader settings 適配為通用端口（通道 A）。
 func ProvideSettingsReader(repo *settings.RepoImpl) dashboardport.SettingsReader {
 	return settingsReaderAdapter{repo: repo}
 }
@@ -33,5 +33,5 @@ var ProviderSet = wire.NewSet(
 	NewDashboardRepoImpl,
 	NewReconciler,
 	NewAdminDashboardService,
-	ProvideSettingsReader, // dashboardport.SettingsReader 绑定（低库存阈值等）
+	ProvideSettingsReader, // dashboardport.SettingsReader 綁定（低庫存閾值等）
 )

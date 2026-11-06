@@ -1,6 +1,6 @@
 package license
 
-// StoreLicenseService 专业套餐购买 storefront 面（ ）。
+// StoreLicenseService 專業套餐購買 storefront 面（ ）。
 
 import (
 	"context"
@@ -14,26 +14,26 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// StoreLicenseService 服务。
+// StoreLicenseService 服務。
 type StoreLicenseService struct {
 	storefrontv1.UnimplementedStoreLicenseServiceServer
 	repo *PurchaseRepo
 }
 
-// NewStoreLicenseService 构造。
+// NewStoreLicenseService 構造。
 func NewStoreLicenseService(repo *PurchaseRepo) *StoreLicenseService {
 	return &StoreLicenseService{repo: repo}
 }
 
-// GetLicenseOffer 报价（登录；价格服务端裁决；余额走 wallet GetBalance）。
+// GetLicenseOffer 報價（登錄；價格服務端裁決；餘額走 wallet GetBalance）。
 func (s *StoreLicenseService) GetLicenseOffer(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.LicenseOfferReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	offer, err := s.repo.Offer(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("license.OFFER_FAILED", "读取报价失败")
+		return nil, errors.InternalServer("license.OFFER_FAILED", "讀取報價失敗")
 	}
 	return &storefrontv1.LicenseOfferReply{
 		MonthlyCents: offer.MonthlyCents,
@@ -43,30 +43,30 @@ func (s *StoreLicenseService) GetLicenseOffer(ctx context.Context, _ *emptypb.Em
 	}, nil
 }
 
-// PurchaseLicense 购买（扣款+签发同事务；返回许可证文件）。
+// PurchaseLicense 購買（扣款+簽發同事務；返回許可證文件）。
 func (s *StoreLicenseService) PurchaseLicense(ctx context.Context, req *storefrontv1.PurchaseLicenseRequest) (*storefrontv1.PurchaseLicenseReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	plan := strings.ToLower(req.GetPlan())
 	if plan != "monthly" && plan != "yearly" {
-		return nil, errors.BadRequest("license.PLAN_INVALID", "套餐档位非法（monthly|yearly）")
+		return nil, errors.BadRequest("license.PLAN_INVALID", "套餐檔位非法（monthly|yearly）")
 	}
 	row, err := s.repo.Purchase(ctx, claims.Subject, plan, req.GetInstanceId(), req.GetDomain())
 	if err != nil {
 		msg := err.Error()
 		switch {
 		case strings.Contains(msg, "ISSUER_UNCONFIGURED"):
-			return nil, errors.BadRequest("license.ISSUER_UNCONFIGURED", "本部署未配置签发密钥，暂不支持在线购买")
+			return nil, errors.BadRequest("license.ISSUER_UNCONFIGURED", "本部署未配置簽發密鑰，暫不支持在線購買")
 		case strings.Contains(msg, "BALANCE_INSUFFICIENT"):
-			return nil, errors.BadRequest("license.BALANCE_INSUFFICIENT", "钱包余额不足，请先充值")
+			return nil, errors.BadRequest("license.BALANCE_INSUFFICIENT", "錢包餘額不足，請先充值")
 		case strings.Contains(msg, "PLAN_INVALID"), strings.Contains(msg, "PRICE_INVALID"):
-			return nil, errors.BadRequest("license.PLAN_INVALID", "套餐档位非法或价格未配置")
+			return nil, errors.BadRequest("license.PLAN_INVALID", "套餐檔位非法或價格未配置")
 		case strings.Contains(msg, "PUBKEY"):
-			return nil, errors.InternalServer("license.PUBKEY_UNCONFIGURED", "公钥未配置（发行侧安装校验依赖）")
+			return nil, errors.InternalServer("license.PUBKEY_UNCONFIGURED", "公鑰未配置（發行側安裝校驗依賴）")
 		}
-		return nil, errors.InternalServer("license.PURCHASE_FAILED", "购买失败")
+		return nil, errors.InternalServer("license.PURCHASE_FAILED", "購買失敗")
 	}
 	return &storefrontv1.PurchaseLicenseReply{
 		OrderId:     row.ID,
@@ -76,11 +76,11 @@ func (s *StoreLicenseService) PurchaseLicense(ctx context.Context, req *storefro
 	}, nil
 }
 
-// ListLicenseOrders 购买记录（含许可证文件重下载）。
+// ListLicenseOrders 購買記錄（含許可證文件重下載）。
 func (s *StoreLicenseService) ListLicenseOrders(ctx context.Context, req *storefrontv1.ListLicenseOrdersRequest) (*storefrontv1.ListLicenseOrdersReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	page, size := int(req.GetPage()), int(req.GetPageSize())
 	if page < 1 {
@@ -91,7 +91,7 @@ func (s *StoreLicenseService) ListLicenseOrders(ctx context.Context, req *storef
 	}
 	rows, total, err := s.repo.ListPurchases(ctx, claims.Subject, page, size)
 	if err != nil {
-		return nil, errors.InternalServer("license.ORDERS_FAILED", "读取购买记录失败")
+		return nil, errors.InternalServer("license.ORDERS_FAILED", "讀取購買記錄失敗")
 	}
 	reply := &storefrontv1.ListLicenseOrdersReply{Total: total}
 	for _, row := range rows {

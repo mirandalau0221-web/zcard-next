@@ -1,10 +1,10 @@
 package server
 
-// BackgroundServer 后台服务托管（kratos.Server 生命周期）：
-//   - Outbox relay：所有模式运行（api 进程也需排水事件；SKIP LOCKED + 消费幂等保证多实例安全）
-//   - 进程内 cron：仅 all/worker 模式（多实例部署纪律：无 Redis 多实例 = 需单 worker，ADR-D6）
+// BackgroundServer 後台服務託管（kratos.Server 生命週期）：
+//   - Outbox relay：所有模式運行（api 進程也需排水事件；SKIP LOCKED + 消費冪等保證多實例安全）
+//   - 進程內 cron：僅 all/worker 模式（多實例部署紀律：無 Redis 多實例 = 需單 worker，ADR-D6）
 //
-// 无 Redis（SyncQueue）时 sync 队列经 Dispatcher 直连分发——单进程即完成「写事件→投递→消费」闭环。
+// 無 Redis（SyncQueue）時 sync 隊列經 Dispatcher 直連分發——單進程即完成「寫事件→投遞→消費」閉環。
 
 import (
 	"context"
@@ -15,29 +15,29 @@ import (
 	"github.com/go-kratos/kratos/v3/log"
 )
 
-// RunMode 进程运行模式（main 注入）。
+// RunMode 進程運行模式（main 注入）。
 type RunMode string
 
-// 三种模式（规划 §4.2：api 与 worker 共享全部代码，启动参数选择装配）。
+// 三種模式（規劃 §4.2：api 與 worker 共享全部代碼，啓動參數選擇裝配）。
 const (
 	ModeAll    RunMode = "all"
 	ModeAPI    RunMode = "api"
 	ModeWorker RunMode = "worker"
 )
 
-// BackgroundServer 后台任务 server。
+// BackgroundServer 後台任務 server。
 type BackgroundServer struct {
 	relay *data.OutboxRelay
 	cron  *queue.Cron
 	mode  RunMode
 }
 
-// NewBackgroundServer 构造。
+// NewBackgroundServer 構造。
 func NewBackgroundServer(relay *data.OutboxRelay, cron *queue.Cron, mode RunMode) *BackgroundServer {
 	return &BackgroundServer{relay: relay, cron: cron, mode: mode}
 }
 
-// Start 启动 relay（全模式）与 cron（all/worker 模式）。
+// Start 啓動 relay（全模式）與 cron（all/worker 模式）。
 func (s *BackgroundServer) Start(ctx context.Context) error {
 	go s.relay.Run(ctx)
 	if s.mode == ModeAll || s.mode == ModeWorker {

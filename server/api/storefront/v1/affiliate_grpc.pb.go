@@ -29,13 +29,13 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreAffiliateService 我的分销：推广码/团队/佣金流水/统计。
+// StoreAffiliateService 我的分銷：推廣碼/團隊/佣金流水/統計。
 type StoreAffiliateServiceClient interface {
-	// MyAffiliate 推广码 + 统计（登录用户）。
+	// MyAffiliate 推廣碼 + 統計（登錄用户）。
 	MyAffiliate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MyAffiliateReply, error)
-	// ListTeam 下级列表（脱敏用户名）。
+	// ListTeam 下級列表（脱敏用户名）。
 	ListTeam(ctx context.Context, in *ListTeamRequest, opts ...grpc.CallOption) (*ListTeamReply, error)
-	// ListCommissions 佣金流水（正 + 负债行）。
+	// ListCommissions 佣金流水（正 + 負債行）。
 	ListCommissions(ctx context.Context, in *ListMyCommissionsRequest, opts ...grpc.CallOption) (*ListMyCommissionsReply, error)
 }
 
@@ -81,13 +81,13 @@ func (c *storeAffiliateServiceClient) ListCommissions(ctx context.Context, in *L
 // All implementations must embed UnimplementedStoreAffiliateServiceServer
 // for forward compatibility.
 //
-// StoreAffiliateService 我的分销：推广码/团队/佣金流水/统计。
+// StoreAffiliateService 我的分銷：推廣碼/團隊/佣金流水/統計。
 type StoreAffiliateServiceServer interface {
-	// MyAffiliate 推广码 + 统计（登录用户）。
+	// MyAffiliate 推廣碼 + 統計（登錄用户）。
 	MyAffiliate(context.Context, *emptypb.Empty) (*MyAffiliateReply, error)
-	// ListTeam 下级列表（脱敏用户名）。
+	// ListTeam 下級列表（脱敏用户名）。
 	ListTeam(context.Context, *ListTeamRequest) (*ListTeamReply, error)
-	// ListCommissions 佣金流水（正 + 负债行）。
+	// ListCommissions 佣金流水（正 + 負債行）。
 	ListCommissions(context.Context, *ListMyCommissionsRequest) (*ListMyCommissionsReply, error)
 	mustEmbedUnimplementedStoreAffiliateServiceServer()
 }

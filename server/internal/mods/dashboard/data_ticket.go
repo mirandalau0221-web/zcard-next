@@ -7,7 +7,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/ticket"
 )
 
-// GetTicketPending 与工单工作台一致：全站客服工单，已解决/关闭不参与提醒。
+// GetTicketPending 與工單工作台一致：全站客服工單，已解決/關閉不參與提醒。
 func (r *DashboardRepoImpl) GetTicketPending(ctx context.Context) (open, processing, urgent int64, err error) {
 	var rows []struct {
 		Status   string `json:"status"`

@@ -27,11 +27,11 @@ const assignmentLimit = 10000
 
 func (r *CardRepoImpl) inventoryProduct(ctx context.Context, id uint64) (*ent.Product, error) {
 	if id == 0 {
-		return nil, errors.BadRequest("inventory.INVALID_INPUT", "请选择商品")
+		return nil, errors.BadRequest("inventory.INVALID_INPUT", "請選擇商品")
 	}
 	p, err := data.Client(ctx, r.data).Product.Query().Where(product.ID(id), product.SubsiteID(tenancy.FromContext(ctx).SubsiteID), product.StatusGTE(0)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("inventory.PRODUCT_NOT_FOUND", "商品不存在或已删除")
+		return nil, errors.NotFound("inventory.PRODUCT_NOT_FOUND", "商品不存在或已刪除")
 	}
 	return p, err
 }
@@ -46,26 +46,26 @@ func (r *CardRepoImpl) inventorySkus(ctx context.Context, p *ent.Product, locked
 
 func importEligibility(p *ent.Product, sku *ent.ProductSku) string {
 	if p.IsLocked {
-		return "商品已锁定，请先解锁"
+		return "商品已鎖定，請先解鎖"
 	}
 	if p.ProductKind == "sms_channel" {
-		return "渠道接码商品不使用卡密库存"
+		return "渠道接碼商品不使用卡密庫存"
 	}
 	if p.GoodsType == "physical" {
-		return "实体商品不能导入卡密，请调整实物库存"
+		return "實體商品不能導入卡密，請調整實物庫存"
 	}
 	if p.StockType != "card" {
-		return "链接或兑换码商品无需导入卡密，请维护直发内容"
+		return "鏈接或兑換碼商品無需導入卡密，請維護直髮內容"
 	}
 	switch data.StockSource(p, sku) {
 	case "local":
 		return ""
 	case "manual":
-		return "人工交付规格不使用自动卡密库存"
+		return "人工交付規格不使用自動卡密庫存"
 	case "reuse":
-		return "重复发货规格请在发货设置中维护内容"
+		return "重複發貨規格請在發貨設置中維護內容"
 	default:
-		return "该规格使用上游采购，请先在发货设置中切换为本地卡密"
+		return "該規格使用上游採購，請先在發貨設置中切換為本地卡密"
 	}
 }
 
@@ -75,9 +75,9 @@ func (r *CardRepoImpl) importTarget(ctx context.Context, p *ent.Product, skuID u
 		return "", err
 	}
 	var selected *ent.ProductSku
-	name := "默认规格"
+	name := "默認規格"
 	if len(skus) > 0 && skuID == 0 {
-		return "", errors.BadRequest("inventory.SKU_REQUIRED", "该商品有规格，请明确选择导入规格")
+		return "", errors.BadRequest("inventory.SKU_REQUIRED", "該商品有規格，請明確選擇導入規格")
 	}
 	if skuID > 0 {
 		for _, sku := range skus {
@@ -88,7 +88,7 @@ func (r *CardRepoImpl) importTarget(ctx context.Context, p *ent.Product, skuID u
 			}
 		}
 		if selected == nil {
-			return "", errors.BadRequest("inventory.SKU_INVALID", "规格不存在或不属于该商品")
+			return "", errors.BadRequest("inventory.SKU_INVALID", "規格不存在或不屬於該商品")
 		}
 	}
 	if reason := importEligibility(p, selected); reason != "" {
@@ -123,7 +123,7 @@ func skuPredicate(sku *uint64) predicate.Card {
 
 func (s *AdminInventoryService) skuNames(ctx context.Context, productID, subsiteID uint64) (map[uint64]string, error) {
 	rows, err := data.Client(ctx, s.data).ProductSku.Query().Where(productsku.ProductID(productID), productsku.SubsiteID(subsiteID)).Select(productsku.FieldID, productsku.FieldName).All(ctx)
-	out := map[uint64]string{0: "商品默认池"}
+	out := map[uint64]string{0: "商品默認池"}
 	for _, row := range rows {
 		out[row.ID] = row.Name
 	}
@@ -133,23 +133,23 @@ func skuLabel(names map[uint64]string, id uint64) string {
 	if name, ok := names[id]; ok {
 		return name
 	}
-	return fmt.Sprintf("已删除规格 #%d", id)
+	return fmt.Sprintf("已刪除規格 #%d", id)
 }
 
 // GetTargets returns only inventory metadata, without catalog prices or costs.
 func (s *AdminInventoryService) GetTargets(ctx context.Context, req *adminv1.InventoryTargetsRequest) (*adminv1.InventoryTargetsReply, error) {
 	p, err := s.repo.inventoryProduct(ctx, req.GetProductId())
 	if err != nil {
-		return nil, inventoryTransportError(err, "inventory.LIST_FAILED", "读取商品失败")
+		return nil, inventoryTransportError(err, "inventory.LIST_FAILED", "讀取商品失敗")
 	}
 	skus, err := s.repo.inventorySkus(ctx, p, false)
 	if err != nil {
-		return nil, errors.InternalServer("inventory.LIST_FAILED", "读取规格失败")
+		return nil, errors.InternalServer("inventory.LIST_FAILED", "讀取規格失敗")
 	}
 	reply := &adminv1.InventoryTargetsReply{ProductId: p.ID, ProductName: p.Name, Revision: p.LockVersion, HasSkus: len(skus) > 0}
-	def := &adminv1.InventoryTarget{SkuId: 0, SkuName: "商品默认池", Reason: importEligibility(p, nil)}
+	def := &adminv1.InventoryTarget{SkuId: 0, SkuName: "商品默認池", Reason: importEligibility(p, nil)}
 	if len(skus) > 0 {
-		def.Reason = "该商品有规格，默认池仅供查看和历史归属，请选择具体规格导入"
+		def.Reason = "該商品有規格，默認池僅供查看和歷史歸屬，請選擇具體規格導入"
 	}
 	def.CanImport = def.Reason == ""
 	reply.Targets = append(reply.Targets, def)
@@ -162,12 +162,12 @@ func (s *AdminInventoryService) GetTargets(ctx context.Context, req *adminv1.Inv
 	}
 	counts, err := inventoryCounts(ctx, data.Client(ctx, s.data).Card.Query().Where(card.ProductID(p.ID), card.SubsiteID(p.SubsiteID)), false)
 	if err != nil {
-		return nil, errors.InternalServer("inventory.LIST_FAILED", "读取库存失败")
+		return nil, errors.InternalServer("inventory.LIST_FAILED", "讀取庫存失敗")
 	}
 	for _, row := range counts {
 		id := row.skuID()
 		if byID[id] == nil {
-			target := &adminv1.InventoryTarget{SkuId: id, SkuName: fmt.Sprintf("已删除规格 #%d", id), Reason: "规格已删除，存量仅供查看"}
+			target := &adminv1.InventoryTarget{SkuId: id, SkuName: fmt.Sprintf("已刪除規格 #%d", id), Reason: "規格已刪除，存量僅供查看"}
 			byID[id] = target
 			reply.Targets = append(reply.Targets, target)
 		}
@@ -198,13 +198,13 @@ func eligibleUnassigned() []predicate.Card {
 }
 func uniqueCardIDs(ids []uint64) ([]uint64, error) {
 	if len(ids) == 0 || len(ids) > assignmentLimit {
-		return nil, errors.BadRequest("inventory.INVALID_INPUT", "请选择 1–10000 张卡密")
+		return nil, errors.BadRequest("inventory.INVALID_INPUT", "請選擇 1–10000 張卡密")
 	}
 	out := append([]uint64(nil), ids...)
 	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
 	for i, id := range out {
 		if id == 0 || (i > 0 && out[i-1] == id) {
-			return nil, errors.BadRequest("inventory.INVALID_INPUT", "卡密 ID 不能为空或重复")
+			return nil, errors.BadRequest("inventory.INVALID_INPUT", "卡密 ID 不能為空或重複")
 		}
 	}
 	return out, nil
@@ -212,23 +212,23 @@ func uniqueCardIDs(ids []uint64) ([]uint64, error) {
 func (s *AdminInventoryService) AssignPreview(ctx context.Context, req *adminv1.AssignPreviewRequest) (*adminv1.AssignPreviewReply, error) {
 	p, err := s.repo.inventoryProduct(ctx, req.GetProductId())
 	if err != nil {
-		return nil, inventoryTransportError(err, "inventory.PREVIEW_FAILED", "读取商品失败")
+		return nil, inventoryTransportError(err, "inventory.PREVIEW_FAILED", "讀取商品失敗")
 	}
 	if req.GetSkuId() == 0 {
-		return nil, errors.BadRequest("inventory.SKU_REQUIRED", "请选择归属的具体规格")
+		return nil, errors.BadRequest("inventory.SKU_REQUIRED", "請選擇歸屬的具體規格")
 	}
 	name, err := s.repo.importTarget(ctx, p, req.GetSkuId(), false)
 	if err != nil {
-		return nil, inventoryTransportError(err, "inventory.PREVIEW_FAILED", "规格不可用")
+		return nil, inventoryTransportError(err, "inventory.PREVIEW_FAILED", "規格不可用")
 	}
 	if (len(req.CardIds) > 0) == (req.GetImportId() > 0) {
-		return nil, errors.BadRequest("inventory.INVALID_INPUT", "请选择卡密或一个原始导入批次")
+		return nil, errors.BadRequest("inventory.INVALID_INPUT", "請選擇卡密或一個原始導入批次")
 	}
 	c := data.Client(ctx, s.data)
 	base := c.Card.Query().Where(card.ProductID(p.ID), card.SubsiteID(p.SubsiteID))
 	if req.GetImportId() > 0 {
 		if _, err = c.CardImport.Query().Where(cardimport.ID(req.GetImportId()), cardimport.ProductID(p.ID), cardimport.SubsiteID(p.SubsiteID)).Only(ctx); err != nil {
-			return nil, errors.NotFound("inventory.BATCH_NOT_FOUND", "导入批次不存在")
+			return nil, errors.NotFound("inventory.BATCH_NOT_FOUND", "導入批次不存在")
 		}
 		base = base.Where(card.ImportID(req.GetImportId()))
 	} else {
@@ -247,7 +247,7 @@ func (s *AdminInventoryService) AssignPreview(ctx context.Context, req *adminv1.
 		return nil, err
 	}
 	if len(ids) > assignmentLimit {
-		return nil, errors.BadRequest("inventory.TOO_MANY_CARDS", "单次最多归属 10000 张卡密，请分批选择")
+		return nil, errors.BadRequest("inventory.TOO_MANY_CARDS", "單次最多歸屬 10000 張卡密，請分批選擇")
 	}
 	blocked, err := lotteryCardReferences(ctx, c, ids)
 	if err != nil {
@@ -261,7 +261,7 @@ func (s *AdminInventoryService) AssignPreview(ctx context.Context, req *adminv1.
 	}
 	ids = allowed
 	if req.GetImportId() == 0 && (total != len(req.CardIds) || len(ids) != total) {
-		return nil, errors.Conflict("inventory.CARDS_CHANGED", "所选卡密不属于该商品、已归属规格或已被使用，请刷新")
+		return nil, errors.Conflict("inventory.CARDS_CHANGED", "所選卡密不屬於該商品、已歸屬規格或已被使用，請刷新")
 	}
 	return &adminv1.AssignPreviewReply{CardIds: ids, EligibleCount: int64(len(ids)), ExcludedCount: int64(total - len(ids)), Revision: p.LockVersion, SkuName: name}, nil
 }
@@ -271,13 +271,13 @@ func (s *AdminInventoryService) AssignCards(ctx context.Context, req *adminv1.As
 		return nil, err
 	}
 	if len(req.GetRequestKey()) > 128 {
-		return nil, errors.BadRequest("inventory.INVALID_INPUT", "请求标识过长")
+		return nil, errors.BadRequest("inventory.INVALID_INPUT", "請求標識過長")
 	}
 	if req.ExpectedRevision == nil {
-		return nil, errors.BadRequest("inventory.PREVIEW_REQUIRED", "请先预览归属结果")
+		return nil, errors.BadRequest("inventory.PREVIEW_REQUIRED", "請先預覽歸屬結果")
 	}
 	if req.GetSkuId() == 0 {
-		return nil, errors.BadRequest("inventory.SKU_REQUIRED", "请选择归属的具体规格")
+		return nil, errors.BadRequest("inventory.SKU_REQUIRED", "請選擇歸屬的具體規格")
 	}
 	err = data.Tx(ctx, s.data, func(ctx context.Context) error {
 		p, e := data.GuardProductWrite(ctx, s.data, req.GetProductId())
@@ -285,7 +285,7 @@ func (s *AdminInventoryService) AssignCards(ctx context.Context, req *adminv1.As
 			return e
 		}
 		if p.LockVersion != req.GetExpectedRevision() {
-			return errors.Conflict("inventory.CONFIG_CHANGED", "商品设置已变化，请重新预览")
+			return errors.Conflict("inventory.CONFIG_CHANGED", "商品設置已變化，請重新預覽")
 		}
 		if _, e = s.repo.importTarget(ctx, p, req.GetSkuId(), true); e != nil {
 			return e
@@ -300,11 +300,11 @@ func (s *AdminInventoryService) AssignCards(ctx context.Context, req *adminv1.As
 			return e
 		}
 		if len(rows) != len(ids) {
-			return errors.Conflict("inventory.CARDS_CHANGED", "卡密归属已变化，请刷新后重试")
+			return errors.Conflict("inventory.CARDS_CHANGED", "卡密歸屬已變化，請刷新後重試")
 		}
 		for _, row := range rows {
 			if row.SkuID != 0 || row.Status != card.StatusAvailable || row.OwnerID != 0 || row.OrderID != 0 || !row.LockedAt.IsZero() {
-				return errors.Conflict("inventory.CARDS_CHANGED", "卡密已归属、预占或使用，请刷新后重试")
+				return errors.Conflict("inventory.CARDS_CHANGED", "卡密已歸屬、預佔或使用，請刷新後重試")
 			}
 		}
 		references, e := lotteryCardReferences(ctx, c, ids)
@@ -312,7 +312,7 @@ func (s *AdminInventoryService) AssignCards(ctx context.Context, req *adminv1.As
 			return e
 		}
 		if len(references) > 0 {
-			return errors.Conflict("inventory.CARDS_CHANGED", "卡密已有发奖记录，不能更改归属")
+			return errors.Conflict("inventory.CARDS_CHANGED", "卡密已有發獎記錄，不能更改歸屬")
 		}
 		predicates := append(eligibleUnassigned(), card.IDIn(ids...), card.ProductID(p.ID), card.SubsiteID(p.SubsiteID))
 		n, e := c.Card.Update().Where(predicates...).SetSkuID(req.GetSkuId()).AddVersion(1).Save(ctx)
@@ -320,14 +320,14 @@ func (s *AdminInventoryService) AssignCards(ctx context.Context, req *adminv1.As
 			return e
 		}
 		if n != len(ids) {
-			return errors.Conflict("inventory.CARDS_CHANGED", "卡密状态已变化，未执行归属")
+			return errors.Conflict("inventory.CARDS_CHANGED", "卡密狀態已變化，未執行歸屬")
 		}
 		// Preserve import_id and import target snapshots; assignment has its own audit.
 		_, e = c.SecurityAuditLog.Create().SetActorType(securityauditlog.ActorTypeAdmin).SetNillableActorID(nilOr(actorID(ctx))).SetAction("inventory.assign_sku").SetMetadata(map[string]any{"product_id": p.ID, "subsite_id": p.SubsiteID, "from_sku_id": 0, "sku_id": req.GetSkuId(), "card_ids": ids, "assigned": n, "request_key_hash": fmt.Sprintf("%x", sha256.Sum256([]byte(req.GetRequestKey())))}).Save(ctx)
 		return e
 	})
 	if err != nil {
-		return nil, inventoryTransportError(err, "inventory.ASSIGN_FAILED", "归属失败")
+		return nil, inventoryTransportError(err, "inventory.ASSIGN_FAILED", "歸屬失敗")
 	}
 	return &adminv1.AssignCardsReply{Assigned: int64(len(ids))}, nil
 }
@@ -356,7 +356,7 @@ func (s *AdminInventoryService) batchInfos(ctx context.Context, imports []*ent.C
 	if e != nil {
 		return nil, e
 	}
-	names := map[uint64]string{0: "商品默认池"}
+	names := map[uint64]string{0: "商品默認池"}
 	for _, sku := range skus {
 		names[sku.ID] = sku.Name
 	}
@@ -419,7 +419,7 @@ func (r *CardRepoImpl) batchCards(ctx context.Context, imp *ent.CardImport, lock
 func (s *AdminInventoryService) PreviewCancelImport(ctx context.Context, req *adminv1.CancelImportRequest) (*adminv1.CancelImportPreviewReply, error) {
 	imp, err := data.Client(ctx, s.data).CardImport.Query().Where(cardimport.ID(req.GetId()), cardimport.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("inventory.BATCH_NOT_FOUND", "导入批次不存在")
+		return nil, errors.NotFound("inventory.BATCH_NOT_FOUND", "導入批次不存在")
 	}
 	if err != nil {
 		return nil, err

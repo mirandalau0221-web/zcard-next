@@ -4,12 +4,12 @@ import { t as $t } from '@/i18n';
 import { displayPrecision, formatCents, fromCents, toCents } from '../../../packages/money/index';
 import { loadPublicConfig } from '../config';
 import { readJSON } from './read';
-// 前台 API 客户端：fetch 封装，金额一律「分」int64。
-// 认证（）：user realm JWT 存 localStorage，请求自动带 Bearer；
-// 401 且本地有 token → 判定过期，清 token 跳登录（游客端点 401 不误伤）。
+// 前台 API 客户端：fetch 封裝，金額一律「分」int64。
+// 認證（）：user realm JWT 存 localStorage，請求自動帶 Bearer；
+// 401 且本地有 token → 判定過期，清 token 跳登錄（遊客端點 401 不誤傷）。
 
-// SSG 构建（vite-ssg）时服务端无同源 API：经 VITE_SSG_API 指向构建机可达的 API
-// （如 http://127.0.0.1:8000）；客户端恒用同源相对路径。
+// SSG 構建（vite-ssg）時服務端無同源 API：經 VITE_SSG_API 指向構建機可達的 API
+// （如 http://127.0.0.1:8000）；客户端恆用同源相對路徑。
 const BASE = import.meta.env.SSR
   ? `${import.meta.env.VITE_SSG_API || 'http://127.0.0.1:8000'}/api/v1/storefront`
   : '/api/v1/storefront';
@@ -21,7 +21,7 @@ export function getToken(): string | null {
   try {
     return localStorage.getItem(TOKEN_KEY);
   } catch {
-    return null; // 存储不可用（隐私模式等）：视为游客
+    return null; // 存儲不可用（隱私模式等）：視為遊客
   }
 }
 
@@ -42,7 +42,7 @@ interface ApiResult<T> {
 async function request<T>(method: string, path: string, body?: unknown, params?: Record<string, string | number | boolean | undefined>, silent = false, headers: Record<string,string> = {}): Promise<ApiResult<T>> {
   if (method === 'GET' && path === '/config') {
     try { return { data: await loadPublicConfig(true) as T, error: null }; }
-    catch { return { data: null, get error() { return $t("店铺配置加载失败，请稍后重试"); } }; }
+    catch { return { data: null, get error() { return $t("店鋪配置加載失敗，請稍後重試"); } }; }
   }
   let url = `${BASE}${path}`;
   if (params) {
@@ -58,7 +58,7 @@ async function request<T>(method: string, path: string, body?: unknown, params?:
   const token = getToken();
   if (publicRead) {
     try { return { data: await readJSON<T>(url, { headers: { ...languageHeaders(), ...(token ? { Authorization: `Bearer ${token}` } : {}) } }), error: null }; }
-    catch { return { data: null, get error() { return $t("加载失败，请检查网络后重试"); } }; }
+    catch { return { data: null, get error() { return $t("加載失敗，請檢查網絡後重試"); } }; }
   }
   try {
     const res = await fetch(url, {
@@ -78,8 +78,8 @@ async function request<T>(method: string, path: string, body?: unknown, params?:
       json = text;
     }
     if (!res.ok) {
-      // token 过期/失效：清态跳登录（带回跳）；silent 模式（购物车等游客可降级
-      // 端点）只清 token 不跳转——由调用方降级游客本地购物车；无 token 的 401 不动
+      // token 過期/失效：清態跳登錄（帶回跳）；silent 模式（購物車等遊客可降級
+      // 端點）只清 token 不跳轉——由調用方降級遊客本地購物車；無 token 的 401 不動
       if (res.status === 401 && token) {
         clearToken();
         if (!silent) {
@@ -91,7 +91,7 @@ async function request<T>(method: string, path: string, body?: unknown, params?:
     }
     return { data: json as T, error: null };
   } catch (e: any) {
-    return { data: null, error: $t('加载失败，请检查网络后重试') };
+    return { data: null, error: $t('加載失敗，請檢查網絡後重試') };
   }
 }
 
@@ -99,23 +99,23 @@ export const api = {
   get: <T>(path: string, params?: Record<string, string | number | boolean | undefined>) => request<T>('GET', path, undefined, params),
   post: <T>(path: string, body: unknown, headers?: Record<string,string>) => request<T>('POST', path, body, undefined, false, headers),
   delete_: <T>(path: string) => request<T>('DELETE', path),
-  // silent 变体：401 只清 token 不跳登录（游客可降级端点在调用方处理）
+  // silent 變體：401 只清 token 不跳登錄（遊客可降級端點在調用方處理）
   getSilent: <T>(path: string, params?: Record<string, string | number | boolean | undefined>, headers?: Record<string,string>) => request<T>('GET', path, undefined, params, true, headers),
   postSilent: <T>(path: string, body: unknown) => request<T>('POST', path, body, undefined, true),
   deleteSilent: <T>(path: string) => request<T>('DELETE', path, undefined, undefined, true)
 };
 
-// ── 金额工具（铁律 15：API 一律 int64「分」，显示 /100 为元、提交 *100 为分）──
-// 符号与小数位取后台默认货币（i18n.base_currency → /storefront/currencies）；
-// 未加载完成回退 ¥/2。显示与输入独立：显示可补位，提交按十进制精确换算并拒绝不足一分。
-// 全站金额显示/提交必须经本组函数，禁止内联 `/ 100` 或硬编码符号（架构测试守护）。
+// ── 金額工具（鐵律 15：API 一律 int64「分」，顯示 /100 為元、提交 *100 為分）──
+// 符號與小數位取後台默認貨幣（i18n.base_currency → /storefront/currencies）；
+// 未加載完成回退 ¥/2。顯示與輸入獨立：顯示可補位，提交按十進制精確換算並拒絕不足一分。
+// 全站金額顯示/提交必須經本組函數，禁止內聯 `/ 100` 或硬編碼符號（架構測試守護）。
 
 export interface CurrencyMeta {
   symbol: string;
   position: string; // prefix | suffix
-  precision: number; // 小数位（CNY=2、JPY=0）
-  code: string; // 币种代码（CNY/USD…；切换器展示与本地存储键）
-  rate: string; // 换算率（decimal 字符串：1 基准货币 = rate 该币；基准币 = "1"）
+  precision: number; // 小數位（CNY=2、JPY=0）
+  code: string; // 幣種代碼（CNY/USD…；切換器展示與本地存儲鍵）
+  rate: string; // 換算率（decimal 字符串：1 基準貨幣 = rate 該幣；基準幣 = "1"）
 }
 
 const DEFAULT_META: CurrencyMeta = { symbol: '¥', position: 'prefix', precision: 2, code: 'CNY', rate: '1' };
@@ -149,8 +149,8 @@ export function formatPaymentAmount(quote: { total_cents: number; charged_curren
   return `${quote.charged_currency} ${amount}`;
 }
 
-// fenToYuan 分 → 元字符串（不含符号；纯整数运算，禁止浮点参与）。
-// undefined/NaN 兜底 0（proto3 零值字段省略 → undefined 传入时显示 0.00 而非 NaN）。
+// fenToYuan 分 → 元字符串（不含符號；純整數運算，禁止浮點參與）。
+// undefined/NaN 兜底 0（proto3 零值字段省略 → undefined 傳入時顯示 0.00 而非 NaN）。
 export function fenToYuan(cents: number): string {
   return formatCents(cents, currencyMeta.precision);
 }
@@ -168,22 +168,22 @@ function displayAmount(cents: number): string {
   return formatCents(cents, currencyMeta.precision, currencyMeta.rate);
 }
 
-// formatMoney 带符号格式化（显示唯一入口；符号位置感知）。
+// formatMoney 帶符號格式化（顯示唯一入口；符號位置感知）。
 export function formatMoney(cents: number): string {
   const v = displayAmount(cents);
   return currencyMeta.position === 'suffix' ? `${v}${currencyMeta.symbol}` : `${currencyMeta.symbol}${v}`;
 }
 
-// formatSignedMoney 有符号金额（流水：正数带 +，负数自带 -）。
+// formatSignedMoney 有符號金額（流水：正數帶 +，負數自帶 -）。
 export function formatSignedMoney(cents: number): string {
   const v = displayAmount(cents);
   const body = cents > 0 ? `+${v}` : v;
   return currencyMeta.position === 'suffix' ? `${body}${currencyMeta.symbol}` : `${currencyMeta.symbol}${body}`;
 }
 
-// initCurrency 启动加载货币（公开配置 i18n.base_currency + i18n.display_currency + 启用货币表；
-// 用户本地选择 zcard_currency 优先，其次站点显示货币，再基础货币——多币种展示换算，结算恒基准币；
-// 失败回退 ¥）。选择集 listCurrencies() 供顶部切换器渲染；selectCurrency 切换后刷新生效。
+// initCurrency 啓動加載貨幣（公開配置 i18n.base_currency + i18n.display_currency + 啓用貨幣表；
+// 用户本地選擇 zcard_currency 優先，其次站點顯示貨幣，再基礎貨幣——多幣種展示換算，結算恆基準幣；
+// 失敗回退 ¥）。選擇集 listCurrencies() 供頂部切換器渲染；selectCurrency 切換後刷新生效。
 let initPromise: Promise<void> | null = null;
 let currencyList: (CurrencyMeta & { code: string })[] = [];
 
@@ -194,7 +194,7 @@ export function listCurrencies(): CurrencyMeta[] {
 export function selectCurrency(code: string) {
   if (!code) return;
   localStorage.setItem(CURRENCY_KEY, code);
-  if (code !== currencyMeta.code) window.location.reload(); // 低频操作：整页刷新保证全站一致
+  if (code !== currencyMeta.code) window.location.reload(); // 低頻操作：整頁刷新保證全站一致
 }
 
 export function initCurrency(): Promise<void> {
@@ -217,7 +217,7 @@ export function initCurrency(): Promise<void> {
               else displayCode = v;
             }
           } catch {
-            /* 非法配置回退默认 */
+            /* 非法配置回退默認 */
           }
         }
         const all = (curRes.data?.currencies || []) as any[];
@@ -231,40 +231,40 @@ export function initCurrency(): Promise<void> {
         try { stored = localStorage.getItem(CURRENCY_KEY); } catch { /* Keep the site default when storage is unavailable. */ }
         const picked =
           currencyList.find((c) => c.code === stored) ||
-          currencyList.find((c) => c.code === displayCode) || // 站点默认展示货币（结算仍基准币）
+          currencyList.find((c) => c.code === displayCode) || // 站點默認展示貨幣（結算仍基準幣）
           currencyList.find((c) => c.code === baseCode) ||
           { code: baseCode, symbol: '¥', position: 'prefix', precision: 2, rate: '1' };
         setCurrency(picked);
       } catch {
-        /* 加载失败回退默认 ¥/2 */
+        /* 加載失敗回退默認 ¥/2 */
       }
     })();
   }
   return initPromise;
 }
 
-// 兼容已保存的充值备注：只转换系统生成的整段文案，金额跟随当前货币。
-// 原始流水与账务金额保持不变，其他人工备注原样显示。
+// 兼容已保存的充值備註：只轉換系統生成的整段文案，金額跟隨當前貨幣。
+// 原始流水與賬務金額保持不變，其他人工備註原樣顯示。
 export function formatTransactionRemark(remark?: string): string {
   if (!remark) return '';
-  const match = /^(充值到账|对接账户自助充值到账)（(?:用户 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*赠送\s*(\d+)\s*分）$/.exec(remark);
+  const match = /^(充值到賬|對接賬户自助充值到賬)（(?:用户 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*贈送\s*(\d+)\s*分）$/.exec(remark);
   if (!match) return remark;
   const principal = Number(match[3]);
   const gift = Number(match[4]);
   const total = principal + gift;
   if (![principal, gift, total].every(Number.isSafeInteger)) return remark;
   const amount = gift > 0
-    ? $t("{0}（本金 {1}＋赠送 {2}）", [formatMoney(total), formatMoney(principal), formatMoney(gift)])
+    ? $t("{0}（本金 {1}＋贈送 {2}）", [formatMoney(total), formatMoney(principal), formatMoney(gift)])
     : formatMoney(principal);
   return `${$t(match[1])} ${amount}${match[2] ? $t("（用户 #{0}）", [match[2]]) : ''}`;
 }
 
 export const TRANSACTION_TYPES: Record<string, string> = {
-  get adjust() { return $t("人工调账"); }, get recharge() { return $t("余额充值"); }, get order_pay() { return $t("订单支付"); }, get payment() { return $t("订单支付"); },
-  get order_refund() { return $t("订单退款"); }, get refund() { return $t("订单退款"); }, get ticket_urgent() { return $t("工单付费加急"); },
-  get commission() { return $t("分销佣金入账"); }, get commission_debt() { return $t("佣金欠款扣回"); }, get commission_reversal() { return $t("佣金退回"); },
-  get withdraw() { return $t("提现"); }, get freeze() { return $t("余额冻结"); }, get unfreeze() { return $t("余额解冻"); }, get giftcard() { return $t("礼品卡兑换"); },
-  get earn_recharge() { return $t("充值赠送积分"); }, get redeem() { return $t("积分兑换"); },
+  get adjust() { return $t("人工調賬"); }, get recharge() { return $t("餘額充值"); }, get order_pay() { return $t("訂單支付"); }, get payment() { return $t("訂單支付"); },
+  get order_refund() { return $t("訂單退款"); }, get refund() { return $t("訂單退款"); }, get ticket_urgent() { return $t("工單付費加急"); },
+  get commission() { return $t("分銷佣金入賬"); }, get commission_debt() { return $t("佣金欠款扣回"); }, get commission_reversal() { return $t("佣金退回"); },
+  get withdraw() { return $t("提現"); }, get freeze() { return $t("餘額凍結"); }, get unfreeze() { return $t("餘額解凍"); }, get giftcard() { return $t("禮品卡兑換"); },
+  get earn_recharge() { return $t("充值贈送積分"); }, get redeem() { return $t("積分兑換"); },
 };
 export function transactionType(type?: string): string {
   return TRANSACTION_TYPES[type || ''] || $t("其他收支");
@@ -275,7 +275,7 @@ export function transactionAmount(row: { direction: string; amount_cents: number
 export function transactionReference(row: { id?: number; display_reference?: string; reference?: string }): string {
   if (row.display_reference) return row.display_reference;
   const [kind, id] = (row.reference || '').split(':');
-  const labels: Record<string, string> = { get order_pay() { return $t("订单"); }, get order_refund() { return $t("退款记录"); }, get ticket_urgent() { return $t("工单"); }, get recharge() { return $t("充值支付记录"); }, get giftcard() { return $t("礼品卡"); }, get commission() { return $t("佣金记录"); }, get adjust() { return $t("调账记录"); } };
+  const labels: Record<string, string> = { get order_pay() { return $t("訂單"); }, get order_refund() { return $t("退款記錄"); }, get ticket_urgent() { return $t("工單"); }, get recharge() { return $t("充值支付記錄"); }, get giftcard() { return $t("禮品卡"); }, get commission() { return $t("佣金記錄"); }, get adjust() { return $t("調賬記錄"); } };
   return labels[kind] && id ? `${labels[kind]} ${kind === 'ticket_urgent' ? '' : '#'}${id}` : $t("流水 #{0}", [row.id || '—']);
 }
 export function transactionRemark(row: { id?: number; type?: string; remark?: string; reference?: string; display_reference?: string }): string {

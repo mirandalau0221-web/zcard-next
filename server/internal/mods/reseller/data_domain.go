@@ -1,11 +1,11 @@
 package reseller
 
-// 域名验证双方案（）：
+// 域名驗證雙方案（）：
 // DNS TXT：_zcard-verify.<domain> TXT "<token>"
-// HTTP：http(s)://<domain>/.well-known/zcard-verify.txt 内容 = token
-// 安全：HTTP 拉取经 httpx（SSRF）；DNS 解析钉公网 IP（只信公网解析结果——
-// rebinding 由 httpx 连接期复核兜底）。
-// 验证通过 → verification_status=verified → tenantMiddleware 生效。
+// HTTP：http(s)://<domain>/.well-known/zcard-verify.txt 內容 = token
+// 安全：HTTP 拉取經 httpx（SSRF）；DNS 解析釘公網 IP（只信公網解析結果——
+// rebinding 由 httpx 連接期複核兜底）。
+// 驗證通過 → verification_status=verified → tenantMiddleware 生效。
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/httpx"
 )
 
-// AddSite 登记域名（生成验证 token；pending）。
+// AddSite 登記域名（生成驗證 token；pending）。
 func (r *ResellerRepo) AddSite(ctx context.Context, profileID uint64, domain, siteName string, isPrimary bool) (*ent.ResellerSite, error) {
 	domain = strings.ToLower(strings.TrimSpace(domain))
 	domain = strings.TrimPrefix(strings.TrimPrefix(domain, "http://"), "https://")
@@ -52,7 +52,7 @@ func (r *ResellerRepo) AddSite(ctx context.Context, profileID uint64, domain, si
 	return s, err
 }
 
-// VerifySite 验证域名（双方案：DNS 通过即过；DNS 失败试 HTTP）。
+// VerifySite 驗證域名（雙方案：DNS 通過即過；DNS 失敗試 HTTP）。
 // 返回 (verified, method, err)。
 func (r *ResellerRepo) VerifySite(ctx context.Context, siteID uint64) (bool, string, error) {
 	client := data.Client(ctx, r.data)
@@ -70,7 +70,7 @@ func (r *ResellerRepo) VerifySite(ctx context.Context, siteID uint64) (bool, str
 			Save(ctx)
 		return true, "dns", nil
 	}
-	// 方案二：HTTP well-known（经 httpx SSRF 防护；钉公网解析）
+	// 方案二：HTTP well-known（經 httpx SSRF 防護；釘公網解析）
 	if ok, err := verifyHTTPWellKnown(ctx, domain, token); err == nil && ok {
 		_, _ = client.ResellerSite.UpdateOneID(siteID).
 			SetVerificationStatus(resellersite.VerificationStatusVerified).
@@ -83,7 +83,7 @@ func (r *ResellerRepo) VerifySite(ctx context.Context, siteID uint64) (bool, str
 	return false, "", nil
 }
 
-// verifyDNSTXT 查 _zcard-verify.<domain> TXT 记录匹配 token。
+// verifyDNSTXT 查 _zcard-verify.<domain> TXT 記錄匹配 token。
 func verifyDNSTXT(ctx context.Context, domain, token string) (bool, error) {
 	resolver := &net.Resolver{}
 	txts, err := resolver.LookupTXT(ctx, "_zcard-verify."+domain)
@@ -98,12 +98,12 @@ func verifyDNSTXT(ctx context.Context, domain, token string) (bool, error) {
 	return false, nil
 }
 
-// verifyHTTPWellKnown 拉 /.well-known/zcard-verify.txt 比对 token。
+// verifyHTTPWellKnown 拉 /.well-known/zcard-verify.txt 比對 token。
 func verifyHTTPWellKnown(ctx context.Context, domain, token string) (bool, error) {
 	for _, scheme := range []string{"https", "http"} {
 		url := fmt.Sprintf("%s://%s/.well-known/zcard-verify.txt", scheme, domain)
 		if err := httpx.ValidateURL(url); err != nil {
-			continue // 域名解析到内网：拒绝（不区分探测细节）
+			continue // 域名解析到內網：拒絕（不區分探測細節）
 		}
 		c := httpx.NewSafeClient(10 * time.Second)
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -125,8 +125,8 @@ func verifyHTTPWellKnown(ctx context.Context, domain, token string) (bool, error
 	return false, nil
 }
 
-// ResolveBrand 站点品牌（白标）解析（notify 端口实现；分站订单邮件用）。
-// 取分站主站名/LOGO；无白标配置返回 ok=false（fail-closed——调用方不得回退主站品牌）。
+// ResolveBrand 站點品牌（白標）解析（notify 端口實現；分站訂單郵件用）。
+// 取分站主站名/LOGO；無白標配置返回 ok=false（fail-closed——調用方不得回退主站品牌）。
 func (r *ResellerRepo) ResolveBrand(ctx context.Context, subsiteID uint64) (notifyport.Brand, bool) {
 	client := data.Client(ctx, r.data)
 	site, err := client.ResellerSite.Query().
@@ -139,8 +139,8 @@ func (r *ResellerRepo) ResolveBrand(ctx context.Context, subsiteID uint64) (noti
 	return notifyport.Brand{SiteName: site.SiteName, Logo: site.Logo}, true
 }
 
-// ResolveDomain 域名 → subsite_id（verified 域名；profile 必须 approved）。
-// 未验证/未审核返回 0（主站兜底）。
+// ResolveDomain 域名 → subsite_id（verified 域名；profile 必須 approved）。
+// 未驗證/未審核返回 0（主站兜底）。
 func (r *ResellerRepo) ResolveDomain(ctx context.Context, host string) (uint64, string, error) {
 	host = strings.ToLower(strings.TrimSpace(host))
 	if host == "" {
@@ -154,14 +154,14 @@ func (r *ResellerRepo) ResolveDomain(ctx context.Context, host string) (uint64, 
 			resellersite.VerificationStatusEQ(resellersite.VerificationStatusVerified),
 		).Only(ctx)
 	if ent.IsNotFound(err) {
-		return 0, "", nil // 未验证域名 → 主站
+		return 0, "", nil // 未驗證域名 → 主站
 	}
 	if err != nil {
 		return 0, "", err
 	}
 	profile, err := client.ResellerProfile.Get(ctx, site.ProfileID)
 	if err != nil || string(profile.Status) != "approved" {
-		return 0, "", nil // 分站被禁/未过审 → 主站兜底
+		return 0, "", nil // 分站被禁/未過審 → 主站兜底
 	}
 	return profile.ID, site.SiteName, nil
 }

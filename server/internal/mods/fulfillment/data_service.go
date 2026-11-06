@@ -1,6 +1,6 @@
 package fulfillment
 
-// 履约 API（；storefront 取货 + admin 手动发货/列表）。
+// 履約 API（；storefront 取貨 + admin 手動發貨/列表）。
 
 import (
 	"context"
@@ -23,18 +23,18 @@ import (
 
 // ── Storefront ──
 
-// StoreDeliveryService 顾客取货服务。
+// StoreDeliveryService 顧客取貨服務。
 type StoreDeliveryService struct {
 	storefrontv1.UnimplementedStoreDeliveryServiceServer
 	repo *DeliveryRepoImpl
 }
 
-// NewStoreDeliveryService 构造。
+// NewStoreDeliveryService 構造。
 func NewStoreDeliveryService(repo *DeliveryRepoImpl) *StoreDeliveryService {
 	return &StoreDeliveryService{repo: repo}
 }
 
-// FetchDelivery 取货（三重门——密码错误与单号不存在响应一致）。
+// FetchDelivery 取貨（三重門——密碼錯誤與單號不存在響應一致）。
 func (s *StoreDeliveryService) FetchDelivery(ctx context.Context, req *storefrontv1.FetchDeliveryRequest) (*storefrontv1.FetchDeliveryReply, error) {
 	token := req.GetOrderAccessToken()
 	if token == "" {
@@ -43,7 +43,7 @@ func (s *StoreDeliveryService) FetchDelivery(ctx context.Context, req *storefron
 		}
 	}
 	if req.GetOrderNo() == "" || (req.GetQueryPassword() == "" && token == "" && identity.ClaimsFromContext(ctx) == nil) {
-		return nil, errors.BadRequest("delivery.INVALID_INPUT", "订单号与查询密码必填")
+		return nil, errors.BadRequest("delivery.INVALID_INPUT", "訂單號與查詢密碼必填")
 	}
 	res, err := s.repo.FetchDelivery(ctx, req.GetOrderNo(), req.GetQueryPassword(), clientIP(ctx), token)
 	if err != nil {
@@ -60,26 +60,26 @@ func (s *StoreDeliveryService) FetchDelivery(ctx context.Context, req *storefron
 	return reply, nil
 }
 
-// MaskedDeliveries 我的订单掩码列表（登录用户）。
+// MaskedDeliveries 我的訂單掩碼列表（登錄用户）。
 func (s *StoreDeliveryService) MaskedDeliveries(ctx context.Context, req *storefrontv1.MaskedDeliveriesRequest) (*storefrontv1.MaskedDeliveriesReply, error) {
-	return &storefrontv1.MaskedDeliveriesReply{}, nil // ：接用户订单列表
+	return &storefrontv1.MaskedDeliveriesReply{}, nil // ：接用户訂單列表
 }
 
 // ── Admin ──
 
-// AdminFulfillmentService 履约管理服务。
+// AdminFulfillmentService 履約管理服務。
 type AdminFulfillmentService struct {
 	adminv1.UnimplementedAdminFulfillmentServiceServer
 	repo *DeliveryRepoImpl
 	data *data.Data
 }
 
-// NewAdminFulfillmentService 构造。
+// NewAdminFulfillmentService 構造。
 func NewAdminFulfillmentService(repo *DeliveryRepoImpl, d *data.Data) *AdminFulfillmentService {
 	return &AdminFulfillmentService{repo: repo, data: d}
 }
 
-// ListPending 待快递发货及人工交付列表。
+// ListPending 待快遞發貨及人工交付列表。
 func (s *AdminFulfillmentService) ListPending(ctx context.Context, req *adminv1.ListPendingRequest) (*adminv1.ListPendingReply, error) {
 	page := int(req.GetPage())
 	size := int(req.GetPageSize())
@@ -91,9 +91,9 @@ func (s *AdminFulfillmentService) ListPending(ctx context.Context, req *adminv1.
 	}
 	rows, hasMore, err := s.repo.ListPending(ctx, page, size)
 	if err != nil {
-		return nil, errors.InternalServer("fulfillment.LIST_FAILED", "读取待发货失败")
+		return nil, errors.InternalServer("fulfillment.LIST_FAILED", "讀取待發貨失敗")
 	}
-	// 商品名批查（item 仅存 product_id 快照）
+	// 商品名批查（item 僅存 product_id 快照）
 	ids := make([]uint64, 0, len(rows)*2)
 	for _, o := range rows {
 		for _, it := range o.Edges.Items {
@@ -123,10 +123,10 @@ func (s *AdminFulfillmentService) ListPending(ctx context.Context, req *adminv1.
 	return reply, nil
 }
 
-// ManualDeliver 手动交付。
+// ManualDeliver 手動交付。
 func (s *AdminFulfillmentService) ManualDeliver(ctx context.Context, req *adminv1.ManualDeliverRequest) (*emptypb.Empty, error) {
 	if req.GetOrderNo() == "" || (req.GetContent() == "" && req.GetLogisticsNo() == "" && req.GetServiceContent() == "") {
-		return nil, errors.BadRequest("fulfillment.INVALID_INPUT", "订单号与交付内容必填")
+		return nil, errors.BadRequest("fulfillment.INVALID_INPUT", "訂單號與交付內容必填")
 	}
 	claims := identity.ClaimsFromContext(ctx)
 	var adminID uint64
@@ -135,7 +135,7 @@ func (s *AdminFulfillmentService) ManualDeliver(ctx context.Context, req *adminv
 	}
 	if req.GetServiceContent() != "" {
 		if req.GetContent() != "" || req.GetLogisticsNo() != "" {
-			return nil, errors.BadRequest("fulfillment.INVALID_INPUT", "请选择一种交付内容")
+			return nil, errors.BadRequest("fulfillment.INVALID_INPUT", "請選擇一種交付內容")
 		}
 		if err := s.repo.CompleteService(ctx, req.OrderNo, req.OrderItemId, req.ServiceContent, req.Remark, adminID); err != nil {
 			return nil, errors.BadRequest("fulfillment.DELIVER_FAILED", err.Error())
@@ -143,13 +143,13 @@ func (s *AdminFulfillmentService) ManualDeliver(ctx context.Context, req *adminv
 		return &emptypb.Empty{}, nil
 	}
 	if err := s.repo.ManualDeliver(ctx, req.GetOrderNo(), req.GetContent(), req.GetLogisticsNo(), req.GetRemark(), adminID, req.GetOrderItemId()); err != nil {
-		return nil, errors.InternalServer("fulfillment.DELIVER_FAILED", "交付失败: "+err.Error())
+		return nil, errors.InternalServer("fulfillment.DELIVER_FAILED", "交付失敗: "+err.Error())
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// ListDeliveries 交付记录列表（含完整卡密——现场解密不落库；路由受
-// order:view_delivery 权限门控，查看行为审计留痕）。
+// ListDeliveries 交付記錄列表（含完整卡密——現場解密不落庫；路由受
+// order:view_delivery 權限門控，查看行為審計留痕）。
 func (s *AdminFulfillmentService) ListDeliveries(ctx context.Context, req *adminv1.ListDeliveriesRequest) (*adminv1.ListDeliveriesReply, error) {
 	page := int(req.GetPage())
 	size := int(req.GetPageSize())
@@ -161,9 +161,9 @@ func (s *AdminFulfillmentService) ListDeliveries(ctx context.Context, req *admin
 	}
 	rows, total, err := s.repo.ListDeliveries(ctx, req.GetOrderNo(), page, size, req.GetOrderItemId())
 	if err != nil {
-		return nil, errors.InternalServer("fulfillment.LIST_FAILED", "读取交付失败")
+		return nil, errors.InternalServer("fulfillment.LIST_FAILED", "讀取交付失敗")
 	}
-	// 明文查看审计（管理端看卡密是敏感操作——谁/何时看了哪单）
+	// 明文查看審計（管理端看卡密是敏感操作——誰/何時看了哪單）
 	if s.repo.auditor != nil && len(rows) > 0 {
 		adminID := uint64(0)
 		if claims := identity.ClaimsFromContext(ctx); claims != nil {
@@ -196,15 +196,15 @@ func (s *AdminFulfillmentService) ListDeliveries(ctx context.Context, req *admin
 	return reply, nil
 }
 
-// decryptDelivery 交付记录明文（卡密现场解密；直发取商品 direct_content；
-// 即删模式卡密已物理删除）。
+// decryptDelivery 交付記錄明文（卡密現場解密；直髮取商品 direct_content；
+// 即刪模式卡密已物理刪除）。
 func (s *AdminFulfillmentService) decryptDelivery(ctx context.Context, d *ent.OrderDelivery) string {
 	client := data.Client(ctx, s.data)
 	if len(d.ServiceContent) > 0 {
 		return s.repo.serviceText(ctx, d)
 	}
 	if tracking, ok := d.Logistics["tracking_no"].(string); ok && tracking != "" {
-		return "物流单号：" + tracking
+		return "物流單號：" + tracking
 	}
 	if d.DeliveredMode == orderdelivery.DeliveredModeDirect && d.CardID == 0 {
 		var productID uint64
@@ -214,11 +214,11 @@ func (s *AdminFulfillmentService) decryptDelivery(ctx context.Context, d *ent.Or
 				if it.FulfillmentType == "reuse" {
 					src, err := client.ProductDeliverySource.Get(ctx, it.DeliverySourceID)
 					if err != nil || src.ProductID != it.ProductID || src.SkuID != it.SkuID || src.SubsiteID != it.SubsiteID {
-						return "（共享交付来源不可用）"
+						return "（共享交付來源不可用）"
 					}
 					plain, err := s.repo.cipher.Open(src.Content, src.ProductID, src.SubsiteID)
 					if err != nil {
-						return "（解密失败）"
+						return "（解密失敗）"
 					}
 					return string(plain)
 				}
@@ -226,24 +226,24 @@ func (s *AdminFulfillmentService) decryptDelivery(ctx context.Context, d *ent.Or
 		}
 		p, err := client.Product.Get(ctx, productID)
 		if err != nil || len(p.DirectContent) == 0 {
-			return "（直发内容未配置）"
+			return "（直髮內容未配置）"
 		}
 		plain, err := s.repo.cipher.Open(p.DirectContent, p.ID, p.SubsiteID)
 		if err != nil {
-			return "（解密失败）"
+			return "（解密失敗）"
 		}
 		return string(plain)
 	}
 	c, err := client.Card.Get(ctx, d.CardID)
 	if ent.IsNotFound(err) {
-		return "（卡密已删除）"
+		return "（卡密已刪除）"
 	}
 	if err != nil {
 		return ""
 	}
 	plain, err := s.repo.cipher.Open(c.Content, c.ProductID, c.SubsiteID)
 	if err != nil {
-		return "（解密失败）"
+		return "（解密失敗）"
 	}
 	return string(plain)
 }

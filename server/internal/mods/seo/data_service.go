@@ -1,6 +1,6 @@
 package seo
 
-// robots.txt + sitemap.xml 生成（设置 site.url 优先作 URL 基准，未配置回落请求 Host）。
+// robots.txt + sitemap.xml 生成（設置 site.url 優先作 URL 基準，未配置回落請求 Host）。
 
 import (
 	"context"
@@ -15,32 +15,32 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/settings"
 )
 
-// SeoService SEO 基础服务。
+// SeoService SEO 基礎服務。
 type SeoService struct {
 	catalog storefrontv1.StoreCatalogServiceServer
 	repo    *SeoRepo
 	cfg     *settings.RepoImpl
 }
 
-// NewSeoService 构造。
+// NewSeoService 構造。
 func NewSeoService(repo *SeoRepo, cfg *settings.RepoImpl, catalog storefrontv1.StoreCatalogServiceServer) *SeoService {
 	return &SeoService{repo: repo, cfg: cfg, catalog: catalog}
 }
 
-// siteURL 站点 URL 基准：site.url 优先（去尾斜杠），空则 https://host 兜底。
+// siteURL 站點 URL 基準：site.url 優先（去尾斜槓），空則 https://host 兜底。
 func (s *SeoService) siteURL(ctx context.Context, host string) string {
 	return s.loadSite(ctx).base(host)
 }
 
-// robotsDisallows 私有/工具页默认禁抓（登录注册、会员中心、安装向导等——
-// 无收录价值且静态壳 canonical 指向首页，放行只会制造重复信号）。
+// robotsDisallows 私有/工具頁默認禁抓（登錄註冊、會員中心、安裝嚮導等——
+// 無收錄價值且靜態殼 canonical 指向首頁，放行只會製造重複信號）。
 var robotsDisallows = []string{
 	"/login", "/register", "/forgot-password",
 	"/member", "/cart", "/order", "/payment",
 	"/coupons", "/tickets", "/withdraw", "/affiliate", "/fetch", "/install",
 }
 
-// RobotsTXT robots.txt：私有页禁抓 + 自定义规则追加 + Sitemap 指向。
+// RobotsTXT robots.txt：私有頁禁抓 + 自定義規則追加 + Sitemap 指向。
 func (s *SeoService) RobotsTXT(ctx context.Context, host string) string {
 	var b strings.Builder
 	b.WriteString("User-agent: *\n")
@@ -60,7 +60,7 @@ func (s *SeoService) RobotsTXT(ctx context.Context, host string) string {
 	return b.String()
 }
 
-// sitemapEntry sitemap URL 条目。
+// sitemapEntry sitemap URL 條目。
 type sitemapEntry struct {
 	Loc     string `xml:"loc"`
 	Lastmod string `xml:"lastmod,omitempty"`
@@ -81,7 +81,7 @@ func lastmodOf(unix int64) string {
 	return time.Unix(unix, 0).UTC().Format("2006-01-02")
 }
 
-// SitemapXML sitemap.xml：静态页 + 商品/文章/分类动态条目。
+// SitemapXML sitemap.xml：靜態頁 + 商品/文章/分類動態條目。
 func (s *SeoService) SitemapXML(ctx context.Context, host string) (string, error) {
 	base := s.siteURL(ctx, host)
 	entries := []sitemapEntry{
@@ -112,9 +112,9 @@ func (s *SeoService) SitemapXML(ctx context.Context, host string) (string, error
 			Lastmod: lastmodOf(p.PublishedAt),
 		})
 	}
-	// 注：分类筛选 URL（/products?category_id=N）不进 sitemap——查询串不参与
-	// 静态页匹配，服务端返回与 /products 相同的静态页（canonical 也指向 /products），
-	// 提交这些 URL 只会制造「重复网页，未选定规范网页」的 GSC 报错。
+	// 注：分類篩選 URL（/products?category_id=N）不進 sitemap——查詢串不參與
+	// 靜態頁匹配，服務端返回與 /products 相同的靜態頁（canonical 也指向 /products），
+	// 提交這些 URL 只會製造「重複網頁，未選定規範網頁」的 GSC 報錯。
 
 	out, err := xml.MarshalIndent(sitemapURLSet{Xmlns: sitemapNS, URLs: entries}, "", "  ")
 	if err != nil {

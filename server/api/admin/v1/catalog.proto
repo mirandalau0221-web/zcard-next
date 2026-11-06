@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminCatalogService 商品目录管理：商品/分类/标签/控件/商品组/评价。
+// AdminCatalogService 商品目錄管理：商品/分類/標籤/控件/商品組/評價。
 service AdminCatalogService {
   rpc ClassifyProducts(ClassifyProductsRequest) returns (ClassifyProductsReply) {
     option (google.api.http) = { post: "/api/v1/admin/products/classify" body: "*" };
@@ -38,7 +38,7 @@ service AdminCatalogService {
   rpc PreviewDeleteProduct(GetProductRequest) returns (DeleteProductPreview) {
     option (google.api.http) = { get: "/api/v1/admin/products/{id}/delete-preview" };
   }
-  // BatchUpdateProductStatus 批量上下架（列表多选操作；status 1=上架 0=下架 2=隐藏）。
+  // BatchUpdateProductStatus 批量上下架（列表多選操作；status 1=上架 0=下架 2=隱藏）。
   rpc BatchUpdateProductStatus(BatchUpdateProductStatusRequest) returns (BatchUpdateProductStatusReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/products/batch-status"
@@ -72,7 +72,7 @@ service AdminCatalogService {
   rpc SetCategoryPlacements(SetCategoryPlacementsRequest) returns (CategoryPlacementsReply) {
     option (google.api.http) = { put: "/api/v1/admin/categories/{category_id}/placements" body: "*" };
   }
-  // ── 分类 ──
+  // ── 分類 ──
   rpc ListCategories(google.protobuf.Empty) returns (CategoryList) {
     option (google.api.http) = { get: "/api/v1/admin/categories" };
   }
@@ -88,12 +88,12 @@ service AdminCatalogService {
   rpc MergeCategories(MergeCategoriesRequest) returns (MergeCategoriesReply) {
     option (google.api.http) = { post: "/api/v1/admin/categories/merge" body: "*" };
   }
-  // ReorderCategories 分类排序（拖拽重排：把某层级全部兄弟按 ids 顺序重排并归一化 sort）。
+  // ReorderCategories 分類排序（拖拽重排：把某層級全部兄弟按 ids 順序重排並歸一化 sort）。
   rpc ReorderCategories(ReorderCategoriesRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { post: "/api/v1/admin/categories/reorder" body: "*" };
   }
 
-  // ── 标签 ──
+  // ── 標籤 ──
   rpc ListTags(google.protobuf.Empty) returns (TagList) {
     option (google.api.http) = { get: "/api/v1/admin/tags" };
   }
@@ -104,7 +104,7 @@ service AdminCatalogService {
     option (google.api.http) = { delete: "/api/v1/admin/tags/{id}" };
   }
 
-  // ── 自定义控件 ──
+  // ── 自定義控件 ──
   rpc ListControls(ListControlsRequest) returns (ControlList) {
     option (google.api.http) = { get: "/api/v1/admin/products/{product_id}/controls" };
   }
@@ -118,7 +118,7 @@ service AdminCatalogService {
     option (google.api.http) = { delete: "/api/v1/admin/controls/{id}" };
   }
 
-  // ── 评价（真实一单一评审核 + 虚拟评价）──
+  // ── 評價（真實一單一評審核 + 虛擬評價）──
   rpc ListReviews(ListReviewsRequest) returns (ListReviewsReply) {
     option (google.api.http) = { get: "/api/v1/admin/reviews" };
   }
@@ -132,7 +132,7 @@ service AdminCatalogService {
     option (google.api.http) = { post: "/api/v1/admin/virtual-reviews" body: "*" };
   }
 
-  // ── SKU 多规格 ──
+  // ── SKU 多規格 ──
   rpc ListSkus(ListSkusRequest) returns (SkuList) {
     option (google.api.http) = { get: "/api/v1/admin/products/{product_id}/skus" };
   }
@@ -146,7 +146,7 @@ service AdminCatalogService {
     option (google.api.http) = { delete: "/api/v1/admin/skus/{id}" };
   }
 
-  // ── 会员商品组 ──
+  // ── 會員商品組 ──
   rpc ListMemberGroups(google.protobuf.Empty) returns (MemberGroupList) {
     option (google.api.http) = { get: "/api/v1/admin/member-groups" };
   }
@@ -166,19 +166,19 @@ service AdminCatalogService {
 message ListProductsRequest {
   uint64 category_id = 1;
   string keyword = 2;
-  int32 status = 3; // 0=全部 1=上架 2=隐藏 -1=仅下架
+  int32 status = 3; // 0=全部 1=上架 2=隱藏 -1=僅下架
   int32 page = 4;
   int32 page_size = 5;
-  bool low_stock_only = 6; // 仅返回库存不足商品（阈值取 settings.supply.low_stock_threshold）
-  uint64 upstream_source_id = 7; // 按供货渠道筛选（0=全部；商品列表渠道商下拉）
-  bool out_of_stock_only = 9; // 仅库存为 0，按自营/上游货源分别计算
-  bool local_only = 8; // 仅看自营（无上游渠道）
+  bool low_stock_only = 6; // 僅返回庫存不足商品（閾值取 settings.supply.low_stock_threshold）
+  uint64 upstream_source_id = 7; // 按供貨渠道篩選（0=全部；商品列表渠道商下拉）
+  bool out_of_stock_only = 9; // 僅庫存為 0，按自營/上游貨源分別計算
+  bool local_only = 8; // 僅看自營（無上游渠道）
   string stock_type = 10; // card | url | code，空表示全部
   optional bool is_locked = 12;
   string inventory = 13; // available | low | empty | unknown
   bool restocked_only = 14;
   optional bool auto_listing = 15;
-  bool options_only = 11; // 轻量下拉选项，不读取描述及库存/销量；默认保持完整列表
+  bool options_only = 11; // 輕量下拉選項，不讀取描述及庫存/銷量；默認保持完整列表
 }
 
 message ListProductsReply {
@@ -192,7 +192,7 @@ message GetProductRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// AdminProduct 管理面商品（含成本价等敏感字段）。
+// AdminProduct 管理面商品（含成本價等敏感字段）。
 message AdminProduct {
   string product_property = 71;
   optional bool track_inventory = 72;
@@ -209,7 +209,7 @@ message AdminProduct {
   uint64 category_id = 2;
   string name = 3;
   string slug = 4;
-  string description = 5; // sanitize 后
+  string description = 5; // sanitize 後
   string cover = 6;
   repeated string images = 7;
   int64 price_cents = 8;
@@ -219,23 +219,23 @@ message AdminProduct {
   string delivery_mode = 12; // status | delete
   bool dedup = 13;
   int32 sort = 14;
-  int32 status = 15; // 1=上架 0=下架 2=隐藏
-  int64 stock = 16; // 计算字段（available 数）
+  int32 status = 15; // 1=上架 0=下架 2=隱藏
+  int64 stock = 16; // 計算字段（available 數）
   uint64 upstream_source_id = 17;
   string upstream_product_code = 18;
   int64 created_at = 19;
   int64 updated_at = 20;
-  // 积分兑换价（0=不参与积分商城；）
+  // 積分兑換價（0=不參與積分商城；）
   int64 points_required = 21;
-  // 已售数量（paid 及之后状态订单的 quantity 聚合；列表计算字段）
+  // 已售數量（paid 及之後狀態訂單的 quantity 聚合；列表計算字段）
   int64 sold_count = 22;
-  // 直发内容已设置（url/code 商品；明文永不回传）
+  // 直髮內容已設置（url/code 商品；明文永不回傳）
   bool has_direct_content = 23;
-  // 运营推荐（storefront 首页推荐位）
+  // 運營推薦（storefront 首頁推薦位）
   bool is_recommend = 24;
   string stock_status = 25; // current | stale | unknown
-  int64 stock_reference = 26; // 仅供展示的上次库存，不作为购买校验依据
-  int64 stock_checked_at = 27; // 上次库存查询时间
+  int64 stock_reference = 26; // 僅供展示的上次庫存，不作為購買校驗依據
+  int64 stock_checked_at = 27; // 上次庫存查詢時間
   bool cover_protected = 28;
   bool description_protected = 29;
   bool is_locked = 32;
@@ -247,12 +247,12 @@ message AdminProduct {
   string listing_message = 38;
   bool listing_restocked = 39;
   int64 listing_observed_at = 40;
-  string low_stock_message = 41; // 按实际发货规格和后台阈值计算，空表示无已确认预警
+  string low_stock_message = 41; // 按實際發貨規格和後台閾值計算，空表示無已確認預警
 
 }
 
 message CreateProductRequest {
-  uint64 copy_from_product_id = 74; // 同站点原商品，按权限复制 SKU 和下单控件
+  uint64 copy_from_product_id = 74; // 同站點原商品，按權限複製 SKU 和下單控件
   optional string product_property = 71;
   optional bool track_inventory = 72;
   optional bool sales_visible = 73;
@@ -276,11 +276,11 @@ message CreateProductRequest {
   bool dedup = 11;
   int32 sort = 12;
   int32 status = 13;
-  // 积分兑换价（0=不参与积分商城；）
+  // 積分兑換價（0=不參與積分商城；）
   int64 points_required = 14;
-  // 直发内容明文（url/code 商品：网盘链接/兑换码，加密存储；同一内容发给每个买家）
+  // 直髮內容明文（url/code 商品：網盤鏈接/兑換碼，加密存儲；同一內容發給每個買家）
   string direct_content = 15;
-  // 运营推荐（storefront 首页推荐位）
+  // 運營推薦（storefront 首頁推薦位）
   bool is_recommend = 16;
 }
 
@@ -299,11 +299,11 @@ message UpdateProductRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
   string name = 2;
   uint64 category_id = 3;
-  // 省略保留原值，显式空串清除。
+  // 省略保留原值，顯式空串清除。
   optional string description = 4;
   optional string cover = 5;
   repeated string images = 6;
-  // true 时以 images 替换图集（包括空数组）；省略且 images 非空时兼容旧客户端。
+  // true 時以 images 替換圖集（包括空數組）；省略且 images 非空時兼容舊客户端。
   bool images_set = 19;
   int64 price_cents = 7;
   int64 factory_price_cents = 8;
@@ -311,13 +311,13 @@ message UpdateProductRequest {
   optional bool stock_visible = 10;
   int32 sort = 11;
   int32 status = 12;
-  // 积分兑换价（0=不参与积分商城；）
+  // 積分兑換價（0=不參與積分商城；）
   int64 points_required = 13;
-  // 直发内容明文（空=保持不变；url/code 商品加密存储）
+  // 直髮內容明文（空=保持不變；url/code 商品加密存儲）
   string direct_content = 14;
-  // 运营推荐（省略保留原值；false=取消推荐）。
+  // 運營推薦（省略保留原值；false=取消推薦）。
   optional bool is_recommend = 15;
-  // 空值保留原类型；card | url | code
+  // 空值保留原類型；card | url | code
   string stock_type = 16;
 }
 
@@ -337,9 +337,9 @@ message DeleteProductPreview {
 
 message BatchUpdateProductStatusRequest {
   repeated uint64 ids = 1 [(google.api.field_behavior) = REQUIRED];
-  // status 不标 REQUIRED:0=下架是合法值,REQUIRED 校验把零值当未传拒绝
-  // (missing required field: status——下架必炸;值域 0/1/2 由业务层校验)。
-  int32 status = 2; // 1=上架 0=下架 2=隐藏
+  // status 不標 REQUIRED:0=下架是合法值,REQUIRED 校驗把零值當未傳拒絕
+  // (missing required field: status——下架必炸;值域 0/1/2 由業務層校驗)。
+  int32 status = 2; // 1=上架 0=下架 2=隱藏
 }
 
 message BatchUpdateProductStatusReply {
@@ -356,13 +356,13 @@ message BatchUpdateProductCategoryReply {
   int32 skipped_locked = 2;
 }
 
-// ── 分类消息 ──
+// ── 分類消息 ──
 
 message CategoryList {
   repeated Category categories = 1;
 }
 
-// Category 分类（树形，含子分类计数）。
+// Category 分類（樹形，含子分類計數）。
 message Category {
   uint64 id = 1;
   uint64 parent_id = 2;
@@ -384,20 +384,20 @@ message CreateCategoryRequest {
 message UpdateCategoryRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
   string name = 2; // 非空才更新
-  // 图标（optional：缺省=不变；显式空串=清除）
+  // 圖標（optional：缺省=不變；顯式空串=清除）
   optional string icon = 3;
-  // 隐藏状态（optional：未传保持不变，避免只改排序/名称时误取消隐藏）
+  // 隱藏狀態（optional：未傳保持不變，避免只改排序/名稱時誤取消隱藏）
   optional bool hide = 4;
-  // 排序（optional：缺省不变——曾用 int32「>=0 即更新」把只改名的请求重置排序）
+  // 排序（optional：缺省不變——曾用 int32「>=0 即更新」把只改名的請求重置排序）
   optional int32 sort = 5;
-  // 父分类（optional：缺省不变；0 = 顶级；>0 = 指定父，防环校验）
+  // 父分類（optional：缺省不變；0 = 頂級；>0 = 指定父，防環校驗）
   optional int64 parent_id = 6;
 }
 
-// ReorderCategoriesRequest 分类排序：把 parent_id 层级下的分类按 ids 顺序重排，
-// sort 归一化为 0..n-1；ids 需包含该层级的全部兄弟（拖拽跨层级时含被移动分类）。
+// ReorderCategoriesRequest 分類排序：把 parent_id 層級下的分類按 ids 順序重排，
+// sort 歸一化為 0..n-1；ids 需包含該層級的全部兄弟（拖拽跨層級時含被移動分類）。
 message ReorderCategoriesRequest {
-  uint64 parent_id = 1; // 目标层级（0=顶级）
+  uint64 parent_id = 1; // 目標層級（0=頂級）
   repeated uint64 ids = 2;
 }
 
@@ -405,7 +405,7 @@ message DeleteCategoryRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// ── 标签消息 ──
+// ── 標籤消息 ──
 
 message TagList {
   repeated Tag tags = 1;
@@ -433,7 +433,7 @@ message DeleteTagRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// ── 自定义控件消息 ──
+// ── 自定義控件消息 ──
 
 message ListControlsRequest {
   uint64 product_id = 1 [(google.api.field_behavior) = REQUIRED];
@@ -484,7 +484,7 @@ message DeleteControlRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// ── 评价消息 ──
+// ── 評價消息 ──
 
 message ListReviewsRequest {
   string status = 1; // pending | approved | rejected；空=全部
@@ -497,7 +497,7 @@ message ListReviewsReply {
   int64 total = 2;
 }
 
-// ReviewItem 真实评价（审核流：pending→approved/rejected）。
+// ReviewItem 真實評價（審核流：pending→approved/rejected）。
 message ReviewItem {
   uint64 id = 1;
   uint64 product_id = 2;
@@ -517,7 +517,7 @@ message RejectReviewRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// VirtualReviewItem 虚拟评价（与真实 approved 合并展示）。
+// VirtualReviewItem 虛擬評價（與真實 approved 合併展示）。
 message VirtualReviewItem {
   uint64 id = 1;
   uint64 product_id = 2;
@@ -546,7 +546,7 @@ message SkuList {
   repeated Sku skus = 1;
 }
 
-// Sku 管理面多规格（含成本价）。
+// Sku 管理面多規格（含成本價）。
 message Sku {
   optional int64 physical_stock = 20;
   string fulfillment_mode = 9;
@@ -554,7 +554,7 @@ message Sku {
   uint64 product_id = 2;
   string name = 3;
   map<string, string> spec_values = 4;
-  int64 price_cents = 5; // 独立售价（分；0=继承商品价）
+  int64 price_cents = 5; // 獨立售價（分；0=繼承商品價）
   int64 cost_cents = 6;
   int32 stock_offset = 7;
   string upstream_sku_id = 8;
@@ -589,18 +589,18 @@ message DeleteSkuRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// ── 会员商品组消息 ──
+// ── 會員商品組消息 ──
 
 message MemberGroupList {
   repeated MemberGroup groups = 1;
 }
 
-// MemberGroup 会员商品组（命中商品的订单按 discount 万分比打折）。
+// MemberGroup 會員商品組（命中商品的訂單按 discount 萬分比打折）。
 message MemberGroup {
   uint64 id = 1;
   string name = 2;
   repeated uint64 product_ids = 3;
-  int32 discount = 4; // 万分比（9500=95 折）
+  int32 discount = 4; // 萬分比（9500=95 折）
   bool stack_member = 5;
   bool stack_coupon = 6;
   string badge_style = 7;
@@ -609,7 +609,7 @@ message MemberGroup {
 message CreateMemberGroupRequest {
   string name = 1 [(google.api.field_behavior) = REQUIRED];
   repeated uint64 product_ids = 2;
-  int32 discount = 3 [(google.api.field_behavior) = REQUIRED]; // 万分比
+  int32 discount = 3 [(google.api.field_behavior) = REQUIRED]; // 萬分比
   bool stack_member = 4;
   bool stack_coupon = 5;
   string badge_style = 6;
@@ -629,7 +629,7 @@ message DeleteMemberGroupRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// 仅合并明确选中的分类；未选中的子分类移到目标下，不递归删除。
+// 僅合併明確選中的分類；未選中的子分類移到目標下，不遞歸刪除。
 message MergeCategoriesRequest {
   repeated uint64 source_ids = 1;
   uint64 target_id = 2;

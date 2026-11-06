@@ -3,7 +3,7 @@ import { pickVideo } from "../video-picker";
 import { pickMedia } from "@/components/common/media-picker";
 
 class MediaLibraryMenu {
-  title = "素材库图片";
+  title = "素材庫圖片";
   iconSvg =
     '<svg viewBox="0 0 1024 1024" width="16" height="16"><path d="M896 128H128c-35.3 0-64 28.7-64 64v640c0 35.3 28.7 64 64 64h768c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64z m0 704H128V192h768v640z" fill="currentColor"/><path d="M320 480m-64 0a64 64 0 1 0 128 0 64 64 0 1 0-128 0zM208 768h608v-64l-160-192-128 160-96-96z" fill="currentColor"/></svg>';
   tag = "button";
@@ -20,16 +20,16 @@ class MediaLibraryMenu {
   async exec(editor: IDomEditor) {
     const urls = await pickMedia({ multiple: true });
     if (!urls?.length) return;
-    // dangerouslyInsertHtml：绕开 Slate Node 类型约束（wangEditor 官方推荐的 HTML 注入路径）
+    // dangerouslyInsertHtml：繞開 Slate Node 類型約束（wangEditor 官方推薦的 HTML 注入路徑）
     editor.dangerouslyInsertHtml(urls.map((url) => `<img src="${url}" alt="" />`).join(""));
     editor.focus();
   }
 }
 
 class VideoMenu extends MediaLibraryMenu {
-  title = "插入视频";
+  title = "插入視頻";
   iconSvg =
-    '<svg aria-label="插入视频" role="img" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 8 6 4-6 4Z"/></svg>';
+    '<svg aria-label="插入視頻" role="img" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 8 6 4-6 4Z"/></svg>';
   async exec(editor: IDomEditor) {
     const selection = editor.selection;
     const html = await pickVideo();

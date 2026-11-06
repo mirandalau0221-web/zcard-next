@@ -1,6 +1,6 @@
 package ticket
 
-// 工单仓储（）：生命周期状态机 + 消息流（内部备注双过滤）+ 自动关闭。
+// 工單倉儲（）：生命週期狀態機 + 消息流（內部備註雙過濾）+ 自動關閉。
 
 import (
 	"context"
@@ -17,36 +17,36 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/sanitize"
 )
 
-// 哨兵错误。
+// 哨兵錯誤。
 var (
-	ErrNotFound     = errors.New("ticket: 工单不存在")
-	ErrTransition   = errors.New("ticket: 非法状态迁移")
-	ErrGuestContact = errors.New("ticket.GUEST_CONTACT_REQUIRED: 游客工单需留联系方式")
-	ErrAlreadyRated = errors.New("ticket: 已评价")
-	ErrNotResolved  = errors.New("ticket: 解决后才能评价")
+	ErrNotFound     = errors.New("ticket: 工單不存在")
+	ErrTransition   = errors.New("ticket: 非法狀態遷移")
+	ErrGuestContact = errors.New("ticket.GUEST_CONTACT_REQUIRED: 遊客工單需留聯繫方式")
+	ErrAlreadyRated = errors.New("ticket: 已評價")
+	ErrNotResolved  = errors.New("ticket: 解決後才能評價")
 )
 
-// 状态机：open → processing（首次客服回复）→ resolved → closed。
+// 狀態機：open → processing（首次客服回覆）→ resolved → closed。
 var allowedTicketTransitions = map[string]map[string]bool{
 	"open":       {"processing": true, "resolved": true, "closed": true},
 	"processing": {"resolved": true, "closed": true},
-	"resolved":   {"closed": true, "processing": true}, // processing 回退（追加回复重开）
+	"resolved":   {"closed": true, "processing": true}, // processing 回退（追加回復重開）
 }
 
-// TicketRepo 工单仓储。
+// TicketRepo 工單倉儲。
 type TicketRepo struct {
 	data     *data.Data
-	mediaRef mediaport.Referencer // 附件引用计数（nil 跳过）
+	mediaRef mediaport.Referencer // 附件引用計數（nil 跳過）
 }
 
-// NewTicketRepo 构造（mediaRef 素材引用计数，）。
+// NewTicketRepo 構造（mediaRef 素材引用計數，）。
 func NewTicketRepo(d *data.Data, mediaRef mediaport.Referencer) *TicketRepo {
 	return &TicketRepo{data: d, mediaRef: mediaRef}
 }
 
-// CreateInput 创建入参。
+// CreateInput 創建入參。
 type CreateInput struct {
-	UserID       uint64 // 0=游客
+	UserID       uint64 // 0=遊客
 	GuestContact string
 	Type         string // presale | aftersale
 	OrderID      uint64
@@ -55,7 +55,7 @@ type CreateInput struct {
 	Attachments  []uint64
 }
 
-// Create 创建工单 + 首条消息（游客联系方式必填；content sanitize）。
+// Create 創建工單 + 首條消息（遊客聯繫方式必填；content sanitize）。
 func (r *TicketRepo) Create(ctx context.Context, ticketNo string, in CreateInput) (*ent.Ticket, error) {
 	if in.UserID == 0 && in.GuestContact == "" {
 		return nil, ErrGuestContact
@@ -82,16 +82,16 @@ func (r *TicketRepo) Create(ctx context.Context, ticketNo string, in CreateInput
 	if err != nil {
 		return nil, err
 	}
-	// 首条消息（user 发起）
+	// 首條消息（user 發起）
 	if _, err := r.CreateMessage(ctx, t.ID, "user", in.UserID, in.Content, in.Attachments, false); err != nil {
 		return nil, err
 	}
 	return t, nil
 }
 
-// CreateMessage 追加消息（append-only；客服回复触发状态机；content sanitize）。
-// senderType: user/admin/system；isInternal 内部备注（用户侧过滤）。
-// 返回（工单是否首次客服回复——用于状态迁移，调用方决定）。
+// CreateMessage 追加消息（append-only；客服回覆觸發狀態機；content sanitize）。
+// senderType: user/admin/system；isInternal 內部備註（用户側過濾）。
+// 返回（工單是否首次客服回覆——用於狀態遷移，調用方決定）。
 func (r *TicketRepo) CreateMessage(ctx context.Context, ticketID uint64, senderType string, senderID uint64, content string, attachments []uint64, isInternal bool) (*ent.TicketMessage, error) {
 	if attachments == nil {
 		attachments = []uint64{}
@@ -105,12 +105,12 @@ func (r *TicketRepo) CreateMessage(ctx context.Context, ticketID uint64, senderT
 		SetIsInternal(isInternal).
 		Save(ctx)
 	if err == nil && r.mediaRef != nil && len(attachments) > 0 {
-		_ = r.mediaRef.AddRefs(ctx, attachments) // 附件引用 +1（防误删门禁）
+		_ = r.mediaRef.AddRefs(ctx, attachments) // 附件引用 +1（防誤刪門禁）
 	}
 	return m, err
 }
 
-// Transition 状态机 CAS（非法迁移拒绝）。
+// Transition 狀態機 CAS（非法遷移拒絕）。
 func (r *TicketRepo) Transition(ctx context.Context, id uint64, to string) error {
 	client := data.Client(ctx, r.data)
 	cur, err := client.Ticket.Get(ctx, id)
@@ -122,12 +122,12 @@ func (r *TicketRepo) Transition(ctx context.Context, id uint64, to string) error
 	}
 	from := string(cur.Status)
 	if from == to {
-		return nil // 幂等
+		return nil // 冪等
 	}
 	if !allowedTicketTransitions[from][to] {
 		return fmt.Errorf("%w: %s → %s", ErrTransition, from, to)
 	}
-	// 首次客服回复回填 first_reply_at + open→processing
+	// 首次客服回覆回填 first_reply_at + open→processing
 	upd := client.Ticket.UpdateOneID(id).SetStatus(ticket.Status(to))
 	if to == "processing" && cur.FirstReplyAt.IsZero() {
 		upd.SetFirstReplyAt(time.Now().UTC())
@@ -136,12 +136,12 @@ func (r *TicketRepo) Transition(ctx context.Context, id uint64, to string) error
 	return err
 }
 
-// MarkProcessingOnReply 客服回复后状态推进（open → processing；首答回填）。
+// MarkProcessingOnReply 客服回覆後狀態推進（open → processing；首答回填）。
 func (r *TicketRepo) MarkProcessingOnReply(ctx context.Context, id uint64) error {
 	return r.Transition(ctx, id, "processing")
 }
 
-// GetByNo 按工单号查。
+// GetByNo 按工單號查。
 func (r *TicketRepo) GetByNo(ctx context.Context, ticketNo string) (*ent.Ticket, error) {
 	t, err := data.Client(ctx, r.data).Ticket.Query().
 		Where(ticket.TicketNo(ticketNo)).
@@ -155,7 +155,7 @@ func (r *TicketRepo) GetByNo(ctx context.Context, ticketNo string) (*ent.Ticket,
 	return t, nil
 }
 
-// MessagesUserVisible 用户侧消息流（内部备注过滤——防泄漏双过滤之一）。
+// MessagesUserVisible 用户側消息流（內部備註過濾——防泄漏雙過濾之一）。
 func (r *TicketRepo) MessagesUserVisible(ctx context.Context, ticketID uint64) ([]*ent.TicketMessage, error) {
 	return data.Client(ctx, r.data).TicketMessage.Query().
 		Where(ticketmessage.TicketID(ticketID), ticketmessage.IsInternal(false)).
@@ -163,7 +163,7 @@ func (r *TicketRepo) MessagesUserVisible(ctx context.Context, ticketID uint64) (
 		All(ctx)
 }
 
-// MessagesAll 客服侧消息流（含内部备注）。
+// MessagesAll 客服側消息流（含內部備註）。
 func (r *TicketRepo) MessagesAll(ctx context.Context, ticketID uint64) ([]*ent.TicketMessage, error) {
 	return data.Client(ctx, r.data).TicketMessage.Query().
 		Where(ticketmessage.TicketID(ticketID)).
@@ -171,7 +171,7 @@ func (r *TicketRepo) MessagesAll(ctx context.Context, ticketID uint64) ([]*ent.T
 		All(ctx)
 }
 
-// ListByUser 用户工单列表。
+// ListByUser 用户工單列表。
 func (r *TicketRepo) ListByUser(ctx context.Context, userID uint64, page, size int) ([]*ent.Ticket, int, error) {
 	q := data.Client(ctx, r.data).Ticket.Query().
 		Where(ticket.UserID(userID)).
@@ -184,12 +184,12 @@ func (r *TicketRepo) ListByUser(ctx context.Context, userID uint64, page, size i
 	return rows, total, err
 }
 
-// ListWorkbench 客服工作台（urgent_paid 置顶 → high → normal → low；状态/类型/订单筛选）。
+// ListWorkbench 客服工作台（urgent_paid 置頂 → high → normal → low；狀態/類型/訂單篩選）。
 func (r *TicketRepo) ListWorkbench(ctx context.Context, status, typ string, orderID uint64, page, size int) ([]*ent.Ticket, int, error) {
 	q := data.Client(ctx, r.data).Ticket.Query()
 	switch status {
 	case "":
-		q = q.Where(ticket.StatusIn(ticket.StatusOpen, ticket.StatusProcessing)) // 默认未关闭
+		q = q.Where(ticket.StatusIn(ticket.StatusOpen, ticket.StatusProcessing)) // 默認未關閉
 	case "open", "processing", "resolved", "closed":
 		q = q.Where(ticket.StatusEQ(ticket.Status(status)))
 	}
@@ -199,13 +199,13 @@ func (r *TicketRepo) ListWorkbench(ctx context.Context, status, typ string, orde
 	if orderID > 0 {
 		q = q.Where(ticket.OrderID(orderID))
 	}
-	// 优先级排序（CASE 语义经 FieldOrder + 自定义顺序：ent 无 CASE——查回后排序）
+	// 優先級排序（CASE 語義經 FieldOrder + 自定義順序：ent 無 CASE——查回後排序）
 	total, err := q.Count(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
 	rows, err := q.Order(ent.Desc(ticket.FieldID)).
-		Offset((page - 1) * size).Limit(size * 2). // 多取一页余量供排序后裁剪
+		Offset((page - 1) * size).Limit(size * 2). // 多取一頁餘量供排序後裁剪
 		All(ctx)
 	if err != nil {
 		return nil, 0, err
@@ -217,7 +217,7 @@ func (r *TicketRepo) ListWorkbench(ctx context.Context, status, typ string, orde
 	return rows, total, nil
 }
 
-// sortByPriority urgent_paid → high → normal → low 稳定排序。
+// sortByPriority urgent_paid → high → normal → low 穩定排序。
 func sortByPriority(rows []*ent.Ticket) {
 	rank := map[string]int{"urgent_paid": 0, "high": 1, "normal": 2, "low": 3}
 	for i := 1; i < len(rows); i++ {
@@ -227,7 +227,7 @@ func sortByPriority(rows []*ent.Ticket) {
 	}
 }
 
-// SetPriority 设置优先级（付费加急路径）。
+// SetPriority 設置優先級（付費加急路徑）。
 func (r *TicketRepo) SetPriority(ctx context.Context, id uint64, priority string) error {
 	_, err := data.Client(ctx, r.data).Ticket.UpdateOneID(id).
 		SetPriority(ticket.Priority(priority)).
@@ -235,7 +235,7 @@ func (r *TicketRepo) SetPriority(ctx context.Context, id uint64, priority string
 	return err
 }
 
-// SetSatisfaction 评价（resolved 后 1-5；幂等拒绝重复评价）。
+// SetSatisfaction 評價（resolved 後 1-5；冪等拒絕重複評價）。
 func (r *TicketRepo) SetSatisfaction(ctx context.Context, id uint64, rating int8) error {
 	t, err := data.Client(ctx, r.data).Ticket.Get(ctx, id)
 	if err != nil {
@@ -251,13 +251,13 @@ func (r *TicketRepo) SetSatisfaction(ctx context.Context, id uint64, rating int8
 	return err
 }
 
-// SetSLA 回填 SLA 时限（付费加急更短；M4 告警消费）。
+// SetSLA 回填 SLA 時限（付費加急更短；M4 告警消費）。
 func (r *TicketRepo) SetSLA(ctx context.Context, id uint64, due time.Time) error {
 	_, err := data.Client(ctx, r.data).Ticket.UpdateOneID(id).SetSLADueAt(due).Save(ctx)
 	return err
 }
 
-// ListAutoCloseable resolved 超 N 天待自动关闭（cron）。
+// ListAutoCloseable resolved 超 N 天待自動關閉（cron）。
 func (r *TicketRepo) ListAutoCloseable(ctx context.Context, olderThan time.Time, limit int) ([]*ent.Ticket, error) {
 	return data.Client(ctx, r.data).Ticket.Query().
 		Where(ticket.StatusEQ(ticket.StatusResolved), ticket.UpdatedAtLT(olderThan)).
@@ -265,14 +265,14 @@ func (r *TicketRepo) ListAutoCloseable(ctx context.Context, olderThan time.Time,
 		All(ctx)
 }
 
-// Stats 工单统计（响应时长/解决率——dashboard 消费）。
+// Stats 工單統計（響應時長/解決率——dashboard 消費）。
 type Stats struct {
 	Total     int64
 	Resolved  int64
-	AvgReplyS time.Duration // 首响平均（有 first_reply_at 的单）
+	AvgReplyS time.Duration // 首響平均（有 first_reply_at 的單）
 }
 
-// ComputeStats 统计。
+// ComputeStats 統計。
 func (r *TicketRepo) ComputeStats(ctx context.Context) (*Stats, error) {
 	client := data.Client(ctx, r.data)
 	total, err := client.Ticket.Query().Count(ctx)
@@ -309,7 +309,7 @@ func nilOrZeroU64(v uint64) *uint64 {
 	return &v
 }
 
-// OrderIDByNo 按订单号反查 ID（工作台筛选拼接输入）。
+// OrderIDByNo 按訂單號反查 ID（工作台篩選拼接輸入）。
 func (r *TicketRepo) OrderIDByNo(ctx context.Context, orderNo string) uint64 {
 	o, err := data.Client(ctx, r.data).Order.Query().
 		Where(order.OrderNo(orderNo)).Only(ctx)

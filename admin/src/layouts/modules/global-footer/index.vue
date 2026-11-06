@@ -11,15 +11,15 @@ const themeVars = useThemeVars();
 
 <template>
   <DarkModeContainer class="h-full flex-center px-12px">
-    <footer class="project-footer" aria-label="ZCard 版权与社区">
+    <footer class="project-footer" aria-label="ZCard 版權與社區">
       <span class="copyright">
         © 2026 <strong>ZCard</strong>
         <span aria-hidden="true">·</span>
         <a href="https://github.com/soybeanjs/soybean-admin/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT</a>
       </span>
-      <a href="https://github.com/NovaWorks/zcard-next" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
-      <a href="https://t.me/ZhonCard" target="_blank" rel="noopener noreferrer">群组 @ZhonCard</a>
-      <a href="https://t.me/ZCardGroup" target="_blank" rel="noopener noreferrer">频道 @ZCardGroup</a>
+      <a href="https://github.com/NovaWorks/zcard-next" target="_blank" rel="noopener noreferrer">GitHub 倉庫</a>
+      <a href="https://t.me/ZhonCard" target="_blank" rel="noopener noreferrer">羣組 @ZhonCard</a>
+      <a href="https://t.me/ZCardGroup" target="_blank" rel="noopener noreferrer">頻道 @ZCardGroup</a>
     </footer>
   </DarkModeContainer>
 </template>

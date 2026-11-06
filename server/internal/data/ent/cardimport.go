@@ -21,21 +21,21 @@ type CardImport struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
 	// Filename holds the value of the "filename" field.
 	Filename string `json:"filename,omitempty"`
-	// 导入目标规格快照：NULL=历史未记录，0=商品默认池
+	// 導入目標規格快照：NULL=歷史未記錄，0=商品默認池
 	SkuID *uint64 `json:"sku_id,omitempty"`
-	// 导入时规格名称
+	// 導入時規格名稱
 	SkuName string `json:"sku_name,omitempty"`
-	// 文件总行数
+	// 文件總行數
 	Total int32 `json:"total,omitempty"`
-	// 已导入（进度回填）
+	// 已導入（進度回填）
 	Imported int32 `json:"imported,omitempty"`
-	// 重复跳过
+	// 重複跳過
 	Skipped int32 `json:"skipped,omitempty"`
 	// Failed holds the value of the "failed" field.
 	Failed int32 `json:"failed,omitempty"`

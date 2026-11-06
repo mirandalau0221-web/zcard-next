@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { t as $t } from '@/i18n';
 
-// 收银台支付方式网格（Payment.vue 订单支付 / Member.vue 余额充值 共用）：
-// 方式级选项卡片（自定义图标 → emoji 回落）：图标居左、名称+描述上下两行、
-// 勾选标右侧居中；列数按容器实际宽度自适应（充值右栏窄 → 整行列表，订单页宽 → 两列）。
+// 收銀台支付方式網格（Payment.vue 訂單支付 / Member.vue 餘額充值 共用）：
+// 方式級選項卡片（自定義圖標 → emoji 回落）：圖標居左、名稱+描述上下兩行、
+// 勾選標右側居中；列數按容器實際寬度自適應（充值右欄窄 → 整行列表，訂單頁寬 → 兩列）。
 import type { PayOption } from '@/composables/pay-options';
 
 defineProps<{
@@ -41,12 +41,12 @@ defineEmits<{ select: [channel: string, method: string] }>();
     </div>
   </div>
   <div v-else class="pay-no-channel">
-    <slot name="empty">{{ $t('暂无可用的支付渠道，请联系客服') }}</slot>
+    <slot name="empty">{{ $t('暫無可用的支付渠道，請聯繫客服') }}</slot>
   </div>
 </template>
 
 <style scoped>
-/* 容器查询按实际宽度切换列数：窄面板（充值右栏/手机）整行列表，宽容器（订单页）两列 */
+/* 容器查詢按實際寬度切換列數：窄面板（充值右欄/手機）整行列表，寬容器（訂單頁）兩列 */
 .pay-grid-wrap { container-type: inline-size; }
 .pay-channel-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
 @container (min-width: 460px) {
@@ -76,7 +76,7 @@ defineEmits<{ select: [channel: string, method: string] }>();
   font-size: 12px; color: #64748b; line-height: 1.5;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* 勾选标常驻占位（对齐不跳），未选中透明缩小、选中放大浮现 */
+/* 勾選標常駐佔位（對齊不跳），未選中透明縮小、選中放大浮現 */
 .pay-channel-check {
   flex-shrink: 0; width: 20px; height: 20px; border-radius: 999px;
   background: var(--zc-primary); color: #fff; font-size: 12px;

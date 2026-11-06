@@ -51,7 +51,7 @@ const loading = ref(false);
 const orders = ref<any[]>([]);
 const page = ref(1);
 const pageSize = ref(20);
-// 游标链：cursors[p-1] = 第 p 页起始游标（next_cursor = 满页时末行 ID；0 = 无更多）
+// 遊標鏈：cursors[p-1] = 第 p 頁起始遊標（next_cursor = 滿頁時末行 ID；0 = 無更多）
 const cursors = ref<number[]>([0]);
 const hasMore = ref(false);
 const shippingFilter = ref("");
@@ -101,87 +101,87 @@ const detail = ref<{
   status_events?: any[];
 } | null>(null);
 
-// 快捷筛选卡片（statusType 同色系：成功绿/待付黄/取消红/其余蓝）
+// 快捷篩選卡片（statusType 同色系：成功綠/待付黃/取消紅/其餘藍）
 const statusTabs = [
-  { label: "待完成发货", value: "needs_delivery", type: "info" as const },
-  { label: "待处理退款", value: "needs_refund", type: "warning" as const },
+  { label: "待完成發貨", value: "needs_delivery", type: "info" as const },
+  { label: "待處理退款", value: "needs_refund", type: "warning" as const },
   { label: "全部", value: "", type: "default" as const },
   { label: "待支付", value: "pending_payment", type: "warning" as const },
   { label: "已支付", value: "paid", type: "success" as const },
-  { label: "履约中", value: "fulfilling", type: "info" as const },
-  { label: "已发货", value: "delivered", type: "success" as const },
+  { label: "履約中", value: "fulfilling", type: "info" as const },
+  { label: "已發貨", value: "delivered", type: "success" as const },
   { label: "已完成", value: "completed", type: "success" as const },
   { label: "已取消", value: "canceled", type: "error" as const },
-  { label: "已过期", value: "expired", type: "error" as const },
+  { label: "已過期", value: "expired", type: "error" as const },
   { label: "已退款", value: "refunded", type: "error" as const },
 ];
 
-// ── 枚举翻译（ 修复：业务名称化，未知值回显原值）──
+// ── 枚舉翻譯（ 修復：業務名稱化，未知值回顯原值）──
 
 function fulfillmentTypeText(t: string) {
   const map: Record<string, string> = {
-    auto: "自动发货",
-    manual: "手动发货",
-    upstream: "上游代发",
-    shipping: "快递配送",
+    auto: "自動發貨",
+    manual: "手動發貨",
+    upstream: "上游代發",
+    shipping: "快遞配送",
   };
   return map[t] || t || "-";
 }
 
 function fulfillmentStatusText(s: string) {
   const map: Record<string, string> = {
-    pending: "待处理",
+    pending: "待處理",
     shipped: "已寄出",
-    received: "已收货",
+    received: "已收貨",
     refunded: "已取消交付",
-    delivering: "履约中",
-    manual: "待人工补发",
-    delivered: "已履约",
-    failed: "履约失败",
+    delivering: "履約中",
+    manual: "待人工補發",
+    delivered: "已履約",
+    failed: "履約失敗",
   };
   return map[s] || s || "-";
 }
 
 function amountTypeText(t: string) {
   const map: Record<string, string> = {
-    shipping: "运费",
-    base_price: "商品价",
-    sku_adjust: "SKU 加价",
-    member_discount: "会员折扣",
-    group_discount: "团购折扣",
-    promo_discount: "促销折扣",
-    coupon_discount: "优惠券折扣",
-    points_discount: "积分抵扣",
-    subsite_markup: "分站加价",
-    fee: "手续费",
-    tax: "税费",
-    rounding_adjust: "取整调整",
+    shipping: "運費",
+    base_price: "商品價",
+    sku_adjust: "SKU 加價",
+    member_discount: "會員折扣",
+    group_discount: "團購折扣",
+    promo_discount: "促銷折扣",
+    coupon_discount: "優惠券折扣",
+    points_discount: "積分抵扣",
+    subsite_markup: "分站加價",
+    fee: "手續費",
+    tax: "税費",
+    rounding_adjust: "取整調整",
   };
   return map[t] || t;
 }
 
 function sourceTypeText(s: string) {
   const map: Record<string, string> = {
-    member_level: "会员等级",
-    member_group: "会员分组",
-    coupon: "优惠券",
-    flash_sale: "限时秒杀",
-    points: "积分",
+    member_level: "會員等級",
+    member_group: "會員分組",
+    coupon: "優惠券",
+    flash_sale: "限時秒殺",
+    points: "積分",
     subsite: "分站",
-    manual: "手动",
-    gift_card: "礼品卡",
+    manual: "手動",
+    gift_card: "禮品卡",
   };
   return map[s] || s || "-";
 }
 
-// 状态事件节点颜色（横向时间线：成功绿/取消红/其他蓝）
+// 狀態事件節點顏色（橫向時間線：成功綠/取消紅/其他藍）
 function eventDotColor(evt: any): string {
   if (["paid", "delivered", "completed", "fulfilled"].includes(evt.event)) return "#18a058";
   if (["canceled", "expired", "refunded"].includes(evt.event)) return "#d03050";
   return "#2080f0";
 }
 
-// 事件排序（时间升序——后端已排，防御性再排一次）
+// 事件排序（時間升序——後端已排，防禦性再排一次）
 function sortedEvents(evts: any[]) {
   return [...(evts || [])]
     .map((evt) => {
@@ -190,7 +190,7 @@ function sortedEvents(evts: any[]) {
           ...evt,
           event: "fetch_pending",
           to_status: evt.from_status,
-          reason: "旧版取货事件误记完成，以订单当前状态为准",
+          reason: "舊版取貨事件誤記完成，以訂單當前狀態為準",
         };
       if (
         evt.event === "delivered" &&
@@ -204,41 +204,41 @@ function sortedEvents(evts: any[]) {
 
 function operatorText(op: string) {
   const map: Record<string, string> = {
-    system: "系统",
+    system: "系統",
     user: "用户",
-    admin: "管理员",
-    worker: "工单处理",
+    admin: "管理員",
+    worker: "工單處理",
   };
   return map[op] || op || "-";
 }
 
 function eventText(evt: string) {
   const map: Record<string, string> = {
-    fulfillment_progress: "履约进度更新",
-    shipment_created: "快递发货",
-    shipment_corrected: "快递信息更正",
-    shipping_address_changed: "收货地址更正",
-    shipment_received: "确认收货",
-    return_restocked: "退货入库",
-    return_registered: "退货登记",
+    fulfillment_progress: "履約進度更新",
+    shipment_created: "快遞發貨",
+    shipment_corrected: "快遞信息更正",
+    shipping_address_changed: "收貨地址更正",
+    shipment_received: "確認收貨",
+    return_restocked: "退貨入庫",
+    return_registered: "退貨登記",
     item_refund: "商品退款 / 取消",
-    created: "创建订单",
+    created: "創建訂單",
     paid: "支付成功",
-    fulfilled: "履约完成",
-    delivered: "发货完成",
-    completed: "订单完成",
-    fetch_pending: "取货查询（待发货）",
-    manual_delivered: "人工补发",
-    fulfillment_manual: "转人工处理",
-    service_started: "开始处理服务",
-    fulfilling: "等待发货",
-    partially_delivered: "部分发货",
-    canceled: "订单取消",
-    expired: "订单过期",
-    expiry_check: "超时核对",
-    payment_review: "到账待核对",
-    refund_requested: "申请退款",
-    refund_partial: "部分退款到账",
+    fulfilled: "履約完成",
+    delivered: "發貨完成",
+    completed: "訂單完成",
+    fetch_pending: "取貨查詢（待發貨）",
+    manual_delivered: "人工補發",
+    fulfillment_manual: "轉人工處理",
+    service_started: "開始處理服務",
+    fulfilling: "等待發貨",
+    partially_delivered: "部分發貨",
+    canceled: "訂單取消",
+    expired: "訂單過期",
+    expiry_check: "超時核對",
+    payment_review: "到賬待核對",
+    refund_requested: "申請退款",
+    refund_partial: "部分退款到賬",
     refunded: "退款完成",
   };
   return map[evt] || evt;
@@ -255,9 +255,9 @@ function formatTime(ts?: number) {
 
 const columns: DataTableColumns<any> = [
   { type: "selection", disabled: (row) => !canDelete(row) },
-  { title: "订单号", key: "order_no", width: 200, ellipsis: { tooltip: true } },
+  { title: "訂單號", key: "order_no", width: 200, ellipsis: { tooltip: true } },
   {
-    title: "订单商品",
+    title: "訂單商品",
     key: "items",
     minWidth: 240,
     render: (row) =>
@@ -276,7 +276,7 @@ const columns: DataTableColumns<any> = [
         : "—",
   },
   {
-    title: "状态",
+    title: "狀態",
     key: "status",
     width: 100,
     render: (row) =>
@@ -287,26 +287,26 @@ const columns: DataTableColumns<any> = [
       ),
   },
   {
-    title: "配送状态",
+    title: "配送狀態",
     key: "shipping_status",
     width: 120,
     render: (row) => (row.commerce_version === 1 ? shippingStatus(row.shipping_status) : "—"),
   },
   {
-    title: "总额",
+    title: "總額",
     key: "total_cents",
     width: 100,
     render: (row) => formatMoney(row.total_cents),
   },
   {
-    title: "联系方式",
+    title: "聯繫方式",
     key: "contact",
     width: 140,
     ellipsis: { tooltip: true },
     render: (row) => row.contact || row.guest_contact || "-",
   },
   {
-    title: "创建时间",
+    title: "創建時間",
     key: "created_at",
     width: 160,
     render: (row) => formatTime(row.created_at),
@@ -324,7 +324,7 @@ const columns: DataTableColumns<any> = [
             h(
               NButton,
               { size: "small", onClick: () => handleDetail(row.order_no) },
-              { default: () => "详情" },
+              { default: () => "詳情" },
             ),
             row.status === "pending_payment" && checkAuth("order:cancel")
               ? h(
@@ -333,7 +333,7 @@ const columns: DataTableColumns<any> = [
                   {
                     trigger: () =>
                       h(NButton, { size: "small", type: "warning" }, { default: () => "取消" }),
-                    default: () => "确定取消该订单？",
+                    default: () => "確定取消該訂單？",
                   },
                 )
               : null,
@@ -346,9 +346,9 @@ const columns: DataTableColumns<any> = [
                       h(
                         NButton,
                         { size: "small", type: "error", disabled: deleting.value },
-                        { default: () => "删除" },
+                        { default: () => "刪除" },
                       ),
-                    default: () => "从管理列表删除该订单？关联支付及审计记录将保留。",
+                    default: () => "從管理列表刪除該訂單？關聯支付及審計記錄將保留。",
                   },
                 )
               : null,
@@ -368,35 +368,35 @@ const itemColumns: DataTableColumns<any> = [
       (row.name || `#${row.product_id}`) + (row.sku_name ? `（${row.sku_name}）` : ""),
   },
   {
-    title: "数量 / 配送",
+    title: "數量 / 配送",
     key: "quantity",
     width: 150,
     render: (row) => h("div", {}, [
-      h("div", {}, `购买 ${row.quantity}`),
+      h("div", {}, `購買 ${row.quantity}`),
       ...(Number(row.canceled_quantity) > 0 ? [h("div", { class: "text-12px text-gray-500" }, `已取消 ${row.canceled_quantity}`)] : []),
       ...(row.goods_type === "physical" ? [
         h("div", { class: "text-12px text-gray-500" }, `已寄 ${row.shipped_quantity || 0} · 已收 ${row.received_quantity || 0}`),
-        ...(Number(row.returned_quantity) > 0 ? [h("div", { class: "text-12px text-gray-500" }, `退回入库 ${row.returned_quantity}`)] : []),
+        ...(Number(row.returned_quantity) > 0 ? [h("div", { class: "text-12px text-gray-500" }, `退回入庫 ${row.returned_quantity}`)] : []),
       ] : []),
     ]),
   },
   {
-    title: "单价",
+    title: "單價",
     key: "unit_price_cents",
     width: 90,
     render: (row) => formatMoney(row.unit_price_cents),
   },
-  { title: "小计", key: "amount_cents", width: 90, render: (row) => formatMoney(row.amount_cents) },
+  { title: "小計", key: "amount_cents", width: 90, render: (row) => formatMoney(row.amount_cents) },
   { title: "成本", key: "cost_cents", width: 90, render: (row) => formatMoney(row.cost_cents) },
   {
-    title: "来源",
+    title: "來源",
     key: "is_self",
     width: 80,
     render: (row) =>
       h(
         NTag,
         { size: "small", type: row.is_self ? "success" : "warning", bordered: false },
-        { default: () => (row.is_self ? "自营" : "上游") },
+        { default: () => (row.is_self ? "自營" : "上游") },
       ),
   },
   {
@@ -407,7 +407,7 @@ const itemColumns: DataTableColumns<any> = [
     render: (row) => row.upstream_source_name || "-",
   },
   {
-    title: "履约",
+    title: "履約",
     key: "fulfillment",
     width: 150,
     render: (row) =>
@@ -438,9 +438,9 @@ const itemColumns: DataTableColumns<any> = [
 
 const amountColumns: DataTableColumns<any> = [
   { title: "#", key: "seq", width: 40 },
-  { title: "类型", key: "type", width: 140, render: (row) => amountTypeText(row.type) },
+  { title: "類型", key: "type", width: 140, render: (row) => amountTypeText(row.type) },
   {
-    title: "金额",
+    title: "金額",
     key: "amount_cents",
     width: 90,
     render: (row) =>
@@ -451,7 +451,7 @@ const amountColumns: DataTableColumns<any> = [
       ),
   },
   {
-    title: "来源",
+    title: "來源",
     key: "source_type",
     width: 100,
     render: (row) => sourceTypeText(row.source_type),
@@ -509,7 +509,7 @@ async function handleDelete(orderNos: string[]) {
   try {
     const { error } = await deleteOrders(orderNos);
     if (!error) {
-      window.$message?.success(`已从列表删除 ${orderNos.length} 条订单`);
+      window.$message?.success(`已從列表刪除 ${orderNos.length} 條訂單`);
       if (detail.value && orderNos.includes(detail.value.order_no)) showDetail.value = false;
       resetOrderList();
     }
@@ -518,7 +518,7 @@ async function handleDelete(orderNos: string[]) {
   }
 }
 
-// 筛选变化：游标链重置回第 1 页
+// 篩選變化：遊標鏈重置回第 1 頁
 function resetOrderList() {
   page.value = 1;
   cursors.value = [0];
@@ -526,13 +526,13 @@ function resetOrderList() {
   loadOrders();
 }
 
-// 分页回调：回第 1 页（首页/改条数）时旧游标链作废，随翻页重建
+// 分頁回調：回第 1 頁（首頁/改條數）時舊遊標鏈作廢，隨翻頁重建
 function onPagerChange(p: number) {
   if (p === 1) cursors.value = [0];
   loadOrders();
 }
 
-// ── 卡密交付（订单详情弹窗：完整明文 + 复制；服务端现场解密 + 审计）──
+// ── 卡密交付（訂單詳情彈窗：完整明文 + 複製；服務端現場解密 + 審計）──
 const deliveries = ref<any[]>([]);
 const copiedCard = ref<number | null>(null);
 
@@ -558,15 +558,15 @@ async function copyCard(content: string, idx: number) {
       if (copiedCard.value === idx) copiedCard.value = null;
     }, 1500);
   } catch {
-    window.$message?.error("复制失败");
+    window.$message?.error("複製失敗");
   }
 }
 
 function deliverModeText(mode: string): string {
-  return { status: "标记模式", delete: "即删模式", direct: "直发" }[mode] || mode;
+  return { status: "標記模式", delete: "即刪模式", direct: "直髮" }[mode] || mode;
 }
 
-// ── 订单退款（order:refund 超管专属；渠道钱包/网关/上游三路）──
+// ── 訂單退款（order:refund 超管專屬；渠道錢包/網關/上游三路）──
 const showRefund = ref(false);
 const refunding = ref(false);
 const refundForm = reactive({
@@ -594,7 +594,7 @@ async function openRefund(row: any) {
   if (error || !data) return;
   const current = data as any;
   if (!current.user_id) {
-    window.$message?.warning("游客订单没有会员余额，请核实其他退款方式");
+    window.$message?.warning("遊客訂單沒有會員餘額，請核實其他退款方式");
     return;
   }
   refundForm.order_no = current.order_no;
@@ -607,7 +607,7 @@ async function openRefund(row: any) {
   );
   refundForm.fee_yuan = Number((refundForm.max_fee_cents / 100).toFixed(2));
   if (refundForm.max_cents <= 0 && refundForm.max_fee_cents <= 0) {
-    window.$message?.info("订单已全部退款");
+    window.$message?.info("訂單已全部退款");
     return;
   }
   refundForm.amount_yuan = Number((refundForm.max_cents / 100).toFixed(2));
@@ -634,7 +634,7 @@ async function handleRefund() {
       reason: refundForm.reason || undefined,
     });
     if (!error && (data as any)?.status === "succeeded") {
-      window.$message?.success("退款成功，已退至下单会员余额");
+      window.$message?.success("退款成功，已退至下單會員餘額");
       showRefund.value = false;
       await handleDetail(refundForm.order_no);
       loadOrders();
@@ -645,7 +645,7 @@ async function handleRefund() {
 }
 
 async function handleCancel(orderNo: string) {
-  const { error } = await cancelOrder(orderNo, "管理员取消");
+  const { error } = await cancelOrder(orderNo, "管理員取消");
   if (!error) {
     window.$message?.success("取消成功");
     loadOrders();
@@ -672,40 +672,40 @@ onMounted(async () => {
 
 <template>
   <div class="order-page min-h-500px min-w-0 flex-col gap-16px">
-    <NCard title="订单管理" class="flex-1">
+    <NCard title="訂單管理" class="flex-1">
       <div v-if="fromDashboard" class="mb-12px flex flex-wrap gap-8px items-center text-13px">
         <span
-          >工作台筛选<span v-if="reportFilter.start_time && reportFilter.end_time">
-            · {{ reportFilter.time_field === "paid" ? "付款" : "创建" }}时间
+          >工作台篩選<span v-if="reportFilter.start_time && reportFilter.end_time">
+            · {{ reportFilter.time_field === "paid" ? "付款" : "創建" }}時間
             {{
-              new Date(reportFilter.start_time * 1000).toLocaleString("zh-CN", {
+              new Date(reportFilter.start_time * 1000).toLocaleString("zh-TW", {
                 timeZone: "Asia/Shanghai",
               })
             }}
             —
             {{
-              new Date(reportFilter.end_time * 1000).toLocaleString("zh-CN", {
+              new Date(reportFilter.end_time * 1000).toLocaleString("zh-TW", {
                 timeZone: "Asia/Shanghai",
               })
-            }}（北京时间）</span
+            }}（北京時間）</span
           ><span v-if="reportFilter.product_id"> · 商品 #{{ reportFilter.product_id }}</span
           ><span v-if="reportFilter.channel_code">
             · 渠道 {{ reportFilter.channel_code }}</span
           ></span
         >
         <NButton size="small" @click="router.replace({ path: '/order', query: {} })"
-          >清除筛选</NButton
+          >清除篩選</NButton
         >
       </div>
       <NTabs type="line">
-        <NTabPane name="orders" tab="订单列表">
+        <NTabPane name="orders" tab="訂單列表">
           <form class="mb-12px flex flex-wrap items-center gap-8px" @submit.prevent="searchOrders">
             <NInput
               v-model:value="keywordInput"
               clearable
               :maxlength="150"
-              placeholder="搜索订单号 / 联系方式"
-              aria-label="搜索订单号或联系方式"
+              placeholder="搜索訂單號 / 聯繫方式"
+              aria-label="搜索訂單號或聯繫方式"
               style="width: 320px; max-width: 100%"
               @clear="clearSearch"
             />
@@ -720,12 +720,12 @@ onMounted(async () => {
                   type="error"
                   :loading="deleting"
                   :disabled="loading || !selectedOrders.length"
-                  >删除所选（{{ selectedOrders.length }}）</NButton
+                  >刪除所選（{{ selectedOrders.length }}）</NButton
                 ></template
               >
-              确认从管理列表删除选中的
+              確認從管理列表刪除選中的
               {{ selectedOrders.length }}
-              条订单？仅支持已取消、已过期的未付款订单，关联支付及审计记录保留。
+              條訂單？僅支持已取消、已過期的未付款訂單，關聯支付及審計記錄保留。
             </NPopconfirm>
           </form>
           <div class="mb-16px flex flex-wrap items-center justify-between gap-12px">
@@ -738,7 +738,7 @@ onMounted(async () => {
               v-model:value="shippingFilter"
               class="w-180px"
               :options="[
-                { label: '全部配送状态', value: '' },
+                { label: '全部配送狀態', value: '' },
                 ...['pending_payment', 'pending', 'partial', 'shipped', 'received', 'canceled'].map(
                   (value) => ({ value, label: shippingStatus(value) }),
                 ),
@@ -766,52 +766,52 @@ onMounted(async () => {
             @change="onPagerChange"
           />
         </NTabPane>
-        <NTabPane v-if="checkAuth('order:view_delivery')" name="pending" tab="待发货">
+        <NTabPane v-if="checkAuth('order:view_delivery')" name="pending" tab="待發貨">
           <PendingDeliverTab :refresh-key="pendingRefreshKey" @open-order="handleDetail" />
         </NTabPane>
       </NTabs>
     </NCard>
 
-    <!-- 订单详情弹窗 -->
-    <NModal v-model:show="showDetail" preset="card" title="订单详情" style="width: min(900px, 94vw)">
+    <!-- 訂單詳情彈窗 -->
+    <NModal v-model:show="showDetail" preset="card" title="訂單詳情" style="width: min(900px, 94vw)">
       <template v-if="detail">
         <NDescriptions :column="2" bordered size="small">
-          <NDescriptionsItem label="订单号">{{ detail.order_no }}</NDescriptionsItem>
-          <NDescriptionsItem label="状态">{{ statusText(detail.status) }}</NDescriptionsItem>
+          <NDescriptionsItem label="訂單號">{{ detail.order_no }}</NDescriptionsItem>
+          <NDescriptionsItem label="狀態">{{ statusText(detail.status) }}</NDescriptionsItem>
           <NDescriptionsItem label="已退本金">{{
             formatMoney(detail.refunded_cents || 0)
           }}</NDescriptionsItem>
-          <NDescriptionsItem label="支付手续费">{{
+          <NDescriptionsItem label="支付手續費">{{
             formatMoney(detail.paid_fee_cents || 0)
           }}</NDescriptionsItem>
-          <NDescriptionsItem label="已退手续费">{{
+          <NDescriptionsItem label="已退手續費">{{
             formatMoney(detail.refunded_fee_cents || 0)
           }}</NDescriptionsItem>
-          <NDescriptionsItem label="总额">{{ formatMoney(detail.total_cents) }}</NDescriptionsItem>
+          <NDescriptionsItem label="總額">{{ formatMoney(detail.total_cents) }}</NDescriptionsItem>
           <NDescriptionsItem label="成本">{{ formatMoney(detail.cost_cents) }}</NDescriptionsItem>
-          <NDescriptionsItem label="联系方式">{{
+          <NDescriptionsItem label="聯繫方式">{{
             detail.contact || detail.guest_contact || "-"
           }}</NDescriptionsItem>
           <NDescriptionsItem label="IP">{{ detail.client_ip || "-" }}</NDescriptionsItem>
           <NDescriptionsItem label="付款截止">{{
             detail.expired_at
               ? new Date(Number(detail.expired_at) * 1000).toLocaleString()
-              : "未记录"
+              : "未記錄"
           }}</NDescriptionsItem>
-          <NDescriptionsItem label="超时处理">{{
-            detail.expiry_review ? "待人工核对" : detail.expiry_reason || "按付款截止时间处理"
+          <NDescriptionsItem label="超時處理">{{
+            detail.expiry_review ? "待人工核對" : detail.expiry_reason || "按付款截止時間處理"
           }}</NDescriptionsItem>
-          <NDescriptionsItem v-if="detail.expiry_reason" label="核对原因">{{
+          <NDescriptionsItem v-if="detail.expiry_reason" label="核對原因">{{
             detail.expiry_reason
           }}</NDescriptionsItem>
           <NDescriptionsItem
             v-if="detail.expiry_retry_at && !detail.expiry_review"
-            label="下次核对"
+            label="下次核對"
             >{{
               new Date(Number(detail.expiry_retry_at) * 1000).toLocaleString()
             }}</NDescriptionsItem
           >
-          <NDescriptionsItem label="订单属性">
+          <NDescriptionsItem label="訂單屬性">
             <NSpace :size="4">
               <NTag v-if="hasDiscount(detail)" size="small" type="success" :bordered="false"
                 >已用折扣</NTag
@@ -821,7 +821,7 @@ onMounted(async () => {
                 size="small"
                 type="info"
                 :bordered="false"
-                >自营</NTag
+                >自營</NTag
               >
               <NTag
                 v-else-if="(detail.items || []).some((it) => !it.is_self)"
@@ -834,18 +834,18 @@ onMounted(async () => {
           </NDescriptionsItem>
         </NDescriptions>
 
-        <!-- 上游货源信息（老项目同款信息区） -->
+        <!-- 上游貨源信息（老項目同款信息區） -->
         <template v-if="(detail.items || []).some((it) => it.upstream_source_name)">
-          <NDivider>上游货源</NDivider>
+          <NDivider>上游貨源</NDivider>
           <NDescriptions :column="2" bordered size="small">
             <NDescriptionsItem label="上游渠道">{{
               (detail.items || []).find((it) => it.upstream_source_name)?.upstream_source_name ||
               "-"
             }}</NDescriptionsItem>
-            <NDescriptionsItem label="上游驱动">{{
+            <NDescriptionsItem label="上游驅動">{{
               (detail.items || []).find((it) => it.upstream_driver)?.upstream_driver || "-"
             }}</NDescriptionsItem>
-            <NDescriptionsItem label="上游商品编码" :span="2">
+            <NDescriptionsItem label="上游商品編碼" :span="2">
               {{
                 (detail.items || []).find((it) => it.upstream_product_code)
                   ?.upstream_product_code || "-"
@@ -870,7 +870,7 @@ onMounted(async () => {
           :order="detail"
           @refresh="afterManualDeliver"
         />
-        <NDivider>商品明细</NDivider>
+        <NDivider>商品明細</NDivider>
         <NDataTable
           :data="detail.items || []"
           :columns="itemColumns"
@@ -878,20 +878,20 @@ onMounted(async () => {
           size="small"
           :max-height="540"
         />
-        <!-- 卡密交付（完整明文；含取货次数/IP——客服核对场景） -->
+        <!-- 卡密交付（完整明文；含取貨次數/IP——客服核對場景） -->
         <div
           v-for="it in detail.items || []"
           :key="it.id"
           class="my-12px rounded-6px border border-gray-200 p-12px"
         >
-          <b>{{ it.name }} {{ it.sku_name }} · 下单资料</b
+          <b>{{ it.name }} {{ it.sku_name }} · 下單資料</b
           ><OrderAnswers :value="it.form_answers_json" />
           <p v-if="it.assigned_admin_id" class="text-12px opacity-60">
-            处理人 ID：{{ it.assigned_admin_id }}
+            處理人 ID：{{ it.assigned_admin_id }}
           </p>
         </div>
         <template v-if="detail.items?.some((it:any)=>it.goods_type!=='physical')">
-        <NDivider>交付结果（{{ deliveries.length }} 条）</NDivider>
+        <NDivider>交付結果（{{ deliveries.length }} 條）</NDivider>
         <div v-if="deliveries.length" class="flex flex-col gap-8px">
           <div
             v-for="(d, i) in deliveries"
@@ -900,13 +900,13 @@ onMounted(async () => {
           >
             <span class="w-24px shrink-0 text-12px text-gray-400">#{{ i + 1 }}</span>
             <div class="min-w-0 flex-1">
-              <span class="text-12px opacity-60">商品项 #{{ d.order_item_id }}</span>
+              <span class="text-12px opacity-60">商品項 #{{ d.order_item_id }}</span>
               <pre class="whitespace-pre-wrap break-all text-13px">{{ d.content }}</pre>
             </div>
             <NTag size="small" :bordered="false" class="shrink-0">{{
-              d.kind === "service" ? "服务完成" : deliverModeText(d.delivered_mode)
+              d.kind === "service" ? "服務完成" : deliverModeText(d.delivered_mode)
             }}</NTag>
-            <span class="shrink-0 text-11px text-gray-400">取货 {{ d.fetch_count || 0 }} 次</span>
+            <span class="shrink-0 text-11px text-gray-400">取貨 {{ d.fetch_count || 0 }} 次</span>
             <NButton
               size="tiny"
               tertiary
@@ -914,21 +914,21 @@ onMounted(async () => {
               class="shrink-0"
               @click="copyCard(d.content, i)"
             >
-              {{ copiedCard === i ? "已复制" : "复制" }}
+              {{ copiedCard === i ? "已複製" : "複製" }}
             </NButton>
           </div>
         </div>
-        <div v-else class="text-12px opacity-50" style="padding: 4px 0">暂无交付记录</div>
+        <div v-else class="text-12px opacity-50" style="padding: 4px 0">暫無交付記錄</div>
         </template>
-        <NDivider>金额明细（{{ (detail.amount_lines || []).length }} 行）</NDivider>
+        <NDivider>金額明細（{{ (detail.amount_lines || []).length }} 行）</NDivider>
         <NDataTable
           :data="detail.amount_lines || []"
           :columns="amountColumns"
           size="small"
           :max-height="540"
         />
-        <NDivider>状态事件（{{ (detail.status_events || []).length }} 条）</NDivider>
-        <!-- 横向时间线（大厂订单详情风格：圆点节点 + 连线 + 时间，可横向滚动） -->
+        <NDivider>狀態事件（{{ (detail.status_events || []).length }} 條）</NDivider>
+        <!-- 橫向時間線（大廠訂單詳情風格：圓點節點 + 連線 + 時間，可橫向滾動） -->
         <div style="display: flex; align-items: flex-start; overflow-x: auto; padding: 4px 4px 8px">
           <div
             v-for="(evt, i) in sortedEvents(detail.status_events || [])"
@@ -987,13 +987,13 @@ onMounted(async () => {
             class="text-12px opacity-50"
             style="padding: 8px 0"
           >
-            暂无状态事件
+            暫無狀態事件
           </div>
         </div>
       </template>
       <template #footer>
         <div v-if="detail" class="flex justify-end gap-8px">
-          <!-- NPopconfirm 的 trigger 槽必须恰好一个子节点：v-if 放在 Popconfirm 自身（空槽会抛 follower 错误） -->
+          <!-- NPopconfirm 的 trigger 槽必須恰好一個子節點：v-if 放在 Popconfirm 自身（空槽會拋 follower 錯誤） -->
           <NButton
             v-if="checkAuth('procurement:read') && detail.items?.some((it:any)=>it.goods_type!=='physical' && it.fulfillment_type==='upstream')"
             @click="
@@ -1003,7 +1003,7 @@ onMounted(async () => {
               });
               showDetail = false;
             "
-            >关联采购单</NButton
+            >關聯採購單</NButton
           >
           <NButton
             v-if="
@@ -1013,16 +1013,16 @@ onMounted(async () => {
             "
             type="primary"
             @click="showManualDeliver = true"
-            >人工补发</NButton
+            >人工補發</NButton
           >
           <NPopconfirm
             v-if="detail.status === 'pending_payment' && checkAuth('order:cancel')"
             @positive-click="handleCancel(detail.order_no)"
           >
             <template #trigger>
-              <NButton size="small" type="warning">取消订单</NButton>
+              <NButton size="small" type="warning">取消訂單</NButton>
             </template>
-            确定取消该订单？
+            確定取消該訂單？
           </NPopconfirm>
           <NButton
             v-if="
@@ -1040,11 +1040,11 @@ onMounted(async () => {
       </template>
     </NModal>
 
-    <!-- 退款弹窗（order:refund 超管专属） -->
+    <!-- 退款彈窗（order:refund 超管專屬） -->
     <NModal
       v-model:show="showRefund"
       preset="dialog"
-      :title="`订单退款：${refundForm.order_no}`"
+      :title="`訂單退款：${refundForm.order_no}`"
       style="width: 460px"
     >
       <NForm :model="refundForm" label-placement="left" label-width="72">
@@ -1052,14 +1052,14 @@ onMounted(async () => {
           <NSelect
             v-model:value="refundForm.channel"
             :options="[
-              { label: '退至下单会员余额', value: 'wallet' },
-              { label: '支付网关（暂不支持自动执行）', value: 'gateway', disabled: true },
-              { label: '上游退货（需向上游核实）', value: 'upstream', disabled: true },
+              { label: '退至下單會員餘額', value: 'wallet' },
+              { label: '支付網關（暫不支持自動執行）', value: 'gateway', disabled: true },
+              { label: '上游退貨（需向上遊核實）', value: 'upstream', disabled: true },
             ]"
           />
         </NFormItem>
         <p class="mb-12px text-13px">
-          退款将进入下单会员余额；关联佣金或分站利润的订单须全额退款。
+          退款將進入下單會員餘額；關聯佣金或分站利潤的訂單須全額退款。
         </p>
         <NFormItem :label="`退本金(${currencyUnit()})`" required>
           <NInputNumber
@@ -1070,7 +1070,7 @@ onMounted(async () => {
             class="w-full"
           />
         </NFormItem>
-        <NFormItem label="退手续费"
+        <NFormItem label="退手續費"
           ><NInputNumber
             v-model:value="refundForm.fee_yuan"
             :min="0"
@@ -1079,26 +1079,26 @@ onMounted(async () => {
             class="w-full"
         /></NFormItem>
         <p class="text-12px mb-12px">
-          合计退至余额
+          合計退至餘額
           {{
             formatMoney(
               Math.round(
                 (Number(refundForm.amount_yuan || 0) + Number(refundForm.fee_yuan || 0)) * 100,
               ),
             )
-          }}。手续费单独退还，部分退款可调整或填 0。
+          }}。手續費單獨退還，部分退款可調整或填 0。
         </p>
         <NFormItem label="原因">
           <NInput
             v-model:value="refundForm.reason"
-            placeholder="选填，会记入订单状态事件与审计"
+            placeholder="選填，會記入訂單狀態事件與審計"
             :maxlength="180"
           />
         </NFormItem>
       </NForm>
       <template #action>
         <NButton @click="showRefund = false">取消</NButton>
-        <NButton type="error" :loading="refunding" @click="handleRefund">确认退款到余额</NButton>
+        <NButton type="error" :loading="refunding" @click="handleRefund">確認退款到餘額</NButton>
       </template>
     </NModal>
     <ManualDeliverDialog

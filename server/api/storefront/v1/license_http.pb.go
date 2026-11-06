@@ -23,11 +23,11 @@ const OperationStoreLicenseServiceListLicenseOrders = "/zcard.api.storefront.v1.
 const OperationStoreLicenseServicePurchaseLicense = "/zcard.api.storefront.v1.StoreLicenseService/PurchaseLicense"
 
 type StoreLicenseServiceHTTPServer interface {
-	// GetLicenseOffer GetLicenseOffer 套餐报价（价格服务端裁决；instance_id 供目标实例绑定预览）。
+	// GetLicenseOffer GetLicenseOffer 套餐報價（價格服務端裁決；instance_id 供目標實例綁定預覽）。
 	GetLicenseOffer(context.Context, *emptypb.Empty) (*LicenseOfferReply, error)
-	// ListLicenseOrders ListLicenseOrders 购买记录（含许可证文件可重新下载）。
+	// ListLicenseOrders ListLicenseOrders 購買記錄（含許可證文件可重新下載）。
 	ListLicenseOrders(context.Context, *ListLicenseOrdersRequest) (*ListLicenseOrdersReply, error)
-	// PurchaseLicense PurchaseLicense 购买（钱包扣款 → ed25519 签发 → 返回许可证文件）。
+	// PurchaseLicense PurchaseLicense 購買（錢包扣款 → ed25519 簽發 → 返回許可證文件）。
 	PurchaseLicense(context.Context, *PurchaseLicenseRequest) (*PurchaseLicenseReply, error)
 }
 
@@ -96,11 +96,11 @@ func _StoreLicenseService_ListLicenseOrders0_HTTP_Handler(srv StoreLicenseServic
 }
 
 type StoreLicenseServiceHTTPClient interface {
-	// GetLicenseOffer GetLicenseOffer 套餐报价（价格服务端裁决；instance_id 供目标实例绑定预览）。
+	// GetLicenseOffer GetLicenseOffer 套餐報價（價格服務端裁決；instance_id 供目標實例綁定預覽）。
 	GetLicenseOffer(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *LicenseOfferReply, err error)
-	// ListLicenseOrders ListLicenseOrders 购买记录（含许可证文件可重新下载）。
+	// ListLicenseOrders ListLicenseOrders 購買記錄（含許可證文件可重新下載）。
 	ListLicenseOrders(ctx context.Context, req *ListLicenseOrdersRequest, opts ...http.CallOption) (rsp *ListLicenseOrdersReply, err error)
-	// PurchaseLicense PurchaseLicense 购买（钱包扣款 → ed25519 签发 → 返回许可证文件）。
+	// PurchaseLicense PurchaseLicense 購買（錢包扣款 → ed25519 簽發 → 返回許可證文件）。
 	PurchaseLicense(ctx context.Context, req *PurchaseLicenseRequest, opts ...http.CallOption) (rsp *PurchaseLicenseReply, err error)
 }
 
@@ -112,7 +112,7 @@ func NewStoreLicenseServiceHTTPClient(client *http.Client) StoreLicenseServiceHT
 	return &StoreLicenseServiceHTTPClientImpl{client}
 }
 
-// GetLicenseOffer GetLicenseOffer 套餐报价（价格服务端裁决；instance_id 供目标实例绑定预览）。
+// GetLicenseOffer GetLicenseOffer 套餐報價（價格服務端裁決；instance_id 供目標實例綁定預覽）。
 func (c *StoreLicenseServiceHTTPClientImpl) GetLicenseOffer(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*LicenseOfferReply, error) {
 	var out LicenseOfferReply
 	pattern := "/api/v1/storefront/license/offer"
@@ -129,7 +129,7 @@ func (c *StoreLicenseServiceHTTPClientImpl) GetLicenseOffer(ctx context.Context,
 	return &out, nil
 }
 
-// ListLicenseOrders ListLicenseOrders 购买记录（含许可证文件可重新下载）。
+// ListLicenseOrders ListLicenseOrders 購買記錄（含許可證文件可重新下載）。
 func (c *StoreLicenseServiceHTTPClientImpl) ListLicenseOrders(ctx context.Context, in *ListLicenseOrdersRequest, opts ...http.CallOption) (*ListLicenseOrdersReply, error) {
 	var out ListLicenseOrdersReply
 	pattern := "/api/v1/storefront/license/orders"
@@ -146,7 +146,7 @@ func (c *StoreLicenseServiceHTTPClientImpl) ListLicenseOrders(ctx context.Contex
 	return &out, nil
 }
 
-// PurchaseLicense PurchaseLicense 购买（钱包扣款 → ed25519 签发 → 返回许可证文件）。
+// PurchaseLicense PurchaseLicense 購買（錢包扣款 → ed25519 簽發 → 返回許可證文件）。
 func (c *StoreLicenseServiceHTTPClientImpl) PurchaseLicense(ctx context.Context, in *PurchaseLicenseRequest, opts ...http.CallOption) (*PurchaseLicenseReply, error) {
 	var out PurchaseLicenseReply
 	pattern := "/api/v1/storefront/license/purchase"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { refundStatusText } from "@/utils/business-status";
-// 支付单流水（payment:read_detail）+ 补单（payment:capture 超管专属）+ 退款单列表。
+// 支付單流水（payment:read_detail）+ 補單（payment:capture 超管專屬）+ 退款單列表。
 import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref, h, watch } from "vue";
 import { NButton, NDataTable, NInput, NPopconfirm, NTag } from "naive-ui";
@@ -30,49 +30,49 @@ const nextCursor = ref(0);
 const statusFilter = ref<string>("");
 const orderNo = ref("");
 
-// 快捷筛选卡片（与 statusTag 同色系）
+// 快捷篩選卡片（與 statusTag 同色系）
 const statusTabs = [
   { label: "全部", value: "", type: "default" as const },
   { label: "待支付", value: "pending", type: "warning" as const },
   { label: "成功", value: "success", type: "success" as const },
-  { label: "失败", value: "failed", type: "error" as const },
-  { label: "已过期", value: "expired", type: "default" as const },
+  { label: "失敗", value: "failed", type: "error" as const },
+  { label: "已過期", value: "expired", type: "default" as const },
 ];
 
 function statusTag(s: string) {
   const type = s === "success" ? "success" : s === "pending" ? "warning" : s === "failed" ? "error" : "default";
-  const text = s === "success" ? "成功" : s === "pending" ? "待支付" : s === "failed" ? "失败" : s === "expired" ? "已过期" : s;
+  const text = s === "success" ? "成功" : s === "pending" ? "待支付" : s === "failed" ? "失敗" : s === "expired" ? "已過期" : s;
   return h(NTag, { type, size: "small" }, { default: () => text });
 }
 
 const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 70 },
-  { title: "订单号", key: "order_no", width: 200, ellipsis: { tooltip: true } },
+  { title: "訂單號", key: "order_no", width: 200, ellipsis: { tooltip: true } },
   { title: "渠道", key: "channel", width: 90 },
-  { title: "到账核对", key: "review_reason", width: 240, render: (row) => row.review_reason || "-" },
-  { title: "渠道单号", key: "channel_order_no", width: 180, ellipsis: { tooltip: true } },
+  { title: "到賬核對", key: "review_reason", width: 240, render: (row) => row.review_reason || "-" },
+  { title: "渠道單號", key: "channel_order_no", width: 180, ellipsis: { tooltip: true } },
   {
-    title: "应收（含手续费）",
+    title: "應收（含手續費）",
     key: "amount_cents",
     width: 100,
     render: (row) => formatMoney(row.amount_cents),
   },
-  { title: "用户手续费", key: "fee_cents", width: 110, render: (row) => formatMoney(row.fee_cents || 0) },
-  { title: "实收", key: "charged_cents", width: 110, render: (row) => row.status === "success" ? formatMoney(row.charged_cents || 0) : "—" },
+  { title: "用户手續費", key: "fee_cents", width: 110, render: (row) => formatMoney(row.fee_cents || 0) },
+  { title: "實收", key: "charged_cents", width: 110, render: (row) => row.status === "success" ? formatMoney(row.charged_cents || 0) : "—" },
   {
-    title: "状态",
+    title: "狀態",
     key: "status",
     width: 86,
     render: (row) => statusTag(row.status),
   },
   {
-    title: "支付时间",
+    title: "支付時間",
     key: "paid_at",
     width: 160,
     render: (row) => (row.paid_at ? new Date(row.paid_at * 1000).toLocaleString() : "-"),
   },
   {
-    title: "创建时间",
+    title: "創建時間",
     key: "created_at",
     width: 160,
     render: (row) => (row.created_at ? new Date(row.created_at * 1000).toLocaleString() : "-"),
@@ -88,8 +88,8 @@ const columns: DataTableColumns<any> = [
             { onPositiveClick: () => handleCapture(row) },
             {
               trigger: () =>
-                h(NButton, { size: "small", type: "primary", secondary: true }, { default: () => "补单" }),
-              default: () => "主动向渠道查单并复走回调管线，确定？",
+                h(NButton, { size: "small", type: "primary", secondary: true }, { default: () => "補單" }),
+              default: () => "主動向渠道查單並復走回調管線，確定？",
             },
           )
         : null,
@@ -119,29 +119,29 @@ async function load(reset = true) {
 async function handleCapture(row: any) {
   const { error } = await capturePayment(row.id);
   if (!error) {
-    window.$message?.success("补单已执行（结果以支付单状态为准）");
+    window.$message?.success("補單已執行（結果以支付單狀態為準）");
     load();
   }
 }
 
-// ── 退款单列表 ──
+// ── 退款單列表 ──
 const refunds = ref<any[]>([]);
 const refundLoading = ref(false);
 const refundColumns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 70 },
-  { title: "订单号", key: "order_no", width: 200, ellipsis: { tooltip: true } },
-  { title: "金额", key: "amount_cents", width: 100, render: (row) => formatMoney(row.amount_cents) },
+  { title: "訂單號", key: "order_no", width: 200, ellipsis: { tooltip: true } },
+  { title: "金額", key: "amount_cents", width: 100, render: (row) => formatMoney(row.amount_cents) },
   {
     title: "渠道",
     key: "channel",
     width: 100,
     render: (row) =>
-      h(NTag, { size: "small" }, { default: () => ({ wallet: "钱包", gateway: "网关", upstream: "上游" } as any)[row.channel] || row.channel }),
+      h(NTag, { size: "small" }, { default: () => ({ wallet: "錢包", gateway: "網關", upstream: "上游" } as any)[row.channel] || row.channel }),
   },
-  { title: "状态", key: "status", width: 100, render: (row) => h(NTag, { size: "small", type: row.status === "succeeded" ? "success" : row.status === "failed" ? "error" : row.status === "processing" ? "info" : "warning" }, { default: () => refundStatusText(row.status) }) },
+  { title: "狀態", key: "status", width: 100, render: (row) => h(NTag, { size: "small", type: row.status === "succeeded" ? "success" : row.status === "failed" ? "error" : row.status === "processing" ? "info" : "warning" }, { default: () => refundStatusText(row.status) }) },
   { title: "原因", key: "reason", minWidth: 140, ellipsis: true },
   {
-    title: "创建时间",
+    title: "創建時間",
     key: "created_at",
     width: 160,
     render: (row) => (row.created_at ? new Date(row.created_at * 1000).toLocaleString() : "-"),
@@ -166,32 +166,32 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col gap-16px">
-    <!-- 支付单 -->
+    <!-- 支付單 -->
     <div>
-      <div class="mb-8px flex flex-wrap gap-8px items-center text-13px font-500">支付单流水
-        <NButton size="small" :type="reviewOnly ? 'warning' : 'default'" @click="toggleReviewFilter">{{ reviewOnly ? '到账待核对 · 查看全部' : '只看到账待核对' }}</NButton>
+      <div class="mb-8px flex flex-wrap gap-8px items-center text-13px font-500">支付單流水
+        <NButton size="small" :type="reviewOnly ? 'warning' : 'default'" @click="toggleReviewFilter">{{ reviewOnly ? '到賬待核對 · 查看全部' : '只看到賬待核對' }}</NButton>
       </div>
       <FilterTabs v-model:value="statusFilter" :options="statusTabs" size="small" class="mb-8px" @change="load()" />
       <div class="mb-8px flex items-center gap-8px">
         <NInput
           v-model:value="orderNo"
           size="small"
-          placeholder="按订单号搜索"
+          placeholder="按訂單號搜索"
           clearable
           class="w-220px"
           @keyup.enter="load()"
         />
-        <NButton size="small" @click="load()">查询</NButton>
+        <NButton size="small" @click="load()">查詢</NButton>
       </div>
       <NDataTable :columns="columns" :data="payments" :loading="loading" size="small"  :max-height="540" />
       <div v-if="nextCursor" class="mt-8px text-center">
-        <NButton size="small" quaternary @click="load(false)">加载更多</NButton>
+        <NButton size="small" quaternary @click="load(false)">加載更多</NButton>
       </div>
     </div>
 
-    <!-- 退款单 -->
+    <!-- 退款單 -->
     <div>
-      <div class="mb-8px text-13px font-500">退款单</div>
+      <div class="mb-8px text-13px font-500">退款單</div>
       <NDataTable :columns="refundColumns" :data="refunds" :loading="refundLoading" size="small"  :max-height="540" />
     </div>
   </div>

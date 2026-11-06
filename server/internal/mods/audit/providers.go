@@ -2,9 +2,9 @@ package audit
 
 // wire providers（）。
 //
-// 跨模块绑定（通道 A）：
-// - AuditRepo 实现 auditport.Auditor（identity/inventory/authz 埋点）
-// - AuditRepo 实现 auditport.RiskGate（order 下单闸门 / fulfillment 取货锁定）
+// 跨模塊綁定（通道 A）：
+// - AuditRepo 實現 auditport.Auditor（identity/inventory/authz 埋點）
+// - AuditRepo 實現 auditport.RiskGate（order 下單閘門 / fulfillment 取貨鎖定）
 
 import (
 	"context"
@@ -19,8 +19,8 @@ import (
 )
 
 // ProviderSet audit providers。
-// 告警：Alerter 依赖 notifyport.Sender（notify.Dispatcher 实现）+
-// notifyport.SettingsReader（settings 适配——经 NotifySettingsBridge 注入）。
+// 告警：Alerter 依賴 notifyport.Sender（notify.Dispatcher 實現）+
+// notifyport.SettingsReader（settings 適配——經 NotifySettingsBridge 注入）。
 var ProviderSet = wire.NewSet(
 	NewVisitCounter,
 	NewTrackRepo,
@@ -32,7 +32,7 @@ var ProviderSet = wire.NewSet(
 	NewAuditRepoWithAlerter,
 )
 
-// auditSettingsAdapter settings.RepoImpl → notifyport.SettingsReader（audit 复用）。
+// auditSettingsAdapter settings.RepoImpl → notifyport.SettingsReader（audit 複用）。
 type auditSettingsAdapter struct{ repo *settings.RepoImpl }
 
 func (a auditSettingsAdapter) GetJSON(ctx context.Context, group, key string) ([]byte, error) {
@@ -43,12 +43,12 @@ func (a auditSettingsAdapter) GetJSON(ctx context.Context, group, key string) ([
 	return raw, nil
 }
 
-// ProvideAuditAlerter 构造告警器（settings + notify sender）。
+// ProvideAuditAlerter 構造告警器（settings + notify sender）。
 func ProvideAuditAlerter(repo *settings.RepoImpl, sender notifyport.Sender) *Alerter {
 	return NewAlerter(auditSettingsAdapter{repo: repo}, sender)
 }
 
-// NewAuditRepoWithAlerter 构造仓储并注入告警器（单一 provider 合并依赖）。
+// NewAuditRepoWithAlerter 構造倉儲並注入告警器（單一 provider 合併依賴）。
 func NewAuditRepoWithAlerter(d *data.Data, logger *slog.Logger, alerter *Alerter) *AuditRepo {
 	r := NewAuditRepo(d, logger)
 	r.SetAlerter(alerter)

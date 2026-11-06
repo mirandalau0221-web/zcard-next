@@ -1,6 +1,6 @@
 package schema
 
-// 所有权：mods/settings（M0）
+// 所有權：mods/settings（M0）
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// Setting 运行时业务开关的真理源（铁律 7：后台可改；env/config 只作首次部署兜底）。
+// Setting 運行時業務開關的真理源（鐵律 7：後台可改；env/config 只作首次部署兜底）。
 type Setting struct {
 	ent.Schema
 }
@@ -19,11 +19,11 @@ func (Setting) Mixin() []ent.Mixin { return []ent.Mixin{TimeMixin{}} }
 func (Setting) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		// group 为 SQL 保留字，Ent/Atlas 生成 DDL 时会引用标识符
-		field.String("group").MaxLen(50).Comment("设置分组：site/template/trade/security/ops/notify..."),
+		// group 為 SQL 保留字，Ent/Atlas 生成 DDL 時會引用標識符
+		field.String("group").MaxLen(50).Comment("設置分組：site/template/trade/security/ops/notify..."),
 		field.String("key").MaxLen(100),
-		// value 为任意 JSON 文档（对象/数组/标量），json.RawMessage 保持原样存储
-		field.JSON("value", json.RawMessage{}).Comment("设置值（JSON 文档）"),
+		// value 為任意 JSON 文檔（對象/數組/標量），json.RawMessage 保持原樣存儲
+		field.JSON("value", json.RawMessage{}).Comment("設置值（JSON 文檔）"),
 	}
 }
 

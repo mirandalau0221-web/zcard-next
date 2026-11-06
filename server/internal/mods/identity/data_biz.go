@@ -1,7 +1,7 @@
 package identity
 
-// identity 身份认证模块（M0 收尾）：管理员 TOTP/登录失败锁定/异地告警/refresh 轮换。
-// user realm 注册登录 M1a 交付。
+// identity 身份認證模塊（M0 收尾）：管理員 TOTP/登錄失敗鎖定/異地告警/refresh 輪換。
+// user realm 註冊登錄 M1a 交付。
 
 import (
 	"context"
@@ -18,29 +18,29 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// 错误 reason（附录 B 区段：identity.*）
+// 錯誤 reason（附錄 B 區段：identity.*）
 var (
-	// ErrLoginFailed 登录失败（账号或密码错误——对外不区分，防枚举）。
+	// ErrLoginFailed 登錄失敗（賬號或密碼錯誤——對外不區分，防枚舉）。
 	ErrLoginFailed = errors.New("identity.LOGIN_FAILED")
-	// ErrAdminDisabled 账号已禁用。
+	// ErrAdminDisabled 賬號已禁用。
 	ErrAdminDisabled = errors.New("identity.ADMIN_DISABLED")
-	// ErrLocked 登录失败次数过多，账号被锁定。
+	// ErrLocked 登錄失敗次數過多，賬號被鎖定。
 	ErrLocked = errors.New("identity.ACCOUNT_LOCKED")
-	// ErrTOTPRequired 需要两步验证码。
+	// ErrTOTPRequired 需要兩步驗證碼。
 	ErrTOTPRequired = errors.New("identity.TOTP_REQUIRED")
-	// ErrTOTPInvalid 两步验证码错误。
+	// ErrTOTPInvalid 兩步驗證碼錯誤。
 	ErrTOTPInvalid = errors.New("identity.TOTP_INVALID")
-	// ErrSessionInvalid refresh 令牌无效或已过期。
+	// ErrSessionInvalid refresh 令牌無效或已過期。
 	ErrSessionInvalid = errors.New("identity.SESSION_INVALID")
 )
 
-// 登录锁定参数。
+// 登錄鎖定參數。
 const (
-	lockThreshold = 5                // 连续失败次数
-	lockDuration  = 15 * time.Minute // 锁定时长
+	lockThreshold = 5                // 連續失敗次數
+	lockDuration  = 15 * time.Minute // 鎖定時長
 )
 
-// AdminUserRepo 员工仓储（模块内端口）。
+// AdminUserRepo 員工倉儲（模塊內端口）。
 type AdminUserRepo interface {
 	FindByUsername(ctx context.Context, username string) (*AdminUser, error)
 	TouchLogin(ctx context.Context, id uint64, ip string, at time.Time) error
@@ -49,7 +49,7 @@ type AdminUserRepo interface {
 	ClearTOTPSecret(ctx context.Context, id uint64) error
 }
 
-// AdminUser 员工聚合。
+// AdminUser 員工聚合。
 type AdminUser struct {
 	TOTPBoundAt   int64
 	ID            uint64
@@ -69,15 +69,15 @@ type IdentityUsecase struct {
 	repo   AdminUserRepo
 	signer *authn.Signer
 	data   *data.Data
-	cipher *crypto.Box // ZCARD_DATA_KEY 解密 TOTP 密钥
+	cipher *crypto.Box // ZCARD_DATA_KEY 解密 TOTP 密鑰
 }
 
-// NewIdentityUsecase 构造。
+// NewIdentityUsecase 構造。
 func NewIdentityUsecase(repo AdminUserRepo, signer *authn.Signer, d *data.Data, box *crypto.Box) *IdentityUsecase {
 	return &IdentityUsecase{repo: repo, signer: signer, data: d, cipher: box}
 }
 
-// AdminLoginResult 登录结果。
+// AdminLoginResult 登錄結果。
 type AdminLoginResult struct {
 	Challenge      string
 	RecoveryTicket string
@@ -87,12 +87,12 @@ type AdminLoginResult struct {
 	Admin          AdminUser
 }
 
-// AdminLogin 管理员登录：锁定检查 → bcrypt 校验 → TOTP 校验 → 签发双令牌。
+// AdminLogin 管理員登錄：鎖定檢查 → bcrypt 校驗 → TOTP 校驗 → 簽發雙令牌。
 func (uc *IdentityUsecase) AdminLogin(ctx context.Context, username, password, totpCode, clientIP string) (*AdminLoginResult, error) {
 	return uc.passwordLogin(ctx, username, password, totpCode, clientIP, false)
 }
 
-// RefreshAccess 用 refresh token 换新令牌对（一次性：旧 session 吊销 + 新 session）。
+// RefreshAccess 用 refresh token 換新令牌對（一次性：舊 session 吊銷 + 新 session）。
 func (uc *IdentityUsecase) RefreshAccess(ctx context.Context, refreshToken string) (*AdminLoginResult, error) {
 	sess, err := uc.data.Client.Session.Query().Where(session.RefreshTokenHash(hashToken(refreshToken)), session.RealmEQ(session.RealmAdmin)).Only(ctx)
 	if err != nil {
@@ -116,7 +116,7 @@ func (uc *IdentityUsecase) RefreshAccess(ctx context.Context, refreshToken strin
 	return out, err
 }
 
-// Logout 吊销指定 refresh token。
+// Logout 吊銷指定 refresh token。
 func (uc *IdentityUsecase) Logout(ctx context.Context, refreshToken string) error {
 	hash := hashToken(refreshToken)
 	_, err := uc.data.Client.Session.Update().
@@ -134,7 +134,7 @@ func hashToken(t string) string {
 func randomToken() string {
 	b := make([]byte, 32)
 	if _, err := randRead(b); err != nil {
-		panic("identity: 随机数生成失败: " + err.Error())
+		panic("identity: 隨機數生成失敗: " + err.Error())
 	}
 	return hex.EncodeToString(b)
 }

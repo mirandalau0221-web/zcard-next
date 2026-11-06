@@ -17,11 +17,11 @@ func validSMTPAuth(auth string) bool {
 
 func smtpAuthentication(client *smtp.Client, cfg *notifyport.SMTPConfig) (smtp.Auth, error) {
 	if cfg.Username == "" || cfg.Password == "" {
-		return nil, fmt.Errorf("SMTP 用户名或密码为空；免认证中继请选择无需认证")
+		return nil, fmt.Errorf("SMTP 用户名或密碼為空；免認證中繼請選擇無需認證")
 	}
 	ok, advertised := client.Extension("AUTH")
 	if !ok {
-		return nil, fmt.Errorf("服务器未宣告 AUTH 支持；请检查端口、连接方式，或确认是否为免认证中继")
+		return nil, fmt.Errorf("服務器未宣告 AUTH 支持；請檢查端口、連接方式，或確認是否為免認證中繼")
 	}
 	mechanisms := strings.Fields(strings.ToUpper(advertised))
 	supported := func(method string) bool {
@@ -46,7 +46,7 @@ func smtpAuthentication(client *smtp.Client, cfg *notifyport.SMTPConfig) (smtp.A
 		}
 	}
 	if method == "" || !supported(method) {
-		return nil, fmt.Errorf("所选认证方式不受支持；服务器提供：%s", advertised)
+		return nil, fmt.Errorf("所選認證方式不受支持；服務器提供：%s", advertised)
 	}
 	if method == "CRAM-MD5" {
 		return smtp.CRAMMD5Auth(cfg.Username, cfg.Password), nil
@@ -64,11 +64,11 @@ type smtpPasswordAuth struct {
 
 func (a *smtpPasswordAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	if server.Name != a.host {
-		return "", nil, fmt.Errorf("SMTP 认证服务器名称不匹配")
+		return "", nil, fmt.Errorf("SMTP 認證服務器名稱不匹配")
 	}
 	local := server.Name == "localhost" || server.Name == "127.0.0.1" || server.Name == "::1"
 	if !server.TLS && !local && !a.allowPlaintext {
-		return "", nil, fmt.Errorf("服务器未提供加密连接，自动模式不会发送明文密码")
+		return "", nil, fmt.Errorf("服務器未提供加密連接，自動模式不會發送明文密碼")
 	}
 	a.step = 0
 	if a.method == "PLAIN" {
@@ -89,5 +89,5 @@ func (a *smtpPasswordAuth) Next(_ []byte, more bool) ([]byte, error) {
 			return []byte(a.password), nil
 		}
 	}
-	return nil, fmt.Errorf("SMTP 认证返回了非预期的挑战")
+	return nil, fmt.Errorf("SMTP 認證返回了非預期的挑戰")
 }

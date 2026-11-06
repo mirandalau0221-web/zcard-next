@@ -1,6 +1,6 @@
 package identity
 
-// wire providers（模块自装配；跨模块绑定在 bootstrap）。
+// wire providers（模塊自裝配；跨模塊綁定在 bootstrap）。
 
 import (
 	"context"
@@ -23,24 +23,24 @@ var ProviderSet = wire.NewSet(
 	wire.Bind(new(port.UserReader), new(*UserRepo)),
 	NewAdminAuthService, NewPasswordService,
 	NewRegisterCodeService,
-	ProvideRegisterCodeSettings, // 注册开关/方式读取（复用 notifyport.SettingsReader 绑定）
+	ProvideRegisterCodeSettings, // 註冊開關/方式讀取（複用 notifyport.SettingsReader 綁定）
 	NewStoreUserService,
 	NewAdminUserManageService,
 )
 
-// RegisterCodeSettings security 组设置读取（通道 A：settings 适配的
-// notifyport.SettingsReader——避免 identity→settings 直接依赖产生环）。
+// RegisterCodeSettings security 組設置讀取（通道 A：settings 適配的
+// notifyport.SettingsReader——避免 identity→settings 直接依賴產生環）。
 type RegisterCodeSettings struct {
 	read notifyport.SettingsReader
 }
 
-// ProvideRegisterCodeSettings 构造。
+// ProvideRegisterCodeSettings 構造。
 func ProvideRegisterCodeSettings(read notifyport.SettingsReader) *RegisterCodeSettings {
 	return &RegisterCodeSettings{read: read}
 }
 
-// RegisterMethods 注册方式（多选数组：["username","email","phone"]；兼容旧单值字符串）。
-// 返回勾选的通道列表；空/解析失败回落 ["username"]。
+// RegisterMethods 註冊方式（多選數組：["username","email","phone"]；兼容舊單值字符串）。
+// 返回勾選的通道列表；空/解析失敗回落 ["username"]。
 func (s *RegisterCodeSettings) RegisterMethods(ctx context.Context) []string {
 	raw, err := s.read.GetJSON(ctx, "security", "register_method")
 	if err != nil || len(raw) == 0 {
@@ -52,12 +52,12 @@ func (s *RegisterCodeSettings) RegisterMethods(ctx context.Context) []string {
 	}
 	var one string
 	if json.Unmarshal(raw, &one) == nil && one != "" {
-		return []string{one} // 旧单值兼容
+		return []string{one} // 舊單值兼容
 	}
 	return []string{"username"}
 }
 
-// MethodEnabled 指定通道是否启用（多选语义）。
+// MethodEnabled 指定通道是否啓用（多選語義）。
 func (s *RegisterCodeSettings) MethodEnabled(ctx context.Context, m string) bool {
 	for _, v := range s.RegisterMethods(ctx) {
 		if v == m {
@@ -67,7 +67,7 @@ func (s *RegisterCodeSettings) MethodEnabled(ctx context.Context, m string) bool
 	return false
 }
 
-// AdminLoginCaptcha 后台登录验证码（security.captcha_admin_login；默认 false）。
+// AdminLoginCaptcha 後台登錄驗證碼（security.captcha_admin_login；默認 false）。
 func (s *RegisterCodeSettings) AdminLoginCaptcha(ctx context.Context) bool {
 	raw, err := s.read.GetJSON(ctx, "security", "captcha_admin_login")
 	if err != nil || len(raw) == 0 {
@@ -80,7 +80,7 @@ func (s *RegisterCodeSettings) AdminLoginCaptcha(ctx context.Context) bool {
 	return v
 }
 
-// RegisterEnabled 开放注册（security.register_enabled；默认 true）。
+// RegisterEnabled 開放註冊（security.register_enabled；默認 true）。
 func (s *RegisterCodeSettings) RegisterEnabled(ctx context.Context) bool {
 	raw, err := s.read.GetJSON(ctx, "security", "register_enabled")
 	if err != nil || len(raw) == 0 {

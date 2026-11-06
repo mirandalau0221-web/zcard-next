@@ -9,8 +9,8 @@ import (
 	catalogport "github.com/NovaWorks/zcard-next/server/internal/mods/catalog/port"
 )
 
-// 同步任务可能缓存了合并前的映射。每次落商品前在渠道锁内读取最新设置，
-// 与分类合并采用相同锁序；图片下载已在调用前完成，不占用数据库事务。
+// 同步任務可能緩存了合併前的映射。每次落商品前在渠道鎖內讀取最新設置，
+// 與分類合併採用相同鎖序；圖片下載已在調用前完成，不佔用數據庫事務。
 func (s *SyncService) writeProductCategory(ctx context.Context, upstreamCategory string, write *catalogport.UpstreamProductInput) (id uint64, created bool, err error) {
 	err = data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		c := s.repo.entClient(ctx)
@@ -40,7 +40,7 @@ func (s *SyncService) writeProductCategory(ctx context.Context, upstreamCategory
 	return
 }
 
-// 首次下载封面也不能用同步任务启动时的旧 settings 覆盖刚保存的分类映射。
+// 首次下載封面也不能用同步任務啓動時的舊 settings 覆蓋剛保存的分類映射。
 func (s *SyncService) saveCoverDirectory(ctx context.Context, connectionID uint64, dir string) (string, error) {
 	err := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		c := s.repo.entClient(ctx)
@@ -65,7 +65,7 @@ func (s *SyncService) saveCoverDirectory(ctx context.Context, connectionID uint6
 	return dir, err
 }
 
-// 商品写入与映射写入之间也可能发生分类合并，保存映射前再以最新分类为准。
+// 商品寫入與映射寫入之間也可能發生分類合併，保存映射前再以最新分類為準。
 func (s *SyncService) saveProductMapping(ctx context.Context, mapping *ent.SupplyMapping) error {
 	return data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		c := s.repo.entClient(ctx)

@@ -205,7 +205,7 @@ type Tx struct {
 	Reference         string                 `protobuf:"bytes,6,opt,name=reference,proto3" json:"reference,omitempty"`
 	Remark            string                 `protobuf:"bytes,7,opt,name=remark,proto3" json:"remark,omitempty"`
 	CreatedAt         int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	DisplayReference  string                 `protobuf:"bytes,9,opt,name=display_reference,json=displayReference,proto3" json:"display_reference,omitempty"` // 展示用业务单号，reference 保留原始幂等键
+	DisplayReference  string                 `protobuf:"bytes,9,opt,name=display_reference,json=displayReference,proto3" json:"display_reference,omitempty"` // 展示用業務單號，reference 保留原始冪等鍵
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -307,7 +307,7 @@ type CreateRechargeRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
 	AmountCents int64                  `protobuf:"varint,1,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
 	Channel     string                 `protobuf:"bytes,2,opt,name=channel,proto3" json:"channel,omitempty"`
-	// 方式标识（多方式渠道必填：易支付 alipay/wxpay、USDT 选链；单方式渠道留空）
+	// 方式標識（多方式渠道必填：易支付 alipay/wxpay、USDT 選鏈；單方式渠道留空）
 	Method        *string `protobuf:"bytes,3,opt,name=method,proto3,oneof" json:"method,omitempty"`
 	QuoteKey      string  `protobuf:"bytes,4,opt,name=quote_key,json=quoteKey,proto3" json:"quote_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -376,8 +376,8 @@ type CreateRechargeReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RechargeId    uint64                 `protobuf:"varint,1,opt,name=recharge_id,json=rechargeId,proto3" json:"recharge_id,omitempty"`
 	PaymentId     uint64                 `protobuf:"varint,2,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`
-	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`       // redirect | qrcode | params（与 CreatePaymentReply 同构）
-	Payload       string                 `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"` // 支付跳转 URL / 二维码内容 / 参数 JSON
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`       // redirect | qrcode | params（與 CreatePaymentReply 同構）
+	Payload       string                 `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"` // 支付跳轉 URL / 二維碼內容 / 參數 JSON
 	Quote         *PaymentQuote          `protobuf:"bytes,5,opt,name=quote,proto3" json:"quote,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -448,7 +448,7 @@ func (x *CreateRechargeReply) GetQuote() *PaymentQuote {
 	return nil
 }
 
-// RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破限流；余额入账幂等键 giftcard:<id>）。
+// RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破限流；餘額入賬冪等鍵 giftcard:<id>）。
 type RedeemGiftcardRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
@@ -662,7 +662,7 @@ type MyWithdrawalItem struct {
 	ReviewedAt    int64                  `protobuf:"varint,9,opt,name=reviewed_at,json=reviewedAt,proto3" json:"reviewed_at,omitempty"`
 	PaidAt        int64                  `protobuf:"varint,10,opt,name=paid_at,json=paidAt,proto3" json:"paid_at,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Receipt       string                 `protobuf:"bytes,12,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回执（流水号/备注）
+	Receipt       string                 `protobuf:"bytes,12,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回執（流水號/備註）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -781,13 +781,13 @@ func (x *MyWithdrawalItem) GetReceipt() string {
 	return ""
 }
 
-// CreateWithdrawalRequest 提现申请（金额/收款方式；method_type 须在白名单内）。
+// CreateWithdrawalRequest 提現申請（金額/收款方式；method_type 須在白名單內）。
 type CreateWithdrawalRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AmountCents   int64                  `protobuf:"varint,1,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
-	MethodType    string                 `protobuf:"bytes,2,opt,name=method_type,json=methodType,proto3" json:"method_type,omitempty"` // 白名单 type（alipay/wechat/usdt_trc20/bank）
-	Account       string                 `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                         // 收款账号（USDT=TRC20 地址）
-	QrCodeUrl     string                 `protobuf:"bytes,4,opt,name=qr_code_url,json=qrCodeUrl,proto3" json:"qr_code_url,omitempty"`  // 收款码图片 URL（微信/支付宝可选；admin 审核展示）
+	MethodType    string                 `protobuf:"bytes,2,opt,name=method_type,json=methodType,proto3" json:"method_type,omitempty"` // 白名單 type（alipay/wechat/usdt_trc20/bank）
+	Account       string                 `protobuf:"bytes,3,opt,name=account,proto3" json:"account,omitempty"`                         // 收款賬號（USDT=TRC20 地址）
+	QrCodeUrl     string                 `protobuf:"bytes,4,opt,name=qr_code_url,json=qrCodeUrl,proto3" json:"qr_code_url,omitempty"`  // 收款碼圖片 URL（微信/支付寶可選；admin 審核展示）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -855,7 +855,7 @@ type CreateWithdrawalReply struct {
 	WithdrawalId  uint64                 `protobuf:"varint,1,opt,name=withdrawal_id,json=withdrawalId,proto3" json:"withdrawal_id,omitempty"`
 	AmountCents   int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
 	FeeCents      int64                  `protobuf:"varint,3,opt,name=fee_cents,json=feeCents,proto3" json:"fee_cents,omitempty"`
-	CreditedCents int64                  `protobuf:"varint,4,opt,name=credited_cents,json=creditedCents,proto3" json:"credited_cents,omitempty"` // 实际到账 = amount - fee
+	CreditedCents int64                  `protobuf:"varint,4,opt,name=credited_cents,json=creditedCents,proto3" json:"credited_cents,omitempty"` // 實際到賬 = amount - fee
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

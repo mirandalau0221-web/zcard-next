@@ -1,5 +1,5 @@
-// 管理面 API（doc/在线更新方案.md §9；system:update 超管专属——权限点在
-// authz/permissions.go 预登记段挂 Op，审计经现有 operation 中间件自动覆盖）。
+// 管理面 API（doc/在線更新方案.md §9；system:update 超管專屬——權限點在
+// authz/permissions.go 預登記段掛 Op，審計經現有 operation 中間件自動覆蓋）。
 package update
 
 import (
@@ -13,23 +13,23 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminUpdateService 在线更新管理面。
+// AdminUpdateService 在線更新管理面。
 type AdminUpdateService struct {
 	adminv1.UnimplementedAdminUpdateServiceServer
 	svc *Service
 }
 
-// NewAdminUpdateService 构造。
+// NewAdminUpdateService 構造。
 func NewAdminUpdateService(svc *Service) *AdminUpdateService {
 	return &AdminUpdateService{svc: svc}
 }
 
-// GetUpdateStatus 状态轮询（重启窗口期连接失败=仍在重启，前端据此等待）。
+// GetUpdateStatus 狀態輪詢（重啓窗口期連接失敗=仍在重啓，前端據此等待）。
 func (s *AdminUpdateService) GetUpdateStatus(ctx context.Context, _ *emptypb.Empty) (*adminv1.UpdateStatus, error) {
 	return toStatusPB(s.svc.Snapshot(ctx)), nil
 }
 
-// CheckUpdate 手动检查（源探测 + manifest 验签）。
+// CheckUpdate 手動檢查（源探測 + manifest 驗籤）。
 func (s *AdminUpdateService) CheckUpdate(ctx context.Context, _ *emptypb.Empty) (*adminv1.UpdateCheckResult, error) {
 	if err := s.svc.DisabledErr(); err != nil {
 		return nil, errors.Forbidden("update.DISABLED", err.Error())
@@ -48,7 +48,7 @@ func (s *AdminUpdateService) CheckUpdate(ctx context.Context, _ *emptypb.Empty) 
 	}, nil
 }
 
-// ApplyUpdate 触发更新（单飞；进行中重复调用返回当前态）。
+// ApplyUpdate 觸發更新（單飛；進行中重複調用返回當前態）。
 func (s *AdminUpdateService) ApplyUpdate(ctx context.Context, req *adminv1.ApplyUpdateRequest) (*adminv1.UpdateStatus, error) {
 	if updater.IsContainer() && os.Getenv("ZCARD_UPDATER_SOCKET") == "" {
 		return nil, errors.Forbidden("update.CONTAINER", updater.ErrContainerUpdate.Error())
@@ -63,12 +63,12 @@ func (s *AdminUpdateService) ApplyUpdate(ctx context.Context, req *adminv1.Apply
 		return toStatusPB(s.svc.Snapshot(ctx)), nil
 	}
 	if err := s.svc.Apply(ctx); err != nil {
-		return toStatusPB(s.svc.Snapshot(ctx)), nil // ErrBusy 亦返回当前态（200 携带 busy）
+		return toStatusPB(s.svc.Snapshot(ctx)), nil // ErrBusy 亦返回當前態（200 攜帶 busy）
 	}
 	return toStatusPB(s.svc.Snapshot(ctx)), nil
 }
 
-// RollbackUpdate 回滚上一版本并重启。
+// RollbackUpdate 回滾上一版本並重啓。
 func (s *AdminUpdateService) RollbackUpdate(ctx context.Context, _ *emptypb.Empty) (*adminv1.UpdateStatus, error) {
 	if updater.IsContainer() && os.Getenv("ZCARD_UPDATER_SOCKET") == "" {
 		return nil, errors.Forbidden("update.CONTAINER", updater.ErrContainerUpdate.Error())
@@ -78,7 +78,7 @@ func (s *AdminUpdateService) RollbackUpdate(ctx context.Context, _ *emptypb.Empt
 	}
 	if err := s.svc.Rollback(ctx); err != nil {
 		if errors.Is(err, ErrBusy) {
-			return toStatusPB(s.svc.Snapshot(ctx)), nil // 进行中：返回当前态（与 apply 一致）
+			return toStatusPB(s.svc.Snapshot(ctx)), nil // 進行中：返回當前態（與 apply 一致）
 		}
 		return nil, errors.InternalServer("update.ROLLBACK_FAILED", err.Error())
 	}

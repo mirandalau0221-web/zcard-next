@@ -1,9 +1,9 @@
-// Package content 内容模块（ 完整落地）：轻量 CMS。
-// - Banner：横幅/轮播（position/生效时间窗/跳转类型/移动端图回落）
-// - Post：文章（blog/notice，多语言 JSON 字段，content 逐语言 sanitize）
-// - PostCategory：文章分类（slug 唯一；有文章禁删）
+// Package content 內容模塊（ 完整落地）：輕量 CMS。
+// - Banner：橫幅/輪播（position/生效時間窗/跳轉類型/移動端圖回落）
+// - Post：文章（blog/notice，多語言 JSON 字段，content 逐語言 sanitize）
+// - PostCategory：文章分類（slug 唯一；有文章禁刪）
 //
-// 发布状态机：草稿 → 发布（首发回填 published_at，取消再发布不覆盖）。
-// 前台读取：生效横幅（30s 进程内缓存）、已发布文章分页、slug 详情、分类。
-// 多语言回落：locale → zh_CN → 首个非空。
+// 發佈狀態機：草稿 → 發佈（首發回填 published_at，取消再發布不覆蓋）。
+// 前台讀取：生效橫幅（30s 進程內緩存）、已發佈文章分頁、slug 詳情、分類。
+// 多語言回落：locale → zh_CN → 首個非空。
 package content

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 实体快递发货进入订单配送面板；虚拟商品继续使用人工交付弹窗。
+// 實體快遞發貨進入訂單配送面板；虛擬商品繼續使用人工交付彈窗。
 import { onMounted, ref, h, watch } from "vue";
 import { NButton, NDataTable, NTag } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
@@ -22,24 +22,24 @@ const target = ref<any>(null);
 
 const columns: DataTableColumns<any> = [
   {
-    title: "订单号",
+    title: "訂單號",
     key: "order_no",
     width: 210,
     render: (row) => h("span", { class: "text-13px" }, row.order_no),
   },
   { title: "商品", key: "product_name", minWidth: 160 },
-  { title: "规格", key: "sku_name", width: 110 },
-  { title: "交付方式", key: "goods_type", width: 100, render: (row) => row.goods_type === "physical" ? "快递配送" : "人工交付" },
-  { title: "处理进度", key: "fulfillment_status", width: 110, render: (row) => row.goods_type === "physical" ? "待寄出" : row.fulfillment_status === "delivering" ? "处理中" : "待处理" },
+  { title: "規格", key: "sku_name", width: 110 },
+  { title: "交付方式", key: "goods_type", width: 100, render: (row) => row.goods_type === "physical" ? "快遞配送" : "人工交付" },
+  { title: "處理進度", key: "fulfillment_status", width: 110, render: (row) => row.goods_type === "physical" ? "待寄出" : row.fulfillment_status === "delivering" ? "處理中" : "待處理" },
   {
-    title: "待发数量",
+    title: "待發數量",
     key: "quantity",
     width: 64,
     render: (row) =>
       h(NTag, { size: "small", type: "warning" }, { default: () => `×${row.quantity}` }),
   },
   {
-    title: "下单时间",
+    title: "下單時間",
     key: "created_at",
     width: 160,
     render: (row) => (row.created_at ? new Date(row.created_at * 1000).toLocaleString() : "-"),
@@ -50,12 +50,12 @@ const columns: DataTableColumns<any> = [
     width: 110,
     render: (row) =>
       row.goods_type === "physical" && checkAuth("order:deliver") && !checkAuth("order:read_detail")
-        ? h(NTag, { size: "small", type: "warning" }, { default: () => "需详情权限" })
+        ? h(NTag, { size: "small", type: "warning" }, { default: () => "需詳情權限" })
         : checkAuth("order:deliver")
         ? h(
             NButton,
             { size: "small", type: "primary", onClick: () => openDeliver(row) },
-            { default: () => row.goods_type === "physical" ? "快递发货" : "手动发货" },
+            { default: () => row.goods_type === "physical" ? "快遞發貨" : "手動發貨" },
           )
         : null,
   },
@@ -89,11 +89,11 @@ watch(() => props.refreshKey, load);
   <div>
     <NDataTable :columns="columns" :data="orders" :loading="loading" :scroll-x="1020" />
     <div class="mt-8px flex items-center justify-between">
-      <span class="text-12px text-gray-400">第 {{ page }} 页 · 按订单分页</span>
+      <span class="text-12px text-gray-400">第 {{ page }} 頁 · 按訂單分頁</span>
       <div class="flex gap-8px">
-        <NButton size="small" :disabled="loading || page <= 1" @click="page--, load()">上一页</NButton>
+        <NButton size="small" :disabled="loading || page <= 1" @click="page--, load()">上一頁</NButton>
         <NButton size="small" :disabled="loading || !hasMore" @click="page++, load()">
-          下一页
+          下一頁
         </NButton>
       </div>
     </div>

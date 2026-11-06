@@ -27,19 +27,19 @@ type ListProductsRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	CategoryId       uint64                 `protobuf:"varint,1,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	Keyword          string                 `protobuf:"bytes,2,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	Status           int32                  `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"` // 0=全部 1=上架 2=隐藏 -1=仅下架
+	Status           int32                  `protobuf:"varint,3,opt,name=status,proto3" json:"status,omitempty"` // 0=全部 1=上架 2=隱藏 -1=僅下架
 	Page             int32                  `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize         int32                  `protobuf:"varint,5,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	LowStockOnly     bool                   `protobuf:"varint,6,opt,name=low_stock_only,json=lowStockOnly,proto3" json:"low_stock_only,omitempty"`             // 仅返回库存不足商品（阈值取 settings.supply.low_stock_threshold）
-	UpstreamSourceId uint64                 `protobuf:"varint,7,opt,name=upstream_source_id,json=upstreamSourceId,proto3" json:"upstream_source_id,omitempty"` // 按供货渠道筛选（0=全部；商品列表渠道商下拉）
-	OutOfStockOnly   bool                   `protobuf:"varint,9,opt,name=out_of_stock_only,json=outOfStockOnly,proto3" json:"out_of_stock_only,omitempty"`     // 仅库存为 0，按自营/上游货源分别计算
-	LocalOnly        bool                   `protobuf:"varint,8,opt,name=local_only,json=localOnly,proto3" json:"local_only,omitempty"`                        // 仅看自营（无上游渠道）
+	LowStockOnly     bool                   `protobuf:"varint,6,opt,name=low_stock_only,json=lowStockOnly,proto3" json:"low_stock_only,omitempty"`             // 僅返回庫存不足商品（閾值取 settings.supply.low_stock_threshold）
+	UpstreamSourceId uint64                 `protobuf:"varint,7,opt,name=upstream_source_id,json=upstreamSourceId,proto3" json:"upstream_source_id,omitempty"` // 按供貨渠道篩選（0=全部；商品列表渠道商下拉）
+	OutOfStockOnly   bool                   `protobuf:"varint,9,opt,name=out_of_stock_only,json=outOfStockOnly,proto3" json:"out_of_stock_only,omitempty"`     // 僅庫存為 0，按自營/上游貨源分別計算
+	LocalOnly        bool                   `protobuf:"varint,8,opt,name=local_only,json=localOnly,proto3" json:"local_only,omitempty"`                        // 僅看自營（無上游渠道）
 	StockType        string                 `protobuf:"bytes,10,opt,name=stock_type,json=stockType,proto3" json:"stock_type,omitempty"`                        // card | url | code，空表示全部
 	IsLocked         *bool                  `protobuf:"varint,12,opt,name=is_locked,json=isLocked,proto3,oneof" json:"is_locked,omitempty"`
 	Inventory        string                 `protobuf:"bytes,13,opt,name=inventory,proto3" json:"inventory,omitempty"` // available | low | empty | unknown
 	RestockedOnly    bool                   `protobuf:"varint,14,opt,name=restocked_only,json=restockedOnly,proto3" json:"restocked_only,omitempty"`
 	AutoListing      *bool                  `protobuf:"varint,15,opt,name=auto_listing,json=autoListing,proto3,oneof" json:"auto_listing,omitempty"`
-	OptionsOnly      bool                   `protobuf:"varint,11,opt,name=options_only,json=optionsOnly,proto3" json:"options_only,omitempty"` // 轻量下拉选项，不读取描述及库存/销量；默认保持完整列表
+	OptionsOnly      bool                   `protobuf:"varint,11,opt,name=options_only,json=optionsOnly,proto3" json:"options_only,omitempty"` // 輕量下拉選項，不讀取描述及庫存/銷量；默認保持完整列表
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -291,7 +291,7 @@ func (x *GetProductRequest) GetId() uint64 {
 	return 0
 }
 
-// AdminProduct 管理面商品（含成本价等敏感字段）。
+// AdminProduct 管理面商品（含成本價等敏感字段）。
 type AdminProduct struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	ProductProperty     string                 `protobuf:"bytes,71,opt,name=product_property,json=productProperty,proto3" json:"product_property,omitempty"`
@@ -309,7 +309,7 @@ type AdminProduct struct {
 	CategoryId          uint64                 `protobuf:"varint,2,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	Name                string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Slug                string                 `protobuf:"bytes,4,opt,name=slug,proto3" json:"slug,omitempty"`
-	Description         string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"` // sanitize 后
+	Description         string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"` // sanitize 後
 	Cover               string                 `protobuf:"bytes,6,opt,name=cover,proto3" json:"cover,omitempty"`
 	Images              []string               `protobuf:"bytes,7,rep,name=images,proto3" json:"images,omitempty"`
 	PriceCents          int64                  `protobuf:"varint,8,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`
@@ -319,23 +319,23 @@ type AdminProduct struct {
 	DeliveryMode        string                 `protobuf:"bytes,12,opt,name=delivery_mode,json=deliveryMode,proto3" json:"delivery_mode,omitempty"` // status | delete
 	Dedup               bool                   `protobuf:"varint,13,opt,name=dedup,proto3" json:"dedup,omitempty"`
 	Sort                int32                  `protobuf:"varint,14,opt,name=sort,proto3" json:"sort,omitempty"`
-	Status              int32                  `protobuf:"varint,15,opt,name=status,proto3" json:"status,omitempty"` // 1=上架 0=下架 2=隐藏
-	Stock               int64                  `protobuf:"varint,16,opt,name=stock,proto3" json:"stock,omitempty"`   // 计算字段（available 数）
+	Status              int32                  `protobuf:"varint,15,opt,name=status,proto3" json:"status,omitempty"` // 1=上架 0=下架 2=隱藏
+	Stock               int64                  `protobuf:"varint,16,opt,name=stock,proto3" json:"stock,omitempty"`   // 計算字段（available 數）
 	UpstreamSourceId    uint64                 `protobuf:"varint,17,opt,name=upstream_source_id,json=upstreamSourceId,proto3" json:"upstream_source_id,omitempty"`
 	UpstreamProductCode string                 `protobuf:"bytes,18,opt,name=upstream_product_code,json=upstreamProductCode,proto3" json:"upstream_product_code,omitempty"`
 	CreatedAt           int64                  `protobuf:"varint,19,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt           int64                  `protobuf:"varint,20,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	// 积分兑换价（0=不参与积分商城；）
+	// 積分兑換價（0=不參與積分商城；）
 	PointsRequired int64 `protobuf:"varint,21,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
-	// 已售数量（paid 及之后状态订单的 quantity 聚合；列表计算字段）
+	// 已售數量（paid 及之後狀態訂單的 quantity 聚合；列表計算字段）
 	SoldCount int64 `protobuf:"varint,22,opt,name=sold_count,json=soldCount,proto3" json:"sold_count,omitempty"`
-	// 直发内容已设置（url/code 商品；明文永不回传）
+	// 直髮內容已設置（url/code 商品；明文永不回傳）
 	HasDirectContent bool `protobuf:"varint,23,opt,name=has_direct_content,json=hasDirectContent,proto3" json:"has_direct_content,omitempty"`
-	// 运营推荐（storefront 首页推荐位）
+	// 運營推薦（storefront 首頁推薦位）
 	IsRecommend          bool   `protobuf:"varint,24,opt,name=is_recommend,json=isRecommend,proto3" json:"is_recommend,omitempty"`
 	StockStatus          string `protobuf:"bytes,25,opt,name=stock_status,json=stockStatus,proto3" json:"stock_status,omitempty"`             // current | stale | unknown
-	StockReference       int64  `protobuf:"varint,26,opt,name=stock_reference,json=stockReference,proto3" json:"stock_reference,omitempty"`   // 仅供展示的上次库存，不作为购买校验依据
-	StockCheckedAt       int64  `protobuf:"varint,27,opt,name=stock_checked_at,json=stockCheckedAt,proto3" json:"stock_checked_at,omitempty"` // 上次库存查询时间
+	StockReference       int64  `protobuf:"varint,26,opt,name=stock_reference,json=stockReference,proto3" json:"stock_reference,omitempty"`   // 僅供展示的上次庫存，不作為購買校驗依據
+	StockCheckedAt       int64  `protobuf:"varint,27,opt,name=stock_checked_at,json=stockCheckedAt,proto3" json:"stock_checked_at,omitempty"` // 上次庫存查詢時間
 	CoverProtected       bool   `protobuf:"varint,28,opt,name=cover_protected,json=coverProtected,proto3" json:"cover_protected,omitempty"`
 	DescriptionProtected bool   `protobuf:"varint,29,opt,name=description_protected,json=descriptionProtected,proto3" json:"description_protected,omitempty"`
 	IsLocked             bool   `protobuf:"varint,32,opt,name=is_locked,json=isLocked,proto3" json:"is_locked,omitempty"`
@@ -347,7 +347,7 @@ type AdminProduct struct {
 	ListingMessage       string `protobuf:"bytes,38,opt,name=listing_message,json=listingMessage,proto3" json:"listing_message,omitempty"`
 	ListingRestocked     bool   `protobuf:"varint,39,opt,name=listing_restocked,json=listingRestocked,proto3" json:"listing_restocked,omitempty"`
 	ListingObservedAt    int64  `protobuf:"varint,40,opt,name=listing_observed_at,json=listingObservedAt,proto3" json:"listing_observed_at,omitempty"`
-	LowStockMessage      string `protobuf:"bytes,41,opt,name=low_stock_message,json=lowStockMessage,proto3" json:"low_stock_message,omitempty"` // 按实际发货规格和后台阈值计算，空表示无已确认预警
+	LowStockMessage      string `protobuf:"bytes,41,opt,name=low_stock_message,json=lowStockMessage,proto3" json:"low_stock_message,omitempty"` // 按實際發貨規格和後台閾值計算，空表示無已確認預警
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -734,7 +734,7 @@ func (x *AdminProduct) GetLowStockMessage() string {
 
 type CreateProductRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	CopyFromProductId uint64                 `protobuf:"varint,74,opt,name=copy_from_product_id,json=copyFromProductId,proto3" json:"copy_from_product_id,omitempty"` // 同站点原商品，按权限复制 SKU 和下单控件
+	CopyFromProductId uint64                 `protobuf:"varint,74,opt,name=copy_from_product_id,json=copyFromProductId,proto3" json:"copy_from_product_id,omitempty"` // 同站點原商品，按權限複製 SKU 和下單控件
 	ProductProperty   *string                `protobuf:"bytes,71,opt,name=product_property,json=productProperty,proto3,oneof" json:"product_property,omitempty"`
 	TrackInventory    *bool                  `protobuf:"varint,72,opt,name=track_inventory,json=trackInventory,proto3,oneof" json:"track_inventory,omitempty"`
 	SalesVisible      *bool                  `protobuf:"varint,73,opt,name=sales_visible,json=salesVisible,proto3,oneof" json:"sales_visible,omitempty"`
@@ -758,11 +758,11 @@ type CreateProductRequest struct {
 	Dedup             bool                   `protobuf:"varint,11,opt,name=dedup,proto3" json:"dedup,omitempty"`
 	Sort              int32                  `protobuf:"varint,12,opt,name=sort,proto3" json:"sort,omitempty"`
 	Status            int32                  `protobuf:"varint,13,opt,name=status,proto3" json:"status,omitempty"`
-	// 积分兑换价（0=不参与积分商城；）
+	// 積分兑換價（0=不參與積分商城；）
 	PointsRequired int64 `protobuf:"varint,14,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
-	// 直发内容明文（url/code 商品：网盘链接/兑换码，加密存储；同一内容发给每个买家）
+	// 直髮內容明文（url/code 商品：網盤鏈接/兑換碼，加密存儲；同一內容發給每個買家）
 	DirectContent string `protobuf:"bytes,15,opt,name=direct_content,json=directContent,proto3" json:"direct_content,omitempty"`
-	// 运营推荐（storefront 首页推荐位）
+	// 運營推薦（storefront 首頁推薦位）
 	IsRecommend   bool `protobuf:"varint,16,opt,name=is_recommend,json=isRecommend,proto3" json:"is_recommend,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1003,11 +1003,11 @@ type UpdateProductRequest struct {
 	Id                    uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name                  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	CategoryId            uint64                 `protobuf:"varint,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
-	// 省略保留原值，显式空串清除。
+	// 省略保留原值，顯式空串清除。
 	Description *string  `protobuf:"bytes,4,opt,name=description,proto3,oneof" json:"description,omitempty"`
 	Cover       *string  `protobuf:"bytes,5,opt,name=cover,proto3,oneof" json:"cover,omitempty"`
 	Images      []string `protobuf:"bytes,6,rep,name=images,proto3" json:"images,omitempty"`
-	// true 时以 images 替换图集（包括空数组）；省略且 images 非空时兼容旧客户端。
+	// true 時以 images 替換圖集（包括空數組）；省略且 images 非空時兼容舊客户端。
 	ImagesSet         bool   `protobuf:"varint,19,opt,name=images_set,json=imagesSet,proto3" json:"images_set,omitempty"`
 	PriceCents        int64  `protobuf:"varint,7,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`
 	FactoryPriceCents int64  `protobuf:"varint,8,opt,name=factory_price_cents,json=factoryPriceCents,proto3" json:"factory_price_cents,omitempty"`
@@ -1015,13 +1015,13 @@ type UpdateProductRequest struct {
 	StockVisible      *bool  `protobuf:"varint,10,opt,name=stock_visible,json=stockVisible,proto3,oneof" json:"stock_visible,omitempty"`
 	Sort              int32  `protobuf:"varint,11,opt,name=sort,proto3" json:"sort,omitempty"`
 	Status            int32  `protobuf:"varint,12,opt,name=status,proto3" json:"status,omitempty"`
-	// 积分兑换价（0=不参与积分商城；）
+	// 積分兑換價（0=不參與積分商城；）
 	PointsRequired int64 `protobuf:"varint,13,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
-	// 直发内容明文（空=保持不变；url/code 商品加密存储）
+	// 直髮內容明文（空=保持不變；url/code 商品加密存儲）
 	DirectContent string `protobuf:"bytes,14,opt,name=direct_content,json=directContent,proto3" json:"direct_content,omitempty"`
-	// 运营推荐（省略保留原值；false=取消推荐）。
+	// 運營推薦（省略保留原值；false=取消推薦）。
 	IsRecommend *bool `protobuf:"varint,15,opt,name=is_recommend,json=isRecommend,proto3,oneof" json:"is_recommend,omitempty"`
-	// 空值保留原类型；card | url | code
+	// 空值保留原類型；card | url | code
 	StockType     string `protobuf:"bytes,16,opt,name=stock_type,json=stockType,proto3" json:"stock_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1392,9 +1392,9 @@ func (x *DeleteProductPreview) GetDeleteOrdersBlockReason() string {
 type BatchUpdateProductStatusRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Ids   []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	// status 不标 REQUIRED:0=下架是合法值,REQUIRED 校验把零值当未传拒绝
-	// (missing required field: status——下架必炸;值域 0/1/2 由业务层校验)。
-	Status        int32 `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"` // 1=上架 0=下架 2=隐藏
+	// status 不標 REQUIRED:0=下架是合法值,REQUIRED 校驗把零值當未傳拒絕
+	// (missing required field: status——下架必炸;值域 0/1/2 由業務層校驗)。
+	Status        int32 `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"` // 1=上架 0=下架 2=隱藏
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1643,7 +1643,7 @@ func (x *CategoryList) GetCategories() []*Category {
 	return nil
 }
 
-// Category 分类（树形，含子分类计数）。
+// Category 分類（樹形，含子分類計數）。
 type Category struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1816,13 +1816,13 @@ type UpdateCategoryRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Id    uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"` // 非空才更新
-	// 图标（optional：缺省=不变；显式空串=清除）
+	// 圖標（optional：缺省=不變；顯式空串=清除）
 	Icon *string `protobuf:"bytes,3,opt,name=icon,proto3,oneof" json:"icon,omitempty"`
-	// 隐藏状态（optional：未传保持不变，避免只改排序/名称时误取消隐藏）
+	// 隱藏狀態（optional：未傳保持不變，避免只改排序/名稱時誤取消隱藏）
 	Hide *bool `protobuf:"varint,4,opt,name=hide,proto3,oneof" json:"hide,omitempty"`
-	// 排序（optional：缺省不变——曾用 int32「>=0 即更新」把只改名的请求重置排序）
+	// 排序（optional：缺省不變——曾用 int32「>=0 即更新」把只改名的請求重置排序）
 	Sort *int32 `protobuf:"varint,5,opt,name=sort,proto3,oneof" json:"sort,omitempty"`
-	// 父分类（optional：缺省不变；0 = 顶级；>0 = 指定父，防环校验）
+	// 父分類（optional：缺省不變；0 = 頂級；>0 = 指定父，防環校驗）
 	ParentId      *int64 `protobuf:"varint,6,opt,name=parent_id,json=parentId,proto3,oneof" json:"parent_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1900,11 +1900,11 @@ func (x *UpdateCategoryRequest) GetParentId() int64 {
 	return 0
 }
 
-// ReorderCategoriesRequest 分类排序：把 parent_id 层级下的分类按 ids 顺序重排，
-// sort 归一化为 0..n-1；ids 需包含该层级的全部兄弟（拖拽跨层级时含被移动分类）。
+// ReorderCategoriesRequest 分類排序：把 parent_id 層級下的分類按 ids 順序重排，
+// sort 歸一化為 0..n-1；ids 需包含該層級的全部兄弟（拖拽跨層級時含被移動分類）。
 type ReorderCategoriesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ParentId      uint64                 `protobuf:"varint,1,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"` // 目标层级（0=顶级）
+	ParentId      uint64                 `protobuf:"varint,1,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"` // 目標層級（0=頂級）
 	Ids           []uint64               `protobuf:"varint,2,rep,packed,name=ids,proto3" json:"ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2830,7 +2830,7 @@ func (x *ListReviewsReply) GetTotal() int64 {
 	return 0
 }
 
-// ReviewItem 真实评价（审核流：pending→approved/rejected）。
+// ReviewItem 真實評價（審核流：pending→approved/rejected）。
 type ReviewItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -3019,7 +3019,7 @@ func (x *RejectReviewRequest) GetId() uint64 {
 	return 0
 }
 
-// VirtualReviewItem 虚拟评价（与真实 approved 合并展示）。
+// VirtualReviewItem 虛擬評價（與真實 approved 合併展示）。
 type VirtualReviewItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -3276,7 +3276,7 @@ func (x *SkuList) GetSkus() []*Sku {
 	return nil
 }
 
-// Sku 管理面多规格（含成本价）。
+// Sku 管理面多規格（含成本價）。
 type Sku struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	PhysicalStock   *int64                 `protobuf:"varint,20,opt,name=physical_stock,json=physicalStock,proto3,oneof" json:"physical_stock,omitempty"`
@@ -3285,7 +3285,7 @@ type Sku struct {
 	ProductId       uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	Name            string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	SpecValues      map[string]string      `protobuf:"bytes,4,rep,name=spec_values,json=specValues,proto3" json:"spec_values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	PriceCents      int64                  `protobuf:"varint,5,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"` // 独立售价（分；0=继承商品价）
+	PriceCents      int64                  `protobuf:"varint,5,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"` // 獨立售價（分；0=繼承商品價）
 	CostCents       int64                  `protobuf:"varint,6,opt,name=cost_cents,json=costCents,proto3" json:"cost_cents,omitempty"`
 	StockOffset     int32                  `protobuf:"varint,7,opt,name=stock_offset,json=stockOffset,proto3" json:"stock_offset,omitempty"`
 	UpstreamSkuId   string                 `protobuf:"bytes,8,opt,name=upstream_sku_id,json=upstreamSkuId,proto3" json:"upstream_sku_id,omitempty"`
@@ -3705,13 +3705,13 @@ func (x *MemberGroupList) GetGroups() []*MemberGroup {
 	return nil
 }
 
-// MemberGroup 会员商品组（命中商品的订单按 discount 万分比打折）。
+// MemberGroup 會員商品組（命中商品的訂單按 discount 萬分比打折）。
 type MemberGroup struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	ProductIds    []uint64               `protobuf:"varint,3,rep,packed,name=product_ids,json=productIds,proto3" json:"product_ids,omitempty"`
-	Discount      int32                  `protobuf:"varint,4,opt,name=discount,proto3" json:"discount,omitempty"` // 万分比（9500=95 折）
+	Discount      int32                  `protobuf:"varint,4,opt,name=discount,proto3" json:"discount,omitempty"` // 萬分比（9500=95 折）
 	StackMember   bool                   `protobuf:"varint,5,opt,name=stack_member,json=stackMember,proto3" json:"stack_member,omitempty"`
 	StackCoupon   bool                   `protobuf:"varint,6,opt,name=stack_coupon,json=stackCoupon,proto3" json:"stack_coupon,omitempty"`
 	BadgeStyle    string                 `protobuf:"bytes,7,opt,name=badge_style,json=badgeStyle,proto3" json:"badge_style,omitempty"`
@@ -3802,7 +3802,7 @@ type CreateMemberGroupRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	ProductIds    []uint64               `protobuf:"varint,2,rep,packed,name=product_ids,json=productIds,proto3" json:"product_ids,omitempty"`
-	Discount      int32                  `protobuf:"varint,3,opt,name=discount,proto3" json:"discount,omitempty"` // 万分比
+	Discount      int32                  `protobuf:"varint,3,opt,name=discount,proto3" json:"discount,omitempty"` // 萬分比
 	StackMember   bool                   `protobuf:"varint,4,opt,name=stack_member,json=stackMember,proto3" json:"stack_member,omitempty"`
 	StackCoupon   bool                   `protobuf:"varint,5,opt,name=stack_coupon,json=stackCoupon,proto3" json:"stack_coupon,omitempty"`
 	BadgeStyle    string                 `protobuf:"bytes,6,opt,name=badge_style,json=badgeStyle,proto3" json:"badge_style,omitempty"`
@@ -4018,7 +4018,7 @@ func (x *DeleteMemberGroupRequest) GetId() uint64 {
 	return 0
 }
 
-// 仅合并明确选中的分类；未选中的子分类移到目标下，不递归删除。
+// 僅合併明確選中的分類；未選中的子分類移到目標下，不遞歸刪除。
 type MergeCategoriesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	SourceIds     []uint64               `protobuf:"varint,1,rep,packed,name=source_ids,json=sourceIds,proto3" json:"source_ids,omitempty"`

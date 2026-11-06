@@ -1,12 +1,12 @@
 <template>
   <aside class="cat-tree" :class="{ 'cat-tree--panel': variant === 'panel' }" :style="{ '--cat-tree-top': `${stickyTop}px` }">
     <div class="cat-tree-card">
-      <!-- 标题栏：品牌竖条 + 标题 + 分类数（与右侧「全部商品」区标题同一设计语言） -->
+      <!-- 標題欄：品牌豎條 + 標題 + 分類數（與右側「全部商品」區標題同一設計語言） -->
       <button class="cat-tree-head" type="button" :aria-expanded="allExpanded" :disabled="!branchIds.length" @click="toggleAll">
         <span class="head-bar"></span>
-        <span class="cat-tree-title">{{ $t('全部分类') }}</span>
-        <span v-if="categories.length" class="cat-tree-count">{{ categories.length }} {{ $t('类') }}</span>
-        <span v-if="branchIds.length" class="cat-tree-toggle-label">{{ allExpanded ? $t('折叠下级') : $t('展开下级') }}</span>
+        <span class="cat-tree-title">{{ $t('全部分類') }}</span>
+        <span v-if="categories.length" class="cat-tree-count">{{ categories.length }} {{ $t('類') }}</span>
+        <span v-if="branchIds.length" class="cat-tree-toggle-label">{{ allExpanded ? $t('摺疊下級') : $t('展開下級') }}</span>
       </button>
       <div class="cat-tree-body">
         <!-- 全部商品入口 -->
@@ -20,9 +20,9 @@
         </button>
         <button v-if="showRecommended" type="button" class="tree-all tree-recommended" :class="{ active: modelValue === -1 }" @click="select(-1)">
           <ThemeIcon name="folder" />
-          <span>{{ $t('推荐商品') }}</span>
+          <span>{{ $t('推薦商品') }}</span>
         </button>
-        <!-- 分类树：递归渲染任意层级（三级/四级均可展开） -->
+        <!-- 分類樹：遞歸渲染任意層級（三級/四級均可展開） -->
         <CategoryTreeNode
           v-for="c in tree"
           :key="c.id"
@@ -33,9 +33,9 @@
           @select="select"
           @toggle="toggle"
         />
-        <div v-if="loading && !tree.length" class="tree-empty muted" role="status">{{ $t('正在加载分类…') }}</div>
-        <div v-else-if="error" class="tree-empty" role="alert">{{ $t('分类加载失败') }} <button class="btn secondary" type="button" :disabled="loading" @click="$emit('retry')">{{ $t('重试') }}</button></div>
-        <div v-else-if="!tree.length" class="tree-empty muted">{{ $t('暂无分类') }}</div>
+        <div v-if="loading && !tree.length" class="tree-empty muted" role="status">{{ $t('正在加載分類…') }}</div>
+        <div v-else-if="error" class="tree-empty" role="alert">{{ $t('分類加載失敗') }} <button class="btn secondary" type="button" :disabled="loading" @click="$emit('retry')">{{ $t('重試') }}</button></div>
+        <div v-else-if="!tree.length" class="tree-empty muted">{{ $t('暫無分類') }}</div>
       </div>
     </div>
   </aside>
@@ -49,13 +49,13 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import CategoryTreeNode from './CategoryTreeNode.vue';
 import type { CategoryItem } from '@/api';
 
-// variant：sidebar=PC 左侧栏（默认）；panel=移动端折叠面板（全宽、限高滚动）
+// variant：sidebar=PC 左側欄（默認）；panel=移動端摺疊面板（全寬、限高滾動）
 const props = withDefaults(
   defineProps<{
     categories: CategoryItem[];
     loading?: boolean;
     error?: boolean;
-    /** 当前选中分类 id（0=全部，-1=推荐；仅前端筛选值） */
+    /** 當前選中分類 id（0=全部，-1=推薦；僅前端篩選值） */
     modelValue: number;
     showRecommended?: boolean;
     variant?: 'sidebar' | 'panel';
@@ -67,7 +67,7 @@ const emit = defineEmits<{
   (e: 'retry'): void;
 }>();
 
-// 跟随导航实际高度，避免平板换行或自定义站名把分类栏遮住。
+// 跟隨導航實際高度，避免平板換行或自定義站名把分類欄遮住。
 const stickyTop = ref(72);
 let headerObserver: ResizeObserver | undefined;
 onMounted(() => {
@@ -81,7 +81,7 @@ onMounted(() => {
 });
 onBeforeUnmount(() => headerObserver?.disconnect());
 
-// 分类树（任意层级：parent_id 链构建 children；一级为根）
+// 分類樹（任意層級：parent_id 鏈構建 children；一級為根）
 const tree = computed(() => {
   const map = new Map<number, any>();
   for (const c of props.categories) map.set(c.id, { ...c, children: [] });
@@ -93,7 +93,7 @@ const tree = computed(() => {
   return rootsArr;
 });
 
-// 多级分类默认收起，选中深层分类时只展开其祖先。
+// 多級分類默認收起，選中深層分類時只展開其祖先。
 const expanded = ref<Set<number>>(new Set());
 const branchIds = computed(() => [...new Set(props.categories.filter((c) => c.parent_id).map((c) => c.parent_id!))]);
 const allExpanded = computed(() => branchIds.value.length > 0 && branchIds.value.every((id) => expanded.value.has(id)));
@@ -134,7 +134,7 @@ function select(id: number) {
   flex-shrink: 0;
 }
 @media (min-width: 768px) {
-  /* 吸顶必须放在参与首页两栏布局的外层，才能沿整个商品区滚动。 */
+  /* 吸頂必須放在參與首頁兩欄佈局的外層，才能沿整個商品區滾動。 */
   .cat-tree { display: block; position: sticky; top: var(--cat-tree-top, 72px); }
 }
 .cat-tree-card {
@@ -194,8 +194,8 @@ function select(id: number) {
 .tree-all > span:first-child { font-size: 16px; }
 .tree-empty { padding: 16px 0; text-align: center; }
 
-/* 面板变体（移动端折叠面板内嵌）：全宽平铺、保留一级分类、限高滚动。
-   双类名提升优先级，覆盖基础 .cat-tree 的移动端 display:none */
+/* 面板變體（移動端摺疊面板內嵌）：全寬平鋪、保留一級分類、限高滾動。
+   雙類名提升優先級，覆蓋基礎 .cat-tree 的移動端 display:none */
 .cat-tree.cat-tree--panel { display: block; width: 100%; position: static; }
 .cat-tree--panel .cat-tree-card { max-height: none; border: none; border-radius: 0; }
 .cat-tree-head:disabled { cursor: default; color: inherit; }

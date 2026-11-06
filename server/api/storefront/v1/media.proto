@@ -7,9 +7,9 @@ option go_package = "github.com/NovaWorks/zcard-next/server/api/storefront/v1;st
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 
-// StoreMediaService 前台媒体（登录态；收款码上传——复用 media 安全三件套）。
+// StoreMediaService 前台媒體（登錄態；收款碼上傳——複用 media 安全三件套）。
 service StoreMediaService {
-  // Upload base64 上传（图片白名单/魔数/重编码；≤2MB）。
+  // Upload base64 上傳（圖片白名單/魔數/重編碼；≤2MB）。
   rpc Upload(StoreUploadRequest) returns (StoreUploadReply) {
     option (google.api.http) = {
       post: "/api/v1/storefront/media/upload"
@@ -23,5 +23,5 @@ message StoreUploadRequest {
 }
 
 message StoreUploadReply {
-  string url = 1; // /uploads/... 访问路径
+  string url = 1; // /uploads/... 訪問路徑
 }

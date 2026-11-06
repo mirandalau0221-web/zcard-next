@@ -21,7 +21,7 @@ import (
 
 const importMaxAttempts = 3
 
-var errImportConfiguration = errors.New("货源配置已变化，请重新选择未完成商品并确认定价")
+var errImportConfiguration = errors.New("貨源配置已變化，請重新選擇未完成商品並確認定價")
 
 func (s *SyncService) runImportTask(ctx context.Context, task *ent.SupplySyncTask) error {
 	payload, err := readImportPayload(ctx, task, false)
@@ -30,14 +30,14 @@ func (s *SyncService) runImportTask(ctx context.Context, task *ent.SupplySyncTas
 	}
 	ctx = tenancy.WithContext(ctx, tenancy.Context{SubsiteID: payload.Tenant, IsMain: payload.Tenant == 0})
 	if !task.CancelRequestedAt.IsZero() {
-		return s.finishImport(ctx, task.ID, supplysynctask.StatusCanceled, "", "已停止，已导入商品保留")
+		return s.finishImport(ctx, task.ID, supplysynctask.StatusCanceled, "", "已停止，已導入商品保留")
 	}
 	conn, a, err := NewAdminSupplyService(s.repo, s).adapterForConnection(ctx, task.ConnectionID)
 	if err != nil {
-		return s.pauseImport(ctx, task.ID, "CONNECTION_INVALID", "无法读取货源配置，请检查后继续")
+		return s.pauseImport(ctx, task.ID, "CONNECTION_INVALID", "無法讀取貨源配置，請檢查後繼續")
 	}
 	if string(conn.Status) != "active" {
-		return s.pauseImport(ctx, task.ID, "CONNECTION_DISABLED", "货源已停用，请启用后继续任务")
+		return s.pauseImport(ctx, task.ID, "CONNECTION_DISABLED", "貨源已停用，請啓用後繼續任務")
 	}
 	if payload.Fingerprint != importFingerprint(conn) {
 		return s.pauseImport(ctx, task.ID, "CONFIG_CHANGED", errImportConfiguration.Error())
@@ -69,7 +69,7 @@ func (s *SyncService) executeImportItems(ctx context.Context, task *ent.SupplySy
 			return err
 		}
 		if !latest.CancelRequestedAt.IsZero() {
-			return s.finishImport(ctx, task.ID, supplysynctask.StatusCanceled, "", "已停止，已导入商品保留；可继续未完成商品")
+			return s.finishImport(ctx, task.ID, supplysynctask.StatusCanceled, "", "已停止，已導入商品保留；可繼續未完成商品")
 		}
 		current, err := s.repo.GetConnection(ctx, conn.ID)
 		if err != nil {
@@ -95,10 +95,10 @@ func (s *SyncService) executeImportItems(ctx context.Context, task *ent.SupplySy
 			if e != nil {
 				return e
 			}
-			code, summary := "", "导入完成"
+			code, summary := "", "導入完成"
 			if failed > 0 {
 				code = "PARTIAL_FAILED"
-				summary = fmt.Sprintf("处理完成，%d 件商品需要处理；可查看问题并仅重试失败部分", failed)
+				summary = fmt.Sprintf("處理完成，%d 件商品需要處理；可查看問題並僅重試失敗部分", failed)
 			}
 			// A stock-only retry must not resume unrelated canceled imports.
 			unselected, e := c.SupplyImportItem.Query().Where(supplyimportitem.TaskID(task.ID), supplyimportitem.StateIn("pending", "retry")).Exist(ctx)
@@ -106,7 +106,7 @@ func (s *SyncService) executeImportItems(ctx context.Context, task *ent.SupplySy
 				return e
 			}
 			if unselected {
-				return s.finishImport(ctx, task.ID, supplysynctask.StatusCanceled, code, "本次重试已完成，其余未处理商品保留；可继续未完成商品")
+				return s.finishImport(ctx, task.ID, supplysynctask.StatusCanceled, code, "本次重試已完成，其餘未處理商品保留；可繼續未完成商品")
 			}
 			return s.finishImport(ctx, task.ID, supplysynctask.StatusDone, code, summary)
 		}
@@ -132,10 +132,10 @@ func (s *SyncService) executeImportItems(ctx context.Context, task *ent.SupplySy
 			}
 			failure := adapter.ClassifyImportError(err)
 			if data.IsProductLocked(err) {
-				failure = adapter.ImportFailure{Code: "PRODUCT_LOCKED", Summary: "商品已锁定，已跳过"}
+				failure = adapter.ImportFailure{Code: "PRODUCT_LOCKED", Summary: "商品已鎖定，已跳過"}
 			}
 			if errors.Is(err, data.ErrLocalDeliveryProtected) {
-				failure = adapter.ImportFailure{Code: "PRODUCT_CHANGED", Summary: "商品已配置本地发货，已跳过"}
+				failure = adapter.ImportFailure{Code: "PRODUCT_CHANGED", Summary: "商品已配置本地發貨，已跳過"}
 			}
 			if errors.Is(err, errImportChanged) {
 				failure = adapter.ImportFailure{Code: "PRODUCT_CHANGED", Summary: errImportChanged.Error()}
@@ -218,7 +218,7 @@ func (s *SyncService) failImportItem(ctx context.Context, item *ent.SupplyImport
 		next = time.Now().Add(delay).Unix()
 	}
 	if state == "failed" && f.Retry {
-		f.Summary = strings.TrimSuffix(f.Summary, "，正在等待重试") + "；自动重试已结束，可手动重试"
+		f.Summary = strings.TrimSuffix(f.Summary, "，正在等待重試") + "；自動重試已結束，可手動重試"
 	}
 	return data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		if err := s.guardTaskLease(ctx); err != nil {
@@ -326,14 +326,14 @@ func (s *SyncService) attemptImportItem(ctx context.Context, task *ent.SupplySyn
 			RefreshProduct(context.Context, *adapter.Product) (*adapter.Product, error)
 		})
 		if !ok {
-			return fmt.Errorf("接码目录需要支持商品详情的驱动")
+			return fmt.Errorf("接碼目錄需要支持商品詳情的驅動")
 		}
 		fresh, e := reader.RefreshProduct(ctx, &p)
 		if e != nil {
 			return e
 		}
 		if fresh.DeliveryKind != p.DeliveryKind || fresh.ProductKind != p.ProductKind || !fresh.IsActive {
-			return fmt.Errorf("接码商品交付类型变化或已下架")
+			return fmt.Errorf("接碼商品交付類型變化或已下架")
 		}
 		p = *fresh
 	}
@@ -345,7 +345,7 @@ func (s *SyncService) attemptImportItem(ctx context.Context, task *ent.SupplySyn
 			return err
 		}
 		if quoted == nil {
-			return fmt.Errorf("账号报价为空")
+			return fmt.Errorf("賬號報價為空")
 		}
 		p = *quoted
 	}
@@ -371,7 +371,7 @@ func (s *SyncService) attemptImportItem(ctx context.Context, task *ent.SupplySyn
 				return e
 			}
 			if !ok {
-				return fmt.Errorf("%w：目标分类已删除，请重新选择商品分类", errImportConfiguration)
+				return fmt.Errorf("%w：目標分類已刪除，請重新選擇商品分類", errImportConfiguration)
 			}
 		}
 		current, err := s.repo.GetConnection(ctx, conn.ID)
@@ -418,7 +418,7 @@ func (s *SyncService) importStock(ctx context.Context, task *ent.SupplySyncTask,
 		return err
 	}
 	if stock < -1 && local.ProductKind != "sms_channel" && local.ProductKind != "social_service" {
-		return fmt.Errorf("货源库存无效")
+		return fmt.Errorf("貨源庫存無效")
 	}
 	return data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		if err := s.guardTaskLease(ctx); err != nil {

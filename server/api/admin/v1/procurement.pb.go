@@ -40,7 +40,7 @@ type ProcurementOrder struct {
 	UpstreamRefundId    string                 `protobuf:"bytes,13,opt,name=upstream_refund_id,json=upstreamRefundId,proto3" json:"upstream_refund_id,omitempty"`
 	ItemQuantity        int32                  `protobuf:"varint,14,opt,name=item_quantity,json=itemQuantity,proto3" json:"item_quantity,omitempty"`
 	ItemUnitCost        int64                  `protobuf:"varint,15,opt,name=item_unit_cost,json=itemUnitCost,proto3" json:"item_unit_cost,omitempty"`
-	ReceivedCards       int32                  `protobuf:"varint,16,opt,name=received_cards,json=receivedCards,proto3" json:"received_cards,omitempty"` // 已到手卡密行数（密文行数）
+	ReceivedCards       int32                  `protobuf:"varint,16,opt,name=received_cards,json=receivedCards,proto3" json:"received_cards,omitempty"` // 已到手卡密行數（密文行數）
 	CreatedAt           int64                  `protobuf:"varint,17,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt           int64                  `protobuf:"varint,18,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	OrderNo             string                 `protobuf:"bytes,19,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
@@ -54,13 +54,13 @@ type ProcurementOrder struct {
 	UpstreamProductCode string                 `protobuf:"bytes,27,opt,name=upstream_product_code,json=upstreamProductCode,proto3" json:"upstream_product_code,omitempty"`
 	SaleUnitCents       int64                  `protobuf:"varint,28,opt,name=sale_unit_cents,json=saleUnitCents,proto3" json:"sale_unit_cents,omitempty"`
 	SaleAmountCents     int64                  `protobuf:"varint,29,opt,name=sale_amount_cents,json=saleAmountCents,proto3" json:"sale_amount_cents,omitempty"`
-	AllocatedSaleCents  int64                  `protobuf:"varint,30,opt,name=allocated_sale_cents,json=allocatedSaleCents,proto3" json:"allocated_sale_cents,omitempty"` // 整单优惠按子项金额分摊
+	AllocatedSaleCents  int64                  `protobuf:"varint,30,opt,name=allocated_sale_cents,json=allocatedSaleCents,proto3" json:"allocated_sale_cents,omitempty"` // 整單優惠按子項金額分攤
 	CostUnitCents       int64                  `protobuf:"varint,31,opt,name=cost_unit_cents,json=costUnitCents,proto3" json:"cost_unit_cents,omitempty"`
 	CostTotalCents      int64                  `protobuf:"varint,32,opt,name=cost_total_cents,json=costTotalCents,proto3" json:"cost_total_cents,omitempty"`
-	ProfitCents         int64                  `protobuf:"varint,33,opt,name=profit_cents,json=profitCents,proto3" json:"profit_cents,omitempty"` // 预计毛利，未计退款和手续费
+	ProfitCents         int64                  `protobuf:"varint,33,opt,name=profit_cents,json=profitCents,proto3" json:"profit_cents,omitempty"` // 預計毛利，未計退款和手續費
 	CostBasis           string                 `protobuf:"bytes,34,opt,name=cost_basis,json=costBasis,proto3" json:"cost_basis,omitempty"`        // order_snapshot | unrecorded
 	DeliveredQuantity   int32                  `protobuf:"varint,35,opt,name=delivered_quantity,json=deliveredQuantity,proto3" json:"delivered_quantity,omitempty"`
-	DeliveryIncomplete  bool                   `protobuf:"varint,36,opt,name=delivery_incomplete,json=deliveryIncomplete,proto3" json:"delivery_incomplete,omitempty"` // 可发货订单的该商品尚未足额交付
+	DeliveryIncomplete  bool                   `protobuf:"varint,36,opt,name=delivery_incomplete,json=deliveryIncomplete,proto3" json:"delivery_incomplete,omitempty"` // 可發貨訂單的該商品尚未足額交付
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -352,7 +352,7 @@ type ListProcurementsRequest struct {
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"` // 空 = 全部
 	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	OrderNo       string                 `protobuf:"bytes,4,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"` // 客户订单号精确匹配
+	OrderNo       string                 `protobuf:"bytes,4,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"` // 客户訂單號精確匹配
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

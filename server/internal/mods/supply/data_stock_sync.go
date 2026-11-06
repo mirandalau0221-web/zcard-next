@@ -82,7 +82,7 @@ func (s *SyncService) runStockOnly(ctx context.Context, task *ent.SupplySyncTask
 		}
 	}
 	status, code := supplysynctask.StatusDone, ""
-	summary := fmt.Sprintf("库存成功 %d，失败 %d。%s", total-failed, failed, strings.Join(samples, "；"))
+	summary := fmt.Sprintf("庫存成功 %d，失敗 %d。%s", total-failed, failed, strings.Join(samples, "；"))
 	if failed > 0 {
 		status = supplysynctask.StatusFailed
 		code = "STOCK_QUERY_FAILED"

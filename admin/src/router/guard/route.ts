@@ -35,7 +35,7 @@ export function createRouteGuard(router: Router) {
     const routeRoles = to.meta.roles || [];
 
     const hasRole = authStore.userInfo.roles.some((role) => routeRoles.includes(role));
-    // 权限点校验（与菜单过滤同源：ROUTE_PERMISSIONS 按 route.name 查表，防直链 URL 越权）
+    // 權限點校驗（與菜單過濾同源：ROUTE_PERMISSIONS 按 route.name 查表，防直鏈 URL 越權）
     const hasPerm = authStore.isStaticSuper || hasRoutePermission(
       to.name as string,
       authStore.userInfo.buttons,

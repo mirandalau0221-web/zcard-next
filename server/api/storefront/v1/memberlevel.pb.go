@@ -23,25 +23,25 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// MyLevelReply 等级进度（阈值即时评估口径：只升不降随累计值单调）。
+// MyLevelReply 等級進度（閾值即時評估口徑：只升不降隨累計值單調）。
 type MyLevelReply struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Source           string                 `protobuf:"bytes,8,opt,name=source,proto3" json:"source,omitempty"` // manual | referral | auto | none
 	HasReferralLevel bool                   `protobuf:"varint,9,opt,name=has_referral_level,json=hasReferralLevel,proto3" json:"has_referral_level,omitempty"`
 	PrivateLevel     bool                   `protobuf:"varint,10,opt,name=private_level,json=privateLevel,proto3" json:"private_level,omitempty"`
-	// 累计充值（countAsRecharge 口径：仅真实充值入账，互转/调账不计）
+	// 累計充值（countAsRecharge 口徑：僅真實充值入賬，互轉/調賬不計）
 	RechargedCents int64 `protobuf:"varint,1,opt,name=recharged_cents,json=rechargedCents,proto3" json:"recharged_cents,omitempty"`
-	// 累计消费（已支付及之后状态订单额）
+	// 累計消費（已支付及之後狀態訂單額）
 	ConsumedCents int64 `protobuf:"varint,2,opt,name=consumed_cents,json=consumedCents,proto3" json:"consumed_cents,omitempty"`
-	// 积分余额
+	// 積分餘額
 	Points int64 `protobuf:"varint,3,opt,name=points,proto3" json:"points,omitempty"`
-	// 当前等级（未命中任何等级为 null）
+	// 當前等級（未命中任何等級為 null）
 	Current *LevelBrief `protobuf:"bytes,4,opt,name=current,proto3" json:"current,omitempty"`
-	// 下一等级（已满级为 null）
+	// 下一等級（已滿級為 null）
 	Next *LevelBrief `protobuf:"bytes,5,opt,name=next,proto3" json:"next,omitempty"`
-	// 升级进度（距下一等级差额）
+	// 升級進度（距下一等級差額）
 	Progress      *LevelProgress `protobuf:"bytes,6,opt,name=progress,proto3" json:"progress,omitempty"`
-	Levels        []*LevelBrief  `protobuf:"bytes,7,rep,name=levels,proto3" json:"levels,omitempty"` // 启用的等级及折扣，按升级顺序排列
+	Levels        []*LevelBrief  `protobuf:"bytes,7,rep,name=levels,proto3" json:"levels,omitempty"` // 啓用的等級及折扣，按升級順序排列
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -146,7 +146,7 @@ func (x *MyLevelReply) GetLevels() []*LevelBrief {
 	return nil
 }
 
-// LevelBrief 等级摘要。
+// LevelBrief 等級摘要。
 type LevelBrief struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	DisplayMode       string                 `protobuf:"bytes,8,opt,name=display_mode,json=displayMode,proto3" json:"display_mode,omitempty"`
@@ -154,11 +154,11 @@ type LevelBrief struct {
 	AcquireMode       string                 `protobuf:"bytes,10,opt,name=acquire_mode,json=acquireMode,proto3" json:"acquire_mode,omitempty"`
 	Id                uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name              string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Discount          int32                  `protobuf:"varint,3,opt,name=discount,proto3" json:"discount,omitempty"`                                            // 万分比折扣
+	Discount          int32                  `protobuf:"varint,3,opt,name=discount,proto3" json:"discount,omitempty"`                                            // 萬分比折扣
 	ThresholdType     string                 `protobuf:"bytes,4,opt,name=threshold_type,json=thresholdType,proto3" json:"threshold_type,omitempty"`              // recharge | consume | both_and | both_or
-	ThresholdRecharge int64                  `protobuf:"varint,5,opt,name=threshold_recharge,json=thresholdRecharge,proto3" json:"threshold_recharge,omitempty"` // 升级阈值（分）
+	ThresholdRecharge int64                  `protobuf:"varint,5,opt,name=threshold_recharge,json=thresholdRecharge,proto3" json:"threshold_recharge,omitempty"` // 升級閾值（分）
 	ThresholdConsume  int64                  `protobuf:"varint,6,opt,name=threshold_consume,json=thresholdConsume,proto3" json:"threshold_consume,omitempty"`
-	PointsRuleJson    string                 `protobuf:"bytes,7,opt,name=points_rule_json,json=pointsRuleJson,proto3" json:"points_rule_json,omitempty"` // 积分产生规则 {"spend_cents":X,"points":Y}
+	PointsRuleJson    string                 `protobuf:"bytes,7,opt,name=points_rule_json,json=pointsRuleJson,proto3" json:"points_rule_json,omitempty"` // 積分產生規則 {"spend_cents":X,"points":Y}
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -263,14 +263,14 @@ func (x *LevelBrief) GetPointsRuleJson() string {
 	return ""
 }
 
-// LevelProgress 距下一等级进度。
+// LevelProgress 距下一等級進度。
 type LevelProgress struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// 充值口径差额（0 = 已达标；下一等级不含充值条件时为 -1）
+	// 充值口徑差額（0 = 已達標；下一等級不含充值條件時為 -1）
 	RechargeGapCents int64 `protobuf:"varint,1,opt,name=recharge_gap_cents,json=rechargeGapCents,proto3" json:"recharge_gap_cents,omitempty"`
-	// 消费口径差额（0 = 已达标；下一等级不含消费条件时为 -1）
+	// 消費口徑差額（0 = 已達標；下一等級不含消費條件時為 -1）
 	ConsumeGapCents int64 `protobuf:"varint,2,opt,name=consume_gap_cents,json=consumeGapCents,proto3" json:"consume_gap_cents,omitempty"`
-	// 综合进度百分比 0-100（按已达标口径均值粗算；both_and 取较小值）
+	// 綜合進度百分比 0-100（按已達標口徑均值粗算；both_and 取較小值）
 	Percent       int32 `protobuf:"varint,3,opt,name=percent,proto3" json:"percent,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

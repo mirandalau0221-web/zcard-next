@@ -37,12 +37,12 @@ func readProductRule(override map[string]any) (*productPricingRule, error) {
 	}
 	var r productPricingRule
 	if err := json.Unmarshal(b, &r); err != nil {
-		return nil, fmt.Errorf("商品定价规则无效: %w", err)
+		return nil, fmt.Errorf("商品定價規則無效: %w", err)
 	}
 	switch r.Mode {
 	case PriceModeChannel, PriceModePercent, PriceModeFixed, PriceModeEqual, PriceModePending:
 	default:
-		return nil, fmt.Errorf("商品定价模式无效")
+		return nil, fmt.Errorf("商品定價模式無效")
 	}
 	if err := validatePricing(1, r.Percent, r.Amount, RoundingNone); err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (s *SyncService) productPrices(ctx context.Context, conn *ent.SupplyConnect
 	}
 	if p.ProductKind == "sms_channel" {
 		if len(p.SKUs) > 0 || conn.Driver != "zcard" || conn.ExchangeRate != 1 {
-			return -1, nil, nil, fmt.Errorf("渠道接码商品配置无效")
+			return -1, nil, nil, fmt.Errorf("渠道接碼商品配置無效")
 		}
 		o["last_synced_price"] = int64(0)
 		return 0, nil, o, nil
@@ -86,13 +86,13 @@ func (s *SyncService) productPrices(ctx context.Context, conn *ent.SupplyConnect
 	if !protected {
 		price = rule.price(conn, p.Price)
 		if price <= 0 {
-			return -1, nil, nil, fmt.Errorf("商品 %s 报价无效，保留原价格", p.ID)
+			return -1, nil, nil, fmt.Errorf("商品 %s 報價無效，保留原價格", p.ID)
 		}
 	}
 	if fixed, ok := o["price"]; ok && conn.AutoSyncPrice && p.IsActive {
 		price = toInt64(fixed)
 		if price <= 0 {
-			return -1, nil, nil, fmt.Errorf("商品固定售价必须大于零")
+			return -1, nil, nil, fmt.Errorf("商品固定售價必須大於零")
 		}
 		protected = true // A fixed product price does not imply a SKU price.
 	} else if price >= 0 && m.LocalProductID > 0 && !force {
@@ -129,7 +129,7 @@ func (s *SyncService) productPrices(ctx context.Context, conn *ent.SupplyConnect
 		if !protected {
 			value = rule.price(conn, sk.Price)
 			if value <= 0 {
-				return -1, nil, nil, fmt.Errorf("商品 %s 规格报价无效，保留原价格", p.ID)
+				return -1, nil, nil, fmt.Errorf("商品 %s 規格報價無效，保留原價格", p.ID)
 			}
 			if local, exists := current[sk.Code]; exists && !force {
 				last, known := previous[sk.Code]

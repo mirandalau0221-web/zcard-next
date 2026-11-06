@@ -1,16 +1,16 @@
-// Package audit 审计与风控模块（ 完整落地）：
-// - 操作审计（）：变更类 admin 操作（POST/PUT/DELETE）自动落 audit_logs；
-// before/after 快照经注册表采集（各模块声明聚合键）；异步落库失败不阻断
-// - 安全审计（）：port.Auditor 埋点（登录/解密/导出/权限变更/黑名单变更/
-// 取货）——写失败不阻断业务（1.x 纪律）；取货审计含谁/何时/IP/订单（零明文）
-// - 风控闸门（）：port.RiskGate——IP 黑名单（精确+CIDR，进程内缓存）→
-// pending 订单闸门（同 IP 超限拒绝，DB 事务内复查防并发穿透）→ 频率限流
-// （每 IP 每分钟滑动窗口）；取货连续失败锁定（risk_lock_keys TTL，锁定期内
-// 正确密码也拒绝）；IPv6 /64 聚合（orders.risk_ip 写入口统一）
-// - 访问统计（）：VisitCounter 进程内聚合（阈值 100 批量落库 + cron 每分钟
-// 兜底 Flush）——不逐请求写库
+// Package audit 審計與風控模塊（ 完整落地）：
+// - 操作審計（）：變更類 admin 操作（POST/PUT/DELETE）自動落 audit_logs；
+// before/after 快照經註冊表採集（各模塊聲明聚合鍵）；異步落庫失敗不阻斷
+// - 安全審計（）：port.Auditor 埋點（登錄/解密/導出/權限變更/黑名單變更/
+// 取貨）——寫失敗不阻斷業務（1.x 紀律）；取貨審計含誰/何時/IP/訂單（零明文）
+// - 風控閘門（）：port.RiskGate——IP 黑名單（精確+CIDR，進程內緩存）→
+// pending 訂單閘門（同 IP 超限拒絕，DB 事務內複查防併發穿透）→ 頻率限流
+// （每 IP 每分鐘滑動窗口）；取貨連續失敗鎖定（risk_lock_keys TTL，鎖定期內
+// 正確密碼也拒絕）；IPv6 /64 聚合（orders.risk_ip 寫入口統一）
+// - 訪問統計（）：VisitCounter 進程內聚合（閾值 100 批量落庫 + cron 每分鐘
+// 兜底 Flush）——不逐請求寫庫
 //
 // 表：audit_logs / security_audit_logs / visit_logs / risk_lock_keys。
-// 阈值常量：MaxPendingPerIP=3 / FetchFailLockN=5 / FetchLockTTL=30min /
-// OrderPerMinPerIP=10（settings.security 读取侧 接线）。
+// 閾值常量：MaxPendingPerIP=3 / FetchFailLockN=5 / FetchLockTTL=30min /
+// OrderPerMinPerIP=10（settings.security 讀取側 接線）。
 package audit

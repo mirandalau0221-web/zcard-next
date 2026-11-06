@@ -25,15 +25,15 @@ type SupplierProductPrice struct {
 	SupplierAccountID uint64 `json:"supplier_account_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
-	// 0=商品级（哨兵，参与唯一索引）
+	// 0=商品級（哨兵，參與唯一索引）
 	SkuID uint64 `json:"sku_id,omitempty"`
-	// 供货价（分）
+	// 供貨價（分）
 	Price int64 `json:"price,omitempty"`
-	// product 固定价 / category 分类折扣 / global 整站折扣
+	// product 固定價 / category 分類折扣 / global 整站折扣
 	Scope string `json:"scope,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID uint64 `json:"category_id,omitempty"`
-	// 折后比例，9000=9折
+	// 折後比例，9000=9折
 	DiscountBps  int32 `json:"discount_bps,omitempty"`
 	selectValues sql.SelectValues
 }

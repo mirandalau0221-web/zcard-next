@@ -1,4 +1,4 @@
-// 重建迁移目录的 atlas.sum（删除迁移文件后校准）。
+// 重建遷移目錄的 atlas.sum（刪除遷移文件後校準）。
 package main
 
 import (

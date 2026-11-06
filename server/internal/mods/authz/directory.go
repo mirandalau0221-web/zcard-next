@@ -1,15 +1,15 @@
 package authz
 
-// 权限点目录（ ：权限目录自动生成，替代 server/middleware 手工映射）。
+// 權限點目錄（ ：權限目錄自動生成，替代 server/middleware 手工映射）。
 //
-// 设计（三源合一，杜绝双源漂移）：
-// - 各模块经 Perm 声明权限点：Op（proto 方法全名）+ Method/Path（HTTP 注解）同条给出
-// - 启动时 Reconcile 用 http.Server.WalkRoute 提取的真实路由表逐条对账——
-// admin 前缀路由未声明且非 Public → 启动失败（fail-fast， 「新增路由
-// 未挂角色 = 仅超管可见」的强化版：未声明权限点直接拒绝启动）
-// - middleware 运行时按 Op 查目录（声明同源，path↔op 不漂移）；miss = 403 + 告警
+// 設計（三源合一，杜絕雙源漂移）：
+// - 各模塊經 Perm 聲明權限點：Op（proto 方法全名）+ Method/Path（HTTP 註解）同條給出
+// - 啓動時 Reconcile 用 http.Server.WalkRoute 提取的真實路由表逐條對賬——
+// admin 前綴路由未聲明且非 Public → 啓動失敗（fail-fast， 「新增路由
+// 未掛角色 = 僅超管可見」的強化版：未聲明權限點直接拒絕啓動）
+// - middleware 運行時按 Op 查目錄（聲明同源，path↔op 不漂移）；miss = 403 + 告警
 //
-// 敏感权限点（）用 AdminOnly 标记：不进非超管内置角色种子，仅 super_admin 的 * 覆盖。
+// 敏感權限點（）用 AdminOnly 標記：不進非超管內置角色種子，僅 super_admin 的 * 覆蓋。
 
 import (
 	"fmt"
@@ -17,37 +17,37 @@ import (
 	"sync"
 )
 
-// Perm 权限点声明（每条 admin RPC 一条；RPC 与 HTTP 一一对应）。
+// Perm 權限點聲明（每條 admin RPC 一條；RPC 與 HTTP 一一對應）。
 type Perm struct {
-	Code   string // 权限点编码（域:动作，如 settings:read）
-	Desc   string // 中文描述（权限树展示）
-	Domain string // 所属域（树分组；缺省取 Code 前缀）
-	Op     string // proto 方法全名（middleware 查询键）
-	Method string // HTTP 方法（路由对账）
-	Path   string // HTTP 路径模板（路由对账）
-	Public bool   // 免鉴权（仅登录等极少数）
-	// AdminOnly 敏感权限点：不进入非超管内置角色种子（card:view_content 等）
+	Code   string // 權限點編碼（域:動作，如 settings:read）
+	Desc   string // 中文描述（權限樹展示）
+	Domain string // 所屬域（樹分組；缺省取 Code 前綴）
+	Op     string // proto 方法全名（middleware 查詢鍵）
+	Method string // HTTP 方法（路由對賬）
+	Path   string // HTTP 路徑模板（路由對賬）
+	Public bool   // 免鑑權（僅登錄等極少數）
+	// AdminOnly 敏感權限點：不進入非超管內置角色種子（card:view_content 等）
 	AdminOnly bool
 }
 
 var (
 	declMu   sync.RWMutex
-	declared = []Perm{}            // 全部声明（同 Code 可挂多条路由，如读/写分开的 REST 路由）
-	byOpSeen = map[string]string{} // op → code（冲突检测）
+	declared = []Perm{}            // 全部聲明（同 Code 可掛多條路由，如讀/寫分開的 REST 路由）
+	byOpSeen = map[string]string{} // op → code（衝突檢測）
 )
 
-// Declare 注册权限点声明（模块 init/providers 装配期调用；同 Code 可多次声明
-// 以覆盖多条路由，同 Op 冲突 panic；仅登记目录无路由的敏感权限点可省略 Op）。
+// Declare 註冊權限點聲明（模塊 init/providers 裝配期調用；同 Code 可多次聲明
+// 以覆蓋多條路由，同 Op 衝突 panic；僅登記目錄無路由的敏感權限點可省略 Op）。
 func Declare(ps ...Perm) {
 	declMu.Lock()
 	defer declMu.Unlock()
 	for _, p := range ps {
 		if p.Code == "" {
-			panic("authz: 权限点声明缺少 Code")
+			panic("authz: 權限點聲明缺少 Code")
 		}
 		if p.Op != "" {
 			if prev, dup := byOpSeen[p.Op]; dup && prev != p.Code {
-				panic(fmt.Sprintf("authz: 权限点 Op 冲突：%s 已属于 %s，又声明为 %s", p.Op, prev, p.Code))
+				panic(fmt.Sprintf("authz: 權限點 Op 衝突：%s 已屬於 %s，又聲明為 %s", p.Op, prev, p.Code))
 			}
 			byOpSeen[p.Op] = p.Code
 		}
@@ -67,20 +67,20 @@ func domainOf(code string) string {
 	return code
 }
 
-// RouteInfo 路由对账输入（与 kratos http.RouteInfo 同构，避免 authz 反向依赖 transport）。
+// RouteInfo 路由對賬輸入（與 kratos http.RouteInfo 同構，避免 authz 反向依賴 transport）。
 type RouteInfo struct {
 	Method string
 	Path   string
 }
 
-// Directory 权限目录（构建后只读，并发安全）。
+// Directory 權限目錄（構建後只讀，併發安全）。
 type Directory struct {
 	perms   map[string]Perm   // code → Perm
 	byOp    map[string]string // op → code
 	byRoute map[string]string // "METHOD /path" → code
 }
 
-// BuildDirectory 以当前全局声明构建目录。
+// BuildDirectory 以當前全局聲明構建目錄。
 func BuildDirectory() *Directory {
 	declMu.RLock()
 	defer declMu.RUnlock()
@@ -91,7 +91,7 @@ func BuildDirectory() *Directory {
 	}
 	for _, p := range declared {
 		if _, seen := d.perms[p.Code]; !seen {
-			d.perms[p.Code] = p // 元信息取首条定义
+			d.perms[p.Code] = p // 元信息取首條定義
 		}
 		if p.Op != "" {
 			d.byOp[p.Op] = p.Code
@@ -103,8 +103,8 @@ func BuildDirectory() *Directory {
 	return d
 }
 
-// Reconcile 路由对账：admin 前缀路由必须被声明覆盖（Public 或权限点），否则返回错误
-// （启动 fail-fast）。非 admin 路由（storefront/supply/回调）直接放行。
+// Reconcile 路由對賬：admin 前綴路由必須被聲明覆蓋（Public 或權限點），否則返回錯誤
+// （啓動 fail-fast）。非 admin 路由（storefront/supply/回調）直接放行。
 func (d *Directory) Reconcile(routes []RouteInfo, adminPrefix string) error {
 	for _, r := range routes {
 		if !hasPrefix(r.Path, adminPrefix) {
@@ -112,7 +112,7 @@ func (d *Directory) Reconcile(routes []RouteInfo, adminPrefix string) error {
 		}
 		_, ok := d.byRoute[r.Method+" "+r.Path]
 		if !ok {
-			return fmt.Errorf("authz: 管理路由未声明权限点（拒绝启动）：%s %s——请在模块内 authz.Declare 登记", r.Method, r.Path)
+			return fmt.Errorf("authz: 管理路由未聲明權限點（拒絕啓動）：%s %s——請在模塊內 authz.Declare 登記", r.Method, r.Path)
 		}
 	}
 	return nil
@@ -120,9 +120,9 @@ func (d *Directory) Reconcile(routes []RouteInfo, adminPrefix string) error {
 
 func hasPrefix(s, p string) bool { return len(s) >= len(p) && s[:len(p)] == p }
 
-// PermissionForOp middleware 查询：返回 (code, public, ok)。
-// operation 归一化：HTTP transport 的 operation 带前导斜杠（/pkg.Svc/Method），
-// 声明侧统一不带——两种形态均兼容。
+// PermissionForOp middleware 查詢：返回 (code, public, ok)。
+// operation 歸一化：HTTP transport 的 operation 帶前導斜槓（/pkg.Svc/Method），
+// 聲明側統一不帶——兩種形態均兼容。
 func (d *Directory) PermissionForOp(op string) (code string, public bool, ok bool) {
 	if len(op) > 0 && op[0] == '/' {
 		op = op[1:]
@@ -134,20 +134,20 @@ func (d *Directory) PermissionForOp(op string) (code string, public bool, ok boo
 	return c, d.perms[c].Public, true
 }
 
-// Perm 取权限点定义。
+// Perm 取權限點定義。
 func (d *Directory) Perm(code string) (Perm, bool) {
 	p, ok := d.perms[code]
 	return p, ok
 }
 
-// Tree 权限树节点（GetPermissionTree API 输出）。
+// Tree 權限樹節點（GetPermissionTree API 輸出）。
 type TreeNode struct {
 	Domain string
 	Label  string
 	Perms  []Perm
 }
 
-// Tree 按域分组导出（域与权限点均按字典序，展示稳定）。
+// Tree 按域分組導出（域與權限點均按字典序，展示穩定）。
 func (d *Directory) Tree() []TreeNode {
 	domains := map[string][]Perm{}
 	for _, p := range d.perms {
@@ -167,17 +167,17 @@ func (d *Directory) Tree() []TreeNode {
 	return out
 }
 
-// ValidateCodes 校验权限点集全部存在于目录（防脏数据写入角色）。
+// ValidateCodes 校驗權限點集全部存在於目錄（防髒數據寫入角色）。
 func (d *Directory) ValidateCodes(codes []string) error {
 	for _, c := range codes {
 		if _, ok := d.perms[c]; !ok {
-			return fmt.Errorf("authz: 权限点 %q 不在目录内（拒绝写入角色）", c)
+			return fmt.Errorf("authz: 權限點 %q 不在目錄內（拒絕寫入角色）", c)
 		}
 	}
 	return nil
 }
 
-// Codes 全部权限点编码（种子与覆盖测试用）。
+// Codes 全部權限點編碼（種子與覆蓋測試用）。
 func (d *Directory) Codes() []string {
 	out := make([]string, 0, len(d.perms))
 	for c := range d.perms {
@@ -187,7 +187,7 @@ func (d *Directory) Codes() []string {
 	return out
 }
 
-// NonAdminOnlyCodes 非敏感权限点（内置角色种子候选）。
+// NonAdminOnlyCodes 非敏感權限點（內置角色種子候選）。
 func (d *Directory) NonAdminOnlyCodes() []string {
 	out := make([]string, 0, len(d.perms))
 	for c, p := range d.perms {
@@ -199,7 +199,7 @@ func (d *Directory) NonAdminOnlyCodes() []string {
 	return out
 }
 
-// AdminOnlyCodes 敏感权限点清单。
+// AdminOnlyCodes 敏感權限點清單。
 func (d *Directory) AdminOnlyCodes() []string {
 	out := make([]string, 0)
 	for c, p := range d.perms {
@@ -218,32 +218,32 @@ func domainLabel(domain string) string {
 	return domain
 }
 
-// domainLabels 域中文名（权限树分组标题；新域在此补充）。
+// domainLabels 域中文名（權限樹分組標題；新域在此補充）。
 var domainLabels = map[string]string{
-	"auth":        "认证",
-	"settings":    "设置中心",
-	"authz":       "权限管理",
-	"identity":    "员工管理",
-	"catalog":     "商品目录",
-	"inventory":   "卡密库存",
-	"order":       "订单",
+	"auth":        "認證",
+	"settings":    "設置中心",
+	"authz":       "權限管理",
+	"identity":    "員工管理",
+	"catalog":     "商品目錄",
+	"inventory":   "卡密庫存",
+	"order":       "訂單",
 	"payment":     "支付",
-	"wallet":      "钱包",
-	"supply":      "上游货源",
-	"procurement": "采购",
-	"supplier":    "对外供货",
+	"wallet":      "錢包",
+	"supply":      "上游貨源",
+	"procurement": "採購",
+	"supplier":    "對外供貨",
 	"reseller":    "分站",
-	"affiliate":   "分销",
-	"coupon":      "营销",
-	"ticket":      "工单",
+	"affiliate":   "分銷",
+	"coupon":      "營銷",
+	"ticket":      "工單",
 	"media":       "素材",
 	"dashboard":   "工作台",
 	"notify":      "通知",
-	"audit":       "审计",
-	"system":      "系统",
+	"audit":       "審計",
+	"system":      "系統",
 }
 
-// All 返回全部权限点声明（审计路径映射等消费方使用）。
+// All 返回全部權限點聲明（審計路徑映射等消費方使用）。
 func (d *Directory) All() []Perm {
 	out := make([]Perm, 0, len(d.perms))
 	for _, p := range d.perms {

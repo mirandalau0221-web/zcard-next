@@ -1,4 +1,4 @@
-/** 图片路径与 emoji 共用分类 icon 字段；相对图片路径按站点根目录解析。 */
+/** 圖片路徑與 emoji 共用分類 icon 字段；相對圖片路徑按站點根目錄解析。 */
 export function categoryIconImagePath(icon?: string): string {
   const value = icon?.trim() || "";
   if (!value || (!value.includes("/") && !/\.(png|jpe?g|gif|webp|svg|ico|bmp|avif)(?:[?#].*)?$/i.test(value))) return "";

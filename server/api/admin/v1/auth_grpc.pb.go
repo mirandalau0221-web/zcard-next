@@ -38,30 +38,30 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminAuthService 管理后台认证（admin realm JWT，双 realm 防提权串用）。
-// 登录 / 登出 / 当前身份（含权限点，供前端动态路由）。
+// AdminAuthService 管理後台認證（admin realm JWT，雙 realm 防提權串用）。
+// 登錄 / 登出 / 當前身份（含權限點，供前端動態路由）。
 type AdminAuthServiceClient interface {
-	// Login 管理员登录。密码 bcrypt 校验；TOTP 校验；captcha_admin_login 开启时图形验证码必填。
+	// Login 管理員登錄。密碼 bcrypt 校驗；TOTP 校驗；captcha_admin_login 開啓時圖形驗證碼必填。
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
-	// GetCaptchaImage 登录图形验证码（免鉴权；captcha_admin_login 开启时登录页使用）。
+	// GetCaptchaImage 登錄圖形驗證碼（免鑑權；captcha_admin_login 開啓時登錄頁使用）。
 	GetCaptchaImage(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CaptchaImageReply, error)
-	// GetCaptchaConfig 登录验证码开关（免鉴权；登录页据此条件渲染验证码区）。
+	// GetCaptchaConfig 登錄驗證碼開關（免鑑權；登錄頁據此條件渲染驗證碼區）。
 	GetCaptchaConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CaptchaConfigReply, error)
-	// Logout 登出（JWT 无状态，前端弃用令牌即可；接入 refresh 轮换后落 sessions）。
+	// Logout 登出（JWT 無狀態，前端棄用令牌即可；接入 refresh 輪換後落 sessions）。
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// GetProfile 当前管理员信息与权限点清单（前端动态路由数据源，规划)。
+	// GetProfile 當前管理員信息與權限點清單（前端動態路由數據源，規劃)。
 	GetProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetProfileReply, error)
-	// RefreshToken 用 refresh token 换新令牌对（一次性轮换）。
+	// RefreshToken 用 refresh token 換新令牌對（一次性輪換）。
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*LoginReply, error)
-	// ChangePassword 修改当前账号密码，并使全部旧会话失效。
+	// ChangePassword 修改當前賬號密碼，並使全部舊會話失效。
 	ChangePassword(ctx context.Context, in *ChangeAdminPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// EnableTOTP 生成 TOTP 密钥（返回 otpauth URL 供二维码）。
+	// EnableTOTP 生成 TOTP 密鑰（返回 otpauth URL 供二維碼）。
 	EnableTOTP(ctx context.Context, in *ConfirmTOTPRequest, opts ...grpc.CallOption) (*EnableTOTPReply, error)
-	// ConfirmTOTP 验证一次确认绑定。
+	// ConfirmTOTP 驗證一次確認綁定。
 	ConfirmTOTP(ctx context.Context, in *ConfirmTOTPRequest, opts ...grpc.CallOption) (*RecoveryCodesReply, error)
 	CancelTOTP(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ResetTOTP(ctx context.Context, in *ResetTOTPRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// DisableTOTP 解绑。
+	// DisableTOTP 解綁。
 	DisableTOTP(ctx context.Context, in *ConfirmTOTPRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -197,30 +197,30 @@ func (c *adminAuthServiceClient) DisableTOTP(ctx context.Context, in *ConfirmTOT
 // All implementations must embed UnimplementedAdminAuthServiceServer
 // for forward compatibility.
 //
-// AdminAuthService 管理后台认证（admin realm JWT，双 realm 防提权串用）。
-// 登录 / 登出 / 当前身份（含权限点，供前端动态路由）。
+// AdminAuthService 管理後台認證（admin realm JWT，雙 realm 防提權串用）。
+// 登錄 / 登出 / 當前身份（含權限點，供前端動態路由）。
 type AdminAuthServiceServer interface {
-	// Login 管理员登录。密码 bcrypt 校验；TOTP 校验；captcha_admin_login 开启时图形验证码必填。
+	// Login 管理員登錄。密碼 bcrypt 校驗；TOTP 校驗；captcha_admin_login 開啓時圖形驗證碼必填。
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
-	// GetCaptchaImage 登录图形验证码（免鉴权；captcha_admin_login 开启时登录页使用）。
+	// GetCaptchaImage 登錄圖形驗證碼（免鑑權；captcha_admin_login 開啓時登錄頁使用）。
 	GetCaptchaImage(context.Context, *emptypb.Empty) (*CaptchaImageReply, error)
-	// GetCaptchaConfig 登录验证码开关（免鉴权；登录页据此条件渲染验证码区）。
+	// GetCaptchaConfig 登錄驗證碼開關（免鑑權；登錄頁據此條件渲染驗證碼區）。
 	GetCaptchaConfig(context.Context, *emptypb.Empty) (*CaptchaConfigReply, error)
-	// Logout 登出（JWT 无状态，前端弃用令牌即可；接入 refresh 轮换后落 sessions）。
+	// Logout 登出（JWT 無狀態，前端棄用令牌即可；接入 refresh 輪換後落 sessions）。
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
-	// GetProfile 当前管理员信息与权限点清单（前端动态路由数据源，规划)。
+	// GetProfile 當前管理員信息與權限點清單（前端動態路由數據源，規劃)。
 	GetProfile(context.Context, *emptypb.Empty) (*GetProfileReply, error)
-	// RefreshToken 用 refresh token 换新令牌对（一次性轮换）。
+	// RefreshToken 用 refresh token 換新令牌對（一次性輪換）。
 	RefreshToken(context.Context, *RefreshTokenRequest) (*LoginReply, error)
-	// ChangePassword 修改当前账号密码，并使全部旧会话失效。
+	// ChangePassword 修改當前賬號密碼，並使全部舊會話失效。
 	ChangePassword(context.Context, *ChangeAdminPasswordRequest) (*emptypb.Empty, error)
-	// EnableTOTP 生成 TOTP 密钥（返回 otpauth URL 供二维码）。
+	// EnableTOTP 生成 TOTP 密鑰（返回 otpauth URL 供二維碼）。
 	EnableTOTP(context.Context, *ConfirmTOTPRequest) (*EnableTOTPReply, error)
-	// ConfirmTOTP 验证一次确认绑定。
+	// ConfirmTOTP 驗證一次確認綁定。
 	ConfirmTOTP(context.Context, *ConfirmTOTPRequest) (*RecoveryCodesReply, error)
 	CancelTOTP(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	ResetTOTP(context.Context, *ResetTOTPRequest) (*emptypb.Empty, error)
-	// DisableTOTP 解绑。
+	// DisableTOTP 解綁。
 	DisableTOTP(context.Context, *ConfirmTOTPRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAdminAuthServiceServer()
 }

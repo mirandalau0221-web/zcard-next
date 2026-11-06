@@ -40,7 +40,7 @@ export function deleteChannel(id: number) {
   });
 }
 
-// ── 员工管理 ──
+// ── 員工管理 ──
 
 export function fetchAdmins() {
   return request({ url: "/api/v1/admin/admins" });
@@ -148,7 +148,7 @@ export function fetchPermissionTree() {
   return request({ url: "/api/v1/admin/authz/permissions" });
 }
 
-// ── 系统设置 ──
+// ── 系統設置 ──
 
 export function fetchSettings(group?: string) {
   return request({
@@ -166,7 +166,7 @@ export function updateSetting(group: string, key: string, valueJson: string) {
   });
 }
 
-// 批量更新（表单级保存；后端单事务原子写入）
+// 批量更新（表單級保存；後端單事務原子寫入）
 export function updateSettings(items: { group: string; key: string; value_json: string }[]) {
   return request<{ updated: number; admin_base_path?: string }>({
     url: "/api/v1/admin/settings",
@@ -185,7 +185,7 @@ export function testEmail(data: { recipient: string; subject: string; content: s
   });
 }
 
-// 可用模板清单（WP 主题式选择；settings.template.pc_template 等取值）
+// 可用模板清單（WP 主題式選擇；settings.template.pc_template 等取值）
 export interface TemplateItem {
   key: string;
   name: string;
@@ -202,7 +202,7 @@ export function fetchTemplates() {
   });
 }
 
-// 安装主题（zip base64；服务端解压校验后原子落盘）
+// 安裝主題（zip base64；服務端解壓校驗後原子落盤）
 export function installTemplate(dataBase64: string) {
   return request<TemplateItem>({
     url: "/api/v1/admin/settings/templates/install",
@@ -211,15 +211,15 @@ export function installTemplate(dataBase64: string) {
   });
 }
 
-// ── 货币（；符号/位置/小数位——前端金额格式化统一取默认货币）──
+// ── 貨幣（；符號/位置/小數位——前端金額格式化統一取默認貨幣）──
 
 export function fetchCurrencies() {
   return request({ url: "/api/v1/admin/currencies", method: "get" });
 }
 
-// ── 支付驱动元数据（：配置面动态表单渲染）──
+// ── 支付驅動元數據（：配置面動態表單渲染）──
 
-// ── 支付单（payment:read_detail / payment:capture）──
+// ── 支付單（payment:read_detail / payment:capture）──
 
 export function fetchPayments(params: { status?: string; order_no?: string; cursor?: number; limit?: number; review_only?: boolean }) {
   return request({ url: "/api/v1/admin/payments", params });

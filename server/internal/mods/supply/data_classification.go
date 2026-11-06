@@ -22,7 +22,7 @@ func categoryRuleMatch(name string, rule *adminv1.ProductCategoryRule) bool {
 
 func (s *AdminSupplyService) resolveImportCategories(ctx context.Context, req *adminv1.ImportProductsRequest, products map[string]adapter.Product, groups map[string]uint64) (map[string]uint64, error) {
 	if len(req.CategoryRules) > 100 {
-		return nil, fmt.Errorf("分类规则最多 100 条")
+		return nil, fmt.Errorf("分類規則最多 100 條")
 	}
 	selected := map[string]bool{}
 	result := map[string]uint64{}
@@ -32,18 +32,18 @@ func (s *AdminSupplyService) resolveImportCategories(ctx context.Context, req *a
 	}
 	for _, rule := range req.CategoryRules {
 		if rule == nil || rule.CategoryId == 0 || len(rule.Keywords) == 0 || len(rule.Keywords)+len(rule.Excludes) > 100 {
-			return nil, fmt.Errorf("请填写分类规则的关键词和目标分类")
+			return nil, fmt.Errorf("請填寫分類規則的關鍵詞和目標分類")
 		}
 		for _, word := range append(append([]string{}, rule.Keywords...), rule.Excludes...) {
 			if strings.TrimSpace(word) == "" || utf8.RuneCountInString(word) > 100 {
-				return nil, fmt.Errorf("分类关键词须为 1–100 个字符")
+				return nil, fmt.Errorf("分類關鍵詞須為 1–100 個字符")
 			}
 		}
 		targets[rule.CategoryId] = true
 	}
 	for code, id := range req.ProductCategories {
 		if !selected[code] {
-			return nil, fmt.Errorf("只能指定本次选中商品的分类")
+			return nil, fmt.Errorf("只能指定本次選中商品的分類")
 		}
 		result[code] = id
 		targets[id] = true
@@ -92,7 +92,7 @@ func (s *AdminSupplyService) resolveImportCategories(ctx context.Context, req *a
 			return nil, err
 		}
 		if !ok {
-			return nil, fmt.Errorf("分类规则的目标分类已不存在，请重新选择")
+			return nil, fmt.Errorf("分類規則的目標分類已不存在，請重新選擇")
 		}
 	}
 	return result, nil

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CategoryIcon from '@/components/CategoryIcon.vue';
 import { computed } from 'vue';
-// 递归分类节点（任意层级：三级/四级……均可展开；缩进随 depth 递增）
+// 遞歸分類節點（任意層級：三級/四級……均可展開；縮進隨 depth 遞增）
 const props = defineProps<{
   node: any;
   depth: number;
@@ -64,7 +64,7 @@ function activate() {
   transition: all 0.15s; font-family: inherit;
   text-align: left;
 }
-/* 一级分类与「全部商品」同字号（15px），子级 14px 递进——层级一眼可辨 */
+/* 一級分類與「全部商品」同字號（15px），子級 14px 遞進——層級一眼可辨 */
 .tree-node--root { font-size: 15px; font-weight: 500; }
 .tree-node--root.active,
 .tree-node.active { font-weight: 600; }
@@ -77,7 +77,7 @@ function activate() {
 }
 .tree-dot.active { background: #fff; opacity: 0.9; }
 .tree-icon { font-size: 16px; }
-/* 纯 CSS 旋钮箭头（Ant Design chevron 惯例）：右向 → 展开时转下向 */
+/* 純 CSS 旋鈕箭頭（Ant Design chevron 慣例）：右向 → 展開時轉下向 */
 .tree-arrow {
   width: 6px; height: 6px; flex-shrink: 0;
   border-right: 1.5px solid currentColor;

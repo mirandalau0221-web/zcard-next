@@ -24,31 +24,31 @@ type SupplierAccount struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// 下游识别 key（可索引明文）
+	// 下游識別 key（可索引明文）
 	APIKey string `json:"api_key,omitempty"`
 	// AES-256-GCM 加密 secret
 	APISecret []byte `json:"api_secret,omitempty"`
-	// 联系方式（申请审核用）
+	// 聯繫方式（申請審核用）
 	Contact string `json:"contact,omitempty"`
 	// Status holds the value of the "status" field.
 	Status supplieraccount.Status `json:"status,omitempty"`
-	// 供货余额缓存（可由流水重算）
+	// 供貨餘額緩存（可由流水重算）
 	BalanceCache int64 `json:"balance_cache,omitempty"`
-	// 交付回调地址（HTTPS 强制）
+	// 交付回調地址（HTTPS 強制）
 	NotifyURL string `json:"notify_url,omitempty"`
 	// ReviewedAt holds the value of the "reviewed_at" field.
 	ReviewedAt time.Time `json:"reviewed_at,omitempty"`
 	// Protocol holds the value of the "protocol" field.
 	Protocol supplieraccount.Protocol `json:"protocol,omitempty"`
-	// connect/ping 回显的店铺名（shopName/site_name）
+	// connect/ping 回顯的店鋪名（shopName/site_name）
 	DisplayName string `json:"display_name,omitempty"`
-	// 申请归属前台用户（0=admin 建号）
+	// 申請歸屬前台用户（0=admin 建號）
 	OwnerUserID uint64 `json:"owner_user_id,omitempty"`
-	// 申请理由（审核用）
+	// 申請理由（審核用）
 	ApplyReason string `json:"apply_reason,omitempty"`
-	// 审核意见/驳回理由
+	// 審核意見/駁回理由
 	ReviewNote string `json:"review_note,omitempty"`
-	// IP 白名单（空=不限；支持精确 IP 与 CIDR）
+	// IP 白名單（空=不限；支持精確 IP 與 CIDR）
 	IPWhitelist  []string `json:"ip_whitelist,omitempty"`
 	selectValues sql.SelectValues
 }

@@ -23,9 +23,9 @@ type OrderItem struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
-	// 父订单（硬外键 → orders）
+	// 父訂單（硬外鍵 → orders）
 	OrderID uint64 `json:"order_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
@@ -47,19 +47,19 @@ type OrderItem struct {
 	FormAnswers []map[string]string `json:"form_answers,omitempty"`
 	// AssignedAdminID holds the value of the "assigned_admin_id" field.
 	AssignedAdminID uint64 `json:"assigned_admin_id,omitempty"`
-	// SKU 名称快照
+	// SKU 名稱快照
 	SkuName string `json:"sku_name,omitempty"`
-	// 单价快照（分）
+	// 單價快照（分）
 	UnitPrice int64 `json:"unit_price,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int32 `json:"quantity,omitempty"`
-	// 小计（分）
+	// 小計（分）
 	Amount int64 `json:"amount,omitempty"`
 	// 成本快照（分）
 	Cost int64 `json:"cost,omitempty"`
 	// GoodsType holds the value of the "goods_type" field.
 	GoodsType string `json:"goods_type,omitempty"`
-	// 下单时数量库存管理快照；旧实体项继续管理
+	// 下單時數量庫存管理快照；舊實體項繼續管理
 	InventoryTracked bool `json:"inventory_tracked,omitempty"`
 	// PaidAmount holds the value of the "paid_amount" field.
 	PaidAmount int64 `json:"paid_amount,omitempty"`
@@ -77,15 +77,15 @@ type OrderItem struct {
 	ReceivedQuantity int32 `json:"received_quantity,omitempty"`
 	// ReturnedQuantity holds the value of the "returned_quantity" field.
 	ReturnedQuantity int32 `json:"returned_quantity,omitempty"`
-	// 履约类型
+	// 履約類型
 	FulfillmentType orderitem.FulfillmentType `json:"fulfillment_type,omitempty"`
 	// DeliverySourceID holds the value of the "delivery_source_id" field.
 	DeliverySourceID uint64 `json:"delivery_source_id,omitempty"`
-	// 履约状态
+	// 履約狀態
 	FulfillmentStatus string `json:"fulfillment_status,omitempty"`
-	// 佣金快照（三级 + 费率）
+	// 佣金快照（三級 + 費率）
 	CommissionSnapshot map[string]interface{} `json:"commission_snapshot,omitempty"`
-	// 分站利润快照
+	// 分站利潤快照
 	ProfitSnapshot map[string]interface{} `json:"profit_snapshot,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderItemQuery when eager-loading is set.

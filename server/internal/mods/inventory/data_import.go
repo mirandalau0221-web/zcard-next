@@ -1,10 +1,10 @@
 package inventory
 
-// 导入管线（ ）：预览 → 确认 → 分片批量写入 → 批次追踪。
-// 性能纪律（PG/MySQL 大数量优化）：去重一律 content_hash 分组 IN 批查
-// （预览全量一次、确认每分片一次，杜绝逐行 Exist 的 N+1）；写入走
+// 導入管線（ ）：預覽 → 確認 → 分片批量寫入 → 批次追蹤。
+// 性能紀律（PG/MySQL 大數量優化）：去重一律 content_hash 分組 IN 批查
+// （預覽全量一次、確認每分片一次，杜絕逐行 Exist 的 N+1）；寫入走
 // CreateBulk + ON CONFLICT DO NOTHING（唯一索引 (subsite_id, product_id,
-// content_hash) 兜底，并发导入窗口的重复行静默跳过）。
+// content_hash) 兜底，併發導入窗口的重複行靜默跳過）。
 
 import (
 	"context"
@@ -20,38 +20,38 @@ import (
 	entsql "entgo.io/ent/dialect/sql"
 )
 
-// ImportPreview 预览结果（确认前端步展示）。
+// ImportPreview 預覽結果（確認前端步展示）。
 type ImportPreview struct {
 	Total     int      `json:"total"`
-	DupInFile int      `json:"dup_in_file"` // 文件内重复
-	DupInDB   int      `json:"dup_in_db"`   // 与库内重复（同商品）
+	DupInFile int      `json:"dup_in_file"` // 文件內重複
+	DupInDB   int      `json:"dup_in_db"`   // 與庫內重複（同商品）
 	Invalid   int      `json:"invalid"`     // 格式非法行
-	Sample    []string `json:"sample"`      // 前 50 行预览
-	IsPremium bool     `json:"is_premium"`  // 显式靓号模式解析到了卡号
+	Sample    []string `json:"sample"`      // 前 50 行預覽
+	IsPremium bool     `json:"is_premium"`  // 顯式靚號模式解析到了卡號
 	SkuID     uint64
 	SkuName   string
 	Revision  int64
 }
 
-// ImportInput 导入参数。
+// ImportInput 導入參數。
 type ImportInput struct {
 	ProductID        uint64
 	SkuID            uint64
-	Lines            []string // 原始行（默认每行完整文本即一条交付卡密）
-	ImportFormat     string   // line（默认）| premium（显式使用旧靓号首段解析）
-	Dedup            bool     // 去重开关（false=重复行报错）
+	Lines            []string // 原始行（默認每行完整文本即一條交付卡密）
+	ImportFormat     string   // line（默認）| premium（顯式使用舊靚號首段解析）
+	Dedup            bool     // 去重開關（false=重複行報錯）
 	Operator         uint64
 	ExpectedRevision *int64
 	SubsiteID        uint64
 	SkuName          string
 }
 
-// dedupChunk IN 批查单批上限（500：IN 列表与唯一索引扫描的平衡点）。
+// dedupChunk IN 批查單批上限（500：IN 列表與唯一索引掃描的平衡點）。
 const dedupChunk = 500
 
 func validateImportFormat(format string) error {
 	if format != "" && format != "line" && format != "premium" {
-		return kerrors.BadRequest("inventory.IMPORT_FORMAT_INVALID", "请选择整行卡密或靓号格式")
+		return kerrors.BadRequest("inventory.IMPORT_FORMAT_INVALID", "請選擇整行卡密或靚號格式")
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func importLine(raw, format string) (content string, premium bool) {
 	return content, false
 }
 
-// existingHashes 批查库内已存在的 content_hash 集合（分组 IN，替代逐行 Exist）。
+// existingHashes 批查庫內已存在的 content_hash 集合（分組 IN，替代逐行 Exist）。
 func (r *CardRepoImpl) existingHashes(ctx context.Context, client *ent.Client, productID uint64, hashes []string) (map[string]bool, error) {
 	out := make(map[string]bool, len(hashes))
 	for i := 0; i < len(hashes); i += dedupChunk {
@@ -91,7 +91,7 @@ func (r *CardRepoImpl) existingHashes(ctx context.Context, client *ent.Client, p
 	return out, nil
 }
 
-// ParseLines 解析原始行（默认完整卡密，显式靓号模式 + 去重 + 预览统计）。
+// ParseLines 解析原始行（默認完整卡密，顯式靚號模式 + 去重 + 預覽統計）。
 func (r *CardRepoImpl) ParseLines(ctx context.Context, in ImportInput) (*ImportPreview, error) {
 	if err := validateImportFormat(in.ImportFormat); err != nil {
 		return nil, err
@@ -105,13 +105,13 @@ func (r *CardRepoImpl) ParseLines(ctx context.Context, in ImportInput) (*ImportP
 		return nil, err
 	}
 	if r.Cipher == nil {
-		return nil, kerrors.InternalServer("inventory.CIPHER_MISSING", "卡密密钥未配置")
+		return nil, kerrors.InternalServer("inventory.CIPHER_MISSING", "卡密密鑰未配置")
 	}
 	p := &ImportPreview{Sample: make([]string, 0, 50), SkuID: in.SkuID, SkuName: name, Revision: product.LockVersion}
 	seen := map[string]bool{}
 	client := data.Client(ctx, r.data)
 
-	// 第一遍：文件内去重 + 收集待查 hash
+	// 第一遍：文件內去重 + 收集待查 hash
 	type pending struct {
 		hash string
 		line string
@@ -132,7 +132,7 @@ func (r *CardRepoImpl) ParseLines(ctx context.Context, in ImportInput) (*ImportP
 			continue
 		}
 
-		// 文件内去重
+		// 文件內去重
 		if seen[line] {
 			p.DupInFile++
 			continue
@@ -144,7 +144,7 @@ func (r *CardRepoImpl) ParseLines(ctx context.Context, in ImportInput) (*ImportP
 		uniq = append(uniq, pending{hash: hash, line: line})
 	}
 
-	// 第二遍：库内去重（一次批查全部 hash）
+	// 第二遍：庫內去重（一次批查全部 hash）
 	exists, err := r.existingHashes(ctx, client, in.ProductID, hashes)
 	if err != nil {
 		return nil, err
@@ -161,11 +161,11 @@ func (r *CardRepoImpl) ParseLines(ctx context.Context, in ImportInput) (*ImportP
 	return p, nil
 }
 
-// ImportConfirm 确认导入（创建批次 + 分片批量写入）。
+// ImportConfirm 確認導入（創建批次 + 分片批量寫入）。
 func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.CardImport, error) {
 	client := data.Client(ctx, r.data)
 
-	// 创建批次
+	// 創建批次
 	imp, err := client.CardImport.Create().
 		SetProductID(in.ProductID).
 		SetSubsiteID(in.SubsiteID).
@@ -180,7 +180,7 @@ func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.
 		return nil, err
 	}
 
-	// 分片写入（1000/批；每片一次 IN 批查去重 + 一次批量 INSERT）
+	// 分片寫入（1000/批；每片一次 IN 批查去重 + 一次批量 INSERT）
 	var imported, skipped, failed int32
 	seen := map[string]bool{}
 	batchSize := 1000
@@ -205,7 +205,7 @@ func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.
 				continue
 			}
 
-			// 文件内去重
+			// 文件內去重
 			if seen[content] {
 				skipped++
 				continue
@@ -231,7 +231,7 @@ func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.
 			if imp.ID > 0 {
 				create.SetImportID(imp.ID)
 			}
-			// 靓号字段
+			// 靚號字段
 			if premium {
 				nh := r.Cipher.ContentHash("number:" + content)
 				create.SetNumberHash(nh)
@@ -239,7 +239,7 @@ func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.
 			creates = append(creates, create)
 		}
 
-		// 分片内批查去重（批次间/与库内重复；并发窗口漏网的由 ON CONFLICT 兜底）
+		// 分片內批查去重（批次間/與庫內重複；併發窗口漏網的由 ON CONFLICT 兜底）
 		if len(pendingHashes) > 0 {
 			exists, err := r.existingHashes(ctx, client, in.ProductID, pendingHashes)
 			if err != nil {
@@ -256,7 +256,7 @@ func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.
 			creates = kept
 		}
 
-		// 批量写入：冲突（并发导入竞态）静默跳过，不退化为逐行
+		// 批量寫入：衝突（併發導入競態）靜默跳過，不退化為逐行
 		if len(creates) > 0 {
 			if err := client.Card.CreateBulk(creates...).
 				OnConflict(entsql.DoNothing()).
@@ -272,8 +272,8 @@ func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.
 		}
 	}
 
-	// 更新批次状态（UpdateOne 返回值不入内存对象——重新读取保证
-	// imported/skipped/status 反映真实结果，否则响应恒为创建态 0/processing）
+	// 更新批次狀態（UpdateOne 返回值不入內存對象——重新讀取保證
+	// imported/skipped/status 反映真實結果，否則響應恆為創建態 0/processing）
 	if _, err = client.CardImport.UpdateOne(imp).
 		SetImported(imported).
 		SetSkipped(skipped).
@@ -285,7 +285,7 @@ func (r *CardRepoImpl) importConfirm(ctx context.Context, in ImportInput) (*ent.
 	return client.CardImport.Get(ctx, imp.ID)
 }
 
-// ListImports 导入批次列表。
+// ListImports 導入批次列表。
 func (r *CardRepoImpl) ListImports(ctx context.Context, productID uint64, skuID *uint64, legacyOnly bool) ([]*ent.CardImport, error) {
 	q := data.Client(ctx, r.data).CardImport.Query().Where(cardimport.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).
 		Order(ent.Desc(cardimport.FieldCreatedAt)).
@@ -301,7 +301,7 @@ func (r *CardRepoImpl) ListImports(ctx context.Context, productID uint64, skuID 
 	return q.All(ctx)
 }
 
-// CancelImport 撤销批次（删除本批 available 卡）。
+// CancelImport 撤銷批次（刪除本批 available 卡）。
 func (r *CardRepoImpl) cancelImport(ctx context.Context, importID uint64) error {
 	client := data.Client(ctx, r.data)
 	n, err := client.Card.Delete().
@@ -317,9 +317,9 @@ func (r *CardRepoImpl) cancelImport(ctx context.Context, importID uint64) error 
 	return err
 }
 
-// ── 导出（）────────────────────────────────────────────────
+// ── 導出（）────────────────────────────────────────────────
 
-// CsvSafe 防 Excel 注入（= + - @ 开头前缀 '）。
+// CsvSafe 防 Excel 注入（= + - @ 開頭前綴 '）。
 func CsvSafe(s string) string {
 	if len(s) > 0 && (s[0] == '=' || s[0] == '+' || s[0] == '-' || s[0] == '@') {
 		return "'" + s
@@ -327,7 +327,7 @@ func CsvSafe(s string) string {
 	return s
 }
 
-// ExportCards 导出 available 卡密（返回解密明文行；需 card:export 权限 + 审计）。
+// ExportCards 導出 available 卡密（返回解密明文行；需 card:export 權限 + 審計）。
 func (r *CardRepoImpl) ExportCards(ctx context.Context, productID uint64, skuID *uint64) ([]string, error) {
 	if _, err := r.inventoryProduct(ctx, productID); err != nil {
 		return nil, err
@@ -335,7 +335,7 @@ func (r *CardRepoImpl) ExportCards(ctx context.Context, productID uint64, skuID 
 	rows, err := data.Client(ctx, r.data).Card.Query().
 		Where(card.ProductID(productID), card.SubsiteID(tenancy.FromContext(ctx).SubsiteID), card.StatusEQ(card.StatusAvailable), skuPredicate(skuID)).
 		Order(ent.Asc(card.FieldID)).
-		Limit(10000). // 导出上限
+		Limit(10000). // 導出上限
 		All(ctx)
 	if err != nil {
 		return nil, err
@@ -344,7 +344,7 @@ func (r *CardRepoImpl) ExportCards(ctx context.Context, productID uint64, skuID 
 	for _, row := range rows {
 		plain, err := r.Cipher.Open(row.Content, row.ProductID, row.SubsiteID)
 		if err != nil {
-			continue // 解密失败降级跳过（绝不 500）
+			continue // 解密失敗降級跳過（絕不 500）
 		}
 		out = append(out, CsvSafe(plain))
 	}
@@ -361,14 +361,14 @@ func (r *CardRepoImpl) ImportConfirm(ctx context.Context, in ImportInput) (out *
 			return e
 		}
 		if in.ExpectedRevision != nil && p.LockVersion != *in.ExpectedRevision {
-			return kerrors.Conflict("inventory.CONFIG_CHANGED", "商品设置已变化，请重新预览")
+			return kerrors.Conflict("inventory.CONFIG_CHANGED", "商品設置已變化，請重新預覽")
 		}
 		name, e := r.importTarget(ctx, p, in.SkuID, true)
 		if e != nil {
 			return e
 		}
 		if r.Cipher == nil {
-			return kerrors.InternalServer("inventory.CIPHER_MISSING", "卡密密钥未配置")
+			return kerrors.InternalServer("inventory.CIPHER_MISSING", "卡密密鑰未配置")
 		}
 		in.SubsiteID = p.SubsiteID
 		in.SkuName = name
@@ -391,7 +391,7 @@ func (r *CardRepoImpl) CancelImport(ctx context.Context, id uint64, expected ...
 			return e
 		}
 		if len(expected) > 0 && expected[0] != "" && expected[0] != cancellationRevision(current) {
-			return kerrors.Conflict("inventory.BATCH_CHANGED", "批次库存已变化，请重新预览撤销范围")
+			return kerrors.Conflict("inventory.BATCH_CHANGED", "批次庫存已變化，請重新預覽撤銷範圍")
 		}
 		return r.cancelImport(ctx, id)
 	})

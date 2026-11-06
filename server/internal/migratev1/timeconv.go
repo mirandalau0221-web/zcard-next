@@ -1,7 +1,7 @@
 package migratev1
 
-// 1.x 时间口径转换：MySQL DATETIME 无时区（PHP 端 APP_TIMEZONE，默认 UTC）→
-// 2.0 全 UTC。源扫描一律以字符串读出（parseTime=false），经本文件显式转换。
+// 1.x 時間口徑轉換：MySQL DATETIME 無時區（PHP 端 APP_TIMEZONE，默認 UTC）→
+// 2.0 全 UTC。源掃描一律以字符串讀出（parseTime=false），經本文件顯式轉換。
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// srcTZ 源时区（来自 .env APP_TIMEZONE；空 = UTC）。
+// srcTZ 源時區（來自 .env APP_TIMEZONE；空 = UTC）。
 func srcTimezone(tz string) *time.Location {
 	if tz == "" {
 		return time.UTC
@@ -21,13 +21,13 @@ func srcTimezone(tz string) *time.Location {
 }
 
 // parseNaiveTime 解析 '2006-01-02 15:04:05[.fff]'（源 DATETIME 字符串），
-// 在源时区解释后转 UTC。空串/NULL/MySQL 零日期返回零值与 false
-// （零日期多见于绕过 ORM 的直插行，按未记录时间处理而非报错）。
+// 在源時區解釋後轉 UTC。空串/NULL/MySQL 零日期返回零值與 false
+// （零日期多見於繞過 ORM 的直插行，按未記錄時間處理而非報錯）。
 func parseNaiveTime(s string, tz *time.Location) (time.Time, bool) {
 	if s == "" || s == "NULL" || strings.HasPrefix(s, "0000-00-00") {
 		return time.Time{}, false
 	}
-	// go-sql-driver 字符串形态；sqlite 测试源同格式
+	// go-sql-driver 字符串形態；sqlite 測試源同格式
 	for _, layout := range []string{"2006-01-02 15:04:05.999999", "2006-01-02 15:04:05", time.RFC3339} {
 		if t, err := time.ParseInLocation(layout, s, tz); err == nil {
 			return t.UTC(), true
@@ -36,7 +36,7 @@ func parseNaiveTime(s string, tz *time.Location) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// mustTime 同 parseNaiveTime，解析失败时返回错误而非静默（时间列损坏应暴露）。
+// mustTime 同 parseNaiveTime，解析失敗時返回錯誤而非靜默（時間列損壞應暴露）。
 func mustTime(s string, tz *time.Location) (time.Time, bool, error) {
 	if s == "" || s == "NULL" || strings.HasPrefix(s, "0000-00-00") {
 		return time.Time{}, false, nil
@@ -46,5 +46,5 @@ func mustTime(s string, tz *time.Location) (time.Time, bool, error) {
 			return t.UTC(), true, nil
 		}
 	}
-	return time.Time{}, false, fmt.Errorf("时间字符串无法解析: %q", s)
+	return time.Time{}, false, fmt.Errorf("時間字符串無法解析: %q", s)
 }

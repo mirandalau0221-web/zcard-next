@@ -9,60 +9,60 @@ import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-// AdminAuthService 管理后台认证（admin realm JWT，双 realm 防提权串用）。
-// 登录 / 登出 / 当前身份（含权限点，供前端动态路由）。
+// AdminAuthService 管理後台認證（admin realm JWT，雙 realm 防提權串用）。
+// 登錄 / 登出 / 當前身份（含權限點，供前端動態路由）。
 service AdminAuthService {
-  // Login 管理员登录。密码 bcrypt 校验；TOTP 校验；captcha_admin_login 开启时图形验证码必填。
+  // Login 管理員登錄。密碼 bcrypt 校驗；TOTP 校驗；captcha_admin_login 開啓時圖形驗證碼必填。
   rpc Login(LoginRequest) returns (LoginReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/auth/login"
       body: "*"
     };
   }
-  // GetCaptchaImage 登录图形验证码（免鉴权；captcha_admin_login 开启时登录页使用）。
+  // GetCaptchaImage 登錄圖形驗證碼（免鑑權；captcha_admin_login 開啓時登錄頁使用）。
   rpc GetCaptchaImage(google.protobuf.Empty) returns (CaptchaImageReply) {
     option (google.api.http) = {
       get: "/api/v1/admin/auth/captcha/image"
     };
   }
-  // GetCaptchaConfig 登录验证码开关（免鉴权；登录页据此条件渲染验证码区）。
+  // GetCaptchaConfig 登錄驗證碼開關（免鑑權；登錄頁據此條件渲染驗證碼區）。
   rpc GetCaptchaConfig(google.protobuf.Empty) returns (CaptchaConfigReply) {
     option (google.api.http) = {
       get: "/api/v1/admin/auth/captcha-config"
     };
   }
-  // Logout 登出（JWT 无状态，前端弃用令牌即可；接入 refresh 轮换后落 sessions）。
+  // Logout 登出（JWT 無狀態，前端棄用令牌即可；接入 refresh 輪換後落 sessions）。
   rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/auth/logout"
       body: "*"
     };
   }
-  // GetProfile 当前管理员信息与权限点清单（前端动态路由数据源，规划)。
+  // GetProfile 當前管理員信息與權限點清單（前端動態路由數據源，規劃)。
   rpc GetProfile(google.protobuf.Empty) returns (GetProfileReply) {
     option (google.api.http) = {
       get: "/api/v1/admin/auth/profile"
     };
   }
-  // RefreshToken 用 refresh token 换新令牌对（一次性轮换）。
+  // RefreshToken 用 refresh token 換新令牌對（一次性輪換）。
   rpc RefreshToken(RefreshTokenRequest) returns (LoginReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/auth/refresh"
       body: "*"
     };
   }
-  // ChangePassword 修改当前账号密码，并使全部旧会话失效。
+  // ChangePassword 修改當前賬號密碼，並使全部舊會話失效。
   rpc ChangePassword(ChangeAdminPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { post: "/api/v1/admin/auth/password" body: "*" };
   }
-  // EnableTOTP 生成 TOTP 密钥（返回 otpauth URL 供二维码）。
+  // EnableTOTP 生成 TOTP 密鑰（返回 otpauth URL 供二維碼）。
   rpc EnableTOTP(ConfirmTOTPRequest) returns (EnableTOTPReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/auth/totp/enable"
       body: "*"
     };
   }
-  // ConfirmTOTP 验证一次确认绑定。
+  // ConfirmTOTP 驗證一次確認綁定。
   rpc ConfirmTOTP(ConfirmTOTPRequest) returns (RecoveryCodesReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/auth/totp/confirm"
@@ -75,7 +75,7 @@ service AdminAuthService {
   rpc ResetTOTP(ResetTOTPRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { post: "/api/v1/admin/auth/totp/reset" body: "*" };
   }
-  // DisableTOTP 解绑。
+  // DisableTOTP 解綁。
   rpc DisableTOTP(ConfirmTOTPRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/auth/totp/disable"
@@ -89,24 +89,24 @@ message ResetTOTPRequest { uint64 admin_id = 1; string password = 2; string code
 
 message LoginRequest {
   string challenge = 6;
-  string username = 1; // 第一阶段必填，挑战验证阶段不重复提交
-  string password = 2; // 第一阶段必填，由登录用例按阶段验证
-  // TOTP 六位动态码（员工开启二步验证时必填）
+  string username = 1; // 第一階段必填，挑戰驗證階段不重複提交
+  string password = 2; // 第一階段必填，由登錄用例按階段驗證
+  // TOTP 六位動態碼（員工開啓二步驗證時必填）
   string totp_code = 3;
-  // 图形验证码 ID/验证码（captcha_admin_login 开启时必填）
+  // 圖形驗證碼 ID/驗證碼（captcha_admin_login 開啓時必填）
   string captcha_id = 4;
   string captcha_code = 5;
 }
 
 message CaptchaImageReply {
-  string captcha_id = 1; // 验证码 ID（提交时回传）
-  string image_base64 = 2; // base64 PNG 图片（data:image/png;base64, 前缀）
-  uint32 length = 3; // 本次验证码位数（4–8）
-  string charset = 4; // 本次字符类型：digit / letter / mixed（字母不区分大小写）
+  string captcha_id = 1; // 驗證碼 ID（提交時回傳）
+  string image_base64 = 2; // base64 PNG 圖片（data:image/png;base64, 前綴）
+  uint32 length = 3; // 本次驗證碼位數（4–8）
+  string charset = 4; // 本次字符類型：digit / letter / mixed（字母不區分大小寫）
 }
 
 message CaptchaConfigReply {
-  bool enabled = 1; // security.captcha_admin_login 开关
+  bool enabled = 1; // security.captcha_admin_login 開關
 }
 
 message LogoutRequest {
@@ -118,34 +118,34 @@ message RefreshTokenRequest {
 }
 
 message EnableTOTPReply {
-  string secret = 1; // base32 密钥（手输用）
-  string otpauth_url = 2; // otpauth:// 二维码内容
+  string secret = 1; // base32 密鑰（手輸用）
+  string otpauth_url = 2; // otpauth:// 二維碼內容
 }
 
 message ConfirmTOTPRequest {
   string password = 2;
   string recovery_ticket = 3;
-  string code = 1; // 首次生成绑定密钥时为空；确认/解绑时由用例验证
+  string code = 1; // 首次生成綁定密鑰時為空；確認/解綁時由用例驗證
 }
 
 message LoginReply {
   bool requires_totp = 6;
   string challenge = 7;
   string recovery_ticket = 8;
-  // admin realm 访问令牌（2h）
+  // admin realm 訪問令牌（2h）
   string access_token = 1;
-  // 令牌类型，固定 Bearer
+  // 令牌類型，固定 Bearer
   string token_type = 2;
-  // 过期时间（unix 秒）
+  // 過期時間（unix 秒）
   int64 expires_at = 3;
   AdminProfile admin = 4;
-  // refresh 令牌（14d，一次性轮换）
+  // refresh 令牌（14d，一次性輪換）
   string refresh_token = 5;
 }
 
 message GetProfileReply {
   AdminProfile admin = 1;
-  // 权限点清单（如 order:list / card:view_content），前端据此生成菜单与按钮
+  // 權限點清單（如 order:list / card:view_content），前端據此生成菜單與按鈕
   repeated string permissions = 2;
 }
 

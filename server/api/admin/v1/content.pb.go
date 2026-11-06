@@ -28,7 +28,7 @@ type Banner struct {
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Position      string                 `protobuf:"bytes,3,opt,name=position,proto3" json:"position,omitempty"`                    // top | middle | bottom
-	TitleJson     string                 `protobuf:"bytes,4,opt,name=title_json,json=titleJson,proto3" json:"title_json,omitempty"` // 多语言标题 {"zh_CN": "...", "en": "..."}
+	TitleJson     string                 `protobuf:"bytes,4,opt,name=title_json,json=titleJson,proto3" json:"title_json,omitempty"` // 多語言標題 {"zh_CN": "...", "en": "..."}
 	Image         string                 `protobuf:"bytes,5,opt,name=image,proto3" json:"image,omitempty"`
 	MobileImage   string                 `protobuf:"bytes,6,opt,name=mobile_image,json=mobileImage,proto3" json:"mobile_image,omitempty"`
 	LinkType      string                 `protobuf:"bytes,7,opt,name=link_type,json=linkType,proto3" json:"link_type,omitempty"` // product | category | url | ad
@@ -613,7 +613,7 @@ type Post struct {
 	PublishedAt   int64                  `protobuf:"varint,10,opt,name=published_at,json=publishedAt,proto3" json:"published_at,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     int64                  `protobuf:"varint,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Sort          int32                  `protobuf:"varint,13,opt,name=sort,proto3" json:"sort,omitempty"` // 数字越小越靠前
+	Sort          int32                  `protobuf:"varint,13,opt,name=sort,proto3" json:"sort,omitempty"` // 數字越小越靠前
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -855,7 +855,7 @@ type UpdatePostRequest struct {
 	ContentJson   string                 `protobuf:"bytes,4,opt,name=content_json,json=contentJson,proto3" json:"content_json,omitempty"`
 	Thumbnail     string                 `protobuf:"bytes,5,opt,name=thumbnail,proto3" json:"thumbnail,omitempty"`
 	CategoryId    uint64                 `protobuf:"varint,6,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
-	Sort          *int32                 `protobuf:"varint,7,opt,name=sort,proto3,oneof" json:"sort,omitempty"` // 未传保留原值，允许重置为 0
+	Sort          *int32                 `protobuf:"varint,7,opt,name=sort,proto3,oneof" json:"sort,omitempty"` // 未傳保留原值，允許重置為 0
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

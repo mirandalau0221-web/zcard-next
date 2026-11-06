@@ -31,17 +31,17 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminAuditService 审计与风控管理：三类日志查询、黑名单管理。
+// AdminAuditService 審計與風控管理：三類日誌查詢、黑名單管理。
 type AdminAuditServiceClient interface {
-	// ListOpLogs 操作审计。
+	// ListOpLogs 操作審計。
 	ListOpLogs(ctx context.Context, in *ListOpLogsRequest, opts ...grpc.CallOption) (*ListOpLogsReply, error)
-	// ListSecurityLogs 安全审计。
+	// ListSecurityLogs 安全審計。
 	ListSecurityLogs(ctx context.Context, in *ListSecurityLogsRequest, opts ...grpc.CallOption) (*ListSecurityLogsReply, error)
-	// ListVisitStats 访问统计。
+	// ListVisitStats 訪問統計。
 	ListVisitStats(ctx context.Context, in *ListVisitStatsRequest, opts ...grpc.CallOption) (*ListVisitStatsReply, error)
-	// GetBlacklist IP 黑名单。
+	// GetBlacklist IP 黑名單。
 	GetBlacklist(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetBlacklistReply, error)
-	// SetBlacklist 设置黑名单（精确 IP 或 CIDR 段，逗号分隔）。
+	// SetBlacklist 設置黑名單（精確 IP 或 CIDR 段，逗號分隔）。
 	SetBlacklist(ctx context.Context, in *SetBlacklistRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -107,17 +107,17 @@ func (c *adminAuditServiceClient) SetBlacklist(ctx context.Context, in *SetBlack
 // All implementations must embed UnimplementedAdminAuditServiceServer
 // for forward compatibility.
 //
-// AdminAuditService 审计与风控管理：三类日志查询、黑名单管理。
+// AdminAuditService 審計與風控管理：三類日誌查詢、黑名單管理。
 type AdminAuditServiceServer interface {
-	// ListOpLogs 操作审计。
+	// ListOpLogs 操作審計。
 	ListOpLogs(context.Context, *ListOpLogsRequest) (*ListOpLogsReply, error)
-	// ListSecurityLogs 安全审计。
+	// ListSecurityLogs 安全審計。
 	ListSecurityLogs(context.Context, *ListSecurityLogsRequest) (*ListSecurityLogsReply, error)
-	// ListVisitStats 访问统计。
+	// ListVisitStats 訪問統計。
 	ListVisitStats(context.Context, *ListVisitStatsRequest) (*ListVisitStatsReply, error)
-	// GetBlacklist IP 黑名单。
+	// GetBlacklist IP 黑名單。
 	GetBlacklist(context.Context, *emptypb.Empty) (*GetBlacklistReply, error)
-	// SetBlacklist 设置黑名单（精确 IP 或 CIDR 段，逗号分隔）。
+	// SetBlacklist 設置黑名單（精確 IP 或 CIDR 段，逗號分隔）。
 	SetBlacklist(context.Context, *SetBlacklistRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAdminAuditServiceServer()
 }

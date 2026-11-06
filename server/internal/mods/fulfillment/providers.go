@@ -13,6 +13,6 @@ var ProviderSet = wire.NewSet(
 	NewDeliveryRepoImpl,
 	NewStoreDeliveryService,
 	NewAdminFulfillmentService,
-	// ：上游采购交付出口（procurement 消费，通道 A）
+	// ：上游採購交付出口（procurement 消費，通道 A）
 	wire.Bind(new(port.AttachUpstreamDelivery), new(*DeliveryRepoImpl)),
 )

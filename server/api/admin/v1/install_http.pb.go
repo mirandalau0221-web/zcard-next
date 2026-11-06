@@ -23,13 +23,13 @@ const OperationAdminInstallServicePerformInstall = "/zcard.api.admin.v1.AdminIns
 const OperationAdminInstallServiceTestInstallConnection = "/zcard.api.admin.v1.AdminInstallService/TestInstallConnection"
 
 type AdminInstallServiceHTTPServer interface {
-	// GetInstallStatus GetInstallStatus 安装状态 + 环境自检（公开）。
+	// GetInstallStatus GetInstallStatus 安裝狀態 + 環境自檢（公開）。
 	GetInstallStatus(context.Context, *emptypb.Empty) (*InstallStatusReply, error)
-	// PerformInstall PerformInstall 执行安装（公开；写管理员 + 站点信息 + 种子；已安装返回 409）。
-	// dialect=sqlite → 当前库直接装；mysql/postgres → 校验连接后写库切换覆盖配置
-	// + 待安装凭据文件，响应 restart_required 并自重启（新库上补装完成）。
+	// PerformInstall PerformInstall 執行安裝（公開；寫管理員 + 站點信息 + 種子；已安裝返回 409）。
+	// dialect=sqlite → 當前庫直接裝；mysql/postgres → 校驗連接後寫庫切換覆蓋配置
+	// + 待安裝憑據文件，響應 restart_required 並自重啓（新庫上補裝完成）。
 	PerformInstall(context.Context, *PerformInstallRequest) (*InstallStatusReply, error)
-	// TestInstallConnection TestInstallConnection 测试数据库/Redis 连接（公开；库不存在时自动创建）。
+	// TestInstallConnection TestInstallConnection 測試數據庫/Redis 連接（公開；庫不存在時自動創建）。
 	TestInstallConnection(context.Context, *TestInstallConnectionRequest) (*TestInstallConnectionReply, error)
 }
 
@@ -98,13 +98,13 @@ func _AdminInstallService_TestInstallConnection0_HTTP_Handler(srv AdminInstallSe
 }
 
 type AdminInstallServiceHTTPClient interface {
-	// GetInstallStatus GetInstallStatus 安装状态 + 环境自检（公开）。
+	// GetInstallStatus GetInstallStatus 安裝狀態 + 環境自檢（公開）。
 	GetInstallStatus(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *InstallStatusReply, err error)
-	// PerformInstall PerformInstall 执行安装（公开；写管理员 + 站点信息 + 种子；已安装返回 409）。
-	// dialect=sqlite → 当前库直接装；mysql/postgres → 校验连接后写库切换覆盖配置
-	// + 待安装凭据文件，响应 restart_required 并自重启（新库上补装完成）。
+	// PerformInstall PerformInstall 執行安裝（公開；寫管理員 + 站點信息 + 種子；已安裝返回 409）。
+	// dialect=sqlite → 當前庫直接裝；mysql/postgres → 校驗連接後寫庫切換覆蓋配置
+	// + 待安裝憑據文件，響應 restart_required 並自重啓（新庫上補裝完成）。
 	PerformInstall(ctx context.Context, req *PerformInstallRequest, opts ...http.CallOption) (rsp *InstallStatusReply, err error)
-	// TestInstallConnection TestInstallConnection 测试数据库/Redis 连接（公开；库不存在时自动创建）。
+	// TestInstallConnection TestInstallConnection 測試數據庫/Redis 連接（公開；庫不存在時自動創建）。
 	TestInstallConnection(ctx context.Context, req *TestInstallConnectionRequest, opts ...http.CallOption) (rsp *TestInstallConnectionReply, err error)
 }
 
@@ -116,7 +116,7 @@ func NewAdminInstallServiceHTTPClient(client *http.Client) AdminInstallServiceHT
 	return &AdminInstallServiceHTTPClientImpl{client}
 }
 
-// GetInstallStatus GetInstallStatus 安装状态 + 环境自检（公开）。
+// GetInstallStatus GetInstallStatus 安裝狀態 + 環境自檢（公開）。
 func (c *AdminInstallServiceHTTPClientImpl) GetInstallStatus(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*InstallStatusReply, error) {
 	var out InstallStatusReply
 	pattern := "/api/v1/admin/install/status"
@@ -133,9 +133,9 @@ func (c *AdminInstallServiceHTTPClientImpl) GetInstallStatus(ctx context.Context
 	return &out, nil
 }
 
-// PerformInstall PerformInstall 执行安装（公开；写管理员 + 站点信息 + 种子；已安装返回 409）。
-// dialect=sqlite → 当前库直接装；mysql/postgres → 校验连接后写库切换覆盖配置
-// + 待安装凭据文件，响应 restart_required 并自重启（新库上补装完成）。
+// PerformInstall PerformInstall 執行安裝（公開；寫管理員 + 站點信息 + 種子；已安裝返回 409）。
+// dialect=sqlite → 當前庫直接裝；mysql/postgres → 校驗連接後寫庫切換覆蓋配置
+// + 待安裝憑據文件，響應 restart_required 並自重啓（新庫上補裝完成）。
 func (c *AdminInstallServiceHTTPClientImpl) PerformInstall(ctx context.Context, in *PerformInstallRequest, opts ...http.CallOption) (*InstallStatusReply, error) {
 	var out InstallStatusReply
 	pattern := "/api/v1/admin/install"
@@ -153,7 +153,7 @@ func (c *AdminInstallServiceHTTPClientImpl) PerformInstall(ctx context.Context, 
 	return &out, nil
 }
 
-// TestInstallConnection TestInstallConnection 测试数据库/Redis 连接（公开；库不存在时自动创建）。
+// TestInstallConnection TestInstallConnection 測試數據庫/Redis 連接（公開；庫不存在時自動創建）。
 func (c *AdminInstallServiceHTTPClientImpl) TestInstallConnection(ctx context.Context, in *TestInstallConnectionRequest, opts ...http.CallOption) (*TestInstallConnectionReply, error) {
 	var out TestInstallConnectionReply
 	pattern := "/api/v1/admin/install/test"

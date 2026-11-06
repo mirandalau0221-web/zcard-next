@@ -1,13 +1,13 @@
 package supplier
 
-// HMAC 四头鉴权中间件（）：
+// HMAC 四頭鑑權中間件（）：
 // X-Supply-Key / X-Supply-Timestamp / X-Supply-Nonce / X-Supply-Signature
-// 流程：四头解析 → key 查账户 → 状态 approved → ±300s 时间窗 → nonce 防重放
-// （DB supply_nonces UNIQUE(key,nonce)）→ 双口径验签（常数时间）→ 账户注入 context。
-// 挂载：仅 /api/supply/* 路由组（不挂 JWT；匿名 Ping 免签名）。
+// 流程：四頭解析 → key 查賬户 → 狀態 approved → ±300s 時間窗 → nonce 防重放
+// （DB supply_nonces UNIQUE(key,nonce)）→ 雙口徑驗籤（常數時間）→ 賬户注入 context。
+// 掛載：僅 /api/supply/* 路由組（不掛 JWT；匿名 Ping 免簽名）。
 //
-// 签名字节不变式：签名哈希的字节 === 实际发出的字节——直接读 *http.Request
-// （Method/URL.Path/RawQuery/Body），不依赖 Kratos operation 转写。
+// 簽名字節不變式：簽名哈希的字節 === 實際發出的字節——直接讀 *http.Request
+// （Method/URL.Path/RawQuery/Body），不依賴 Kratos operation 轉寫。
 
 import (
 	"bytes"
@@ -22,7 +22,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent"
 )
 
-// 鉴权错误码（下游可编程处理）。
+// 鑑權錯誤碼（下游可編程處理）。
 const (
 	errMissingHeaders  = "missing_headers"
 	errUnknownKey      = "unknown_key"
@@ -32,29 +32,29 @@ const (
 	errInvalidSig      = "invalid_signature"
 )
 
-// 默认时间窗（秒）。
+// 默認時間窗（秒）。
 const defaultTimestampSkew = 300
 
-// accountCtxKey 鉴权账户上下文键。
+// accountCtxKey 鑑權賬户上下文鍵。
 type accountCtxKey struct{}
 
-// SupplyAccountID 从 context 取鉴权账户（服务实现消费）。
+// SupplyAccountID 從 context 取鑑權賬户（服務實現消費）。
 func SupplyAccountID(ctx context.Context) uint64 {
 	id, _ := ctx.Value(accountCtxKey{}).(uint64)
 	return id
 }
 
-// AuthStore 鉴权数据访问（中间件依赖；由 SupplierRepoImpl 实现）。
+// AuthStore 鑑權數據訪問（中間件依賴；由 SupplierRepoImpl 實現）。
 type AuthStore interface {
-	// AccountByKey 按 api_key 查账户（返回解密后的 secret）。
+	// AccountByKey 按 api_key 查賬户（返回解密後的 secret）。
 	AccountByKey(ctx context.Context, key string) (*ent.SupplierAccount, string, error)
-	// ConsumeNonce 消费 nonce（UNIQUE 约束冲突 = 重放）。
+	// ConsumeNonce 消費 nonce（UNIQUE 約束衝突 = 重放）。
 	ConsumeNonce(ctx context.Context, key, nonce string, expiresAt time.Time) error
 }
 
-// SupplyAuthFilter HMAC 四头鉴权过滤器（http.Handler 级，能拿到原始 *http.Request
-// ——Kratos v3 Transporter 不暴露 method/path/body，签名不变式要求原始字节）。
-// 仅匹配 /api/supply/*（匿名 Ping 免签名）；账户注入 request context（Handler 内读取）。
+// SupplyAuthFilter HMAC 四頭鑑權過濾器（http.Handler 級，能拿到原始 *http.Request
+// ——Kratos v3 Transporter 不暴露 method/path/body，簽名不變式要求原始字節）。
+// 僅匹配 /api/supply/*（匿名 Ping 免簽名）；賬户注入 request context（Handler 內讀取）。
 func SupplyAuthFilter(store AuthStore, skew int64) func(http.Handler) http.Handler {
 	if skew <= 0 {
 		skew = defaultTimestampSkew
@@ -82,41 +82,41 @@ func SupplyAuthFilter(store AuthStore, skew int64) func(http.Handler) http.Handl
 	}
 }
 
-// authenticate 执行四头校验（分离便于单测）。
+// authenticate 執行四頭校驗（分離便於單測）。
 func authenticate(r *http.Request, store AuthStore, skew int64) (context.Context, error) {
 	key := r.Header.Get("X-Supply-Key")
 	tsStr := r.Header.Get("X-Supply-Timestamp")
 	nonce := r.Header.Get("X-Supply-Nonce")
 	sig := r.Header.Get("X-Supply-Signature")
 	if key == "" || tsStr == "" || nonce == "" || sig == "" {
-		return nil, newAuthError(errMissingHeaders, "缺少鉴权头（X-Supply-Key/Timestamp/Nonce/Signature）")
+		return nil, newAuthError(errMissingHeaders, "缺少鑑權頭（X-Supply-Key/Timestamp/Nonce/Signature）")
 	}
 	ts, err := strconv.ParseInt(tsStr, 10, 64)
 	if err != nil {
 		return nil, newAuthError(errTimestampSkew, "timestamp 非法")
 	}
 	if abs64(time.Now().Unix()-ts) > skew {
-		return nil, newAuthError(errTimestampSkew, "timestamp 超出时间窗（±300s）")
+		return nil, newAuthError(errTimestampSkew, "timestamp 超出時間窗（±300s）")
 	}
 	account, secret, err := store.AccountByKey(r.Context(), key)
 	if err != nil {
 		return nil, newAuthError(errUnknownKey, "未知 api_key")
 	}
 	if string(account.Status) != "approved" {
-		return nil, newAuthError(errAccountDisabled, "账户未审核或已禁用")
+		return nil, newAuthError(errAccountDisabled, "賬户未審核或已禁用")
 	}
-	// IP 白名单（空名单放行；非空须命中——精确 IP 或 CIDR）
+	// IP 白名單（空名單放行；非空須命中——精確 IP 或 CIDR）
 	if !ipAllowed(account.IPWhitelist, r) {
-		return nil, newAuthError(errAccountDisabled, "请求 IP 不在白名单内")
+		return nil, newAuthError(errAccountDisabled, "請求 IP 不在白名單內")
 	}
-	// 验签（先验签后写 nonce——1.x 教训：未验签请求不污染 nonce 缓存）
+	// 驗籤（先驗籤後寫 nonce——1.x 教訓：未驗籤請求不污染 nonce 緩存）
 	body, _ := io.ReadAll(r.Body)
-	r.Body = io.NopCloser(bytes.NewReader(body)) // 恢复 body（后续 Kratos 解码需要）
+	r.Body = io.NopCloser(bytes.NewReader(body)) // 恢復 body（後續 Kratos 解碼需要）
 	if !verifyDual(secret, r.Method, r.URL.Path, r.URL.RawQuery, tsStr, nonce, body, sig) {
-		return nil, newAuthError(errInvalidSig, "签名校验失败")
+		return nil, newAuthError(errInvalidSig, "簽名校驗失敗")
 	}
 	if err := store.ConsumeNonce(r.Context(), key, nonce, time.Unix(ts, 0).Add(time.Duration(skew)*time.Second)); err != nil {
-		return nil, newAuthError(errNonceReplay, "nonce 已使用（重放拒绝）")
+		return nil, newAuthError(errNonceReplay, "nonce 已使用（重放拒絕）")
 	}
 	return context.WithValue(r.Context(), accountCtxKey{}, account.ID), nil
 }
@@ -130,7 +130,7 @@ func hasSupplyCredentials(r *http.Request) bool {
 	return false
 }
 
-// isSupplyPath 供货路由判定。
+// isSupplyPath 供貨路由判定。
 func isSupplyPath(path string) bool {
 	if len(path) < len("/api/supply/") || path[:len("/api/supply/")] != "/api/supply/" {
 		return false
@@ -138,7 +138,7 @@ func isSupplyPath(path string) bool {
 	return true
 }
 
-// writeAuthError 401 响应（错误码供下游程序化处理）。
+// writeAuthError 401 響應（錯誤碼供下游程序化處理）。
 func writeAuthError(w http.ResponseWriter, err error) {
 	code := "invalid_signature"
 	msg := err.Error()
@@ -152,7 +152,7 @@ func writeAuthError(w http.ResponseWriter, err error) {
 	_, _ = w.Write([]byte(`{"code":401,"reason":"` + code + `","message":"` + msg + `"}`))
 }
 
-// authError 带错误码的错误（HTTP 401；code 供下游程序化处理）。
+// authError 帶錯誤碼的錯誤（HTTP 401；code 供下游程序化處理）。
 type authError struct {
 	Code    string
 	Message string
@@ -169,5 +169,5 @@ func abs64(v int64) int64 {
 	return v
 }
 
-// 编译期断言：AuthStore 由 repo 实现（见 data_repo.go）。
+// 編譯期斷言：AuthStore 由 repo 實現（見 data_repo.go）。
 var _ AuthStore = (*SupplierRepoImpl)(nil)

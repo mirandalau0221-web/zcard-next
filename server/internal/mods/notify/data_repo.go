@@ -1,6 +1,6 @@
 package notify
 
-// 仓储（）：站内信、模板、发送日志。
+// 倉儲（）：站內信、模板、發送日誌。
 
 import (
 	"context"
@@ -17,22 +17,22 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/user"
 )
 
-// 哨兵错误。
+// 哨兵錯誤。
 var (
-	ErrNotFound = errors.New("notify: 记录不存在")
+	ErrNotFound = errors.New("notify: 記錄不存在")
 )
 
-// NotifyRepo 通知仓储。
+// NotifyRepo 通知倉儲。
 type NotifyRepo struct {
 	data *data.Data
 }
 
-// NewNotifyRepo 构造。
+// NewNotifyRepo 構造。
 func NewNotifyRepo(d *data.Data) *NotifyRepo { return &NotifyRepo{data: d} }
 
-// ── 站内信 ────────────────────────────────────────────────
+// ── 站內信 ────────────────────────────────────────────────
 
-// CreateInbox 写站内信。
+// CreateInbox 寫站內信。
 func (r *NotifyRepo) CreateInbox(ctx context.Context, userID uint64, title, content, sourceType string, sourceID uint64) error {
 	create := data.Client(ctx, r.data).Notification.Create().
 		SetUserID(userID).
@@ -48,7 +48,7 @@ func (r *NotifyRepo) CreateInbox(ctx context.Context, userID uint64, title, cont
 	return err
 }
 
-// ListInbox 用户站内信分页。
+// ListInbox 用户站內信分頁。
 func (r *NotifyRepo) ListInbox(ctx context.Context, userID uint64, unreadOnly bool, page, size int) ([]*ent.Notification, int, error) {
 	q := data.Client(ctx, r.data).Notification.Query().
 		Where(notification.UserID(userID)).
@@ -64,14 +64,14 @@ func (r *NotifyRepo) ListInbox(ctx context.Context, userID uint64, unreadOnly bo
 	return rows, total, err
 }
 
-// UnreadCount 未读数（铃铛）。
+// UnreadCount 未讀數（鈴鐺）。
 func (r *NotifyRepo) UnreadCount(ctx context.Context, userID uint64) (int, error) {
 	return data.Client(ctx, r.data).Notification.Query().
 		Where(notification.UserID(userID), notification.ReadAtIsNil()).
 		Count(ctx)
 }
 
-// MarkRead 标记已读（单条/全部：id=0 全部）。
+// MarkRead 標記已讀（單條/全部：id=0 全部）。
 func (r *NotifyRepo) MarkRead(ctx context.Context, userID, id uint64) error {
 	q := data.Client(ctx, r.data).Notification.Update().
 		Where(notification.UserID(userID), notification.ReadAtIsNil())
@@ -84,7 +84,7 @@ func (r *NotifyRepo) MarkRead(ctx context.Context, userID, id uint64) error {
 
 // ── 模板 ──────────────────────────────────────────────────
 
-// UpsertTemplate 创建/更新模板（UNIQUE(event_type, channel, locale) 语义）。
+// UpsertTemplate 創建/更新模板（UNIQUE(event_type, channel, locale) 語義）。
 func (r *NotifyRepo) UpsertTemplate(ctx context.Context, eventType, channel, locale, subjectTpl, bodyTpl string, enabled bool) (*ent.NotifyTemplate, error) {
 	existing, err := data.Client(ctx, r.data).NotifyTemplate.Query().
 		Where(
@@ -113,7 +113,7 @@ func (r *NotifyRepo) UpsertTemplate(ctx context.Context, eventType, channel, loc
 		Save(ctx)
 }
 
-// Template 查模板（事件 × 通道 × 语言；locale 回落 zh_CN）。
+// Template 查模板（事件 × 通道 × 語言；locale 回落 zh_CN）。
 func (r *NotifyRepo) Template(ctx context.Context, eventType, channel, locale string) (*ent.NotifyTemplate, error) {
 	locales := []string{locale}
 	if locale != "zh_CN" {
@@ -143,9 +143,9 @@ func (r *NotifyRepo) ListTemplates(ctx context.Context) ([]*ent.NotifyTemplate, 
 		All(ctx)
 }
 
-// ── 发送日志 ──────────────────────────────────────────────
+// ── 發送日誌 ──────────────────────────────────────────────
 
-// LogInput 日志写入参数。
+// LogInput 日誌寫入參數。
 type LogInput struct {
 	EventType    string
 	BizType      string
@@ -160,7 +160,7 @@ type LogInput struct {
 	Variables    map[string]string
 }
 
-// WriteLog 落发送日志（每发送一条一行）。
+// WriteLog 落髮送日誌（每發送一條一行）。
 func (r *NotifyRepo) WriteLog(ctx context.Context, in LogInput) error {
 	create := data.Client(ctx, r.data).NotificationLog.Create().
 		SetEventType(in.EventType).
@@ -190,7 +190,7 @@ func (r *NotifyRepo) WriteLog(ctx context.Context, in LogInput) error {
 	return err
 }
 
-// ListLogs 日志查询（按状态/事件筛选）。
+// ListLogs 日誌查詢（按狀態/事件篩選）。
 func (r *NotifyRepo) ListLogs(ctx context.Context, status, eventType string, page, size int, channels ...string) ([]*ent.NotificationLog, int, error) {
 	q := data.Client(ctx, r.data).NotificationLog.Query().
 		Order(ent.Desc(notificationlog.FieldID))
@@ -211,12 +211,12 @@ func (r *NotifyRepo) ListLogs(ctx context.Context, status, eventType string, pag
 	return rows, total, err
 }
 
-// jsonUnmarshal 防御性解析（channel.go 使用）。
+// jsonUnmarshal 防禦性解析（channel.go 使用）。
 func jsonUnmarshal(raw []byte, v any) error { return json.Unmarshal(raw, v) }
 
-// ── 群发任务（）─────────────────────────────────────────
+// ── 羣發任務（）─────────────────────────────────────────
 
-// CreateBroadcast 创建群发任务（pending；audience 预估回填）。
+// CreateBroadcast 創建羣發任務（pending；audience 預估回填）。
 func (r *NotifyRepo) CreateBroadcast(ctx context.Context, in BroadcastInput, audience int64) (*ent.NotifyBroadcast, error) {
 	channels := in.Channels
 	if channels == nil {
@@ -241,7 +241,7 @@ func (r *NotifyRepo) CreateBroadcast(ctx context.Context, in BroadcastInput, aud
 	return create.Save(ctx)
 }
 
-// GetBroadcast 群发详情。
+// GetBroadcast 羣發詳情。
 func (r *NotifyRepo) GetBroadcast(ctx context.Context, id uint64) (*ent.NotifyBroadcast, error) {
 	b, err := data.Client(ctx, r.data).NotifyBroadcast.Get(ctx, id)
 	if err != nil {
@@ -253,7 +253,7 @@ func (r *NotifyRepo) GetBroadcast(ctx context.Context, id uint64) (*ent.NotifyBr
 	return b, nil
 }
 
-// ListBroadcasts 群发列表。
+// ListBroadcasts 羣發列表。
 func (r *NotifyRepo) ListBroadcasts(ctx context.Context, page, size int) ([]*ent.NotifyBroadcast, int, error) {
 	q := data.Client(ctx, r.data).NotifyBroadcast.Query().Order(ent.Desc(notifybroadcast.FieldID))
 	total, err := q.Count(ctx)
@@ -264,7 +264,7 @@ func (r *NotifyRepo) ListBroadcasts(ctx context.Context, page, size int) ([]*ent
 	return rows, total, err
 }
 
-// SetBroadcastStatus 状态迁移（startedAt 非空时回填）。
+// SetBroadcastStatus 狀態遷移（startedAt 非空時回填）。
 func (r *NotifyRepo) SetBroadcastStatus(ctx context.Context, id uint64, status string, startedAt time.Time) (*ent.NotifyBroadcast, error) {
 	upd := data.Client(ctx, r.data).NotifyBroadcast.UpdateOneID(id).
 		SetStatus(notifybroadcast.Status(status))
@@ -274,7 +274,7 @@ func (r *NotifyRepo) SetBroadcastStatus(ctx context.Context, id uint64, status s
 	return upd.Save(ctx)
 }
 
-// UpdateBroadcastProgress 进度回填（发送中可观测）。
+// UpdateBroadcastProgress 進度回填（發送中可觀測）。
 func (r *NotifyRepo) UpdateBroadcastProgress(ctx context.Context, id uint64, sent, failed int64) error {
 	_, err := data.Client(ctx, r.data).NotifyBroadcast.UpdateOneID(id).
 		SetSentCount(sent).
@@ -283,7 +283,7 @@ func (r *NotifyRepo) UpdateBroadcastProgress(ctx context.Context, id uint64, sen
 	return err
 }
 
-// FinishBroadcast 终态（done + finished_at）。
+// FinishBroadcast 終態（done + finished_at）。
 func (r *NotifyRepo) FinishBroadcast(ctx context.Context, id uint64, sent, failed int64) (*ent.NotifyBroadcast, error) {
 	return data.Client(ctx, r.data).NotifyBroadcast.UpdateOneID(id).
 		SetStatus(notifybroadcast.StatusDone).
@@ -293,7 +293,7 @@ func (r *NotifyRepo) FinishBroadcast(ctx context.Context, id uint64, sent, faile
 		Save(ctx)
 }
 
-// CountBroadcastTargets 目标计数（all=全部用户；active=正常状态；specified=ID 集合）。
+// CountBroadcastTargets 目標計數（all=全部用户；active=正常狀態；specified=ID 集合）。
 func (r *NotifyRepo) CountBroadcastTargets(ctx context.Context, targetType string, targetIDs []uint64) (int64, error) {
 	q := data.Client(ctx, r.data).User.Query()
 	switch targetType {
@@ -309,7 +309,7 @@ func (r *NotifyRepo) CountBroadcastTargets(ctx context.Context, targetType strin
 	return int64(n), err
 }
 
-// BroadcastTargets 目标分页（afterID 游标分批）。
+// BroadcastTargets 目標分頁（afterID 遊標分批）。
 func (r *NotifyRepo) BroadcastTargets(ctx context.Context, targetType string, targetIDs []uint64, afterID uint64, limit int) ([]*ent.User, error) {
 	q := data.Client(ctx, r.data).User.Query().
 		Where(user.IDGT(afterID)).
@@ -327,7 +327,7 @@ func (r *NotifyRepo) BroadcastTargets(ctx context.Context, targetType string, ta
 	return q.All(ctx)
 }
 
-// ListDueBroadcasts 到期待发（定时群发 cron 扫描；scheduled_at 为空视为立即）。
+// ListDueBroadcasts 到期待發（定時羣發 cron 掃描；scheduled_at 為空視為立即）。
 func (r *NotifyRepo) ListDueBroadcasts(ctx context.Context, now time.Time) ([]uint64, error) {
 	rows, err := data.Client(ctx, r.data).NotifyBroadcast.Query().
 		Where(

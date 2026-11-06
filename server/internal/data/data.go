@@ -1,5 +1,5 @@
-// Package data 数据层装配：Ent client、三方言驱动选择（platform/db 收口）、
-// 事务工作单元（通道 B：biz 层不见 *ent.Tx，repo 经 data.Client(ctx) 自动加入事务）。
+// Package data 數據層裝配：Ent client、三方言驅動選擇（platform/db 收口）、
+// 事務工作單元（通道 B：biz 層不見 *ent.Tx，repo 經 data.Client(ctx) 自動加入事務）。
 package data
 
 import (
@@ -17,8 +17,8 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/db"
 	"github.com/NovaWorks/zcard-next/server/internal/platform/events"
 
-	// 三方言驱动注册（同一二进制，运行时按 DSN 切换，ADR-D20）：
-	// 纯 Go 无 CGO（SQLite 用 modernc，保单二进制交叉编译，ADR-D19）
+	// 三方言驅動註冊（同一二進制，運行時按 DSN 切換，ADR-D20）：
+	// 純 Go 無 CGO（SQLite 用 modernc，保單二進制交叉編譯，ADR-D19）
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgx/v5/stdlib"
 	_ "modernc.org/sqlite"
@@ -26,8 +26,8 @@ import (
 	"github.com/google/wire"
 )
 
-// atlas 的 sqlclient 按驱动名 "postgres" 打开连接（迁移执行器 PG 路径）；
-// pgx stdlib 注册名是 "pgx"，此处注册别名（幂等）。
+// atlas 的 sqlclient 按驅動名 "postgres" 打開連接（遷移執行器 PG 路徑）；
+// pgx stdlib 註冊名是 "pgx"，此處註冊別名（冪等）。
 func init() {
 	if !slices.Contains(sql.Drivers(), "postgres") {
 		sql.Register("postgres", stdlib.GetDefaultDriver())
@@ -39,12 +39,12 @@ var ProviderSet = wire.NewSet(
 	NewData,
 	NewOutboxWriter,
 	NewFailedTaskWriter,
-	// 接口绑定：OutboxWriter → events.Writer（模块发布事件经接口，通道 A）
+	// 接口綁定：OutboxWriter → events.Writer（模塊發佈事件經接口，通道 A）
 	wire.Bind(new(events.Writer), new(*OutboxWriter)),
 )
 
-// Data 数据句柄（业务模块 repo 经构造函数持有；禁止绕过 data.Client 持有全局单例，
-// 未来 per-tenant client 由 TenantStore 注入，铁律 14）。
+// Data 數據句柄（業務模塊 repo 經構造函數持有；禁止繞過 data.Client 持有全局單例，
+// 未來 per-tenant client 由 TenantStore 注入，鐵律 14）。
 type Data struct {
 	Client  *ent.Client
 	DB      *sql.DB
@@ -64,10 +64,10 @@ func entDialect(d db.Dialect) string {
 	return string(d)
 }
 
-// NewData 打开数据库并装配 ent client（wire provider）。
+// NewData 打開數據庫並裝配 ent client（wire provider）。
 func NewData(c *conf.Data) (*Data, func(), error) {
 	if c == nil || c.Database == nil || c.Database.Driver == "" {
-		return nil, func() {}, fmt.Errorf("data: 缺少数据库配置（data.database.driver/source）")
+		return nil, func() {}, fmt.Errorf("data: 缺少數據庫配置（data.database.driver/source）")
 	}
 	d, err := db.Detect(c.Database.Driver)
 	if err != nil {
@@ -93,17 +93,17 @@ func NewData(c *conf.Data) (*Data, func(), error) {
 	return &Data{Client: client, DB: handle, Dialect: d}, cleanup, nil
 }
 
-// Ping 连接健康检查（/health 与启动自检）。
+// Ping 連接健康檢查（/health 與啓動自檢）。
 func (d *Data) Ping(ctx context.Context) error {
 	return d.DB.PingContext(ctx)
 }
 
 type txKey struct{}
 
-// Tx 事务工作单元：fn 内所有经 data.Client(ctx, d) 取句柄的仓储操作加入同一事务。
-// biz 层只见 TxFunc，不见 *ent.Tx（规划 §4.7 通道 B）。
+// Tx 事務工作單元：fn 內所有經 data.Client(ctx, d) 取句柄的倉儲操作加入同一事務。
+// biz 層只見 TxFunc，不見 *ent.Tx（規劃 §4.7 通道 B）。
 func Tx(ctx context.Context, d *Data, fn func(ctx context.Context) error) error {
-	// 嵌套事务：复用外层（SAVEPOINT 分级 M1 按需引入）
+	// 嵌套事務：複用外層（SAVEPOINT 分級 M1 按需引入）
 	if _, ok := ctx.Value(txKey{}).(*ent.Tx); ok {
 		return fn(ctx)
 	}
@@ -119,8 +119,8 @@ func Tx(ctx context.Context, d *Data, fn func(ctx context.Context) error) error 
 	return tx.Commit()
 }
 
-// Client 取当前上下文的 ent 句柄：事务内返回 *ent.Tx 包装的 client，否则返回基础 client。
-// 所有 repo 的查询入口（ Mods 数据层唯一取句柄方式）。
+// Client 取當前上下文的 ent 句柄：事務內返回 *ent.Tx 包裝的 client，否則返回基礎 client。
+// 所有 repo 的查詢入口（ Mods 數據層唯一取句柄方式）。
 func Client(ctx context.Context, d *Data) *ent.Client {
 	if tx, ok := ctx.Value(txKey{}).(*ent.Tx); ok {
 		return tx.Client()

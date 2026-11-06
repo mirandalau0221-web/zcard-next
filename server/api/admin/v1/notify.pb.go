@@ -184,7 +184,7 @@ type NotifyTemplate struct {
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	EventType     string                 `protobuf:"bytes,2,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
 	Channel       string                 `protobuf:"bytes,3,opt,name=channel,proto3" json:"channel,omitempty"` // email | inbox | sms | telegram
-	Locale        string                 `protobuf:"bytes,4,opt,name=locale,proto3" json:"locale,omitempty"`   // zh_CN 默认
+	Locale        string                 `protobuf:"bytes,4,opt,name=locale,proto3" json:"locale,omitempty"`   // zh_CN 默認
 	SubjectTpl    string                 `protobuf:"bytes,5,opt,name=subject_tpl,json=subjectTpl,proto3" json:"subject_tpl,omitempty"`
 	BodyTpl       string                 `protobuf:"bytes,6,opt,name=body_tpl,json=bodyTpl,proto3" json:"body_tpl,omitempty"`
 	Enabled       bool                   `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -879,7 +879,7 @@ func (x *ResendNotifyLogRequest) GetId() uint64 {
 	return 0
 }
 
-// EstimateBroadcast 覆盖人数预估（创建前预览）。
+// EstimateBroadcast 覆蓋人數預估（創建前預覽）。
 type EstimateBroadcastRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TargetType    string                 `protobuf:"bytes,1,opt,name=target_type,json=targetType,proto3" json:"target_type,omitempty"`
@@ -976,7 +976,7 @@ func (x *EstimateBroadcastReply) GetAudience() int64 {
 	return 0
 }
 
-// CreateBroadcast 创建群发（定时 scheduled_at；空 = 立即）。
+// CreateBroadcast 創建羣發（定時 scheduled_at；空 = 立即）。
 type CreateBroadcastRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`

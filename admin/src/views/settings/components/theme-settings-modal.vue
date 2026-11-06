@@ -99,7 +99,7 @@ async function searchChoices(type: string, keyword = "") {
   if (seq !== choiceSequence) return;
   choicesBusy.value = false;
   if (err) {
-    error.value = "读取商品或分类失败，请重试";
+    error.value = "讀取商品或分類失敗，請重試";
     return;
   }
   const rows = (data as any)?.items || (data as any)?.categories || [];
@@ -140,7 +140,7 @@ async function load(revision = "") {
   if (seq !== sequence) return;
   loading.value = false;
   if (err || !data) {
-    error.value = "读取主题设置失败，请重试";
+    error.value = "讀取主題設置失敗，請重試";
     return;
   }
   accept(data.state_json);
@@ -179,17 +179,17 @@ async function save(action: string) {
   saving.value = false;
   if (err || !data) {
     error.value =
-      "保存失败；若其他页面已修改，请重新加载后再编辑。当前输入已保留。";
+      "保存失敗；若其他頁面已修改，請重新加載後再編輯。當前輸入已保留。";
     return;
   }
   accept(data.state_json);
   window.$message?.success(
     action === "publish"
-      ? "主题设置已发布"
+      ? "主題設置已發佈"
       : action === "rollback"
-        ? "已恢复上一版"
+        ? "已恢復上一版"
         : action === "reset"
-          ? "默认设置已存为草稿"
+          ? "默認設置已存為草稿"
           : "草稿已保存",
   );
   if (action === "publish" || action === "rollback") emit("published");
@@ -206,7 +206,7 @@ async function preview() {
   if (seq !== previewSequence) return;
   previewBusy.value = false;
   if (err || !data) {
-    error.value = "预览生成失败，请检查输入或重新加载设置";
+    error.value = "預覽生成失敗，請檢查輸入或重新加載設置";
     return;
   }
   previewURL.value = data.url;
@@ -236,10 +236,10 @@ function blocked(field: Field) {
 function close() {
   if (dirty.value) {
     window.$dialog?.warning({
-      title: "有尚未保存的设置",
-      content: "关闭后会丢弃本次输入；已保存的草稿和线上设置保留。",
-      positiveText: "放弃修改",
-      negativeText: "继续编辑",
+      title: "有尚未保存的設置",
+      content: "關閉後會丟棄本次輸入；已保存的草稿和線上設置保留。",
+      positiveText: "放棄修改",
+      negativeText: "繼續編輯",
       onPositiveClick: () => emit("update:show", false),
     });
   } else emit("update:show", false);
@@ -249,7 +249,7 @@ function close() {
   <NModal
     :show="show"
     preset="card"
-    :title="`主题自定义 · ${themeKey === 'classic' ? '默认主题' : themeKey}`"
+    :title="`主題自定義 · ${themeKey === 'classic' ? '默認主題' : themeKey}`"
     style="width: 1480px; max-width: 96vw; height: 92vh"
     content-style="min-height:0;display:flex;flex-direction:column;overflow:hidden"
     :mask-closable="false"
@@ -260,10 +260,10 @@ function close() {
         dirty
           ? "未保存"
           : state?.draft
-            ? "有未发布草稿"
+            ? "有未發佈草稿"
             : state?.published
-              ? "已发布设置"
-              : "使用默认配置"
+              ? "已發佈設置"
+              : "使用默認配置"
       }}</NTag>
       <NSelect
         v-if="versions.length"
@@ -277,26 +277,26 @@ function close() {
         size="small"
         :disabled="saving || dirty"
         @click="load(state?.theme_revision)"
-        >重新加载</NButton
+        >重新加載</NButton
       >
       <span class="theme-settings-note">{{
         state?.active
-          ? "发布后影响当前商城"
-          : "此主题尚未启用，发布设置不会切换商城主题"
+          ? "發佈後影響當前商城"
+          : "此主題尚未啓用，發佈設置不會切換商城主題"
       }}</span>
     </div>
     <NAlert v-if="state?.schema" type="info" :bordered="false" class="mb-10px">
-      外观修改统一在这里管理，点击「发布生效」后商城才会更新；「保存草稿」仅保存待发布内容。
+      外觀修改統一在這裏管理，點擊「發佈生效」後商城才會更新；「保存草稿」僅保存待發布內容。
     </NAlert>
     <NAlert v-if="error" type="error" class="mb-10px">{{ error }}</NAlert>
     <NSpin :show="loading" class="theme-settings-body">
       <NEmpty
         v-if="state && !state.schema"
-        description="此主题未提供自定义设置，请使用支持自定义设置的主题版本；已有外观配置继续兼容。"
+        description="此主題未提供自定義設置，請使用支持自定義設置的主題版本；已有外觀配置繼續兼容。"
       />
       <div v-else-if="state?.schema" ref="layoutRef" class="theme-settings-layout">
         <section ref="editorRef" class="theme-settings-editor">
-          <nav class="theme-settings-groups" aria-label="主题设置分组">
+          <nav class="theme-settings-groups" aria-label="主題設置分組">
             <button
               v-for="g in state.schema.groups"
               :key="g.id"
@@ -351,7 +351,7 @@ function close() {
                   :options="choices"
                   :loading="choicesBusy"
                   :disabled="!canWrite || saving"
-                  placeholder="输入名称搜索"
+                  placeholder="輸入名稱搜索"
                   @focus="searchChoices(f.type)"
                   @search="searchChoices(f.type, $event)"
                 />
@@ -370,7 +370,7 @@ function close() {
                 />
                 <p v-if="f.help && (f.type !== 'image' || !canWrite || saving)">{{ f.help }}</p>
                 <NAlert v-if="blocked(f)" type="info" :show-icon="false"
-                  >系统已关闭此业务。请在系统业务设置中开启后调整入口展示。</NAlert
+                  >系統已關閉此業務。請在系統業務設置中開啓後調整入口展示。</NAlert
                 >
               </div></template
             >
@@ -378,33 +378,33 @@ function close() {
         </section>
         <section class="theme-settings-preview">
           <div class="theme-preview-toolbar">
-            <span>只读预览</span
+            <span>只讀預覽</span
             ><NSelect
               v-model:value="size"
               :options="[
-                { label: '电脑', value: 'desktop' },
+                { label: '電腦', value: 'desktop' },
                 { label: '平板', value: 'tablet' },
-                { label: '手机', value: 'mobile' },
+                { label: '手機', value: 'mobile' },
               ]"
               style="width: 110px"
             /><NButton
               :loading="previewBusy"
               :disabled="!canWrite"
               @click="preview"
-              >{{ previewURL ? "刷新预览" : "打开预览" }}</NButton
+              >{{ previewURL ? "刷新預覽" : "打開預覽" }}</NButton
             >
           </div>
           <div class="theme-preview-stage">
             <iframe
               v-if="previewURL"
               :src="previewURL"
-              title="主题只读预览"
+              title="主題只讀預覽"
               :style="{ width: frameWidth }"
               sandbox="allow-scripts allow-same-origin"
               referrerpolicy="no-referrer"
             /><NEmpty
               v-else
-              description="打开预览后，调整设置会自动更新画面；访客不受影响"
+              description="打開預覽後，調整設置會自動更新畫面；訪客不受影響"
             />
           </div>
         </section>
@@ -415,16 +415,16 @@ function close() {
         <NPopconfirm @positive-click="save('reset')"
           ><template #trigger
             ><NButton :disabled="!canWrite || !state?.schema || saving"
-              >恢复默认</NButton
+              >恢復默認</NButton
             ></template
-          >将当前主题默认值存为草稿，发布前不影响访客。</NPopconfirm
+          >將當前主題默認值存為草稿，發佈前不影響訪客。</NPopconfirm
         >
         <NPopconfirm @positive-click="save('rollback')"
           ><template #trigger
             ><NButton :disabled="!canWrite || !state?.can_rollback || saving"
-              >恢复上一版</NButton
+              >恢復上一版</NButton
             ></template
-          >恢复上一版已发布设置及其主题版本，立即生效。</NPopconfirm
+          >恢復上一版已發佈設置及其主題版本，立即生效。</NPopconfirm
         >
         <span class="theme-settings-spacer" />
         <NButton
@@ -438,7 +438,7 @@ function close() {
           :disabled="!canWrite || !state?.schema"
           :loading="saving"
           @click="save('publish')"
-          >发布生效</NButton
+          >發佈生效</NButton
         >
       </div></template
     >

@@ -15,18 +15,18 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// DeleteOrders 只从管理列表移除无用订单，支付回调、对账和幂等查询保留原记录。
-// 整批事务提交，状态、付款或租户校验失败时不删除任何一条。
+// DeleteOrders 只從管理列表移除無用訂單，支付回調、對賬和冪等查詢保留原記錄。
+// 整批事務提交，狀態、付款或租户校驗失敗時不刪除任何一條。
 func (s *AdminOrderService) DeleteOrders(ctx context.Context, req *adminv1.DeleteOrdersRequest) (*emptypb.Empty, error) {
 	if len(req.GetOrderNos()) == 0 || len(req.GetOrderNos()) > 100 {
-		return nil, errors.BadRequest("order.INVALID_SELECTION", "每次请选择 1 至 100 条订单")
+		return nil, errors.BadRequest("order.INVALID_SELECTION", "每次請選擇 1 至 100 條訂單")
 	}
 	codes := make([]string, 0, len(req.GetOrderNos()))
 	seen := make(map[string]bool)
 	for _, code := range req.GetOrderNos() {
 		code = strings.TrimSpace(code)
 		if code == "" {
-			return nil, errors.BadRequest("order.INVALID_SELECTION", "订单号不能为空")
+			return nil, errors.BadRequest("order.INVALID_SELECTION", "訂單號不能為空")
 		}
 		if !seen[code] {
 			seen[code] = true
@@ -41,11 +41,11 @@ func (s *AdminOrderService) DeleteOrders(ctx context.Context, req *adminv1.Delet
 			return err
 		}
 		if len(rows) != len(codes) {
-			return errors.NotFound("order.NOT_FOUND", "部分订单不存在，请刷新列表后重试")
+			return errors.NotFound("order.NOT_FOUND", "部分訂單不存在，請刷新列表後重試")
 		}
 		for _, row := range rows {
 			if row.AdminDeletedAt != nil {
-				continue // 重复请求幂等，不重复创建删除事件。
+				continue // 重複請求冪等，不重複創建刪除事件。
 			}
 			n, err := client.Order.Update().Where(
 				order.ID(row.ID), order.SubsiteID(subsiteID), order.Version(row.Version),
@@ -58,12 +58,12 @@ func (s *AdminOrderService) DeleteOrders(ctx context.Context, req *adminv1.Delet
 				return err
 			}
 			if n != 1 {
-				return errors.BadRequest("order.CANNOT_DELETE", "仅可删除已取消或已过期且无付款、发货、退款记录的订单；请刷新后重试")
+				return errors.BadRequest("order.CANNOT_DELETE", "僅可刪除已取消或已過期且無付款、發貨、退款記錄的訂單；請刷新後重試")
 			}
 			if _, err := client.OrderStatusEvent.Create().SetOrderID(row.ID).
 				SetFromStatus(string(row.Status)).SetToStatus(string(row.Status)).
 				SetEvent("admin_deleted").SetOperator(orderstatusevent.OperatorAdmin).
-				SetReason("管理员从订单列表删除无用订单，保留关联记录").Save(ctx); err != nil {
+				SetReason("管理員從訂單列表刪除無用訂單，保留關聯記錄").Save(ctx); err != nil {
 				return err
 			}
 		}

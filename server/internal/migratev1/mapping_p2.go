@@ -1,9 +1,9 @@
 package migratev1
 
-// P2 目录域迁移：categories → products（+virtual_reviews 展开 / direct_content 重加密 /
-// member_price key 重写）→ product_skus → reviews → supply_mappings 生成。
-// 映射规格《数据迁移工具开发计划》§5.3；主站先行决策：merchant_id=1 → subsite_id=0，
-// merchant_id>1 的分站数据跳过计数（P6 分批补迁）。
+// P2 目錄域遷移：categories → products（+virtual_reviews 展開 / direct_content 重加密 /
+// member_price key 重寫）→ product_skus → reviews → supply_mappings 生成。
+// 映射規格《數據遷移工具開發計劃》§5.3；主站先行決策：merchant_id=1 → subsite_id=0，
+// merchant_id>1 的分站數據跳過計數（P6 分批補遷）。
 
 import (
 	"context"
@@ -19,7 +19,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/inventory"
 )
 
-// MigrateCatalog P2 阶段。
+// MigrateCatalog P2 階段。
 func (m *Migrator) MigrateCatalog(ctx context.Context) error {
 	if err := m.migrateCategories(ctx); err != nil {
 		return err
@@ -37,7 +37,7 @@ func (m *Migrator) MigrateCatalog(ctx context.Context) error {
 }
 
 // migrateCategories 1.x categories → categories。
-// 1.x slug/description 无 2.0 列（丢弃入报告）；status=0 并入 hide。
+// 1.x slug/description 無 2.0 列（丟棄入報告）；status=0 併入 hide。
 func (m *Migrator) migrateCategories(ctx context.Context) error {
 	var (
 		id, sort, status int64
@@ -55,7 +55,7 @@ func (m *Migrator) migrateCategories(ctx context.Context) error {
 		func(int64) error {
 			siteID, ok := m.subsiteFor(ctx, merchant)
 			if !ok {
-				m.st.Record("categories", "skip") // 分站分类：P6 补迁
+				m.st.Record("categories", "skip") // 分站分類：P6 補遷
 				return nil
 			}
 			if _, ok := m.IDs.Get(ctx, "categories", uint64(id)); ok {
@@ -73,7 +73,7 @@ func (m *Migrator) migrateCategories(ctx context.Context) error {
 			if pid := nullInt(parentID); pid > 0 {
 				newPID, ok := m.IDs.Get(ctx, "categories", uint64(pid))
 				if !ok {
-					return fmt.Errorf("父分类 %d 未迁移（顺序异常或属分站）", pid)
+					return fmt.Errorf("父分類 %d 未遷移（順序異常或屬分站）", pid)
 				}
 				b.SetParentID(newPID)
 			}
@@ -91,12 +91,12 @@ func (m *Migrator) migrateCategories(ctx context.Context) error {
 }
 
 // migrateProducts 1.x products → products。
-// 关键变换：member_price JSON 的 key 由 1.x 用户组 ID 重写为 member_level 新 ID；
-// fulfillment_type=fixed 的 delivery_message → direct_content（2.0 卡密钥匙 GCM，
-// AAD=product/subsite，与 catalog 读取端口径一致）；软删 → 下架。
-// 丢弃列（2.0 无 extra 列，统一报告）：seo_*/price_manual/upstream_price/stock_cache/
+// 關鍵變換：member_price JSON 的 key 由 1.x 用户組 ID 重寫為 member_level 新 ID；
+// fulfillment_type=fixed 的 delivery_message → direct_content（2.0 卡密鑰匙 GCM，
+// AAD=product/subsite，與 catalog 讀取端口徑一致）；軟刪 → 下架。
+// 丟棄列（2.0 無 extra 列，統一報告）：seo_*/price_manual/upstream_price/stock_cache/
 // upstream_product_url/min_order/max_order/contact_type/send_email/leave_message/
-// only_user/purchase_limit/level_disable/pick_type/virtual_sales/virtual_reviews 聚合数。
+// only_user/purchase_limit/level_disable/pick_type/virtual_sales/virtual_reviews 聚合數。
 func (m *Migrator) migrateProducts(ctx context.Context) error {
 	var (
 		id                      int64
@@ -142,7 +142,7 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 		func(int64) error {
 			siteID, siteOK := m.subsiteFor(ctx, nullInt(merchant))
 			if !siteOK {
-				m.st.Record("products", "skip") // 分站商品：P6 补迁
+				m.st.Record("products", "skip") // 分站商品：P6 補遷
 				return nil
 			}
 			if _, ok := m.IDs.Get(ctx, "products", uint64(id)); ok {
@@ -160,7 +160,7 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 			st := int8(1)
 			switch {
 			case nullStr(deletedAt) != "":
-				st = 0 // 软删 → 下架
+				st = 0 // 軟刪 → 下架
 			case hide:
 				st = 2
 			case status == 0:
@@ -185,7 +185,7 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 			if cid := nullInt(categoryID); cid > 0 {
 				newCID, ok := m.IDs.Get(ctx, "categories", uint64(cid))
 				if !ok {
-					return fmt.Errorf("分类 %d 未迁移（顺序异常或属分站）", cid)
+					return fmt.Errorf("分類 %d 未遷移（順序異常或屬分站）", cid)
 				}
 				b.SetCategoryID(newCID)
 			}
@@ -219,7 +219,7 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 			if us := nullInt(upstreamSource); us > 0 {
 				newUS, ok := m.IDs.Get(ctx, "supply_sources", uint64(us))
 				if !ok {
-					return fmt.Errorf("上游货源 %d 未迁移（顺序异常）", us)
+					return fmt.Errorf("上游貨源 %d 未遷移（順序異常）", us)
 				}
 				b.SetUpstreamSourceID(newUS)
 				if code := nullStr(upstreamCode); code != "" {
@@ -238,15 +238,15 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			// 直发内容（fulfillment_type=fixed）：明文 → 2.0 卡密钥匙 GCM（AAD=product/subsite）
+			// 直髮內容（fulfillment_type=fixed）：明文 → 2.0 卡密鑰匙 GCM（AAD=product/subsite）
 			if nullStr(fulfillmentType) == "fixed" {
 				msg := nullStr(deliveryMessage)
 				if msg == "" {
-					m.RW.AddError("products", uint64(id), "fixed 商品 delivery_message 为空，direct_content 未迁移")
+					m.RW.AddError("products", uint64(id), "fixed 商品 delivery_message 為空，direct_content 未遷移")
 				} else {
 					cipher, err := inventory.NewCardCipher(m.NewCardKey)
 					if err != nil {
-						return fmt.Errorf("ZCARD_CARD_KEY 不可用（直发内容重加密必需）: %w", err)
+						return fmt.Errorf("ZCARD_CARD_KEY 不可用（直髮內容重加密必需）: %w", err)
 					}
 					sealed, err := cipher.Seal(msg, p.ID, p.SubsiteID)
 					if err != nil {
@@ -257,7 +257,7 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 					}
 				}
 			}
-			// 虚拟评论 list 展开（聚合数 rating/count 无 2.0 列，丢弃入报告）
+			// 虛擬評論 list 展開（聚合數 rating/count 無 2.0 列，丟棄入報告）
 			if vr := nullStr(virtualReviews); vr != "" && json.Valid([]byte(vr)) {
 				if err := m.expandVirtualReviews(ctx, p.ID, vr); err != nil {
 					return err
@@ -272,22 +272,22 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 	)
 }
 
-// rewriteMemberPrice {"<1.x组id>": 分} → {"<member_level新id>": 分}（映射缺失的 key 跳过并记录）。
+// rewriteMemberPrice {"<1.x組id>": 分} → {"<member_level新id>": 分}（映射缺失的 key 跳過並記錄）。
 func (m *Migrator) rewriteMemberPrice(raw string) (map[string]int64, error) {
 	var src map[string]int64
 	if err := json.Unmarshal([]byte(raw), &src); err != nil {
-		return nil, fmt.Errorf("member_price 解析失败: %w", err)
+		return nil, fmt.Errorf("member_price 解析失敗: %w", err)
 	}
 	out := make(map[string]int64, len(src))
 	for k, cents := range src {
 		var oldID int64
 		if _, err := fmt.Sscanf(k, "%d", &oldID); err != nil {
-			m.RW.AddError("products", 0, fmt.Sprintf("member_price key %q 非数字，已跳过", k))
+			m.RW.AddError("products", 0, fmt.Sprintf("member_price key %q 非數字，已跳過", k))
 			continue
 		}
 		newID, ok := m.IDs.Get(context.Background(), "user_groups", uint64(oldID))
 		if !ok {
-			m.RW.AddError("products", 0, fmt.Sprintf("member_price 引用未迁移用户组 %s，已跳过", k))
+			m.RW.AddError("products", 0, fmt.Sprintf("member_price 引用未遷移用户組 %s，已跳過", k))
 			continue
 		}
 		out[fmt.Sprintf("%d", newID)] = cents
@@ -296,7 +296,7 @@ func (m *Migrator) rewriteMemberPrice(raw string) (map[string]int64, error) {
 }
 
 // expandVirtualReviews 1.x virtual_reviews JSON（{"rating":4.8,"count":156,"list":[...]}）
-// 的 list 数组展开为 virtual_reviews 行；无 list 仅聚合数则记报告。
+// 的 list 數組展開為 virtual_reviews 行；無 list 僅聚合數則記報告。
 func (m *Migrator) expandVirtualReviews(ctx context.Context, productID uint64, raw string) error {
 	var doc struct {
 		Rating float64          `json:"rating"`
@@ -304,10 +304,10 @@ func (m *Migrator) expandVirtualReviews(ctx context.Context, productID uint64, r
 		List   []map[string]any `json:"list"`
 	}
 	if err := json.Unmarshal([]byte(raw), &doc); err != nil {
-		return nil // 非预期结构：不阻断商品迁移，留报告
+		return nil // 非預期結構：不阻斷商品遷移，留報告
 	}
 	if len(doc.List) == 0 {
-		m.RW.AddError("products", 0, fmt.Sprintf("商品 %d 虚拟评论仅聚合数(rating=%.1f,count=%d)，2.0 无对应列已丢弃", productID, doc.Rating, doc.Count))
+		m.RW.AddError("products", 0, fmt.Sprintf("商品 %d 虛擬評論僅聚合數(rating=%.1f,count=%d)，2.0 無對應列已丟棄", productID, doc.Rating, doc.Count))
 		return nil
 	}
 	for i, item := range doc.List {
@@ -331,8 +331,8 @@ func (m *Migrator) expandVirtualReviews(ctx context.Context, productID uint64, r
 }
 
 // migrateProductSkus 1.x product_skus → product_skus。
-// 1.x sort/status 无 2.0 列：status=0 跳过；spec_values 置空 map（1.x 无规格值概念）。
-// upstream_sku_code 超 64 字符报错（截断会破坏上游同步键）。
+// 1.x sort/status 無 2.0 列：status=0 跳過；spec_values 置空 map（1.x 無規格值概念）。
+// upstream_sku_code 超 64 字符報錯（截斷會破壞上游同步鍵）。
 func (m *Migrator) migrateProductSkus(ctx context.Context) error {
 	var (
 		id, productID, price, sort, status int64
@@ -347,7 +347,7 @@ func (m *Migrator) migrateProductSkus(ctx context.Context) error {
 		},
 		func(int64) error {
 			if status == 0 {
-				m.st.Record("product_skus", "skip") // 1.x 停用 SKU：不迁（2.0 无状态列）
+				m.st.Record("product_skus", "skip") // 1.x 停用 SKU：不遷（2.0 無狀態列）
 				return nil
 			}
 			if _, ok := m.IDs.Get(ctx, "product_skus", uint64(id)); ok {
@@ -356,7 +356,7 @@ func (m *Migrator) migrateProductSkus(ctx context.Context) error {
 			}
 			newPID, ok := m.IDs.Get(ctx, "products", uint64(productID))
 			if !ok {
-				m.st.Record("product_skus", "skip") // 属分站商品（未迁）：跳过计数
+				m.st.Record("product_skus", "skip") // 屬分站商品（未遷）：跳過計數
 				return nil
 			}
 			b := m.Client.ProductSku.Create().
@@ -383,8 +383,8 @@ func (m *Migrator) migrateProductSkus(ctx context.Context) error {
 	)
 }
 
-// migrateReviews 1.x reviews → reviews（状态枚举同名直传；user/order 缺失容忍为 0——
-// 1.x 允许游客评价，2.0 user_id/order_id 为必填 uint64，0 值语义由查询侧兼容）。
+// migrateReviews 1.x reviews → reviews（狀態枚舉同名直傳；user/order 缺失容忍為 0——
+// 1.x 允許遊客評價，2.0 user_id/order_id 為必填 uint64，0 值語義由查詢側兼容）。
 func (m *Migrator) migrateReviews(ctx context.Context) error {
 	var (
 		id, productID, rating int64
@@ -405,7 +405,7 @@ func (m *Migrator) migrateReviews(ctx context.Context) error {
 			}
 			newPID, ok := m.IDs.Get(ctx, "products", uint64(productID))
 			if !ok {
-				m.st.Record("reviews", "skip") // 分站商品评论：P6 补
+				m.st.Record("reviews", "skip") // 分站商品評論：P6 補
 				return nil
 			}
 			ca, caOK, err := mustTime(nullStr(createdAt), m.TZ)
@@ -419,7 +419,7 @@ func (m *Migrator) migrateReviews(ctx context.Context) error {
 				SetRating(int8(rating)).
 				SetContent(nullStr(content)).
 				SetStatus(review.Status(status))
-			if caOK { // 直插行可能缺时间（零日期）——不 Set 走 ent 默认
+			if caOK { // 直插行可能缺時間（零日期）——不 Set 走 ent 默認
 				b = b.SetCreatedAt(ca)
 			}
 			r, err := b.Save(ctx)
@@ -435,8 +435,8 @@ func (m *Migrator) migrateReviews(ctx context.Context) error {
 	)
 }
 
-// generateSupplyMappings 为已迁移的上游商品生成 supply_mappings（幂等：存在即跳过）。
-// up_stock 不回填（2.0 同步任务接管）。
+// generateSupplyMappings 為已遷移的上游商品生成 supply_mappings（冪等：存在即跳過）。
+// up_stock 不回填（2.0 同步任務接管）。
 func (m *Migrator) generateSupplyMappings(ctx context.Context) error {
 	rows, err := m.Client.Product.Query().
 		Where(product.UpstreamSourceIDNotNil()).
@@ -475,8 +475,8 @@ func (m *Migrator) generateSupplyMappings(ctx context.Context) error {
 	return nil
 }
 
-// safeSlug 1.x slug 最长 250，2.0 上限 150：超长按 rune 截 140 后追加 -v1-<旧ID>
-// （保唯一与可追溯），正常长度原样。
+// safeSlug 1.x slug 最長 250，2.0 上限 150：超長按 rune 截 140 後追加 -v1-<舊ID>
+// （保唯一與可追溯），正常長度原樣。
 func safeSlug(slug string, oldID int64) string {
 	if utf8.RuneCountInString(slug) <= 150 {
 		return slug
@@ -485,7 +485,7 @@ func safeSlug(slug string, oldID int64) string {
 	return string(runes[:140]) + fmt.Sprintf("-v1-%d", oldID)
 }
 
-// truncateRunes 按 rune 截断（多字节安全）。
+// truncateRunes 按 rune 截斷（多字節安全）。
 func truncateRunes(s string, max int) string {
 	if utf8.RuneCountInString(s) <= max {
 		return s

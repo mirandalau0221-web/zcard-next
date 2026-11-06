@@ -41,10 +41,10 @@ func (r *PaymentRepoImpl) dispatchPayment(ctx context.Context, p *ent.Payment, p
 			return e
 		}
 		if current.Status != payment.StatusPending {
-			return errors.BadRequest("payment.NOT_PENDING", "支付已处理，请刷新查看结果")
+			return errors.BadRequest("payment.NOT_PENDING", "支付已處理，請刷新查看結果")
 		}
 		if !current.ExpiresAt.IsZero() && !time.Now().Before(current.ExpiresAt) {
-			return errors.BadRequest("payment.ORDER_EXPIRED", "支付已过期")
+			return errors.BadRequest("payment.ORDER_EXPIRED", "支付已過期")
 		}
 		state := gatewayAttempt{}
 		if len(current.GatewayContext) > 0 && json.Unmarshal(current.GatewayContext, &state) != nil {
@@ -55,7 +55,7 @@ func (r *PaymentRepoImpl) dispatchPayment(ctx context.Context, p *ent.Payment, p
 			return nil
 		}
 		if time.Now().Before(state.LeaseUntil) {
-			return errors.BadRequest("payment.IN_PROGRESS", "正在发起支付，请稍后重试")
+			return errors.BadRequest("payment.IN_PROGRESS", "正在發起支付，請稍後重試")
 		}
 		state.Lease = lease
 		state.LeaseUntil = time.Now().Add(time.Minute)

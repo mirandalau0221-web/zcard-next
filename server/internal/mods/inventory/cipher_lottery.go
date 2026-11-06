@@ -1,6 +1,6 @@
 package inventory
 
-// SealLottery 使用独立用途 AAD，抽奖内容不能被当作商品卡密解密。
+// SealLottery 使用獨立用途 AAD，抽獎內容不能被當作商品卡密解密。
 func (c *CardCipher) SealLottery(plain, reference string, subsiteID uint64) ([]byte, error) {
 	return c.box.Seal([]byte(plain), []byte("lottery:"+reference+":subsite:"+u64(subsiteID)))
 }

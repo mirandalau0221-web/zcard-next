@@ -1,13 +1,13 @@
 package procurement
 
-// E：上游回调接收端点（采购三通道之回调通道的接收侧）。
+// E：上游回調接收端點（採購三通道之回調通道的接收側）。
 //
 // POST /api/v1/procurement/callback?connection_id=N
-// - 不挂 JWT（架构测试规则 9）；connection_id 经 query 定位连接 → 按驱动验签
-// （zcard 四头 / dujiao 三头；acg 无回调）
-// - 验签/查单失败统一 401 防枚举（1.x 纪律：不区分原因防探测）
-// - 回填走 confirmResult（与轮询/巡检幂等汇聚——状态机 CAS，先到先终态）
-// - zcard 回调不携带卡密（确认后转 PollOne 查单获取）；dujiao 事件带 payload
+// - 不掛 JWT（架構測試規則 9）；connection_id 經 query 定位連接 → 按驅動驗籤
+// （zcard 四頭 / dujiao 三頭；acg 無回調）
+// - 驗籤/查單失敗統一 401 防枚舉（1.x 紀律：不區分原因防探測）
+// - 回填走 confirmResult（與輪詢/巡檢冪等匯聚——狀態機 CAS，先到先終態）
+// - zcard 回調不攜帶卡密（確認後轉 PollOne 查單獲取）；dujiao 事件帶 payload
 
 import (
 	"context"
@@ -23,11 +23,11 @@ import (
 	supplyport "github.com/NovaWorks/zcard-next/server/internal/mods/supply/port"
 )
 
-// UpstreamCallbackPath 回调接收路径（Gateway.Submit 登记给上游的是连接配置的
-// callback_url——运营应填 <本站公网地址>/api/v1/procurement/callback）。
+// UpstreamCallbackPath 回調接收路徑（Gateway.Submit 登記給上游的是連接配置的
+// callback_url——運營應填 <本站公網地址>/api/v1/procurement/callback）。
 const UpstreamCallbackPath = "/api/v1/procurement/callback"
 
-// RegisterUpstreamCallback 挂载回调接收路由（须在 SPA 兜底前注册）。
+// RegisterUpstreamCallback 掛載回調接收路由（須在 SPA 兜底前註冊）。
 func RegisterUpstreamCallback(srv *khttp.Server, svc *ProcureService, gw supplyport.UpstreamGateway) {
 	srv.HandleFunc(UpstreamCallbackPath, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -53,7 +53,7 @@ func RegisterUpstreamCallback(srv *khttp.Server, svc *ProcureService, gw supplyp
 			Method: r.Method, Path: r.URL.Path, RawQuery: r.URL.RawQuery, Headers: headers, Body: body,
 		})
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized) // 防枚举：不区分验签失败原因
+			w.WriteHeader(http.StatusUnauthorized) // 防枚舉：不區分驗籤失敗原因
 			return
 		}
 		if strings.HasPrefix(result.DownstreamOrderNo, "reuse:") {
@@ -89,8 +89,8 @@ func RegisterUpstreamCallback(srv *khttp.Server, svc *ProcureService, gw supplyp
 	})
 }
 
-// HandleUpstreamCallback 回调结果回填：delivered 且带卡密 → 直接终态；
-// 其余（确认型回调 / 无卡密）→ 转查单通道获取。
+// HandleUpstreamCallback 回調結果回填：delivered 且帶卡密 → 直接終態；
+// 其餘（確認型回調 / 無卡密）→ 轉查單通道獲取。
 func (s *ProcureService) HandleUpstreamCallback(ctx context.Context, poID uint64, result *supplyport.UpstreamCallbackResult) error {
 	if result.Status == "delivered" && len(result.Cards) > 0 {
 		return s.confirmResult(ctx, poID, "delivered", result.Cards, result.Amount)

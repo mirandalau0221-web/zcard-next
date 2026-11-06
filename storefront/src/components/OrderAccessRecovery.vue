@@ -31,14 +31,14 @@ async function recover() {
 </script>
 <template>
   <form class="order-recovery" @submit.prevent="recover">
-    <p>{{ $t('通过下单邮箱验证，查看订单与交付结果') }}</p>
-    <label v-if="!orderNo">{{ $t('订单号') }}<input v-model="number" class="input" required autocomplete="off" /></label>
-    <label>{{ $t('下单邮箱') }}<input v-model="email" class="input" type="email" required autocomplete="email" /></label>
-    <button type="button" class="btn secondary" :disabled="busy || !number.trim() || !email.trim()" @click="sendCode">{{ $t('发送验证码') }}</button>
-    <p v-if="sent" role="status">{{ $t('若邮箱与订单匹配，将收到验证码，请检查邮箱') }}</p>
-    <label>{{ $t('邮箱验证码') }}<input v-model="code" class="input" required inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" /></label>
+    <p>{{ $t('通過下單郵箱驗證，查看訂單與交付結果') }}</p>
+    <label v-if="!orderNo">{{ $t('訂單號') }}<input v-model="number" class="input" required autocomplete="off" /></label>
+    <label>{{ $t('下單郵箱') }}<input v-model="email" class="input" type="email" required autocomplete="email" /></label>
+    <button type="button" class="btn secondary" :disabled="busy || !number.trim() || !email.trim()" @click="sendCode">{{ $t('發送驗證碼') }}</button>
+    <p v-if="sent" role="status">{{ $t('若郵箱與訂單匹配，將收到驗證碼，請檢查郵箱') }}</p>
+    <label>{{ $t('郵箱驗證碼') }}<input v-model="code" class="input" required inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" /></label>
     <p v-if="error" role="alert" class="error">{{ uiText(error) }}</p>
-    <button type="submit" class="btn btn-primary" :disabled="busy || !sent">{{ busy ? $t('验证中…') : $t('验证并查看订单') }}</button>
+    <button type="submit" class="btn btn-primary" :disabled="busy || !sent">{{ busy ? $t('驗證中…') : $t('驗證並查看訂單') }}</button>
   </form>
 </template>
 <style scoped>

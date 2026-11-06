@@ -1,7 +1,7 @@
 package bootstrap
 
-// 密钥装配：四把钥匙解耦（§4.11.6），env/secret 注入优先，conf 兜底，
-// 开发环境允许随机临时密钥（带显著告警；重启失效，仅限本机开发）。
+// 密鑰裝配：四把鑰匙解耦（§4.11.6），env/secret 注入優先，conf 兜底，
+// 開發環境允許隨機臨時密鑰（帶顯著告警；重啓失效，僅限本機開發）。
 
 import (
 	"crypto/rand"
@@ -24,7 +24,7 @@ var securityProviderSet = wire.NewSet(
 	NewDataBox,
 )
 
-// NewDataBox 业务数据加密盒（ZCARD_DATA_KEY：凭据列/TOTP 密钥共用）。
+// NewDataBox 業務數據加密盒（ZCARD_DATA_KEY：憑據列/TOTP 密鑰共用）。
 func NewDataBox(sec *conf.Security) (*crypto.Box, error) {
 	if sec == nil {
 		sec = &conf.Security{}
@@ -39,7 +39,7 @@ func NewDataBox(sec *conf.Security) (*crypto.Box, error) {
 			return nil, err
 		}
 		raw = hex.EncodeToString(buf)
-		slog.Warn("bootstrap: 未配置 ZCARD_DATA_KEY，使用随机临时密钥（仅限开发）")
+		slog.Warn("bootstrap: 未配置 ZCARD_DATA_KEY，使用隨機臨時密鑰（僅限開發）")
 	}
 	key, err := crypto.ParseHexKey(raw)
 	if err != nil {
@@ -48,8 +48,8 @@ func NewDataBox(sec *conf.Security) (*crypto.Box, error) {
 	return crypto.NewBox(key)
 }
 
-// resolveKey 密钥解析：env > conf > dev 随机（告警）。
-// kind 用于日志标识（jwt_admin/jwt_user/card/data）。
+// resolveKey 密鑰解析：env > conf > dev 隨機（告警）。
+// kind 用於日誌標識（jwt_admin/jwt_user/card/data）。
 func resolveKey(envName, confVal, kind string) []byte {
 	if v := os.Getenv(envName); v != "" {
 		return []byte(v)
@@ -59,9 +59,9 @@ func resolveKey(envName, confVal, kind string) []byte {
 	}
 	buf := make([]byte, 32)
 	if _, err := rand.Read(buf); err != nil {
-		panic("bootstrap: 开发随机密钥生成失败：" + err.Error())
+		panic("bootstrap: 開發隨機密鑰生成失敗：" + err.Error())
 	}
-	slog.Warn("bootstrap: 未配置密钥，使用随机临时密钥（仅限开发；生产必须经 env 注入）",
+	slog.Warn("bootstrap: 未配置密鑰，使用隨機臨時密鑰（僅限開發；生產必須經 env 注入）",
 		"key", kind, "env", envName)
 	return buf
 }
@@ -75,7 +75,7 @@ func key32(b []byte) []byte {
 	return out
 }
 
-// NewSigner 构造 JWT 签发器（admin/user 双 realm 独立密钥）。
+// NewSigner 構造 JWT 簽發器（admin/user 雙 realm 獨立密鑰）。
 func NewSigner(sec *conf.Security) (*authn.Signer, error) {
 	if sec == nil {
 		sec = &conf.Security{}
@@ -83,11 +83,11 @@ func NewSigner(sec *conf.Security) (*authn.Signer, error) {
 	return authn.NewSigner(
 		key32(resolveKey("ZCARD_JWT_ADMIN_KEY", sec.JwtAdminKey, "jwt_admin")),
 		key32(resolveKey("ZCARD_JWT_USER_KEY", sec.JwtUserKey, "jwt_user")),
-		24*time.Hour, // access TTL 24h（频繁重启/更新的部署形态下 2h 掉线感过强；refresh 会话 14 天不变）
+		24*time.Hour, // access TTL 24h（頻繁重啓/更新的部署形態下 2h 掉線感過強；refresh 會話 14 天不變）
 	)
 }
 
-// NewCardCipher 构造卡密加密器（ZCARD_CARD_KEY：hex 32 字节 → AES-256-GCM + keyed hash）。
+// NewCardCipher 構造卡密加密器（ZCARD_CARD_KEY：hex 32 字節 → AES-256-GCM + keyed hash）。
 func NewCardCipher(sec *conf.Security) (*inventory.CardCipher, error) {
 	if sec == nil {
 		sec = &conf.Security{}
@@ -102,7 +102,7 @@ func NewCardCipher(sec *conf.Security) (*inventory.CardCipher, error) {
 			return nil, err
 		}
 		raw = hex.EncodeToString(buf)
-		slog.Warn("bootstrap: 未配置 ZCARD_CARD_KEY，使用随机临时卡密密钥（仅限开发；重启后已存卡密不可解）")
+		slog.Warn("bootstrap: 未配置 ZCARD_CARD_KEY，使用隨機臨時卡密密鑰（僅限開發；重啓後已存卡密不可解）")
 	}
 	key, err := crypto.ParseHexKey(raw)
 	if err != nil {

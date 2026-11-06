@@ -28,19 +28,19 @@ type SupplierAccountReply struct {
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	ApiKey        string                 `protobuf:"bytes,3,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	ApiSecret     string                 `protobuf:"bytes,4,opt,name=api_secret,json=apiSecret,proto3" json:"api_secret,omitempty"` // 仅创建/重置时回显（一次）
+	ApiSecret     string                 `protobuf:"bytes,4,opt,name=api_secret,json=apiSecret,proto3" json:"api_secret,omitempty"` // 僅創建/重置時回顯（一次）
 	Contact       string                 `protobuf:"bytes,5,opt,name=contact,proto3" json:"contact,omitempty"`
 	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"` // applying | approved | rejected | disabled
 	BalanceCache  int64                  `protobuf:"varint,7,opt,name=balance_cache,json=balanceCache,proto3" json:"balance_cache,omitempty"`
 	NotifyUrl     string                 `protobuf:"bytes,8,opt,name=notify_url,json=notifyUrl,proto3" json:"notify_url,omitempty"`
 	ReviewedAt    int64                  `protobuf:"varint,9,opt,name=reviewed_at,json=reviewedAt,proto3" json:"reviewed_at,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Protocol      string                 `protobuf:"bytes,11,opt,name=protocol,proto3" json:"protocol,omitempty"`                             // zcard | dujiao_next | acg_faka（对外供货协议； B/C）
-	DisplayName   string                 `protobuf:"bytes,12,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`    // connect/ping 回显店铺名
-	OwnerUserId   uint64                 `protobuf:"varint,13,opt,name=owner_user_id,json=ownerUserId,proto3" json:"owner_user_id,omitempty"` // 前台申请归属用户（0=admin 手动建号）
-	ApplyReason   string                 `protobuf:"bytes,14,opt,name=apply_reason,json=applyReason,proto3" json:"apply_reason,omitempty"`    // 申请理由（前台申请时填）
-	ReviewNote    string                 `protobuf:"bytes,15,opt,name=review_note,json=reviewNote,proto3" json:"review_note,omitempty"`       // 审核意见/驳回理由
-	IpWhitelist   []string               `protobuf:"bytes,16,rep,name=ip_whitelist,json=ipWhitelist,proto3" json:"ip_whitelist,omitempty"`    // IP 白名单（空=所有 IP 放行；精确 IP 或 CIDR）
+	Protocol      string                 `protobuf:"bytes,11,opt,name=protocol,proto3" json:"protocol,omitempty"`                             // zcard | dujiao_next | acg_faka（對外供貨協議； B/C）
+	DisplayName   string                 `protobuf:"bytes,12,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`    // connect/ping 回顯店鋪名
+	OwnerUserId   uint64                 `protobuf:"varint,13,opt,name=owner_user_id,json=ownerUserId,proto3" json:"owner_user_id,omitempty"` // 前台申請歸屬用户（0=admin 手動建號）
+	ApplyReason   string                 `protobuf:"bytes,14,opt,name=apply_reason,json=applyReason,proto3" json:"apply_reason,omitempty"`    // 申請理由（前台申請時填）
+	ReviewNote    string                 `protobuf:"bytes,15,opt,name=review_note,json=reviewNote,proto3" json:"review_note,omitempty"`       // 審核意見/駁回理由
+	IpWhitelist   []string               `protobuf:"bytes,16,rep,name=ip_whitelist,json=ipWhitelist,proto3" json:"ip_whitelist,omitempty"`    // IP 白名單（空=所有 IP 放行；精確 IP 或 CIDR）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -193,7 +193,7 @@ type CreateSupplierAccountRequest struct {
 	ApiKey        string                 `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
 	ApiSecret     string                 `protobuf:"bytes,3,opt,name=api_secret,json=apiSecret,proto3" json:"api_secret,omitempty"`
 	Contact       string                 `protobuf:"bytes,4,opt,name=contact,proto3" json:"contact,omitempty"`
-	Protocol      string                 `protobuf:"bytes,5,opt,name=protocol,proto3" json:"protocol,omitempty"` // 空 = zcard；dujiao_next/acg_faka 为兼容账号
+	Protocol      string                 `protobuf:"bytes,5,opt,name=protocol,proto3" json:"protocol,omitempty"` // 空 = zcard；dujiao_next/acg_faka 為兼容賬號
 	DisplayName   string                 `protobuf:"bytes,6,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -395,7 +395,7 @@ type ReviewSupplierAccountRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Approve       bool                   `protobuf:"varint,2,opt,name=approve,proto3" json:"approve,omitempty"`
-	ReviewNote    string                 `protobuf:"bytes,3,opt,name=review_note,json=reviewNote,proto3" json:"review_note,omitempty"` // 审核意见；驳回时建议必填（≤500）
+	ReviewNote    string                 `protobuf:"bytes,3,opt,name=review_note,json=reviewNote,proto3" json:"review_note,omitempty"` // 審核意見；駁回時建議必填（≤500）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -557,7 +557,7 @@ func (x *ResetSupplierSecretRequest) GetNewSecret() string {
 
 type ResetSupplierSecretReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ApiSecret     string                 `protobuf:"bytes,1,opt,name=api_secret,json=apiSecret,proto3" json:"api_secret,omitempty"` // 明文只出现这一次
+	ApiSecret     string                 `protobuf:"bytes,1,opt,name=api_secret,json=apiSecret,proto3" json:"api_secret,omitempty"` // 明文只出現這一次
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -656,7 +656,7 @@ type RechargeSupplierRequest struct {
 	Id          uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	AmountCents int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
 	Remark      string                 `protobuf:"bytes,3,opt,name=remark,proto3" json:"remark,omitempty"`
-	// 一次充值使用一个幂等键；重试沿用原键，下一笔充值使用新键。
+	// 一次充值使用一個冪等鍵；重試沿用原鍵，下一筆充值使用新鍵。
 	Reference     string `protobuf:"bytes,4,opt,name=reference,proto3" json:"reference,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -786,7 +786,7 @@ type SupplierLedgerEntry struct {
 	AccountId     uint64                 `protobuf:"varint,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
 	SupplyOrderId uint64                 `protobuf:"varint,3,opt,name=supply_order_id,json=supplyOrderId,proto3" json:"supply_order_id,omitempty"`
 	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`      // recharge | supply_pay | supply_refund | adjust
-	Amount        int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"` // 有符号分
+	Amount        int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"` // 有符號分
 	Reference     string                 `protobuf:"bytes,6,opt,name=reference,proto3" json:"reference,omitempty"`
 	Remark        string                 `protobuf:"bytes,7,opt,name=remark,proto3" json:"remark,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -954,7 +954,7 @@ type UpsertSupplierPriceRequest struct {
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	SkuId         uint64                 `protobuf:"varint,3,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
 	Price         int64                  `protobuf:"varint,4,opt,name=price,proto3" json:"price,omitempty"`
-	Scope         string                 `protobuf:"bytes,5,opt,name=scope,proto3" json:"scope,omitempty"` // 空或 product=专属价，category=分类折扣，global=整站折扣
+	Scope         string                 `protobuf:"bytes,5,opt,name=scope,proto3" json:"scope,omitempty"` // 空或 product=專屬價，category=分類折扣，global=整站折扣
 	CategoryId    uint64                 `protobuf:"varint,6,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	DiscountBps   int32                  `protobuf:"varint,7,opt,name=discount_bps,json=discountBps,proto3" json:"discount_bps,omitempty"` // 9000=9折，1..10000
 	unknownFields protoimpl.UnknownFields
@@ -1088,7 +1088,7 @@ type SupplierPriceItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
-	SkuId         uint64                 `protobuf:"varint,3,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"` // 0 = 商品级默认价
+	SkuId         uint64                 `protobuf:"varint,3,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"` // 0 = 商品級默認價
 	Price         int64                  `protobuf:"varint,4,opt,name=price,proto3" json:"price,omitempty"`              // 分
 	UpdatedAt     int64                  `protobuf:"varint,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Scope         string                 `protobuf:"bytes,6,opt,name=scope,proto3" json:"scope,omitempty"`
@@ -1587,7 +1587,7 @@ func (x *ResendSupplierCallbackRequest) GetId() uint64 {
 type SetSupplierIPWhitelistRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Ips           []string               `protobuf:"bytes,2,rep,name=ips,proto3" json:"ips,omitempty"` // 精确 IP 或 CIDR 网段；空 = 不限
+	Ips           []string               `protobuf:"bytes,2,rep,name=ips,proto3" json:"ips,omitempty"` // 精確 IP 或 CIDR 網段；空 = 不限
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

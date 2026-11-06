@@ -1,9 +1,9 @@
 package license
 
-// 订阅许可证模块（ 第 1 层落地）：
-//   settings license 组存储（file=许可证内容 / pubkey=ed25519 公钥 / instance_id=实例 ID）；
-//   安装 = 校验（签名/实例绑定/到期）通过后落库；查询 = 实时 Verify fail-closed。
-// 社区版无公钥/无许可证 → 全部高级特性关闭（开源核心功能不受影响）。
+// 訂閲許可證模塊（ 第 1 層落地）：
+//   settings license 組存儲（file=許可證內容 / pubkey=ed25519 公鑰 / instance_id=實例 ID）；
+//   安裝 = 校驗（簽名/實例綁定/到期）通過後落庫；查詢 = 實時 Verify fail-closed。
+// 社區版無公鑰/無許可證 → 全部高級特性關閉（開源核心功能不受影響）。
 
 import (
 	"context"
@@ -15,23 +15,23 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/license"
 )
 
-// settingsStore 设置读写窄接口（consumer-side，settings.RepoImpl 满足，通道 A）。
+// settingsStore 設置讀寫窄接口（consumer-side，settings.RepoImpl 滿足，通道 A）。
 type settingsStore interface {
 	Get(ctx context.Context, group, key string) (json.RawMessage, error)
 	Put(ctx context.Context, group, key string, value json.RawMessage) error
 }
 
-// LicenseRepo 许可证仓储。
+// LicenseRepo 許可證倉儲。
 type LicenseRepo struct {
 	settings settingsStore
 }
 
-// NewLicenseRepo 构造。
+// NewLicenseRepo 構造。
 func NewLicenseRepo(settings settingsStore) *LicenseRepo {
 	return &LicenseRepo{settings: settings}
 }
 
-// InstanceID 读取或生成实例 ID（生成后持久化，许可证绑定用）。
+// InstanceID 讀取或生成實例 ID（生成後持久化，許可證綁定用）。
 func (r *LicenseRepo) InstanceID(ctx context.Context) (string, error) {
 	raw, err := r.settings.Get(ctx, "license", "instance_id")
 	if err == nil && len(raw) > 0 && string(raw) != "null" && string(raw) != `""` {
@@ -47,7 +47,7 @@ func (r *LicenseRepo) InstanceID(ctx context.Context) (string, error) {
 	return id, nil
 }
 
-// Status 许可证状态。
+// Status 許可證狀態。
 type Status struct {
 	Installed  bool
 	Valid      bool
@@ -58,23 +58,23 @@ type Status struct {
 	Error      string
 }
 
-// Status 查询：读许可证 + 公钥 → Verify（fail-closed）。
+// Status 查詢：讀許可證 + 公鑰 → Verify（fail-closed）。
 func (r *LicenseRepo) Status(ctx context.Context) Status {
 	st := Status{InstanceID: "", Installed: false, Valid: false}
 	id, err := r.InstanceID(ctx)
 	if err != nil {
-		st.Error = "实例 ID 生成失败"
+		st.Error = "實例 ID 生成失敗"
 		return st
 	}
 	st.InstanceID = id
 	raw, _ := r.settings.Get(ctx, "license", "file")
 	if len(raw) == 0 || string(raw) == "null" || string(raw) == `""` {
-		st.Error = "未安装许可证（社区版）"
+		st.Error = "未安裝許可證（社區版）"
 		return st
 	}
 	var content string
 	if json.Unmarshal(raw, &content) != nil || content == "" {
-		st.Error = "许可证存储损坏"
+		st.Error = "許可證存儲損壞"
 		return st
 	}
 	st.Installed = true
@@ -95,7 +95,7 @@ func (r *LicenseRepo) Status(ctx context.Context) Status {
 	return st
 }
 
-// Install 校验并安装许可证（绑定当前实例；失败不落库）。
+// Install 校驗並安裝許可證（綁定當前實例；失敗不落庫）。
 func (r *LicenseRepo) Install(ctx context.Context, content string) error {
 	pub, err := r.PubKey(ctx)
 	if err != nil {
@@ -111,12 +111,12 @@ func (r *LicenseRepo) Install(ctx context.Context, content string) error {
 	return r.settings.Put(ctx, "license", "file", json.RawMessage(`"`+jsonEscape(content)+`"`))
 }
 
-// Clear 清除许可证。
+// Clear 清除許可證。
 func (r *LicenseRepo) Clear(ctx context.Context) error {
 	return r.settings.Put(ctx, "license", "file", json.RawMessage(`""`))
 }
 
-// PubKey 读取 ed25519 公钥（base64；未配置返回 ErrInvalidLicense）。
+// PubKey 讀取 ed25519 公鑰（base64；未配置返回 ErrInvalidLicense）。
 func (r *LicenseRepo) PubKey(ctx context.Context) (ed25519PublicKey, error) {
 	raw, _ := r.settings.Get(ctx, "license", "pubkey")
 	if len(raw) == 0 || string(raw) == "null" || string(raw) == `""` {
@@ -133,7 +133,7 @@ func (r *LicenseRepo) PubKey(ctx context.Context) (ed25519PublicKey, error) {
 	return pub, nil
 }
 
-// domain 主站域名（license 组 domain 配置；空 = 跳过域名绑定）。
+// domain 主站域名（license 組 domain 配置；空 = 跳過域名綁定）。
 func (r *LicenseRepo) domain(ctx context.Context) string {
 	raw, _ := r.settings.Get(ctx, "license", "domain")
 	if len(raw) == 0 {

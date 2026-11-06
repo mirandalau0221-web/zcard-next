@@ -36,32 +36,32 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// SupplyService 对外供货 API（本站作上游，ZCard Supply v2 协议）。
-// 里程碑 完整落地：HMAC 四头鉴权（X-Supply-Key/Timestamp/Nonce/Signature）、
-// ±300s 时间窗、Nonce 防重放、按 key 限流（规划)。
-// Ping 免签名（连通性探测）；其余端点全部需要签名。
-// 金额口径：一律「分」（int64）——与 zcard 适配器对偶。
+// SupplyService 對外供貨 API（本站作上游，ZCard Supply v2 協議）。
+// 里程碑 完整落地：HMAC 四頭鑑權（X-Supply-Key/Timestamp/Nonce/Signature）、
+// ±300s 時間窗、Nonce 防重放、按 key 限流（規劃)。
+// Ping 免簽名（連通性探測）；其餘端點全部需要簽名。
+// 金額口徑：一律「分」（int64）——與 zcard 適配器對偶。
 type SupplyServiceClient interface {
-	// Ping 连通性与协议版本探测（免签名）。
+	// Ping 連通性與協議版本探測（免簽名）。
 	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PingReply, error)
-	// ListCategories 商品分类（下游建目录）。
+	// ListCategories 商品分類（下游建目錄）。
 	ListCategories(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListCategoriesReply, error)
-	// ListProducts 商品列表（分页；include_inactive 回声字段防旧版误判）。
+	// ListProducts 商品列表（分頁；include_inactive 回聲字段防舊版誤判）。
 	ListProducts(ctx context.Context, in *ListProductsRequest, opts ...grpc.CallOption) (*ListProductsReply, error)
-	// GetProduct 商品详情。
+	// GetProduct 商品詳情。
 	GetProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*GetProductReply, error)
-	// GetStock 实时库存（-1=无限）。
+	// GetStock 實時庫存（-1=無限）。
 	GetStock(ctx context.Context, in *GetStockRequest, opts ...grpc.CallOption) (*GetStockReply, error)
-	// CreateOrder 下游下单（downstream_order_no 幂等；复用本地锁卡防超卖；
-	// 同步交付：响应 fulfillment.delivered + cards）。
+	// CreateOrder 下游下單（downstream_order_no 冪等；複用本地鎖卡防超賣；
+	// 同步交付：響應 fulfillment.delivered + cards）。
 	CreateOrder(ctx context.Context, in *CreateSupplyOrderRequest, opts ...grpc.CallOption) (*CreateSupplyOrderReply, error)
-	// ListOrders 时间窗内订单列表（对账数据源；按创建时间过滤）。
+	// ListOrders 時間窗內訂單列表（對賬數據源；按創建時間過濾）。
 	ListOrders(ctx context.Context, in *ListSupplyOrdersRequest, opts ...grpc.CallOption) (*ListSupplyOrdersReply, error)
-	// GetOrder 订单查询（轮询/巡检兜底）。
+	// GetOrder 訂單查詢（輪詢/巡檢兜底）。
 	GetOrder(ctx context.Context, in *GetSupplyOrderRequest, opts ...grpc.CallOption) (*GetSupplyOrderReply, error)
-	// CancelOrder 取消（未交付订单释放锁卡）。
+	// CancelOrder 取消（未交付訂單釋放鎖卡）。
 	CancelOrder(ctx context.Context, in *CancelSupplyOrderRequest, opts ...grpc.CallOption) (*CancelSupplyOrderReply, error)
-	// RefundOrder 退款（已交付转人工；未交付释放）。
+	// RefundOrder 退款（已交付轉人工；未交付釋放）。
 	RefundOrder(ctx context.Context, in *RefundSupplyOrderRequest, opts ...grpc.CallOption) (*RefundSupplyOrderReply, error)
 }
 
@@ -177,32 +177,32 @@ func (c *supplyServiceClient) RefundOrder(ctx context.Context, in *RefundSupplyO
 // All implementations must embed UnimplementedSupplyServiceServer
 // for forward compatibility.
 //
-// SupplyService 对外供货 API（本站作上游，ZCard Supply v2 协议）。
-// 里程碑 完整落地：HMAC 四头鉴权（X-Supply-Key/Timestamp/Nonce/Signature）、
-// ±300s 时间窗、Nonce 防重放、按 key 限流（规划)。
-// Ping 免签名（连通性探测）；其余端点全部需要签名。
-// 金额口径：一律「分」（int64）——与 zcard 适配器对偶。
+// SupplyService 對外供貨 API（本站作上游，ZCard Supply v2 協議）。
+// 里程碑 完整落地：HMAC 四頭鑑權（X-Supply-Key/Timestamp/Nonce/Signature）、
+// ±300s 時間窗、Nonce 防重放、按 key 限流（規劃)。
+// Ping 免簽名（連通性探測）；其餘端點全部需要簽名。
+// 金額口徑：一律「分」（int64）——與 zcard 適配器對偶。
 type SupplyServiceServer interface {
-	// Ping 连通性与协议版本探测（免签名）。
+	// Ping 連通性與協議版本探測（免簽名）。
 	Ping(context.Context, *emptypb.Empty) (*PingReply, error)
-	// ListCategories 商品分类（下游建目录）。
+	// ListCategories 商品分類（下游建目錄）。
 	ListCategories(context.Context, *emptypb.Empty) (*ListCategoriesReply, error)
-	// ListProducts 商品列表（分页；include_inactive 回声字段防旧版误判）。
+	// ListProducts 商品列表（分頁；include_inactive 回聲字段防舊版誤判）。
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsReply, error)
-	// GetProduct 商品详情。
+	// GetProduct 商品詳情。
 	GetProduct(context.Context, *GetProductRequest) (*GetProductReply, error)
-	// GetStock 实时库存（-1=无限）。
+	// GetStock 實時庫存（-1=無限）。
 	GetStock(context.Context, *GetStockRequest) (*GetStockReply, error)
-	// CreateOrder 下游下单（downstream_order_no 幂等；复用本地锁卡防超卖；
-	// 同步交付：响应 fulfillment.delivered + cards）。
+	// CreateOrder 下游下單（downstream_order_no 冪等；複用本地鎖卡防超賣；
+	// 同步交付：響應 fulfillment.delivered + cards）。
 	CreateOrder(context.Context, *CreateSupplyOrderRequest) (*CreateSupplyOrderReply, error)
-	// ListOrders 时间窗内订单列表（对账数据源；按创建时间过滤）。
+	// ListOrders 時間窗內訂單列表（對賬數據源；按創建時間過濾）。
 	ListOrders(context.Context, *ListSupplyOrdersRequest) (*ListSupplyOrdersReply, error)
-	// GetOrder 订单查询（轮询/巡检兜底）。
+	// GetOrder 訂單查詢（輪詢/巡檢兜底）。
 	GetOrder(context.Context, *GetSupplyOrderRequest) (*GetSupplyOrderReply, error)
-	// CancelOrder 取消（未交付订单释放锁卡）。
+	// CancelOrder 取消（未交付訂單釋放鎖卡）。
 	CancelOrder(context.Context, *CancelSupplyOrderRequest) (*CancelSupplyOrderReply, error)
-	// RefundOrder 退款（已交付转人工；未交付释放）。
+	// RefundOrder 退款（已交付轉人工；未交付釋放）。
 	RefundOrder(context.Context, *RefundSupplyOrderRequest) (*RefundSupplyOrderReply, error)
 	mustEmbedUnimplementedSupplyServiceServer()
 }

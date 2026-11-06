@@ -9,32 +9,32 @@ import "admin/v1/order.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminUserManageService 前台用户管理（storefront 注册用户；员工管理见
-// AdminUserService——两者数据域独立，勿混）。
+// AdminUserManageService 前台用户管理（storefront 註冊用户；員工管理見
+// AdminUserService——兩者數據域獨立，勿混）。
 service AdminUserManageService {
-  // ListUsers 用户列表（关键词/状态筛选，分页）。
+  // ListUsers 用户列表（關鍵詞/狀態篩選，分頁）。
   rpc ListUsers(ListUsersRequest) returns (ListUsersReply) {
     option (google.api.http) = { get: "/api/v1/admin/users" };
   }
-  // GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+  // GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
   rpc GetUser(GetUserRequest) returns (UserDetail) {
     option (google.api.http) = { get: "/api/v1/admin/users/{id}" };
   }
-  // CreateUser 后台新增用户（用户名/邮箱/初始密码；复用注册管线含推广码生成）。
+  // CreateUser 後台新增用户（用户名/郵箱/初始密碼；複用註冊管線含推廣碼生成）。
   rpc CreateUser(CreateUserRequest) returns (UserItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/users"
       body: "*"
     };
   }
-  // ResetUserPassword 重置用户密码（超管专属）。
+  // ResetUserPassword 重置用户密碼（超管專屬）。
   rpc ResetUserPassword(ResetUserPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/api/v1/admin/users/{id}/password"
       body: "*"
     };
   }
-  // SetUserStatus 封禁/解封（status: active | banned；deleted 不可经此设置）。
+  // SetUserStatus 封禁/解封（status: active | banned；deleted 不可經此設置）。
   rpc SetUserStatus(SetUserStatusRequest) returns (UserItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/users/{id}/status"
@@ -44,12 +44,12 @@ service AdminUserManageService {
 }
 
 message ListUsersRequest {
-  string keyword = 1; // 用户名/邮箱模糊匹配
+  string keyword = 1; // 用户名/郵箱模糊匹配
   string status = 2; // active | banned（空 = 全部）
   int32 page = 3;
   int32 page_size = 4;
-  bool is_supplier = 5; // 仅看开通供货账户的用户（true 时生效）
-  uint64 level_id = 6; // 按会员等级筛选（非 0 时生效）
+  bool is_supplier = 5; // 僅看開通供貨賬户的用户（true 時生效）
+  uint64 level_id = 6; // 按會員等級篩選（非 0 時生效）
 }
 
 message ListUsersReply {
@@ -69,7 +69,7 @@ message SetUserStatusRequest {
 message CreateUserRequest {
   string username = 1 [(google.api.field_behavior) = REQUIRED];
   string password = 2 [(google.api.field_behavior) = REQUIRED]; // ≥6 位
-  string email = 3; // 可选
+  string email = 3; // 可選
 }
 
 message ResetUserPasswordRequest {
@@ -77,7 +77,7 @@ message ResetUserPasswordRequest {
   string new_password = 2 [(google.api.field_behavior) = REQUIRED]; // ≥6 位
 }
 
-// UserItem 前台用户（敏感字段如密码哈希绝不外发）。
+// UserItem 前台用户（敏感字段如密碼哈希絕不外發）。
 message UserItem {
   uint64 manual_level_id = 15;
   uint64 referral_level_id = 16;
@@ -92,18 +92,18 @@ message UserItem {
   string status = 4; // active | banned | deleted
   int64 last_login_at = 5;
   int64 created_at = 6;
-  // 聚合展示（列表/详情同源）
-  uint64 level_id = 7; // 会员等级（0=无等级）
+  // 聚合展示（列表/詳情同源）
+  uint64 level_id = 7; // 會員等級（0=無等級）
   string level_name = 8;
-  int64 balance_cents = 9; // 钱包可用余额（分）
-  int32 points = 10; // 积分余额
-  int64 order_count = 11; // 全部订单数
-  int64 spent_cents = 12; // 累计消费（已支付订单总额，分）
-  bool is_supplier = 13; // 是否开通供货账户
+  int64 balance_cents = 9; // 錢包可用餘額（分）
+  int32 points = 10; // 積分餘額
+  int64 order_count = 11; // 全部訂單數
+  int64 spent_cents = 12; // 累計消費（已支付訂單總額，分）
+  bool is_supplier = 13; // 是否開通供貨賬户
   string supplier_status = 14; // applying | approved | rejected
 }
 
-// UserCouponItem 用户持有优惠券。
+// UserCouponItem 用户持有優惠券。
 message UserCouponItem {
   uint64 id = 1;
   string title = 2;
@@ -111,20 +111,20 @@ message UserCouponItem {
   int64 expires_at = 4; // 0=不限
 }
 
-// UserRecentOrder 最近订单（用户详情聚合，默认 10 条）。
+// UserRecentOrder 最近訂單（用户詳情聚合，默認 10 條）。
 message UserRecentOrder {
-  repeated AdminOrderItem items = 5; // 商品名称、规格和数量摘要
+  repeated AdminOrderItem items = 5; // 商品名稱、規格和數量摘要
   string order_no = 1;
   int64 amount_cents = 2;
   string status = 3;
   int64 created_at = 4;
 }
 
-// UserDetail 用户详情（聚合视图）。
+// UserDetail 用户詳情（聚合視圖）。
 message UserDetail {
   UserItem user = 1;
-  repeated UserCouponItem coupons = 2; // 持有优惠券（最多 50）
-  repeated UserRecentOrder recent_orders = 3; // 最近订单
-  string inviter_username = 4; // 邀请人（无则空）
-  int64 invitees_count = 5; // 直接下级数量
+  repeated UserCouponItem coupons = 2; // 持有優惠券（最多 50）
+  repeated UserRecentOrder recent_orders = 3; // 最近訂單
+  string inviter_username = 4; // 邀請人（無則空）
+  int64 invitees_count = 5; // 直接下級數量
 }

@@ -18,7 +18,7 @@ func (s *AdminProcurementService) detail(ctx context.Context, po *ent.Procuremen
 	c := data.Client(ctx, s.repo.data)
 	item, err := c.OrderItem.Query().Where(orderitem.ID(po.OrderItemID), orderitem.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("procurement.ORDER_NOT_FOUND", "关联订单不存在")
+		return nil, errors.NotFound("procurement.ORDER_NOT_FOUND", "關聯訂單不存在")
 	}
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (s *AdminProcurementService) detail(ctx context.Context, po *ent.Procuremen
 	return out, nil
 }
 
-// 累计比例分摊避免逐项四舍五入造成整单差一分；大整数避免金额乘法溢出。
+// 累計比例分攤避免逐項四捨五入造成整單差一分；大整數避免金額乘法溢出。
 func allocatedSale(total int64, items []*ent.OrderItem, target uint64) int64 {
 	sum := new(big.Int)
 	for _, it := range items {

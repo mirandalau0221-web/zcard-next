@@ -1,6 +1,6 @@
 package procurement
 
-// 管理面 API（）：采购单列表/详情/手动重试/手动标记完成。
+// 管理面 API（）：採購單列表/詳情/手動重試/手動標記完成。
 
 import (
 	"context"
@@ -14,14 +14,14 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminProcurementService 管理面采购服务。
+// AdminProcurementService 管理面採購服務。
 type AdminProcurementService struct {
 	adminv1.UnimplementedAdminProcurementServiceServer
 	repo *ProcureRepo
 	svc  *ProcureService
 }
 
-// NewAdminProcurementService 构造。
+// NewAdminProcurementService 構造。
 func NewAdminProcurementService(repo *ProcureRepo, svc *ProcureService) *AdminProcurementService {
 	return &AdminProcurementService{repo: repo, svc: svc}
 }
@@ -40,7 +40,7 @@ func (s *AdminProcurementService) ListProcurements(ctx context.Context, req *adm
 	return reply, nil
 }
 
-// GetProcurement 详情。
+// GetProcurement 詳情。
 func (s *AdminProcurementService) GetProcurement(ctx context.Context, req *adminv1.GetProcurementRequest) (*adminv1.ProcurementOrder, error) {
 	po, err := s.repo.Get(ctx, req.GetId())
 	if err != nil {
@@ -49,7 +49,7 @@ func (s *AdminProcurementService) GetProcurement(ctx context.Context, req *admin
 	return s.detail(ctx, po)
 }
 
-// RetryProcurement 恢复本地交付或查询已有上游订单。
+// RetryProcurement 恢復本地交付或查詢已有上游訂單。
 func (s *AdminProcurementService) RetryProcurement(ctx context.Context, req *adminv1.RetryProcurementRequest) (*adminv1.ProcurementOrder, error) {
 	po, err := s.repo.Get(ctx, req.GetId())
 	if err != nil {
@@ -57,9 +57,9 @@ func (s *AdminProcurementService) RetryProcurement(ctx context.Context, req *adm
 	}
 	switch string(po.Status) {
 	case "rejected", "refunding", "refunded", "manual":
-		return nil, errors.New("procurement.ALREADY_TERMINAL: 采购单已终态")
+		return nil, errors.New("procurement.ALREADY_TERMINAL: 採購單已終態")
 	}
-	// 有采购回执时只恢复本地交付；没有回执时仅查询上游，绝不重新购买。
+	// 有采購回執時只恢復本地交付；沒有回執時僅查詢上游，絕不重新購買。
 	if err := s.svc.PollOne(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (s *AdminProcurementService) RetryProcurement(ctx context.Context, req *adm
 	return s.toProto(ctx, po), nil
 }
 
-// MarkProcurementManual 停止自动采购并转人工，后续通过订单人工补发完成交付。
+// MarkProcurementManual 停止自動採購並轉人工，後續通過訂單人工補發完成交付。
 func (s *AdminProcurementService) MarkProcurementManual(ctx context.Context, req *adminv1.MarkProcurementManualRequest) (*adminv1.ProcurementOrder, error) {
 	po, err := s.repo.Get(ctx, req.GetId())
 	if err != nil {
@@ -79,14 +79,14 @@ func (s *AdminProcurementService) MarkProcurementManual(ctx context.Context, req
 	if string(po.Status) == "manual" {
 		return s.toProto(ctx, po), nil
 	}
-	if err := s.repo.MarkManual(ctx, req.GetId(), orEmpty(req.GetRemark(), "管理员手动转人工")); err != nil {
+	if err := s.repo.MarkManual(ctx, req.GetId(), orEmpty(req.GetRemark(), "管理員手動轉人工")); err != nil {
 		return nil, err
 	}
 	po, _ = s.repo.Get(ctx, req.GetId())
 	return s.toProto(ctx, po), nil
 }
 
-// toProto 转协议（含采购项信息）。
+// toProto 轉協議（含採購項信息）。
 func (s *AdminProcurementService) toProto(ctx context.Context, po *ent.ProcurementOrder) *adminv1.ProcurementOrder {
 	out := &adminv1.ProcurementOrder{
 		Id:               po.ID,
@@ -119,7 +119,7 @@ func (s *AdminProcurementService) toProto(ctx context.Context, po *ent.Procureme
 			}
 		}
 	}
-	// 采购项（数量/成本/到手卡密行数）
+	// 採購項（數量/成本/到手卡密行數）
 	if item, err := s.repo.ItemByProcurement(ctx, po.ID); err == nil {
 		out.ItemQuantity = item.Quantity
 		out.ItemUnitCost = item.UnitCost
@@ -150,6 +150,6 @@ func orEmpty(v, def string) string {
 	return v
 }
 
-// 编译期保证：procurementorder 包被引用（状态过滤语义）。
+// 編譯期保證：procurementorder 包被引用（狀態過濾語義）。
 var _ = procurementorder.StatusPending
 var _ = emptypb.Empty{}

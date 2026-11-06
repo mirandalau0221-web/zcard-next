@@ -49,42 +49,42 @@ type contentBatchPayload struct {
 func batchActor(ctx context.Context) (uint64, error) {
 	c := identity.ClaimsFromContext(ctx)
 	if c == nil || c.Realm != authn.RealmAdmin || c.Subject == 0 {
-		return 0, errors.Unauthorized("catalog.UNAUTHORIZED", "请重新登录管理员账号")
+		return 0, errors.Unauthorized("catalog.UNAUTHORIZED", "請重新登錄管理員賬號")
 	}
 	return c.Subject, nil
 }
 func contentInvalid(msg string) error { return errors.BadRequest("catalog.BATCH_CONTENT_INVALID", msg) }
 func contentStale() error {
-	return errors.Conflict("catalog.BATCH_CONTENT_STALE", "商品、类目或内容已发生变化，本次未修改，请重新预览")
+	return errors.Conflict("catalog.BATCH_CONTENT_STALE", "商品、類目或內容已發生變化，本次未修改，請重新預覽")
 }
 
 func normalizeContentPatch(in *adminv1.ProductContentPatch) (*adminv1.ProductContentPatch, error) {
 	if in == nil {
-		return nil, contentInvalid("请选择修改内容")
+		return nil, contentInvalid("請選擇修改內容")
 	}
 	p := proto.Clone(in).(*adminv1.ProductContentPatch)
 	if p.CoverAction < 0 || p.CoverAction > 3 || p.ImagesAction < 0 || p.ImagesAction > 2 || p.DescriptionAction < 0 || p.DescriptionAction > 3 {
-		return nil, contentInvalid("修改方式无效")
+		return nil, contentInvalid("修改方式無效")
 	}
 	if p.CoverAction+p.ImagesAction+p.DescriptionAction == 0 {
-		return nil, contentInvalid("至少启用一个修改字段")
+		return nil, contentInvalid("至少啓用一個修改字段")
 	}
 	if p.CoverAction == 1 {
 		if p.Cover == "" || len(p.Cover) > 255 {
-			return nil, contentInvalid("请选择有效封面，地址不超过 255 字节")
+			return nil, contentInvalid("請選擇有效封面，地址不超過 255 字節")
 		}
 	} else {
 		p.Cover = ""
 	}
 	if p.ImagesAction == 1 {
 		if len(p.Images) == 0 || len(p.Images) > 20 {
-			return nil, contentInvalid("请选择 1～20 张详情图片")
+			return nil, contentInvalid("請選擇 1～20 張詳情圖片")
 		}
 		seen := map[string]bool{}
 		images := []string{}
 		for _, u := range p.Images {
 			if u == "" || len(u) > 500 {
-				return nil, contentInvalid("详情图片地址无效")
+				return nil, contentInvalid("詳情圖片地址無效")
 			}
 			if !seen[u] {
 				seen[u] = true
@@ -97,11 +97,11 @@ func normalizeContentPatch(in *adminv1.ProductContentPatch) (*adminv1.ProductCon
 	}
 	if p.DescriptionAction == 1 {
 		if len(p.Description) > batchDescriptionLimit {
-			return nil, contentInvalid("产品介绍不能超过 512 KiB")
+			return nil, contentInvalid("產品介紹不能超過 512 KiB")
 		}
 		p.Description = sanitize.RichHTML(p.Description)
 		if !hasContent(p.Description) {
-			return nil, contentInvalid("介绍清洗后为空，请填写内容或明确选择清空")
+			return nil, contentInvalid("介紹清洗後為空，請填寫內容或明確選擇清空")
 		}
 	} else {
 		p.Description = ""
@@ -140,11 +140,11 @@ func validateContentMedia(ctx context.Context, c *ent.Client, p *adminv1.Product
 	types := map[string]string{}
 	add := func(u, kind string) error {
 		if !strings.HasPrefix(u, "/uploads/") || strings.ContainsAny(u, "?#\\") {
-			return contentInvalid("请从素材管理选择图片或视频")
+			return contentInvalid("請從素材管理選擇圖片或視頻")
 		}
 		path := strings.TrimPrefix(u, "/uploads/")
 		if previous, exists := types[path]; exists && previous != kind {
-			return contentInvalid("同一素材不能同时作为图片和视频")
+			return contentInvalid("同一素材不能同時作為圖片和視頻")
 		}
 		types[path] = kind
 		return nil
@@ -201,7 +201,7 @@ func validateContentMedia(ctx context.Context, c *ent.Client, p *adminv1.Product
 				return err
 			}
 			if n != 1 {
-				return contentInvalid("素材已删除或类型不符，请重新选择")
+				return contentInvalid("素材已刪除或類型不符，請重新選擇")
 			}
 		}
 		ok, err := c.Media.Query().Where(media.PathEQ(path), media.MimeHasPrefix(types[path])).Exist(ctx)
@@ -209,7 +209,7 @@ func validateContentMedia(ctx context.Context, c *ent.Client, p *adminv1.Product
 			return err
 		}
 		if !ok {
-			return contentInvalid("素材已删除或类型不符，请重新选择")
+			return contentInvalid("素材已刪除或類型不符，請重新選擇")
 		}
 	}
 	return nil
@@ -228,7 +228,7 @@ func contentCategories(ctx context.Context, c *ent.Client, id uint64, desc bool,
 		all[r.ID] = r.ParentID
 	}
 	if _, ok := all[id]; !ok {
-		return nil, contentInvalid("请选择本站有效类目")
+		return nil, contentInvalid("請選擇本站有效類目")
 	}
 	out := map[uint64]uint64{id: all[id]}
 	if desc {
@@ -307,7 +307,7 @@ func (s *AdminCatalogService) PreviewBatchUpdateProductContent(ctx context.Conte
 		return nil, err
 	}
 	if (len(req.Ids) == 0) == (req.CategoryId == 0) || len(req.Ids) > batchContentLimit {
-		return nil, contentInvalid("请选择 1～1000 件商品或一个类目")
+		return nil, contentInvalid("請選擇 1～1000 件商品或一個類目")
 	}
 	c := data.Client(ctx, s.repo.data)
 	if err = validateContentMedia(ctx, c, patch, false); err != nil {
@@ -330,7 +330,7 @@ func (s *AdminCatalogService) PreviewBatchUpdateProductContent(ctx context.Conte
 		q.Where(product.CategoryIDIn(cats...))
 	} else {
 		if len(ids) == 0 || ids[0] == 0 {
-			return nil, contentInvalid("商品编号无效")
+			return nil, contentInvalid("商品編號無效")
 		}
 		q.Where(product.IDIn(ids...))
 	}
@@ -350,12 +350,12 @@ func (s *AdminCatalogService) PreviewBatchUpdateProductContent(ctx context.Conte
 		return nil, err
 	}
 	if total == 0 || len(rows) > batchContentLimit {
-		return nil, contentInvalid("可修改商品为空或超过 1000 件，请缩小范围")
+		return nil, contentInvalid("可修改商品為空或超過 1000 件，請縮小範圍")
 	}
 
 	encodedPatch, _ := json.Marshal(patch)
 	if len(encodedPatch)*len(rows) > batchPreviewBytes {
-		return nil, contentInvalid("本批次写入的图文总量超过 8 MiB，请缩小范围")
+		return nil, contentInvalid("本批次寫入的圖文總量超過 8 MiB，請縮小範圍")
 	}
 	out := &adminv1.BatchProductContentPreview{Patch: patch, Matched: int32(total), SkippedLocked: int32(skipped), ExpiresAt: time.Now().Add(10 * time.Minute).Unix()}
 	bytes := 0
@@ -365,7 +365,7 @@ func (s *AdminCatalogService) PreviewBatchUpdateProductContent(ctx context.Conte
 			continue
 		}
 		if (patch.CoverAction == 3 || patch.DescriptionAction == 3) && p.UpstreamSourceID == 0 {
-			return nil, contentInvalid("恢复跟随上游仅适用于对接商品，请单独选择")
+			return nil, contentInvalid("恢復跟隨上游僅適用於對接商品，請單獨選擇")
 		}
 		_, content, protection := contentNext(p, patch)
 		changed := content || protection
@@ -373,7 +373,7 @@ func (s *AdminCatalogService) PreviewBatchUpdateProductContent(ctx context.Conte
 		out.Targets = append(out.Targets, &adminv1.BatchProductContentTarget{Id: p.ID, Name: p.Name, Cover: p.Cover, Images: p.Images, Description: sanitize.RichHTML(p.Description), Upstream: p.UpstreamSourceID > 0, Changed: changed, ContentChanged: content, ProtectionChanged: protection})
 		bytes += len(p.Description) + len(p.Cover)
 		if bytes > batchPreviewBytes {
-			return nil, contentInvalid("目标图文总量超过 8 MiB，请缩小本次范围")
+			return nil, contentInvalid("目標圖文總量超過 8 MiB，請縮小本次範圍")
 		}
 		if changed {
 			out.Changed++
@@ -411,11 +411,11 @@ func (s *AdminCatalogService) contentBatch(ctx context.Context, token string) (*
 		return nil, err
 	}
 	if len(token) != 43 {
-		return nil, contentInvalid("预览编号无效，请重新预览")
+		return nil, contentInvalid("預覽編號無效，請重新預覽")
 	}
 	b, err := data.Client(ctx, s.repo.data).ProductContentBatch.Query().Where(batch.TokenEQ(token), batch.ActorID(actor), batch.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("catalog.BATCH_CONTENT_NOT_FOUND", "预览不存在或已过期，请重新预览")
+		return nil, errors.NotFound("catalog.BATCH_CONTENT_NOT_FOUND", "預覽不存在或已過期，請重新預覽")
 	}
 	return b, err
 }
@@ -449,7 +449,7 @@ func (s *AdminCatalogService) BatchUpdateProductContent(ctx context.Context, req
 			return nil
 		}
 		if !time.Now().Before(b.ExpiresAt) {
-			return contentInvalid("预览已过期，请重新预览")
+			return contentInvalid("預覽已過期，請重新預覽")
 		}
 		var payload contentBatchPayload
 		if err = json.Unmarshal(b.Payload, &payload); err != nil {

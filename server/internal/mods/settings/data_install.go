@@ -1,7 +1,7 @@
 package settings
 
-// 安装向导（）：CLI 交互式 + 事务原子（初始 settings + 内置角色种子 + 管理员）。
-// 幂等：ops.installed_at 已存在即拒绝。Web /install 表单入口 前端补齐（后端逻辑同源）。
+// 安裝嚮導（）：CLI 交互式 + 事務原子（初始 settings + 內置角色種子 + 管理員）。
+// 冪等：ops.installed_at 已存在即拒絕。Web /install 表單入口 前端補齊（後端邏輯同源）。
 
 import (
 	"bufio"
@@ -21,10 +21,10 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// ErrAlreadyInstalled 已安装（幂等拒绝）。
+// ErrAlreadyInstalled 已安裝（冪等拒絕）。
 var ErrAlreadyInstalled = errors.New("settings.ALREADY_INSTALLED")
 
-// installedAt 安装时间（未安装返回空串）。
+// installedAt 安裝時間（未安裝返回空串）。
 func installedAt(ctx context.Context, d *data.Data) (string, error) {
 	s, err := data.Client(ctx, d).Setting.Query().
 		Where(setting.Group("ops"), setting.Key("installed_at")).Only(ctx)
@@ -38,14 +38,14 @@ func installedAt(ctx context.Context, d *data.Data) (string, error) {
 	return ts, nil
 }
 
-// Installed 是否已安装（ops.installed_at 存在判定）。
+// Installed 是否已安裝（ops.installed_at 存在判定）。
 func Installed(ctx context.Context, d *data.Data) bool {
 	_, err := data.Client(ctx, d).Setting.Query().
 		Where(setting.Group("ops"), setting.Key("installed_at")).Only(ctx)
 	return err == nil
 }
 
-// InstallInput 安装参数（CLI 交互收集或 Web 表单）。
+// InstallInput 安裝參數（CLI 交互收集或 Web 表單）。
 type InstallInput struct {
 	AdminUsername string
 	AdminPassword string
@@ -53,19 +53,19 @@ type InstallInput struct {
 	SiteURL       string
 }
 
-// Install 执行安装（单事务：写关键默认 settings + installed_at + 角色/权限种子 + 管理员）。
+// Install 執行安裝（單事務：寫關鍵默認 settings + installed_at + 角色/權限種子 + 管理員）。
 func Install(ctx context.Context, d *data.Data, in InstallInput) error {
 	if Installed(ctx, d) {
 		return ErrAlreadyInstalled
 	}
 	if len(in.AdminPassword) < 8 {
-		return errors.New("settings.WEAK_PASSWORD：管理员密码至少 8 位")
+		return errors.New("settings.WEAK_PASSWORD：管理員密碼至少 8 位")
 	}
 	return data.Tx(ctx, d, func(ctx context.Context) error {
-		// 事务句柄（通道 B）——旧代码误用闭包外 d.Client：每条语句独立连接自动提交，
-		// 中途失败半提交（settings/roles 已落、管理员缺失）且多连接竞态偶发 SQLITE_BUSY
+		// 事務句柄（通道 B）——舊代碼誤用閉包外 d.Client：每條語句獨立連接自動提交，
+		// 中途失敗半提交（settings/roles 已落、管理員缺失）且多連接競態偶發 SQLITE_BUSY
 		client := data.Client(ctx, d)
-		// 1) 关键业务默认值（站点名/网址 + 安装时间戳）
+		// 1) 關鍵業務默認值（站點名/網址 + 安裝時間戳）
 		writes := []struct {
 			group, key string
 			value      any
@@ -76,8 +76,8 @@ func Install(ctx context.Context, d *data.Data, in InstallInput) error {
 		}
 		for _, w := range writes {
 			v, _ := json.Marshal(w.value)
-			// 冲突目标显式化：PG 要求 ON CONFLICT (group, key) 带推断列
-			//（SQLite 容忍省略——跨方言纪律 ADR-D18）
+			// 衝突目標顯式化：PG 要求 ON CONFLICT (group, key) 帶推斷列
+			//（SQLite 容忍省略——跨方言紀律 ADR-D18）
 			if err := client.Setting.Create().
 				SetGroup(w.group).SetKey(w.key).SetValue(v).
 				OnConflict(sql.ConflictColumns(setting.FieldGroup, setting.FieldKey)).
@@ -85,15 +85,15 @@ func Install(ctx context.Context, d *data.Data, in InstallInput) error {
 				return err
 			}
 		}
-		// 2) 内置角色与权限种子（幂等）
+		// 2) 內置角色與權限種子（冪等）
 		if err := authz.EnsureBuiltinRoles(ctx, client); err != nil {
 			return err
 		}
-		// 2.1) 基础货币种子（幂等；CNY 恒等 rate=1）
+		// 2.1) 基礎貨幣種子（冪等；CNY 恆等 rate=1）
 		if err := EnsureDefaultCurrencies(ctx, d); err != nil {
 			return err
 		}
-		// 3) 管理员（super_admin）
+		// 3) 管理員（super_admin）
 		role, err := client.AdminRole.Query().Where(adminrole.Code("super_admin")).Only(ctx)
 		if err != nil {
 			return err
@@ -115,23 +115,23 @@ func Install(ctx context.Context, d *data.Data, in InstallInput) error {
 	})
 }
 
-// RunInstallCLI CLI 交互式入口（zcard install；stdin 三问）。
+// RunInstallCLI CLI 交互式入口（zcard install；stdin 三問）。
 func RunInstallCLI(ctx context.Context, d *data.Data) error {
 	if Installed(ctx, d) {
 		return ErrAlreadyInstalled
 	}
 	r := bufio.NewReader(os.Stdin)
 	in := InstallInput{}
-	in.AdminUsername = prompt(r, "管理员用户名")
+	in.AdminUsername = prompt(r, "管理員用户名")
 	for {
-		in.AdminPassword = prompt(r, "管理员密码（≥8 位）")
+		in.AdminPassword = prompt(r, "管理員密碼（≥8 位）")
 		if len(in.AdminPassword) >= 8 {
 			break
 		}
-		fmt.Println("  ✗ 密码至少 8 位，请重输")
+		fmt.Println("  ✗ 密碼至少 8 位，請重輸")
 	}
-	in.SiteName = promptDefault(r, "站点名称", "ZCard 演示站")
-	in.SiteURL = promptDefault(r, "站点网址", "")
+	in.SiteName = promptDefault(r, "站點名稱", "ZCard 演示站")
+	in.SiteURL = promptDefault(r, "站點網址", "")
 	return Install(ctx, d, in)
 }
 

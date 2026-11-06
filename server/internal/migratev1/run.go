@@ -1,10 +1,10 @@
-// Package migratev1 1.x→2.0 数据迁移内核（《数据迁移工具开发计划》P0 交付）。
+// Package migratev1 1.x→2.0 數據遷移內核（《數據遷移工具開發計劃》P0 交付）。
 //
-// P0 范围：子命令骨架 + preflight 巡检（连通性/表完整性/schema 版本探测/密钥解析
-// 与抽样自检）+ 报告框架 + v1id_maps 读写 + 1.x 加密载荷解密原语（laracrypt 子包，
-// 由真实 Laravel 加密器生成的 golden vectors 钉死）。
-// 数据搬迁执行器自 P1（身份域）起逐阶段交付；本包只 import data/ent 与 platform/*
-// （架构测试规则 3b 白名单内），卡密重加密经注入的 Sealer 接口复用 inventory 实现。
+// P0 範圍：子命令骨架 + preflight 巡檢（連通性/表完整性/schema 版本探測/密鑰解析
+// 與抽樣自檢）+ 報告框架 + v1id_maps 讀寫 + 1.x 加密載荷解密原語（laracrypt 子包，
+// 由真實 Laravel 加密器生成的 golden vectors 釘死）。
+// 數據搬遷執行器自 P1（身份域）起逐階段交付；本包只 import data/ent 與 platform/*
+// （架構測試規則 3b 白名單內），卡密重加密經注入的 Sealer 接口複用 inventory 實現。
 package migratev1
 
 import (
@@ -19,11 +19,11 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent"
 )
 
-// Options 子命令选项（admincmd 解析后传入）。
+// Options 子命令選項（admincmd 解析後傳入）。
 type Options struct {
-	DSNOld     string // 1.x 源库 DSN（与 OldEnvDir 二选一）
-	OldEnvDir  string // 1.x 部署目录（读 .env 自动装配 DSN 与密钥）
-	AppKeyRaw  string // --old-app-key（优先级最高）
+	DSNOld     string // 1.x 源庫 DSN（與 OldEnvDir 二選一）
+	OldEnvDir  string // 1.x 部署目錄（讀 .env 自動裝配 DSN 與密鑰）
+	AppKeyRaw  string // --old-app-key（優先級最高）
 	CardKeyRaw string // --old-card-key
 
 	Phases      []int
@@ -37,17 +37,17 @@ type Options struct {
 	Sample      int
 	SkipMAC     bool
 	Yes         bool
-	// TargetDesc 目标库描述（admincmd 从配置装配传入：方言 + 库地址），用于确认提示与报告。
+	// TargetDesc 目標庫描述（admincmd 從配置裝配傳入：方言 + 庫地址），用於確認提示與報告。
 	TargetDesc string
-	// DataKey 2.0 业务数据密钥（ZCARD_DATA_KEY 原始 32 字节；凭据重加密必需）。
+	// DataKey 2.0 業務數據密鑰（ZCARD_DATA_KEY 原始 32 字節；憑據重加密必需）。
 	DataKey []byte
-	// NewCardKey 2.0 卡密密钥（ZCARD_CARD_KEY 原始 32 字节；直发内容/卡密重加密用）。
+	// NewCardKey 2.0 卡密密鑰（ZCARD_CARD_KEY 原始 32 字節；直髮內容/卡密重加密用）。
 	NewCardKey []byte
-	// OldStorageRoot 1.x 部署根（媒体文件源：<root>/storage/app/public）。
+	// OldStorageRoot 1.x 部署根（媒體文件源：<root>/storage/app/public）。
 	OldStorageRoot string
 }
 
-// Run 迁移入口内核（client = 2.0 目标库 ent 客户端）。
+// Run 遷移入口內核（client = 2.0 目標庫 ent 客户端）。
 func Run(ctx context.Context, client *ent.Client, opts Options) error {
 	if opts.Batch <= 0 {
 		opts.Batch = 1000
@@ -59,7 +59,7 @@ func Run(ctx context.Context, client *ent.Client, opts Options) error {
 		opts.Phases = ParsePhaseSpecDefault()
 	}
 
-	// 源装配：--old-env 或 --dsn-old
+	// 源裝配：--old-env 或 --dsn-old
 	var env map[string]string
 	dsn := opts.DSNOld
 	if opts.OldEnvDir != "" {
@@ -73,7 +73,7 @@ func Run(ctx context.Context, client *ent.Client, opts Options) error {
 		}
 	}
 	if dsn == "" {
-		return fmt.Errorf("缺少源库：--dsn-old <mysql-dsn> 或 --old-env <1.x 部署目录> 二选一")
+		return fmt.Errorf("缺少源庫：--dsn-old <mysql-dsn> 或 --old-env <1.x 部署目錄> 二選一")
 	}
 	if env == nil {
 		env = map[string]string{}
@@ -85,7 +85,7 @@ func Run(ctx context.Context, client *ent.Client, opts Options) error {
 	}
 	defer src.Close()
 
-	// preflight（dry-run 与实跑共用；verify-only 同样先巡检再校验）
+	// preflight（dry-run 與實跑共用；verify-only 同樣先巡檢再校驗）
 	report, err := RunPreflight(ctx, src, PreflightOptions{
 		Env:         env,
 		AppKeyRaw:   opts.AppKeyRaw,
@@ -123,10 +123,10 @@ func Run(ctx context.Context, client *ent.Client, opts Options) error {
 
 	printPreflight(report, meta, reportDir)
 	if report.HasFail() {
-		return fmt.Errorf("%w：详见 %s", ErrPreflightFailed, filepath.Join(reportDir, "report.md"))
+		return fmt.Errorf("%w：詳見 %s", ErrPreflightFailed, filepath.Join(reportDir, "report.md"))
 	}
 
-	// 数据搬迁：按 opts.Phases 编排（已交付：P0 系统域 / P1 身份域；P2+ 逐阶段交付）
+	// 數據搬遷：按 opts.Phases 編排（已交付：P0 系統域 / P1 身份域；P2+ 逐階段交付）
 	m := NewMigrator(src, client, NewIDMapper(client), rw, opts, report.Timezone)
 	m.AppKey = report.AppKey
 	m.CardKey = report.CardKey
@@ -145,12 +145,12 @@ func Run(ctx context.Context, client *ent.Client, opts Options) error {
 			fmt.Printf("  [%s] %s：%s\n", c.Status, c.Name, c.Message)
 		}
 		for k, v := range res.Summary {
-			fmt.Printf("  行数核对 %s：%s\n", k, v)
+			fmt.Printf("  行數核對 %s：%s\n", k, v)
 		}
 		if !res.Passed {
-			return fmt.Errorf("校验未通过：详见 %s", filepath.Join(reportDir, "report.md"))
+			return fmt.Errorf("校驗未通過：詳見 %s", filepath.Join(reportDir, "report.md"))
 		}
-		fmt.Printf("\n校验通过。报告目录：%s\n", reportDir)
+		fmt.Printf("\n校驗通過。報告目錄：%s\n", reportDir)
 		return nil
 	}
 
@@ -185,21 +185,21 @@ func Run(ctx context.Context, client *ent.Client, opts Options) error {
 		}
 		if err != nil {
 			_ = rw.WriteStats(m.Stats(), meta)
-			return fmt.Errorf("P%d 执行失败: %w（已迁移进度可重跑续接，报告：%s）", id, err, reportDir)
+			return fmt.Errorf("P%d 執行失敗: %w（已遷移進度可重跑續接，報告：%s）", id, err, reportDir)
 		}
 	}
 
 	if err := rw.WriteStats(m.Stats(), meta); err != nil {
 		return err
 	}
-	fmt.Printf("\n── 迁移统计 ──\n")
+	fmt.Printf("\n── 遷移統計 ──\n")
 	for name, t := range m.Stats().Tables {
-		fmt.Printf("  %-18s 迁移 %d / 跳过 %d / 失败 %d%s\n", name, t.Migrated, t.SkippedExists, t.Failed, plannedSuffix(t.Planned))
+		fmt.Printf("  %-18s 遷移 %d / 跳過 %d / 失敗 %d%s\n", name, t.Migrated, t.SkippedExists, t.Failed, plannedSuffix(t.Planned))
 	}
 	if len(notDelivered) > 0 {
-		fmt.Printf("\n注意：%s 尚未交付（按计划后续阶段实现），本次未执行。\n", strings.Join(notDelivered, "、"))
+		fmt.Printf("\n注意：%s 尚未交付（按計劃後續階段實現），本次未執行。\n", strings.Join(notDelivered, "、"))
 	}
-	fmt.Printf("\n%s 完成。报告目录：%s\n", map[bool]string{true: "dry-run", false: "迁移"}[opts.DryRun], reportDir)
+	fmt.Printf("\n%s 完成。報告目錄：%s\n", map[bool]string{true: "dry-run", false: "遷移"}[opts.DryRun], reportDir)
 	return nil
 }
 
@@ -211,29 +211,29 @@ func plannedSuffix(p int64) string {
 }
 
 func printPreflight(r *PreflightReport, meta PreflightMeta, dir string) {
-	fmt.Printf("── ZCard 1.x → 2.0 迁移预检 ──\n")
+	fmt.Printf("── ZCard 1.x → 2.0 遷移預檢 ──\n")
 	src := meta.Source
 	if r.ServerVersion != "" {
 		src += "（MySQL " + r.ServerVersion + "）"
 	}
-	fmt.Printf("源库：%s\n", src)
+	fmt.Printf("源庫：%s\n", src)
 	for _, c := range r.Checks {
 		fmt.Printf("  [%s] %s：%s\n", c.Status, c.Name, c.Message)
 	}
-	fmt.Printf("报告：%s\n", dir)
+	fmt.Printf("報告：%s\n", dir)
 }
 
-// ParsePhaseSpecDefault 空 --phase 时的全阶段。
+// ParsePhaseSpecDefault 空 --phase 時的全階段。
 func ParsePhaseSpecDefault() []int {
 	ids, _ := ParsePhaseSpec("all")
 	return ids
 }
 
-// MaskDSN 脱敏 DSN（隐去密码，用于日志/确认提示/报告）。
+// MaskDSN 脱敏 DSN（隱去密碼，用於日誌/確認提示/報告）。
 func MaskDSN(dsn string) string {
 	cfg, err := gomysql.ParseDSN(dsn)
 	if err != nil {
-		return "mysql:<无法解析的 DSN>"
+		return "mysql:<無法解析的 DSN>"
 	}
 	if cfg.Passwd != "" {
 		cfg.Passwd = "****"

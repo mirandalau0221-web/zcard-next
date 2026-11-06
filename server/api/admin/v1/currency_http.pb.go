@@ -24,13 +24,13 @@ const OperationAdminCurrencyServiceListCurrencies = "/zcard.api.admin.v1.AdminCu
 const OperationAdminCurrencyServiceUpdateCurrency = "/zcard.api.admin.v1.AdminCurrencyService/UpdateCurrency"
 
 type AdminCurrencyServiceHTTPServer interface {
-	// CreateCurrency CreateCurrency 新增货币（code 唯一）。
+	// CreateCurrency CreateCurrency 新增貨幣（code 唯一）。
 	CreateCurrency(context.Context, *CreateCurrencyRequest) (*Currency, error)
-	// DeleteCurrency DeleteCurrency 删除货币（无引用时）。
+	// DeleteCurrency DeleteCurrency 刪除貨幣（無引用時）。
 	DeleteCurrency(context.Context, *DeleteCurrencyRequest) (*emptypb.Empty, error)
-	// ListCurrencies ListCurrencies 全部货币（含停用）。
+	// ListCurrencies ListCurrencies 全部貨幣（含停用）。
 	ListCurrencies(context.Context, *emptypb.Empty) (*CurrencyList, error)
-	// UpdateCurrency UpdateCurrency 修改货币（rate/precision/symbol/启停）。
+	// UpdateCurrency UpdateCurrency 修改貨幣（rate/precision/symbol/啓停）。
 	UpdateCurrency(context.Context, *UpdateCurrencyRequest) (*Currency, error)
 }
 
@@ -125,13 +125,13 @@ func _AdminCurrencyService_DeleteCurrency0_HTTP_Handler(srv AdminCurrencyService
 }
 
 type AdminCurrencyServiceHTTPClient interface {
-	// CreateCurrency CreateCurrency 新增货币（code 唯一）。
+	// CreateCurrency CreateCurrency 新增貨幣（code 唯一）。
 	CreateCurrency(ctx context.Context, req *CreateCurrencyRequest, opts ...http.CallOption) (rsp *Currency, err error)
-	// DeleteCurrency DeleteCurrency 删除货币（无引用时）。
+	// DeleteCurrency DeleteCurrency 刪除貨幣（無引用時）。
 	DeleteCurrency(ctx context.Context, req *DeleteCurrencyRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ListCurrencies ListCurrencies 全部货币（含停用）。
+	// ListCurrencies ListCurrencies 全部貨幣（含停用）。
 	ListCurrencies(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CurrencyList, err error)
-	// UpdateCurrency UpdateCurrency 修改货币（rate/precision/symbol/启停）。
+	// UpdateCurrency UpdateCurrency 修改貨幣（rate/precision/symbol/啓停）。
 	UpdateCurrency(ctx context.Context, req *UpdateCurrencyRequest, opts ...http.CallOption) (rsp *Currency, err error)
 }
 
@@ -143,7 +143,7 @@ func NewAdminCurrencyServiceHTTPClient(client *http.Client) AdminCurrencyService
 	return &AdminCurrencyServiceHTTPClientImpl{client}
 }
 
-// CreateCurrency CreateCurrency 新增货币（code 唯一）。
+// CreateCurrency CreateCurrency 新增貨幣（code 唯一）。
 func (c *AdminCurrencyServiceHTTPClientImpl) CreateCurrency(ctx context.Context, in *CreateCurrencyRequest, opts ...http.CallOption) (*Currency, error) {
 	var out Currency
 	pattern := "/api/v1/admin/currencies"
@@ -161,7 +161,7 @@ func (c *AdminCurrencyServiceHTTPClientImpl) CreateCurrency(ctx context.Context,
 	return &out, nil
 }
 
-// DeleteCurrency DeleteCurrency 删除货币（无引用时）。
+// DeleteCurrency DeleteCurrency 刪除貨幣（無引用時）。
 func (c *AdminCurrencyServiceHTTPClientImpl) DeleteCurrency(ctx context.Context, in *DeleteCurrencyRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/currencies/{code}"
@@ -178,7 +178,7 @@ func (c *AdminCurrencyServiceHTTPClientImpl) DeleteCurrency(ctx context.Context,
 	return &out, nil
 }
 
-// ListCurrencies ListCurrencies 全部货币（含停用）。
+// ListCurrencies ListCurrencies 全部貨幣（含停用）。
 func (c *AdminCurrencyServiceHTTPClientImpl) ListCurrencies(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CurrencyList, error) {
 	var out CurrencyList
 	pattern := "/api/v1/admin/currencies"
@@ -195,7 +195,7 @@ func (c *AdminCurrencyServiceHTTPClientImpl) ListCurrencies(ctx context.Context,
 	return &out, nil
 }
 
-// UpdateCurrency UpdateCurrency 修改货币（rate/precision/symbol/启停）。
+// UpdateCurrency UpdateCurrency 修改貨幣（rate/precision/symbol/啓停）。
 func (c *AdminCurrencyServiceHTTPClientImpl) UpdateCurrency(ctx context.Context, in *UpdateCurrencyRequest, opts ...http.CallOption) (*Currency, error) {
 	var out Currency
 	pattern := "/api/v1/admin/currencies/{code}"

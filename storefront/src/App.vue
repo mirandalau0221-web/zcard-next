@@ -1,45 +1,45 @@
 <template>
   <div class="app" :style="appBgStyle">
-    <!-- 安装页：无商城布局（头部/尾部/客服/公告全隐藏，仅渲染向导自身） -->
+    <!-- 安裝頁：無商城佈局（頭部/尾部/客服/公告全隱藏，僅渲染嚮導自身） -->
     <template v-if="!isInstall && shellReady">
-    <!-- 顶部品牌条：主题自定义可独立关闭，不影响首页轮播。 -->
+    <!-- 頂部品牌條：主題自定義可獨立關閉，不影響首頁輪播。 -->
     <div v-if="brandBarEnabled" class="brand-bar">
-      <span class="brand-slogan">🎁 {{ siteName }} {{ $t('· 在线下单 按商品交付') }}</span>
+      <span class="brand-slogan">🎁 {{ siteName }} {{ $t('· 在線下單 按商品交付') }}</span>
       <span class="brand-trust">
         <span>{{ $t('✓ 安全支付') }}</span>
-        <span>{{ $t('✓ 隐私保障') }}</span>
-        <span>{{ $t('✓ 售后无忧') }}</span>
+        <span>{{ $t('✓ 隱私保障') }}</span>
+        <span>{{ $t('✓ 售後無憂') }}</span>
       </span>
     </div>
 
-    <!-- 维护模式：横幅样式（ops.maintenance_style=banner） -->
-    <div v-if="maintenance && maintenanceStyle === 'banner'" class="maint-banner"> {{ $t('🔧 站点维护中，下单与支付可能间歇性不可用，请稍后再试') }} </div>
+    <!-- 維護模式：橫幅樣式（ops.maintenance_style=banner） -->
+    <div v-if="maintenance && maintenanceStyle === 'banner'" class="maint-banner"> {{ $t('🔧 站點維護中，下單與支付可能間歇性不可用，請稍後再試') }} </div>
 
-    <!-- 维护模式：弹窗样式（ops.maintenance_style=modal；ops.maintenance_modal_freq 控制频率
-         every=每次进入都弹 / daily=24 小时内只弹一次，关闭后本次会话不再打扰） -->
+    <!-- 維護模式：彈窗樣式（ops.maintenance_style=modal；ops.maintenance_modal_freq 控制頻率
+         every=每次進入都彈 / daily=24 小時內只彈一次，關閉後本次會話不再打擾） -->
     <div v-if="maintenance && maintenanceStyle === 'modal' && maintModalVisible" class="maint-overlay">
       <div class="maint-card">
         <div class="maint-icon">🔧</div>
-        <h2>{{ $t('站点维护中') }}</h2>
-        <p>{{ $t('我们正在升级系统，下单与支付可能间歇性不可用。') }}<br />{{ $t('给您带来不便敬请谅解，请稍后再试。') }}</p>
-        <button class="maint-btn" @click="closeMaintModal">{{ $t('我知道了，继续浏览') }}</button>
+        <h2>{{ $t('站點維護中') }}</h2>
+        <p>{{ $t('我們正在升級系統，下單與支付可能間歇性不可用。') }}<br />{{ $t('給您帶來不便敬請諒解，請稍後再試。') }}</p>
+        <button class="maint-btn" @click="closeMaintModal">{{ $t('我知道了，繼續瀏覽') }}</button>
       </div>
     </div>
 
-    <!-- 主导航（sticky） -->
+    <!-- 主導航（sticky） -->
     <header class="topbar">
-      <router-link to="/" class="logo" :aria-busy="!brandReady" :aria-label="$t('店铺首页')">
+      <router-link to="/" class="logo" :aria-busy="!brandReady" :aria-label="$t('店鋪首頁')">
         <img v-if="siteLogo" :src="siteLogo" alt="logo" class="logo-mark logo-img" />
         <span v-else-if="brandReady" class="logo-mark">ZC</span>
         <span v-else class="logo-mark brand-placeholder" aria-hidden="true"></span>
         <span class="logo-name" :class="{ 'brand-name-placeholder': !brandReady }" :title="siteName">{{ siteName }}</span>
       </router-link>
       <nav class="nav-links">
-        <router-link v-if="lotteryVisible" to="/lottery">{{ $t('幸运抽奖') }}</router-link>
-        <router-link to="/" exact>{{ $t('首页') }}</router-link>
-        <button class="nav-horn" @click="openNotice" :title="$t('系统公告')"><ThemeIcon name="announcement" />{{ $t('公告') }}</button>
-        <router-link to="/fetch">{{ $t('取货查询') }}</router-link>
-        <!-- 顶部自定义按钮：外部链接新窗口；文章/公告站内路由（site.top_button {text,type,url|slug}） -->
+        <router-link v-if="lotteryVisible" to="/lottery">{{ $t('幸運抽獎') }}</router-link>
+        <router-link to="/" exact>{{ $t('首頁') }}</router-link>
+        <button class="nav-horn" @click="openNotice" :title="$t('系統公告')"><ThemeIcon name="announcement" />{{ $t('公告') }}</button>
+        <router-link to="/fetch">{{ $t('取貨查詢') }}</router-link>
+        <!-- 頂部自定義按鈕：外部鏈接新窗口；文章/公告站內路由（site.top_button {text,type,url|slug}） -->
         <router-link
           v-if="topButton && topButton.type !== 'link' && topButton.slug"
           :to="`/posts/${topButton.slug}`"
@@ -52,7 +52,7 @@
           rel="noopener noreferrer"
           class="nav-custom-btn"
         ><ThemeIcon v-if="isGuide(topButton.text)" name="book" />{{ navText(topButton.text) }}</a>
-        <!-- 导航推荐位（promo.nav_recommend [{text,url}]）：站内路径走路由，外链新窗口 -->
+        <!-- 導航推薦位（promo.nav_recommend [{text,url}]）：站內路徑走路由，外鏈新窗口 -->
         <template v-for="r in navRecommend" :key="r.text + r.url">
           <router-link v-if="r.url.startsWith('/')" :to="r.url" class="nav-recommend-btn">{{ r.text }}</router-link>
           <a v-else :href="r.url" target="_blank" rel="noopener noreferrer" class="nav-recommend-btn">{{ r.text }}</a>
@@ -61,44 +61,44 @@
       <div class="nav-right">
         <LanguageSwitcher />
         <CurrencySwitcher />
-        <router-link v-if="cartEnabled" to="/cart" class="cart-link" :title="$t('查看购物车')" :aria-label="$t('查看购物车')">
+        <router-link v-if="cartEnabled" to="/cart" class="cart-link" :title="$t('查看購物車')" :aria-label="$t('查看購物車')">
           <ThemeIcon name="cart" class="cart-icon" />
-          <span class="cart-label">{{ $t('购物车') }}</span>
+          <span class="cart-label">{{ $t('購物車') }}</span>
           <span v-if="cartCount > 0" :key="cartCount" class="cart-badge">{{ cartCount > 99 ? '99+' : cartCount }}</span>
         </router-link>
         <template v-if="authState.loggedIn">
-          <router-link to="/member" class="member-link" :title="$t('个人中心')">{{ $t('👤 个人中心') }}</router-link>
+          <router-link to="/member" class="member-link" :title="$t('個人中心')">{{ $t('👤 個人中心') }}</router-link>
           <router-link to="/member" class="user-link">{{ authState.username }}</router-link>
           <button class="logout-btn" @click="onLogout">{{ $t('退出') }}</button>
         </template>
         <template v-else>
-          <router-link to="/login" class="login-link">{{ $t('登录') }}</router-link>
-          <router-link to="/register" class="btn btn-primary">{{ $t('注册') }}</router-link>
+          <router-link to="/login" class="login-link">{{ $t('登錄') }}</router-link>
+          <router-link to="/register" class="btn btn-primary">{{ $t('註冊') }}</router-link>
         </template>
       </div>
     </header>
     </template>
 
     <main class="main" :class="{ 'install-main': isInstall, 'home-main': route.path === '/' }">
-      <!-- Suspense：路由组件 async setup（SSG 预取）在客户端水合时也能正常等待 -->
+      <!-- Suspense：路由組件 async setup（SSG 預取）在客户端水合時也能正常等待 -->
       <router-view v-if="shellReady || isInstall" v-slot="{ Component, route: viewRoute }">
-        <!-- 保留目录浏览状态；会员页内切换复用表单，其余详情和支付页按导航重新创建。 -->
+        <!-- 保留目錄瀏覽狀態；會員頁內切換複用表單，其餘詳情和支付頁按導航重新創建。 -->
         <KeepAlive include="Home" :max="8">
           <Suspense>
-            <template #fallback><div class="store-loading" role="status">{{ $t('正在加载页面…') }}</div></template>
+            <template #fallback><div class="store-loading" role="status">{{ $t('正在加載頁面…') }}</div></template>
             <component :is="Component" :key="['/', '/member', '/posts'].includes(viewRoute.path) ? viewRoute.path : viewRoute.fullPath" />
           </Suspense>
         </KeepAlive>
       </router-view>
       <div v-if="!shellReady && !isInstall" class="store-loading" :role="shellError ? 'alert' : 'status'" :aria-busy="shellLoading">
-        <p>{{ shellError || $t('正在加载店铺…') }}</p>
-        <a v-if="!shellError" href="" class="muted">{{ $t('加载时间较长？重新加载') }}</a>
-        <noscript>{{ $t('请启用 JavaScript 后重新加载店铺。') }}</noscript>
-        <button v-if="shellError" class="btn btn-primary" :disabled="shellLoading" @click="refreshShell">{{ $t('重新加载') }}</button>
+        <p>{{ shellError || $t('正在加載店鋪…') }}</p>
+        <a v-if="!shellError" href="" class="muted">{{ $t('加載時間較長？重新加載') }}</a>
+        <noscript>{{ $t('請啓用 JavaScript 後重新加載店鋪。') }}</noscript>
+        <button v-if="shellError" class="btn btn-primary" :disabled="shellLoading" @click="refreshShell">{{ $t('重新加載') }}</button>
       </div>
     </main>
 
-    <!-- 页脚（安装页隐藏；页脚配置 footer.* 可覆盖关于/导航/联系/社交/备案） -->
+    <!-- 頁腳（安裝頁隱藏；頁腳配置 footer.* 可覆蓋關於/導航/聯繫/社交/備案） -->
     <template v-if="!isInstall && shellReady">
     <footer class="footer">
       <div class="footer-trust">
@@ -110,22 +110,22 @@
           <div class="trust-copy"><b>{{ item.title }}</b><span class="muted">{{ item.description }}</span></div>
         </div>
       </div>
-      <nav class="footer-mobile-actions" :aria-label="$t('常用服务')">
+      <nav class="footer-mobile-actions" :aria-label="$t('常用服務')">
         <router-link to="/fetch">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 7 9-4 9 4v10l-9 4-9-4Z"/><path d="m3 7 9 4 9-4M12 11v10M7.5 5l9 4"/></svg>
-          <span>{{ $t('订单取货') }}</span>
+          <span>{{ $t('訂單取貨') }}</span>
         </router-link>
         <router-link to="/posts?type=blog">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-2H4ZM20 4h-4a3 3 0 0 0-3 3v14a4 4 0 0 1 4-2h3Z"/></svg>
-          <span>{{ $t('使用帮助') }}</span>
+          <span>{{ $t('使用幫助') }}</span>
         </router-link>
         <router-link to="/tickets">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 12H3v6h4v-6ZM20 12h1v6h-4v-6ZM19 18v1a2 2 0 0 1-2 2h-5"/></svg>
-          <span>{{ $t('售后工单') }}</span>
+          <span>{{ $t('售後工單') }}</span>
         </router-link>
       </nav>
       <button class="footer-mobile-toggle" type="button" :aria-expanded="footerExpanded" aria-controls="footer-information" @click="footerExpanded = !footerExpanded">
-        <span>{{ footerExpanded ? $t('收起服务与店铺信息') : $t('更多服务与店铺信息') }}</span>
+        <span>{{ footerExpanded ? $t('收起服務與店鋪信息') : $t('更多服務與店鋪信息') }}</span>
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" :class="{ expanded: footerExpanded }" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
       </button>
       <div id="footer-information" class="footer-cols" :class="{ 'is-expanded': footerExpanded }">
@@ -135,57 +135,57 @@
             <span v-else-if="brandReady" class="logo-mark">ZC</span>
             <span v-else class="logo-mark brand-placeholder" aria-hidden="true"></span>
           </div>
-          <p class="muted">{{ footerAbout || $t('在线选购商品，查看虚拟交付结果或实体配送进度。') }}</p>
-          <!-- 社交链接（footer.social = [{icon,url}]，配置后显示） -->
+          <p class="muted">{{ footerAbout || $t('在線選購商品，查看虛擬交付結果或實體配送進度。') }}</p>
+          <!-- 社交鏈接（footer.social = [{icon,url}]，配置後顯示） -->
           <div v-if="footerSocial.length" class="footer-social">
             <a v-for="(s, i) in footerSocial" :key="i" :href="s.url || '#'" target="_blank" rel="noopener noreferrer" class="footer-social-link" :title="s.url">{{ s.icon }}</a>
           </div>
         </div>
         <div class="footer-col">
-          <h4>{{ $t('快速导航') }}</h4>
+          <h4>{{ $t('快速導航') }}</h4>
           <template v-if="footerNav.length">
             <a v-for="(n, i) in footerNav" :key="i" :href="n.url || '#'">{{ n.text }}</a>
           </template>
           <template v-else>
-            <router-link to="/#catalog">{{ $t('选购商品') }}</router-link>
-            <router-link to="/points">{{ $t('积分商城') }}</router-link>
-            <router-link to="/coupons">{{ $t('优惠券') }}</router-link>
-            <router-link to="/affiliate">{{ $t('推广中心') }}</router-link>
+            <router-link to="/#catalog">{{ $t('選購商品') }}</router-link>
+            <router-link to="/points">{{ $t('積分商城') }}</router-link>
+            <router-link to="/coupons">{{ $t('優惠券') }}</router-link>
+            <router-link to="/affiliate">{{ $t('推廣中心') }}</router-link>
           </template>
         </div>
         <div class="footer-col">
-          <h4>{{ $t('帮助中心') }}</h4>
-          <router-link to="/posts?type=notice">{{ $t('系统公告') }}</router-link>
-          <router-link to="/posts?type=blog">{{ $t('使用帮助') }}</router-link>
-          <router-link to="/tickets">{{ $t('提交工单') }}</router-link>
-          <router-link to="/fetch">{{ $t('订单取货') }}</router-link>
+          <h4>{{ $t('幫助中心') }}</h4>
+          <router-link to="/posts?type=notice">{{ $t('系統公告') }}</router-link>
+          <router-link to="/posts?type=blog">{{ $t('使用幫助') }}</router-link>
+          <router-link to="/tickets">{{ $t('提交工單') }}</router-link>
+          <router-link to="/fetch">{{ $t('訂單取貨') }}</router-link>
         </div>
         <div class="footer-col">
-          <h4>{{ $t('会员服务') }}</h4>
-          <router-link to="/member">{{ $t('会员中心') }}</router-link>
-          <router-link to="/member?tab=orders">{{ $t('我的订单') }}</router-link>
-          <router-link to="/member?tab=recharge">{{ $t('余额充值') }}</router-link>
-          <router-link to="/member?tab=giftcard">{{ $t('礼品卡兑换') }}</router-link>
+          <h4>{{ $t('會員服務') }}</h4>
+          <router-link to="/member">{{ $t('會員中心') }}</router-link>
+          <router-link to="/member?tab=orders">{{ $t('我的訂單') }}</router-link>
+          <router-link to="/member?tab=recharge">{{ $t('餘額充值') }}</router-link>
+          <router-link to="/member?tab=giftcard">{{ $t('禮品卡兑換') }}</router-link>
         </div>
         <div v-if="footerContact" class="footer-col">
-          <h4>{{ $t('联系我们') }}</h4>
+          <h4>{{ $t('聯繫我們') }}</h4>
           <p class="muted" style="white-space: pre-line;">{{ footerContact }}</p>
         </div>
       </div>
       <div class="footer-copy">
-        <span class="footer-copyright">© {{ year }} {{ siteName }}<span class="footer-rights"> {{ $t('· 保留所有权利') }}</span></span>
-        <a v-if="agreementHref" :href="agreementHref" :target="agreementHref.startsWith('http') ? '_blank' : undefined" rel="noopener noreferrer" class="footer-copy-link">{{ $t('用户协议') }}</a>
+        <span class="footer-copyright">© {{ year }} {{ siteName }}<span class="footer-rights"> {{ $t('· 保留所有權利') }}</span></span>
+        <a v-if="agreementHref" :href="agreementHref" :target="agreementHref.startsWith('http') ? '_blank' : undefined" rel="noopener noreferrer" class="footer-copy-link">{{ $t('用户協議') }}</a>
         <a v-if="footerIcp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="footer-copy-link">{{ footerIcp }}</a>
       </div>
     </footer>
 
-    <!-- 回到顶部悬浮球 -->
-    <button v-if="showTop" class="back-top" @click="scrollTop" :title="$t('回到顶部')">↑</button>
+    <!-- 回到頂部懸浮球 -->
+    <button v-if="showTop" class="back-top" @click="scrollTop" :title="$t('回到頂部')">↑</button>
 
-    <!-- 右下角客服（第三方脚本原生气泡 / 本站链接浮窗） -->
+    <!-- 右下角客服（第三方腳本原生氣泡 / 本站鏈接浮窗） -->
     <ServiceWidget />
 
-    <!-- 公告弹窗（首次访问自动弹出 + 导航喇叭/首页公告轮播入口） -->
+    <!-- 公告彈窗（首次訪問自動彈出 + 導航喇叭/首頁公告輪播入口） -->
     <NoticeModal :show="noticeShow" :post="noticePost" :content="noticeContent" :announcement="noticeAnnouncement" @update:show="(v: boolean) => (noticeShow = v)" />
     </template>
   </div>
@@ -217,7 +217,7 @@ onMounted(async () => { const { data } = await listLotteryActivities(); lotteryV
 const router = useRouter();
 const route = useRoute();
 
-// 安装页：无商城布局（头部/尾部/客服/公告等全部不渲染，见模板 v-if）
+// 安裝頁：無商城佈局（頭部/尾部/客服/公告等全部不渲染，見模板 v-if）
 const isInstall = computed(() => route.path === '/install');
 
 const { siteName, siteLogo, brandReady } = useBranding();
@@ -227,25 +227,25 @@ watch([siteLogo, brandReady], () => {
   if (icon) { icon.removeAttribute('type'); icon.href = siteLogo.value || '/zcard-icon.png'; }
 }, { immediate: true });
 
-// SEO 默认 head 由 main.ts 处理（客户端拉取后更新；SSR 渲染后输出到静态 HTML）
+// SEO 默認 head 由 main.ts 處理（客户端拉取後更新；SSR 渲染後輸出到靜態 HTML）
 
-// 启动加载默认货币（i18n.base_currency → 符号/小数位；失败回退默认符号）
+// 啓動加載默認貨幣（i18n.base_currency → 符號/小數位；失敗回退默認符號）
 if (!import.meta.env.SSR) initCurrency();
-// 登录态恢复（token 存在则拉用户名；失败静默——401 层统一处理）
+// 登錄態恢復（token 存在則拉用户名；失敗靜默——401 層統一處理）
 if (!import.meta.env.SSR) refreshAuth();
 
 const year = new Date().getFullYear();
 
-// 购物车角标：共享响应式状态（商品页加购/删除实时联动；:key 变化触发弹跳动画）
+// 購物車角標：共享響應式狀態（商品頁加購/刪除實時聯動；:key 變化觸發彈跳動畫）
 async function refreshCartAvailability() {
   if (!isInstall.value && await refreshCartSetting(true)) await refreshCartState();
 }
 watch(() => route.fullPath, refreshCartAvailability);
 const cartCount = computed(() => cartState.value.count);
-// 登录/登出后重拉（登录合并本地车、登出回退本地车）
+// 登錄/登出後重拉（登錄合併本地車、登出回退本地車）
 watch(() => authState.loggedIn, () => { refreshCartState(); });
 
-// 统计代码（service.stats_script）：注入 document.body 末尾——统计代码置底，与客服悬浮球无关
+// 統計代碼（service.stats_script）：注入 document.body 末尾——統計代碼置底，與客服懸浮球無關
 let statsInjected = false;
 function injectStatsScript(html: string) {
   if (statsInjected) return;
@@ -260,12 +260,12 @@ function injectStatsScript(html: string) {
       const el = document.createElement('script');
       el.textContent = code;
       el.dataset.zcardStatsScript = 'true';
-      document.body.appendChild(el); // 页面最底部
+      document.body.appendChild(el); // 頁面最底部
     }
-  } catch { /* 统计脚本注入失败忽略 */ }
+  } catch { /* 統計腳本注入失敗忽略 */ }
 }
 
-// 回到顶部
+// 回到頂部
 const showTop = ref(false);
 function onScroll() {
   showTop.value = window.scrollY > 300;
@@ -274,19 +274,19 @@ function scrollTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── 顶部自定义按钮（site.top_button 公开下发）+ 维护模式（ops.maintenance[_style]）──
-// top_button：{text, type: link|post|notice, url?|slug?}——link 外链新窗口；post/notice 站内文章路由
-// 教程入口可能来自自定义按钮或推荐位；只替换旧书本前缀，配置原文不变。
-const isGuide = (text: string) => /教程|指南|帮助/.test(text);
+// ── 頂部自定義按鈕（site.top_button 公開下發）+ 維護模式（ops.maintenance[_style]）──
+// top_button：{text, type: link|post|notice, url?|slug?}——link 外鏈新窗口；post/notice 站內文章路由
+// 教程入口可能來自自定義按鈕或推薦位；只替換舊書本前綴，配置原文不變。
+const isGuide = (text: string) => /教程|指南|幫助/.test(text);
 const navText = (text: string) => isGuide(text) ? text.replace(/^(?:📚|📖|📘|📙|📗|📕|📔|📓)\s*/, '') : text;
 const topButton = ref<{ text: string; type?: string; url?: string; slug?: string } | null>(null);
 const navRecommend = ref<{ text: string; url: string }[]>([]);
 const maintenance = ref(false);
-const maintenanceStyle = ref('modal'); // modal=全屏遮罩 | banner=顶部横幅
-const maintenanceModalFreq = ref('every'); // every=每次进入都弹 | daily=24 小时一次
-// 无主题配置时兼容旧 promo 开关；主题自定义优先，缺省显示。
+const maintenanceStyle = ref('modal'); // modal=全屏遮罩 | banner=頂部橫幅
+const maintenanceModalFreq = ref('every'); // every=每次進入都彈 | daily=24 小時一次
+// 無主題配置時兼容舊 promo 開關；主題自定義優先，缺省顯示。
 const brandBarEnabled = ref(true);
-// template.bg_image：全站背景图（空=默认纯色背景）
+// template.bg_image：全站背景圖（空=默認純色背景）
 const bgImage = ref(themeValue('template.bg_image', ''));
 const bgImageMobile = ref(themeValue('template.bg_image_mobile', ''));
 const mobileBackground = ref(typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches);
@@ -294,21 +294,21 @@ let backgroundMedia: MediaQueryList | null = null;
 function updateBackgroundMedia() { mobileBackground.value = backgroundMedia?.matches ?? false; }
 onMounted(() => { backgroundMedia = window.matchMedia('(max-width: 768px)'); updateBackgroundMedia(); backgroundMedia.addEventListener('change', updateBackgroundMedia); });
 onUnmounted(() => backgroundMedia?.removeEventListener('change', updateBackgroundMedia));
-// 背景属于商城外壳，导航到商品详情时保持不变。
+// 背景屬於商城外殼，導航到商品詳情時保持不變。
 const appBgStyle = computed(() => {
   const image = mobileBackground.value ? bgImageMobile.value || bgImage.value : bgImage.value;
   if (!image || isInstall.value) return undefined;
   return { backgroundImage: `url(${JSON.stringify(image)})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' };
 });
 
-// ── 页脚配置（footer.* 公开下发：about/nav/social/contact/agreement/icp，空值回落默认）──
+// ── 頁腳配置（footer.* 公開下發：about/nav/social/contact/agreement/icp，空值回落默認）──
 const footerExpanded = ref(false);
 watch(() => route.fullPath, () => { footerExpanded.value = false; });
 const footerTrustDefaults = [
-  { icon: '⚡', image: '', get title() { return $t("按商品履约"); }, get description() { return $t("虚拟交付或快递配送"); } },
-  { icon: '🛡️', image: '', get title() { return $t("正品保障"); }, get description() { return $t("渠道直供货源"); } },
-  { icon: '💬', image: '', get title() { return $t("在线客服"); }, get description() { return $t("7×24 小时响应"); } },
-  { icon: '↩️', image: '', get title() { return $t("售后无忧"); }, get description() { return $t("问题订单快速处理"); } },
+  { icon: '⚡', image: '', get title() { return $t("按商品履約"); }, get description() { return $t("虛擬交付或快遞配送"); } },
+  { icon: '🛡️', image: '', get title() { return $t("正品保障"); }, get description() { return $t("渠道直供貨源"); } },
+  { icon: '💬', image: '', get title() { return $t("在線客服"); }, get description() { return $t("7×24 小時響應"); } },
+  { icon: '↩️', image: '', get title() { return $t("售後無憂"); }, get description() { return $t("問題訂單快速處理"); } },
 ];
 const footerTrust = ref(footerTrustDefaults.map(item => ({ ...item })));
 function applyFooterTrustSettings(read: (key: string, fallback: string) => string) {
@@ -317,8 +317,8 @@ function applyFooterTrustSettings(read: (key: string, fallback: string) => strin
     return {
       icon: read(`${prefix}_icon`, item.icon),
       image: read(`${prefix}_image`, item.image),
-      title: (() => { const value = read(`${prefix}_title`, item.title); const source = ['按商品履约', '正品保障', '在线客服', '售后无忧'][index]; return value === source ? $t(source) : value; })(),
-      description: (() => { const value = read(`${prefix}_description`, item.description); const source = ['虚拟交付或快递配送', '渠道直供货源', '7×24 小时响应', '问题订单快速处理'][index]; return value === source ? $t(source) : value; })(),
+      title: (() => { const value = read(`${prefix}_title`, item.title); const source = ['按商品履約', '正品保障', '在線客服', '售後無憂'][index]; return value === source ? $t(source) : value; })(),
+      description: (() => { const value = read(`${prefix}_description`, item.description); const source = ['虛擬交付或快遞配送', '渠道直供貨源', '7×24 小時響應', '問題訂單快速處理'][index]; return value === source ? $t(source) : value; })(),
     };
   });
 }
@@ -328,7 +328,7 @@ const footerSocial = ref<{ icon: string; url: string }[]>([]);
 const footerContact = ref('');
 const footerAgreement = ref('');
 const footerIcp = ref('');
-// 协议链接：http(s) 外链原样；非空文本视为文章 slug → /posts/<slug>
+// 協議鏈接：http(s) 外鏈原樣；非空文本視為文章 slug → /posts/<slug>
 const agreementHref = computed(() => {
   const v = footerAgreement.value.trim();
   if (!v) return '';
@@ -336,7 +336,7 @@ const agreementHref = computed(() => {
   return `/posts/${v}`;
 });
 
-// 维护弹窗显隐：daily 频率下 24 小时窗口用 localStorage 标记；关闭即记时间戳
+// 維護彈窗顯隱：daily 頻率下 24 小時窗口用 localStorage 標記；關閉即記時間戳
 const maintModalVisible = ref(false);
 const MAINT_SHOWN_KEY = 'zc_maint_shown_at';
 
@@ -353,10 +353,10 @@ function closeMaintModal() {
   maintModalVisible.value = false;
   try {
     localStorage.setItem(MAINT_SHOWN_KEY, String(Date.now()));
-  } catch { /* 隐私模式忽略 */ }
+  } catch { /* 隱私模式忽略 */ }
 }
 
-// ── 公告弹窗（设置公告优先；回落最新公告文章；首次访问自动弹出 + 导航喇叭/首页轮播随时重开）──
+// ── 公告彈窗（設置公告優先；回落最新公告文章；首次訪問自動彈出 + 導航喇叭/首頁輪播隨時重開）──
 const noticeShow = ref(false);
 const noticePost = ref<StorePost | null>(null);
 const noticeContent = ref('');
@@ -366,7 +366,7 @@ let noticeRequest = 0;
 async function loadNotice() {
   const currentRequest = ++noticeRequest;
   const requestedLocale = locale.value;
-  // 设置公告（ops.announcement）：text/image/carousel 任一配置生效即优先
+  // 設置公告（ops.announcement）：text/image/carousel 任一配置生效即優先
   const ann = await fetchAnnouncement();
   if (currentRequest !== noticeRequest || requestedLocale !== locale.value) return;
   if ((ann.type === 'text' && ann.text) || ann.images.length) {
@@ -389,11 +389,11 @@ async function loadNotice() {
 function openNotice() {
   if (noticePost.value || noticeAnnouncement.value) noticeShow.value = true;
   else {
-    // 尚未加载（或失败）：静默拉一次再弹
+    // 尚未加載（或失敗）：靜默拉一次再彈
     loadNotice().then(() => { noticeShow.value = true; });
   }
 }
-// 供页面内公告入口（首页滚动公告条等）复用同一弹窗
+// 供頁面內公告入口（首頁滾動公告條等）複用同一彈窗
 provide('openNotice', openNotice);
 
 const shellReady = ref(!import.meta.env.SSR && !!publicConfig.value);
@@ -411,7 +411,7 @@ function applyShellConfig(json: PublicConfig) {
     });
     topButton.value = null;
     navRecommend.value = [];
-    // 顶部自定义按钮 {text,type,url|slug}
+    // 頂部自定義按鈕 {text,type,url|slug}
     const tb = find('site.top_button');
     if (tb) {
       try {
@@ -426,7 +426,7 @@ function applyShellConfig(json: PublicConfig) {
         }
       } catch { /* 非法配置忽略 */ }
     }
-    // 导航推荐位（promo.nav_recommend [{text,url}]：最多取 3 条，非法结构忽略）
+    // 導航推薦位（promo.nav_recommend [{text,url}]：最多取 3 條，非法結構忽略）
     const nr = find('promo.nav_recommend');
     if (nr) {
       try {
@@ -439,7 +439,7 @@ function applyShellConfig(json: PublicConfig) {
         }
       } catch { /* 非法配置忽略 */ }
     }
-    // 页脚配置（footer.*：空值回落模板默认）
+    // 頁腳配置（footer.*：空值回落模板默認）
     const fa = find('footer.about');
     if (fa) { try { footerAbout.value = String(JSON.parse(fa) || ''); } catch { /* ignore */ } }
     const fn = find('footer.nav');
@@ -462,13 +462,13 @@ function applyShellConfig(json: PublicConfig) {
     if (fag) { try { footerAgreement.value = String(JSON.parse(fag) || ''); } catch { /* ignore */ } }
     const ficp = find('footer.icp');
     if (ficp) { try { footerIcp.value = String(JSON.parse(ficp) || ''); } catch { /* ignore */ } }
-    // 维护模式与样式（modal=遮罩弹窗 / banner=顶部横幅）；弹窗频率 daily=24h 一次
+    // 維護模式與樣式（modal=遮罩彈窗 / banner=頂部橫幅）；彈窗頻率 daily=24h 一次
     const mt = find('ops.maintenance');
     if (mt) { try { maintenance.value = JSON.parse(mt) === true; } catch { /* ignore */ } }
-    // 主题品牌条开关独立于首页横幅；未配置主题开关时沿用旧设置。
+    // 主題品牌條開關獨立於首頁橫幅；未配置主題開關時沿用舊設置。
     const tbe = find('theme.brand_bar_enabled') || find('promo.top_banner_enabled');
     if (tbe) { try { brandBarEnabled.value = JSON.parse(tbe) !== false; } catch { /* ignore */ } }
-    // 全站背景图（template.bg_image；空=默认纯色）
+    // 全站背景圖（template.bg_image；空=默認純色）
     const mobileBi = find('template.bg_image_mobile');
     if (mobileBi) { try { const v = JSON.parse(mobileBi); if (typeof v === 'string') bgImageMobile.value = v; } catch { /* ignore */ } }
     const bi = find('template.bg_image');
@@ -479,7 +479,7 @@ function applyShellConfig(json: PublicConfig) {
     if (mf) { try { const v = JSON.parse(mf); if (v === 'every' || v === 'daily') maintenanceModalFreq.value = v; } catch { /* ignore */ } }
     if (maintenance.value && maintenanceStyle.value === 'modal' && (!wasMaintenance || previousMaintenanceStyle !== 'modal')) {
       if (maintenanceModalFreq.value === 'daily' && maintShownRecently()) {
-        maintModalVisible.value = false; // 24 小时内已弹过：本次不再打扰
+        maintModalVisible.value = false; // 24 小時內已彈過：本次不再打擾
       } else {
         maintModalVisible.value = true;
       }
@@ -507,7 +507,7 @@ async function refreshShell() {
   if (shellLoading.value) return;
   shellLoading.value = true;
   try { await loadPublicConfig(); }
-  catch { if (!shellReady.value) shellError.value = $t("店铺暂时无法加载，请检查网络后重试"); }
+  catch { if (!shellReady.value) shellError.value = $t("店鋪暫時無法加載，請檢查網絡後重試"); }
   finally { shellLoading.value = false; }
 }
 function resumeShell() {
@@ -526,11 +526,11 @@ onMounted(async () => {
 
   refreshCartState();
   window.addEventListener('scroll', onScroll);
-  // 登录态：合并本地游客购物车到后端（游客加购的商品登录后自动同步；merge 内部会刷新角标）
+  // 登錄態：合併本地遊客購物車到後端（遊客加購的商品登錄後自動同步；merge 內部會刷新角標）
   if (authState.loggedIn) {
     await mergeGuestCart();
   }
-  // 公告：每会话首次访问自动弹出（sessionStorage 标记）
+  // 公告：每會話首次訪問自動彈出（sessionStorage 標記）
   await loadNotice();
   try {
     if (themeValue('theme.notice_auto', true) && (noticePost.value || noticeAnnouncement.value) && !sessionStorage.getItem('zc_notice_shown')) {
@@ -538,7 +538,7 @@ onMounted(async () => {
       noticeShow.value = true;
     }
   } catch { /* Storage restrictions must not break the storefront. */ }
-  // 首页公告轮播点击 → 打开弹窗
+  // 首頁公告輪播點擊 → 打開彈窗
   window.addEventListener('zcard-open-notice', openNotice);
 });
 onUnmounted(() => {

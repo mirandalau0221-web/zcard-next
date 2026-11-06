@@ -22,21 +22,21 @@ type PaymentChannel struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// 渠道码（alipay/wechat/epay/wallet...）
+	// 渠道碼（alipay/wechat/epay/wallet...）
 	Code string `json:"code,omitempty"`
-	// 驱动类型（适配器按 (provider, channel) 注册表路由）
+	// 驅動類型（適配器按 (provider, channel) 註冊表路由）
 	Driver string `json:"driver,omitempty"`
-	// AES-256-GCM 加密凭据（结构随 driver）
+	// AES-256-GCM 加密憑據（結構隨 driver）
 	Config []byte `json:"config,omitempty"`
-	// 手续费（分 或 万分比，按 fee_type）
+	// 手續費（分 或 萬分比，按 fee_type）
 	Fee int64 `json:"fee,omitempty"`
 	// FeeType holds the value of the "fee_type" field.
 	FeeType paymentchannel.FeeType `json:"fee_type,omitempty"`
-	// 手续费承担方
+	// 手續費承擔方
 	FeeBearer paymentchannel.FeeBearer `json:"fee_bearer,omitempty"`
 	// Recommended holds the value of the "recommended" field.
 	Recommended bool `json:"recommended,omitempty"`
@@ -48,7 +48,7 @@ type PaymentChannel struct {
 	Sort int32 `json:"sort,omitempty"`
 	// Enabled holds the value of the "enabled" field.
 	Enabled bool `json:"enabled,omitempty"`
-	// 已删除渠道从管理列表隐藏；保留历史支付回调凭据
+	// 已刪除渠道從管理列表隱藏；保留歷史支付回調憑據
 	DeletedAt time.Time `json:"deleted_at,omitempty"`
 	// AllowPurchase holds the value of the "allow_purchase" field.
 	AllowPurchase bool `json:"allow_purchase,omitempty"`

@@ -1,4 +1,4 @@
-// 采购单 API（procurement:read / procurement:write）：上游拿货单列表、手动重试/完成。
+// 採購單 API（procurement:read / procurement:write）：上游拿貨單列表、手動重試/完成。
 
 import { request } from "../request";
 

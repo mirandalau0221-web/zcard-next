@@ -7,22 +7,22 @@
     <div class="pc-cover">
       <img v-if="p.cover" :src="p.cover" :alt="p.name" loading="lazy" @error="onImgError" />
       <img v-else :src="NO_IMAGE" :alt="p.name" class="pc-noimg" loading="lazy" />
-      <span v-if="p.points_required" class="pc-points-tag">{{ p.points_required }} {{ $t('积分') }}</span>
+      <span v-if="p.points_required" class="pc-points-tag">{{ p.points_required }} {{ $t('積分') }}</span>
     </div>
     <div class="pc-body">
       <div class="pc-heading">
         <div class="pc-name" :title="p.name">{{ p.name }}</div>
-        <span v-if="p.is_recommend || p.category_recommend" class="pc-recommend-tag">{{ $t('推荐') }}</span>
+        <span v-if="p.is_recommend || p.category_recommend" class="pc-recommend-tag">{{ $t('推薦') }}</span>
       </div>
-      <div v-if="p.delivery_kind === 'social_service'" class="pc-price">{{ $t('按填写内容报价') }}</div>
-      <div v-else-if="p.product_kind === 'sms_channel'" class="pc-price">{{ $t('进入选价') }}</div>
-      <div v-else class="pc-price">{{ formatMoney(flash.price(p.price_cents, p.flash_sale)) }}<span v-if="flash.active(p.flash_sale)" class="pc-flash-label">{{ (p.flash_sale?.remaining || 0) > 0 ? $t('秒杀') : $t('已抢完') }}</span></div>
+      <div v-if="p.delivery_kind === 'social_service'" class="pc-price">{{ $t('按填寫內容報價') }}</div>
+      <div v-else-if="p.product_kind === 'sms_channel'" class="pc-price">{{ $t('進入選價') }}</div>
+      <div v-else class="pc-price">{{ formatMoney(flash.price(p.price_cents, p.flash_sale)) }}<span v-if="flash.active(p.flash_sale)" class="pc-flash-label">{{ (p.flash_sale?.remaining || 0) > 0 ? $t('秒殺') : $t('已搶完') }}</span></div>
       <div v-if="p.product_kind !== 'sms_channel' && p.delivery_kind !== 'social_service' && (salesShown || stockShown)" class="pc-meta">
         <span v-if="salesShown" class="pc-sales">{{ $t('已售') }} {{ p.sales_count || 0 }}</span>
-        <span v-if="stockShown && p.stock_status === 'stale'" class="pc-stock-reference" :title="stockHint(p)">{{ p.stock_reference === -1 ? $t('上次库存不限') : $t('参考库存 {0}', [p.stock_reference ?? 0]) }}</span>
-        <span v-else-if="stockShown && stockValue(p) >= 0">{{ stockValue(p) === 0 ? $t('暂时售罄') : $t('库存 {0}', [stockValue(p)]) }}</span>
-        <span v-else-if="stockShown && p.stock === -1" class="pc-stock-free">{{ $t('不限库存') }}</span>
-        <span v-else-if="stockShown" :title="$t('上游暂未提供库存，进入商品详情查询或重试')">{{ $t('库存待确认') }}</span>
+        <span v-if="stockShown && p.stock_status === 'stale'" class="pc-stock-reference" :title="stockHint(p)">{{ p.stock_reference === -1 ? $t('上次庫存不限') : $t('參考庫存 {0}', [p.stock_reference ?? 0]) }}</span>
+        <span v-else-if="stockShown && stockValue(p) >= 0">{{ stockValue(p) === 0 ? $t('暫時售罄') : $t('庫存 {0}', [stockValue(p)]) }}</span>
+        <span v-else-if="stockShown && p.stock === -1" class="pc-stock-free">{{ $t('不限庫存') }}</span>
+        <span v-else-if="stockShown" :title="$t('上游暫未提供庫存，進入商品詳情查詢或重試')">{{ $t('庫存待確認') }}</span>
       </div>
       <button type="button" class="btn btn-primary pc-buy" :aria-label="`${buyLabel(p, mode)}：${p.name}`" @click.stop="$router.push(`/product/${p.id}`)">{{ buyLabel(p, mode) }}</button>
     </div>
@@ -39,19 +39,19 @@ const flash = useFlashOffers();
 import { formatMoney } from '@/api/client';
 import { NO_IMAGE, onImgError } from '@/no-image';
 function stockValue(p: Product) { return p.stock ?? (p.stock_status === 'unknown' || p.stock_status === 'stale' ? -2 : 0); }
-function buyLabel(p: Product, mode?: string) { if(p.delivery_kind === 'social_service') return $t("填写信息报价"); if(p.product_kind === 'sms_channel') return $t("选价接码"); return mode !== 'list' ? $t("查看详情") : stockValue(p) === 0 ? $t("查看") : stockValue(p) < -1 ? $t("查看详情") : $t("购买"); }
+function buyLabel(p: Product, mode?: string) { if(p.delivery_kind === 'social_service') return $t("填寫信息報價"); if(p.product_kind === 'sms_channel') return $t("選價接碼"); return mode !== 'list' ? $t("查看詳情") : stockValue(p) === 0 ? $t("查看") : stockValue(p) < -1 ? $t("查看詳情") : $t("購買"); }
 function stockHint(p: Product) {
   const date = p.stock_checked_at ? new Date(p.stock_checked_at * 1000).toLocaleString(localeTag.value) : '';
-  return $t("上次同步{0}，仅供参考；进入商品详情重新核对库存", [date ? '：' + date : '']);
+  return $t("上次同步{0}，僅供參考；進入商品詳情重新核對庫存", [date ? '：' + date : '']);
 }
 
 
 const props = defineProps<{
   p: Product;
   mode?: 'grid' | 'list';
-  /** 卡片「已售」显示（template.show_sales；缺省显示） */
+  /** 卡片「已售」顯示（template.show_sales；缺省顯示） */
   showSales?: boolean;
-  /** 卡片「库存」显示（template.show_stock；叠加商品级 stock_visible；缺省显示） */
+  /** 卡片「庫存」顯示（template.show_stock；疊加商品級 stock_visible；缺省顯示） */
   showStock?: boolean;
 }>();
 const salesShown=computed(()=>props.showSales !== false && props.p.sales_visible !== false);
@@ -68,7 +68,7 @@ const stockShown=computed(()=>props.showStock !== false && props.p.stock_visible
   transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
   display: flex;
   flex-direction: column;
-  min-width: 0; /* 网格/flex 子项防长词撑爆列宽（grid item 默认 min-width:auto） */
+  min-width: 0; /* 網格/flex 子項防長詞撐爆列寬（grid item 默認 min-width:auto） */
 }
 .product-card:hover {
   border-color: color-mix(in srgb, var(--zc-primary) 45%, transparent);
@@ -101,7 +101,7 @@ const stockShown=computed(()=>props.showStock !== false && props.p.stock_visible
   color: var(--zc-primary-border);
   background: linear-gradient(135deg, var(--zc-primary-soft), var(--zc-primary-tint));
 }
-/* 无图占位（SVG data URI）：contain 完整显示，不参与 hover 缩放 */
+/* 無圖佔位（SVG data URI）：contain 完整顯示，不參與 hover 縮放 */
 .pc-noimg { object-fit: contain !important; }
 .product-card:hover .pc-cover img.pc-noimg { transform: none; }
 .pc-points-tag {
@@ -114,7 +114,7 @@ const stockShown=computed(()=>props.showStock !== false && props.p.stock_visible
   background: #4338ca;
   color: #fff;
 }
-/* 信息区 */
+/* 信息區 */
 .pc-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
 .pc-heading { display:flex; align-items:flex-start; gap:6px; min-width:0; }
 .pc-heading .pc-name { flex:1; min-width:0; }
@@ -128,7 +128,7 @@ const stockShown=computed(()=>props.showStock !== false && props.p.stock_visible
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 40px;
-  word-break: break-word; /* 不可断长词（连续英文/URL）换行，防横向溢出 */
+  word-break: break-word; /* 不可斷長詞（連續英文/URL）換行，防橫向溢出 */
   overflow-wrap: anywhere;
 }
 .pc-flash-label { display:inline-block; margin-left:5px; padding:1px 4px; font-size:12px; line-height:18px; font-weight:500; color:#b91c1c; background:#fef2f2; border-radius:4px; }
@@ -144,7 +144,7 @@ const stockShown=computed(()=>props.showStock !== false && props.p.stock_visible
 .pc-stock-reference { color: #475569; }
 .pc-buy { align-items: center; line-height: 1.2; flex-shrink: 0; display: none; margin-top: 8px; width: 100%; justify-content: center; }
 
-/* 列表视图 */
+/* 列表視圖 */
 .product-card.list-mode { flex-direction: row; align-items: center; gap: 14px; padding: 12px; }
 .list-mode .pc-cover { width: 64px; height: 64px; aspect-ratio: 1 / 1; border-radius: 8px; flex-shrink: 0; }
 .list-mode .pc-cover img { object-fit: contain; }
@@ -161,7 +161,7 @@ const stockShown=computed(()=>props.showStock !== false && props.p.stock_visible
   .grid-mode:hover .pc-buy { display: flex; }
 }
 
-/* 移动端双列窄卡：收紧留白，字号保持 ≥14px */
+/* 移動端雙列窄卡：收緊留白，字號保持 ≥14px */
 @media (max-width: 640px) {
   .grid-mode .pc-body { padding: 10px; gap: 5px; }
   .grid-mode .pc-price { font-size: 16px; }

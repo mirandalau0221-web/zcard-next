@@ -43,41 +43,41 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminSupplyService 货源连接管理：上游连接 CRUD + Ping 探活、
-// 商品映射规则、同步任务（创建/列表/详情/取消）、连接健康。
-// 凭据纪律：credentials 仅创建时明文传入，任何响应都不回显密文
-// （列表/详情只给 credentials_set 布尔，铁律 11）。
+// AdminSupplyService 貨源連接管理：上游連接 CRUD + Ping 探活、
+// 商品映射規則、同步任務（創建/列表/詳情/取消）、連接健康。
+// 憑據紀律：credentials 僅創建時明文傳入，任何響應都不回顯密文
+// （列表/詳情只給 credentials_set 布爾，鐵律 11）。
 type AdminSupplyServiceClient interface {
-	// CreateConnection 创建上游连接（凭据 AES-GCM 加密入库；base_url SSRF 校验）。
+	// CreateConnection 創建上游連接（憑據 AES-GCM 加密入庫；base_url SSRF 校驗）。
 	CreateConnection(ctx context.Context, in *CreateConnectionRequest, opts ...grpc.CallOption) (*SupplyConnection, error)
-	// UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+	// UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
 	UpdateConnection(ctx context.Context, in *UpdateConnectionRequest, opts ...grpc.CallOption) (*SupplyConnection, error)
-	// DeleteConnection 删除连接（存在映射时拒绝）。
+	// DeleteConnection 刪除連接（存在映射時拒絕）。
 	DeleteConnection(ctx context.Context, in *DeleteConnectionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListConnections 连接列表（凭据零回显）。
+	// ListConnections 連接列表（憑據零回顯）。
 	ListConnections(ctx context.Context, in *ListConnectionsRequest, opts ...grpc.CallOption) (*ListConnectionsReply, error)
 	// PingConnection 探活（更新 last_ping_at/last_ping_ok/balance_cache）。
 	PingConnection(ctx context.Context, in *PingConnectionRequest, opts ...grpc.CallOption) (*PingConnectionReply, error)
-	// ListMappings 商品映射列表（按连接过滤）。
+	// ListMappings 商品映射列表（按連接過濾）。
 	ListMappings(ctx context.Context, in *ListMappingsRequest, opts ...grpc.CallOption) (*ListMappingsReply, error)
-	// UpsertMapping 创建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
+	// UpsertMapping 創建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
 	UpsertMapping(ctx context.Context, in *UpsertMappingRequest, opts ...grpc.CallOption) (*SupplyMapping, error)
-	// DeleteMapping 删除映射。
+	// DeleteMapping 刪除映射。
 	DeleteMapping(ctx context.Context, in *DeleteMappingRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// CreateSyncTask 创建同步任务（full=全量 / incremental=增量；low 队列执行）。
+	// CreateSyncTask 創建同步任務（full=全量 / incremental=增量；low 隊列執行）。
 	CreateSyncTask(ctx context.Context, in *CreateSyncTaskRequest, opts ...grpc.CallOption) (*SupplySyncTask, error)
-	// ListSyncTasks 同步任务列表。
+	// ListSyncTasks 同步任務列表。
 	ListSyncTasks(ctx context.Context, in *ListSyncTasksRequest, opts ...grpc.CallOption) (*ListSyncTasksReply, error)
-	// GetSyncTask 任务详情（心跳/统计/错误上下文）。
+	// GetSyncTask 任務詳情（心跳/統計/錯誤上下文）。
 	GetSyncTask(ctx context.Context, in *GetSyncTaskRequest, opts ...grpc.CallOption) (*SupplySyncTask, error)
-	// CancelSyncTask 请求取消（分批间检查标志）。
+	// CancelSyncTask 請求取消（分批間檢查標誌）。
 	CancelSyncTask(ctx context.Context, in *CancelSyncTaskRequest, opts ...grpc.CallOption) (*SupplySyncTask, error)
 	ListImportItems(ctx context.Context, in *ListImportItemsRequest, opts ...grpc.CallOption) (*ListImportItemsReply, error)
 	RetryImportTask(ctx context.Context, in *RetryImportTaskRequest, opts ...grpc.CallOption) (*SupplySyncTask, error)
-	// ListHealth 连接健康列表（探活结果 + 最近错误 + 同步时间）。
-	// PreviewProducts 轻量目录预览；quote_code 按需查询一个商品的账号报价。
+	// ListHealth 連接健康列表（探活結果 + 最近錯誤 + 同步時間）。
+	// PreviewProducts 輕量目錄預覽；quote_code 按需查詢一個商品的賬號報價。
 	PreviewProducts(ctx context.Context, in *PreviewProductsRequest, opts ...grpc.CallOption) (*PreviewProductsReply, error)
-	// ImportProducts 勾选导入（定价策略 + 类目映射 + 存为连接默认； D）。
+	// ImportProducts 勾選導入（定價策略 + 類目映射 + 存為連接默認； D）。
 	ImportProducts(ctx context.Context, in *ImportProductsRequest, opts ...grpc.CallOption) (*ImportProductsReply, error)
 	ListHealth(ctx context.Context, in *ListHealthRequest, opts ...grpc.CallOption) (*ListHealthReply, error)
 }
@@ -264,41 +264,41 @@ func (c *adminSupplyServiceClient) ListHealth(ctx context.Context, in *ListHealt
 // All implementations must embed UnimplementedAdminSupplyServiceServer
 // for forward compatibility.
 //
-// AdminSupplyService 货源连接管理：上游连接 CRUD + Ping 探活、
-// 商品映射规则、同步任务（创建/列表/详情/取消）、连接健康。
-// 凭据纪律：credentials 仅创建时明文传入，任何响应都不回显密文
-// （列表/详情只给 credentials_set 布尔，铁律 11）。
+// AdminSupplyService 貨源連接管理：上游連接 CRUD + Ping 探活、
+// 商品映射規則、同步任務（創建/列表/詳情/取消）、連接健康。
+// 憑據紀律：credentials 僅創建時明文傳入，任何響應都不回顯密文
+// （列表/詳情只給 credentials_set 布爾，鐵律 11）。
 type AdminSupplyServiceServer interface {
-	// CreateConnection 创建上游连接（凭据 AES-GCM 加密入库；base_url SSRF 校验）。
+	// CreateConnection 創建上游連接（憑據 AES-GCM 加密入庫；base_url SSRF 校驗）。
 	CreateConnection(context.Context, *CreateConnectionRequest) (*SupplyConnection, error)
-	// UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+	// UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
 	UpdateConnection(context.Context, *UpdateConnectionRequest) (*SupplyConnection, error)
-	// DeleteConnection 删除连接（存在映射时拒绝）。
+	// DeleteConnection 刪除連接（存在映射時拒絕）。
 	DeleteConnection(context.Context, *DeleteConnectionRequest) (*emptypb.Empty, error)
-	// ListConnections 连接列表（凭据零回显）。
+	// ListConnections 連接列表（憑據零回顯）。
 	ListConnections(context.Context, *ListConnectionsRequest) (*ListConnectionsReply, error)
 	// PingConnection 探活（更新 last_ping_at/last_ping_ok/balance_cache）。
 	PingConnection(context.Context, *PingConnectionRequest) (*PingConnectionReply, error)
-	// ListMappings 商品映射列表（按连接过滤）。
+	// ListMappings 商品映射列表（按連接過濾）。
 	ListMappings(context.Context, *ListMappingsRequest) (*ListMappingsReply, error)
-	// UpsertMapping 创建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
+	// UpsertMapping 創建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
 	UpsertMapping(context.Context, *UpsertMappingRequest) (*SupplyMapping, error)
-	// DeleteMapping 删除映射。
+	// DeleteMapping 刪除映射。
 	DeleteMapping(context.Context, *DeleteMappingRequest) (*emptypb.Empty, error)
-	// CreateSyncTask 创建同步任务（full=全量 / incremental=增量；low 队列执行）。
+	// CreateSyncTask 創建同步任務（full=全量 / incremental=增量；low 隊列執行）。
 	CreateSyncTask(context.Context, *CreateSyncTaskRequest) (*SupplySyncTask, error)
-	// ListSyncTasks 同步任务列表。
+	// ListSyncTasks 同步任務列表。
 	ListSyncTasks(context.Context, *ListSyncTasksRequest) (*ListSyncTasksReply, error)
-	// GetSyncTask 任务详情（心跳/统计/错误上下文）。
+	// GetSyncTask 任務詳情（心跳/統計/錯誤上下文）。
 	GetSyncTask(context.Context, *GetSyncTaskRequest) (*SupplySyncTask, error)
-	// CancelSyncTask 请求取消（分批间检查标志）。
+	// CancelSyncTask 請求取消（分批間檢查標誌）。
 	CancelSyncTask(context.Context, *CancelSyncTaskRequest) (*SupplySyncTask, error)
 	ListImportItems(context.Context, *ListImportItemsRequest) (*ListImportItemsReply, error)
 	RetryImportTask(context.Context, *RetryImportTaskRequest) (*SupplySyncTask, error)
-	// ListHealth 连接健康列表（探活结果 + 最近错误 + 同步时间）。
-	// PreviewProducts 轻量目录预览；quote_code 按需查询一个商品的账号报价。
+	// ListHealth 連接健康列表（探活結果 + 最近錯誤 + 同步時間）。
+	// PreviewProducts 輕量目錄預覽；quote_code 按需查詢一個商品的賬號報價。
 	PreviewProducts(context.Context, *PreviewProductsRequest) (*PreviewProductsReply, error)
-	// ImportProducts 勾选导入（定价策略 + 类目映射 + 存为连接默认； D）。
+	// ImportProducts 勾選導入（定價策略 + 類目映射 + 存為連接默認； D）。
 	ImportProducts(context.Context, *ImportProductsRequest) (*ImportProductsReply, error)
 	ListHealth(context.Context, *ListHealthRequest) (*ListHealthReply, error)
 	mustEmbedUnimplementedAdminSupplyServiceServer()

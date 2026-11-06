@@ -15,9 +15,9 @@ var ProviderSet = wire.NewSet(
 	NewSupplyAPIService,
 	NewAdminSupplierService,
 	NewStoreSupplierService,
-	// target=supply 充值入账端口（payment 回调消费；SupplierRepoImpl.Recharge 实现）
+	// target=supply 充值入賬端口（payment 回調消費；SupplierRepoImpl.Recharge 實現）
 	wire.Bind(new(paymentport.SupplierRecharger), new(*SupplierRepoImpl)),
-	// 依赖经 wire 结构匹配：SupplierCatalog ← catalog（已 Bind）、
+	// 依賴經 wire 結構匹配：SupplierCatalog ← catalog（已 Bind）、
 	// Inventory/CardContentReader ← inventory、Enqueuer ← bootstrap
 )
 

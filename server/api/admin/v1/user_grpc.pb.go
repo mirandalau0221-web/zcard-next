@@ -31,18 +31,18 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminUserManageService 前台用户管理（storefront 注册用户；员工管理见
-// AdminUserService——两者数据域独立，勿混）。
+// AdminUserManageService 前台用户管理（storefront 註冊用户；員工管理見
+// AdminUserService——兩者數據域獨立，勿混）。
 type AdminUserManageServiceClient interface {
-	// ListUsers 用户列表（关键词/状态筛选，分页）。
+	// ListUsers 用户列表（關鍵詞/狀態篩選，分頁）。
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersReply, error)
-	// GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+	// GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserDetail, error)
-	// CreateUser 后台新增用户（用户名/邮箱/初始密码；复用注册管线含推广码生成）。
+	// CreateUser 後台新增用户（用户名/郵箱/初始密碼；複用註冊管線含推廣碼生成）。
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*UserItem, error)
-	// ResetUserPassword 重置用户密码（超管专属）。
+	// ResetUserPassword 重置用户密碼（超管專屬）。
 	ResetUserPassword(ctx context.Context, in *ResetUserPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// SetUserStatus 封禁/解封（status: active | banned；deleted 不可经此设置）。
+	// SetUserStatus 封禁/解封（status: active | banned；deleted 不可經此設置）。
 	SetUserStatus(ctx context.Context, in *SetUserStatusRequest, opts ...grpc.CallOption) (*UserItem, error)
 }
 
@@ -108,18 +108,18 @@ func (c *adminUserManageServiceClient) SetUserStatus(ctx context.Context, in *Se
 // All implementations must embed UnimplementedAdminUserManageServiceServer
 // for forward compatibility.
 //
-// AdminUserManageService 前台用户管理（storefront 注册用户；员工管理见
-// AdminUserService——两者数据域独立，勿混）。
+// AdminUserManageService 前台用户管理（storefront 註冊用户；員工管理見
+// AdminUserService——兩者數據域獨立，勿混）。
 type AdminUserManageServiceServer interface {
-	// ListUsers 用户列表（关键词/状态筛选，分页）。
+	// ListUsers 用户列表（關鍵詞/狀態篩選，分頁）。
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
-	// GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+	// GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
 	GetUser(context.Context, *GetUserRequest) (*UserDetail, error)
-	// CreateUser 后台新增用户（用户名/邮箱/初始密码；复用注册管线含推广码生成）。
+	// CreateUser 後台新增用户（用户名/郵箱/初始密碼；複用註冊管線含推廣碼生成）。
 	CreateUser(context.Context, *CreateUserRequest) (*UserItem, error)
-	// ResetUserPassword 重置用户密码（超管专属）。
+	// ResetUserPassword 重置用户密碼（超管專屬）。
 	ResetUserPassword(context.Context, *ResetUserPasswordRequest) (*emptypb.Empty, error)
-	// SetUserStatus 封禁/解封（status: active | banned；deleted 不可经此设置）。
+	// SetUserStatus 封禁/解封（status: active | banned；deleted 不可經此設置）。
 	SetUserStatus(context.Context, *SetUserStatusRequest) (*UserItem, error)
 	mustEmbedUnimplementedAdminUserManageServiceServer()
 }

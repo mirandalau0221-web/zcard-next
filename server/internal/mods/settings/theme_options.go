@@ -45,12 +45,12 @@ func newThemeRevision() string {
 func resolveSettingsTheme(key, revision string) (*theme.Theme, *theme.SettingsSchema, error) {
 	if key == "classic" {
 		if revision != "" && revision != "builtin" {
-			return nil, nil, fmt.Errorf("内置主题版本不可用")
+			return nil, nil, fmt.Errorf("內置主題版本不可用")
 		}
 		return nil, theme.ClassicSettings(), nil
 	}
 	if !theme.ValidKey(key) {
-		return nil, nil, fmt.Errorf("主题标识无效")
+		return nil, nil, fmt.Errorf("主題標識無效")
 	}
 	var t *theme.Theme
 	var err error
@@ -156,21 +156,21 @@ func (s *AdminSettingsService) SaveThemeSettings(ctx context.Context, req *admin
 		return nil, errors.BadRequest("theme.INVALID", err.Error())
 	}
 	if schema == nil {
-		return nil, errors.BadRequest("theme.UNSUPPORTED", "此主题未声明扩展设置")
+		return nil, errors.BadRequest("theme.UNSUPPORTED", "此主題未聲明擴展設置")
 	}
 	st, err := readThemeState(ctx, s.uc.repo, req.Key)
 	if err != nil {
 		return nil, err
 	}
 	if st.Revision != req.ExpectedRevision {
-		return nil, errors.Conflict("theme.CONFLICT", "设置已被其他页面更新，请重新加载")
+		return nil, errors.Conflict("theme.CONFLICT", "設置已被其他頁面更新，請重新加載")
 	}
 	values := map[string]any{}
 	if req.Action == "reset" {
 		values = schema.Defaults()
 	} else if req.Action != "rollback" {
 		if len(req.ValuesJson) > 128<<10 || json.Unmarshal([]byte(req.ValuesJson), &values) != nil {
-			return nil, errors.BadRequest("theme.INVALID_VALUES", "设置格式无效")
+			return nil, errors.BadRequest("theme.INVALID_VALUES", "設置格式無效")
 		}
 		if err = schema.ValidateValues(values); err != nil {
 			return nil, errors.BadRequest("theme.INVALID_VALUES", err.Error())
@@ -196,15 +196,15 @@ func (s *AdminSettingsService) SaveThemeSettings(ctx context.Context, req *admin
 		st.Draft = nil
 	case "rollback":
 		if st.Previous == nil {
-			return nil, errors.BadRequest("theme.NO_PREVIOUS", "没有可恢复的已发布版本")
+			return nil, errors.BadRequest("theme.NO_PREVIOUS", "沒有可恢復的已發佈版本")
 		}
 		if _, prevSchema, e := resolveSettingsTheme(req.Key, st.Previous.ThemeRevision); e != nil || prevSchema == nil {
-			return nil, errors.BadRequest("theme.PREVIOUS_MISSING", "上一版主题文件不可用")
+			return nil, errors.BadRequest("theme.PREVIOUS_MISSING", "上一版主題文件不可用")
 		}
 		st.Published, st.Previous = st.Previous, st.Published
 		st.Draft = nil
 	default:
-		return nil, errors.BadRequest("theme.INVALID_ACTION", "不支持的设置操作")
+		return nil, errors.BadRequest("theme.INVALID_ACTION", "不支持的設置操作")
 	}
 	if req.Action == "publish" || req.Action == "rollback" {
 		active, e := readActiveTheme(ctx, s.uc.repo)

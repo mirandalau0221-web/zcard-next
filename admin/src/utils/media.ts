@@ -1,9 +1,9 @@
 import { getServiceBaseURL } from "@/utils/service";
 
-// 素材/静态资源 URL 解析：
-// 后端返回相对路径（如 /uploads/2026/08/xxx.png），浏览器直接加载会落在前端
-// 站点根下 404（admin 走 /proxy-default 网关，图片需同网关前缀转发到后端静态服务）。
-// 绝对 URL（http(s)/data:）原样返回。
+// 素材/靜態資源 URL 解析：
+// 後端返回相對路徑（如 /uploads/2026/08/xxx.png），瀏覽器直接加載會落在前端
+// 站點根下 404（admin 走 /proxy-default 網關，圖片需同網關前綴轉發到後端靜態服務）。
+// 絕對 URL（http(s)/data:）原樣返回。
 const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === "Y";
 const { baseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
 

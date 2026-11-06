@@ -1,35 +1,35 @@
 <template>
   <div class="pay-page">
-    <!-- 加载态 -->
+    <!-- 加載態 -->
     <div v-if="phase === 'loading'" class="pay-center-card">
       <div class="pay-loading-icon pulse">⏳</div>
-      <div class="pay-loading-title">{{ $t('正在加载订单…') }}</div>
+      <div class="pay-loading-title">{{ $t('正在加載訂單…') }}</div>
     </div>
 
     <div v-else-if="phase === 'error'" class="pay-center-card">
-      <div class="pay-state-title">{{ $t('暂时无法查询订单') }}</div>
+      <div class="pay-state-title">{{ $t('暫時無法查詢訂單') }}</div>
       <div class="muted" role="alert">{{ uiText(error) }}</div>
-      <p class="muted">{{ $t('已付款请勿重复支付。可通过下单邮箱验证恢复订单访问。') }}</p>
+      <p class="muted">{{ $t('已付款請勿重複支付。可通過下單郵箱驗證恢復訂單訪問。') }}</p>
       <OrderAccessRecovery :order-no="orderNo" @recovered="retryOrder" />
-      <details><summary>{{ $t('虚拟商品或历史订单：使用查询密码') }}</summary>
+      <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼') }}</summary>
       <form @submit.prevent="retryOrder">
-        <label for="order-query-password">{{ $t('查询密码（游客订单）') }}</label>
+        <label for="order-query-password">{{ $t('查詢密碼（遊客訂單）') }}</label>
         <input id="order-query-password" v-model="queryPassword" class="input" type="password" autocomplete="off" />
         <div class="pay-btn-row">
-          <button class="btn btn-primary" type="submit" :disabled="retrying">{{ retrying ? $t('查询中…') : $t('重新查询') }}</button>
-          <router-link class="btn btn-outline" :to="`/fetch?order_no=${orderNo}`">{{ $t('前往取货') }}</router-link>
+          <button class="btn btn-primary" type="submit" :disabled="retrying">{{ retrying ? $t('查詢中…') : $t('重新查詢') }}</button>
+          <router-link class="btn btn-outline" :to="`/fetch?order_no=${orderNo}`">{{ $t('前往取貨') }}</router-link>
         </div>
       </form></details>
     </div>
 
-    <!-- 已取消 / 已过期 -->
+    <!-- 已取消 / 已過期 -->
     <div v-else-if="phase === 'closed'" class="pay-center-card">
       <div class="pay-state-icon gray">{{ order?.status === 'canceled' ? '🚫' : '⏰' }}</div>
-      <div class="pay-state-title">{{ order?.status === 'refunded' ? $t('订单已退款') : order?.status === 'canceled' ? $t('订单已取消') : $t('订单已超时') }}</div>
-      <div class="muted">{{ $t('订单号：') }}{{ orderNo }} · {{ order?.status === 'refunded' ? $t('请核对退款记录') : $t('未完成支付') }}</div>
+      <div class="pay-state-title">{{ order?.status === 'refunded' ? $t('訂單已退款') : order?.status === 'canceled' ? $t('訂單已取消') : $t('訂單已超時') }}</div>
+      <div class="muted">{{ $t('訂單號：') }}{{ orderNo }} · {{ order?.status === 'refunded' ? $t('請核對退款記錄') : $t('未完成支付') }}</div>
       <div class="pay-btn-row">
-        <router-link class="btn btn-primary" to="/products">{{ $t('重新选购') }}</router-link>
-        <router-link class="btn btn-outline" to="/member?tab=orders">{{ $t('我的订单') }}</router-link>
+        <router-link class="btn btn-primary" to="/products">{{ $t('重新選購') }}</router-link>
+        <router-link class="btn btn-outline" to="/member?tab=orders">{{ $t('我的訂單') }}</router-link>
       </div>
     </div>
 
@@ -37,106 +37,106 @@
     <div v-else-if="phase === 'success'" class="pay-center-card">
       <div class="pay-state-icon green pop">✓</div>
       <div class="pay-state-title">{{ $t('支付成功') }}</div>
-      <div class="muted" style="margin-bottom: 4px;">{{ $t('订单号：') }}{{ orderNo }}</div>
-      <div style="margin-bottom: 6px;">{{ $t('支付金额') }} <b class="pay-amount">{{ formatBaseMoney(order?.paid_total_cents || order?.total_cents || 0) }}</b></div>
+      <div class="muted" style="margin-bottom: 4px;">{{ $t('訂單號：') }}{{ orderNo }}</div>
+      <div style="margin-bottom: 6px;">{{ $t('支付金額') }} <b class="pay-amount">{{ formatBaseMoney(order?.paid_total_cents || order?.total_cents || 0) }}</b></div>
 
-      <div v-if="Number(order?.paid_fee_cents) > 0" class="muted">{{ $t('含支付手续费') }} {{ formatBaseMoney(order?.paid_fee_cents || 0) }}</div>
-      <!-- 自动取货：卡密直接展示（会话内记忆查询密码；失败降级提示去取货页） -->
+      <div v-if="Number(order?.paid_fee_cents) > 0" class="muted">{{ $t('含支付手續費') }} {{ formatBaseMoney(order?.paid_fee_cents || 0) }}</div>
+      <!-- 自動取貨：卡密直接展示（會話內記憶查詢密碼；失敗降級提示去取貨頁） -->
       <DeliveryResults v-if="!order?.items.some(i=>['sms_activation','social_service'].includes(i.delivery_kind || '')) && delivery?.items.length" :items="delivery.items" />
-      <p v-if="Number(order?.commerce_version)===1" class="muted">{{ $t('实体商品已进入配送流程，请在订单详情查看包裹并确认收货。') }}</p>
+      <p v-if="Number(order?.commerce_version)===1" class="muted">{{ $t('實體商品已進入配送流程，請在訂單詳情查看包裹並確認收貨。') }}</p>
       <div v-if="order?.items.some(i=>i.goods_type!=='physical' && !['sms_activation','social_service'].includes(i.delivery_kind || ''))" class="pay-fetch-hint">
-        <span>{{ ['delivered', 'completed'].includes(order?.status || '') ? $t('交付已完成，凭订单号与查询密码查看结果') : $t('已付款，正在安排交付。人工服务请在订单详情查看进度，请勿重复付款。') }}</span>
-        <router-link class="btn btn-primary" :to="`/fetch?order_no=${orderNo}`">{{ $t('前往取货') }}</router-link>
+        <span>{{ ['delivered', 'completed'].includes(order?.status || '') ? $t('交付已完成，憑訂單號與查詢密碼查看結果') : $t('已付款，正在安排交付。人工服務請在訂單詳情查看進度，請勿重複付款。') }}</span>
+        <router-link class="btn btn-primary" :to="`/fetch?order_no=${orderNo}`">{{ $t('前往取貨') }}</router-link>
       </div>
 
-      <p v-if="order?.items.some(i=>i.delivery_kind==='social_service')" class="muted">{{ $t('付款已确认，请前往订单详情查看服务进度与退款状态。') }}</p>
-      <p v-if="order?.items.some(i=>i.delivery_kind==='sms_activation')" class="muted">{{ $t('正在获取号码，请前往订单详情查看短信和取消/完成状态。') }}</p>
-      <p v-if="physicalOnly" class="muted">{{ $t('请保存订单访问链接，换设备可通过邮箱验证找回') }}</p>
-      <p v-else class="muted">{{ $t('请保存订单号和下单时的查询密码，游客也可随时查询、取货，无需注册。') }}</p>
+      <p v-if="order?.items.some(i=>i.delivery_kind==='social_service')" class="muted">{{ $t('付款已確認，請前往訂單詳情查看服務進度與退款狀態。') }}</p>
+      <p v-if="order?.items.some(i=>i.delivery_kind==='sms_activation')" class="muted">{{ $t('正在獲取號碼，請前往訂單詳情查看短信和取消/完成狀態。') }}</p>
+      <p v-if="physicalOnly" class="muted">{{ $t('請保存訂單訪問鏈接，換設備可通過郵箱驗證找回') }}</p>
+      <p v-else class="muted">{{ $t('請保存訂單號和下單時的查詢密碼，遊客也可隨時查詢、取貨，無需註冊。') }}</p>
       <div class="pay-btn-row">
-        <button class="btn btn-primary" @click="checkOnce(true)">{{ physicalOnly ? $t('刷新订单状态') : $t('刷新发货结果') }}</button>
-        <button v-if="physicalOnly && getOrderAccessToken(orderNo)" class="btn btn-outline" @click="saveAccessLink">{{ copiedAccessLink ? $t('已复制') : $t('复制订单访问链接') }}</button>
-        <router-link class="btn btn-outline" :to="`/order/${orderNo}`">{{ $t('查看订单详情') }}</router-link>
-        <router-link class="btn btn-outline" to="/products">{{ $t('继续购物') }}</router-link>
+        <button class="btn btn-primary" @click="checkOnce(true)">{{ physicalOnly ? $t('刷新訂單狀態') : $t('刷新發貨結果') }}</button>
+        <button v-if="physicalOnly && getOrderAccessToken(orderNo)" class="btn btn-outline" @click="saveAccessLink">{{ copiedAccessLink ? $t('已複製') : $t('複製訂單訪問鏈接') }}</button>
+        <router-link class="btn btn-outline" :to="`/order/${orderNo}`">{{ $t('查看訂單詳情') }}</router-link>
+        <router-link class="btn btn-outline" to="/products">{{ $t('繼續購物') }}</router-link>
       </div>
     </div>
 
-    <!-- 等待回调（轮询超时兜底） -->
+    <!-- 等待回調（輪詢超時兜底） -->
     <div v-else-if="phase === 'waiting'" class="pay-center-card">
       <div class="pay-state-icon amber pulse">🕒</div>
-      <div class="pay-state-title">{{ $t('支付处理中') }}</div>
-      <div class="muted">{{ $t('如已完成支付，到账可能有数秒延迟') }}</div>
+      <div class="pay-state-title">{{ $t('支付處理中') }}</div>
+      <div class="muted">{{ $t('如已完成支付，到賬可能有數秒延遲') }}</div>
       <div class="pay-btn-row">
-        <button class="btn btn-primary" @click="checkOnce(true)">{{ $t('刷新支付状态') }}</button>
-        <router-link class="btn btn-outline" :to="`/fetch?order_no=${orderNo}`">{{ $t('前往取货') }}</router-link>
+        <button class="btn btn-primary" @click="checkOnce(true)">{{ $t('刷新支付狀態') }}</button>
+        <router-link class="btn btn-outline" :to="`/fetch?order_no=${orderNo}`">{{ $t('前往取貨') }}</router-link>
       </div>
     </div>
 
-    <!-- 扫码支付中 -->
+    <!-- 掃碼支付中 -->
     <div v-else-if="phase === 'qrcode'" class="pay-qr-layout">
       <div class="pay-qr-main">
         <div class="pay-qr-head">
           <span class="pay-channel-icon">{{ payingChannel ? emojiOf(selected.method || payingChannel.code, payingChannel.driver) : '💳' }}</span>
           <div>
-            <div class="pay-qr-title">{{ payingChannel?.name || $t('扫码支付') }}</div>
-            <div class="muted">{{ $t('请使用手机扫一扫完成支付') }}</div>
+            <div class="pay-qr-title">{{ payingChannel?.name || $t('掃碼支付') }}</div>
+            <div class="muted">{{ $t('請使用手機掃一掃完成支付') }}</div>
           </div>
           <span v-if="countdownText" class="pay-countdown" :class="{ danger: countdownDanger }">{{ countdownText }}</span>
         </div>
         <div class="pay-qr-box">
-          <img v-if="qrDataUrl" :src="qrDataUrl" :alt="$t('支付二维码')" />
-          <div v-else class="pay-qr-loading">{{ $t('生成二维码中…') }}</div>
+          <img v-if="qrDataUrl" :src="qrDataUrl" :alt="$t('支付二維碼')" />
+          <div v-else class="pay-qr-loading">{{ $t('生成二維碼中…') }}</div>
         </div>
         <PaymentBreakdown :quote="paidQuote" />
         <div class="pay-qr-hint">
-          <span class="dot-loader"><span></span><span></span><span></span></span> {{ $t('正在检测支付结果，付款成功后可查看交付进度与结果') }} </div>
-        <button class="pay-change" @click="backToSelect">{{ $t('← 更换支付方式') }}</button>
+          <span class="dot-loader"><span></span><span></span><span></span></span> {{ $t('正在檢測支付結果，付款成功後可查看交付進度與結果') }} </div>
+        <button class="pay-change" @click="backToSelect">{{ $t('← 更換支付方式') }}</button>
       </div>
       <aside class="pay-side">
-        <div class="pay-side-row"><span class="muted">{{ $t('订单号') }}</span><span class="pay-mono">{{ orderNo }}</span></div>
-        <div class="pay-side-row"><span class="muted">{{ $t('下单时间') }}</span><span>{{ fmtTime(order?.created_at) }}</span></div>
+        <div class="pay-side-row"><span class="muted">{{ $t('訂單號') }}</span><span class="pay-mono">{{ orderNo }}</span></div>
+        <div class="pay-side-row"><span class="muted">{{ $t('下單時間') }}</span><span>{{ fmtTime(order?.created_at) }}</span></div>
         <div class="pay-side-row"><span class="muted">{{ $t('商品') }}</span><span>{{ itemCount }} {{ $t('件') }}</span></div>
-        <div class="pay-side-row total"><span>{{ $t('实付') }}</span><b class="pay-amount">{{ formatBaseMoney(paidQuote?.total_cents || order?.total_cents || 0) }}</b></div>
+        <div class="pay-side-row total"><span>{{ $t('實付') }}</span><b class="pay-amount">{{ formatBaseMoney(paidQuote?.total_cents || order?.total_cents || 0) }}</b></div>
       </aside>
     </div>
 
-    <!-- 跳转支付中 -->
+    <!-- 跳轉支付中 -->
     <div v-else-if="phase === 'redirect'" class="pay-center-card">
       <div class="pay-state-icon blue">🚀</div>
-      <div class="pay-state-title">{{ $t('正在前往收银台') }}</div>
+      <div class="pay-state-title">{{ $t('正在前往收銀台') }}</div>
       <PaymentBreakdown :quote="paidQuote" />
-      <div class="muted">{{ $t('使用 {0} 完成支付；支付后本页自动检测', [payingChannel?.name || $t('所选渠道')]) }}</div>
+      <div class="muted">{{ $t('使用 {0} 完成支付；支付後本頁自動檢測', [payingChannel?.name || $t('所選渠道')]) }}</div>
       <div class="pay-btn-row">
-        <button class="btn btn-primary" @click="openRedirect">{{ $t('重新打开收银台') }}</button>
-        <button v-if="!redirectParams" class="btn btn-outline" @click="copyLink">{{ $t('复制支付链接') }}</button>
-        <button class="btn btn-outline" @click="backToSelect">{{ $t('更换支付方式') }}</button>
+        <button class="btn btn-primary" @click="openRedirect">{{ $t('重新打開收銀台') }}</button>
+        <button v-if="!redirectParams" class="btn btn-outline" @click="copyLink">{{ $t('複製支付鏈接') }}</button>
+        <button class="btn btn-outline" @click="backToSelect">{{ $t('更換支付方式') }}</button>
       </div>
       <div class="pay-qr-hint" style="margin-top: 14px;">
-        <span class="dot-loader"><span></span><span></span><span></span></span> {{ $t('正在检测支付结果…') }} </div>
+        <span class="dot-loader"><span></span><span></span><span></span></span> {{ $t('正在檢測支付結果…') }} </div>
     </div>
 
-    <!-- 选择支付（默认态） -->
+    <!-- 選擇支付（默認態） -->
     <div v-else class="pay-select">
-      <!-- 订单摘要 -->
+      <!-- 訂單摘要 -->
       <div class="pay-summary">
         <div class="pay-summary-head">
-          <span class="muted">{{ $t('订单号') }}</span>
+          <span class="muted">{{ $t('訂單號') }}</span>
           <span class="pay-mono">{{ orderNo }}</span>
           <span v-if="countdownText" class="pay-countdown" :class="{ danger: countdownDanger }">⏱ {{ countdownText }}</span>
         </div>
         <div class="pay-summary-amount">
-          <span>{{ $t('订单金额') }}</span>
+          <span>{{ $t('訂單金額') }}</span>
           <b class="pay-amount">{{ formatMoney(order?.total_cents || 0) }}</b>
         </div>
         <div class="pay-summary-meta">
-          <span class="muted">{{ $t('下单时间') }} {{ fmtTime(order?.created_at) }}</span>
-          <span class="muted">{{ $t('商品数量：{0}', [itemCount]) }}</span>
+          <span class="muted">{{ $t('下單時間') }} {{ fmtTime(order?.created_at) }}</span>
+          <span class="muted">{{ $t('商品數量：{0}', [itemCount]) }}</span>
         </div>
       </div>
 
-      <!-- 渠道网格（方式级收银台，与充值页共用组件） -->
+      <!-- 渠道網格（方式級收銀台，與充值頁共用組件） -->
       <div class="pay-channels">
-        <div class="pay-channels-title">{{ $t('选择支付方式') }}</div>
+        <div class="pay-channels-title">{{ $t('選擇支付方式') }}</div>
         <PayChannelGrid
           :options="payOptions"
           :channel="selected.channel"
@@ -144,7 +144,7 @@
           @select="selectPayment"
         />
         <div v-if="hasWallet" class="pay-btn-row">
-          <button class="btn btn-outline" :disabled="balanceRefreshing" @click="refreshBalance">{{ balanceRefreshing ? $t('查询余额中…') : $t('刷新余额') }}</button>
+          <button class="btn btn-outline" :disabled="balanceRefreshing" @click="refreshBalance">{{ balanceRefreshing ? $t('查詢餘額中…') : $t('刷新餘額') }}</button>
           <router-link class="btn btn-outline" to="/member?tab=recharge">{{ $t('去充值') }}</router-link>
         </div>
       </div>
@@ -153,9 +153,9 @@
 
       <PaymentBreakdown :quote="quote" :loading="quoteLoading" :error="quoteError" @retry="refreshQuote" />
       <button class="pay-submit" :disabled="!selectedAvailable || submitting || !quote || quoteLoading" @click="pay">
-        {{ submitting ? $t('创建支付中…') : quote ? $t('立即支付 {0}', [formatPaymentAmount(quote)]) : $t('等待计算金额') }}
+        {{ submitting ? $t('創建支付中…') : quote ? $t('立即支付 {0}', [formatPaymentAmount(quote)]) : $t('等待計算金額') }}
       </button>
-      <div class="pay-assure">{{ $t('🔒 支付过程安全加密 · 付款后按商品交付方式处理') }}</div>
+      <div class="pay-assure">{{ $t('🔒 支付過程安全加密 · 付款後按商品交付方式處理') }}</div>
     </div>
   </div>
 </template>
@@ -181,13 +181,13 @@ const route = useRoute();
 const router = useRouter();
 const orderNo = String(route.params.orderNo || '');
 
-// ── 六态：loading → select / qrcode / redirect / success / waiting / closed ──
+// ── 六態：loading → select / qrcode / redirect / success / waiting / closed ──
 type Phase = 'loading' | 'select' | 'qrcode' | 'redirect' | 'success' | 'waiting' | 'closed' | 'error';
 const phase = ref<Phase>('loading');
 
 const order = ref<OrderDetail | null>(null);
 const channels = ref<ChannelItem[]>([]);
-// 方式级选择：channel=渠道码 + method=方式 code（单方式渠道 method 为空串）
+// 方式級選擇：channel=渠道碼 + method=方式 code（單方式渠道 method 為空串）
 const selected = ref<{ channel: string; method: string }>({ channel: '', method: '' });
 let selectionTouched = false;
 function selectPayment(channel: string, method: string) { selectionTouched = true; selected.value = { channel, method }; error.value = ''; }
@@ -197,7 +197,7 @@ const error = ref('');
 const queryPassword = ref('');
 const physicalOnly=computed(()=>!!order.value?.items?.length && order.value.items.every(i=>i.goods_type==='physical'));
 const copiedAccessLink=ref(false);
-async function saveAccessLink(){try{await navigator.clipboard.writeText(orderAccessLink(orderNo));copiedAccessLink.value=true;}catch{error.value=$t('无法复制链接，请允许剪贴板权限后重试');}}
+async function saveAccessLink(){try{await navigator.clipboard.writeText(orderAccessLink(orderNo));copiedAccessLink.value=true;}catch{error.value=$t('無法複製鏈接，請允許剪貼板權限後重試');}}
 const retrying = ref(false);
 const paidQuote = ref<PaymentQuote | null>(null);
 const { quote, quoteLoading, quoteError, refreshQuote } = usePaymentQuote(() =>
@@ -208,28 +208,28 @@ const { quote, quoteLoading, quoteError, refreshQuote } = usePaymentQuote(() =>
 );
 
 
-// 二维码 / 跳转
+// 二維碼 / 跳轉
 const qrDataUrl = ref('');
 const redirectUrl = ref('');
 const redirectParams = ref<Record<string, string> | null>(null);
 
-// 自动取货结果
+// 自動取貨結果
 const delivery = ref<FetchDeliveryReply | null>(null);
 const copied = ref<number | null>(null);
 const copiedAll = ref(false);
 
-// 轮询（4s；3 分钟超时进等待回调态）
+// 輪詢（4s；3 分鐘超時進等待回調態）
 const PAID_STATES = ['paid', 'fulfilling', 'partially_delivered', 'delivered', 'completed'];
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 let pollCount = 0;
 const POLL_MAX = 45;
 
-// 倒计时
+// 倒計時
 const countdown = ref<number | null>(null);
 let cdTimer: ReturnType<typeof setInterval> | null = null;
 const countdownText = computed(() => {
   if (countdown.value === null) return '';
-  if (countdown.value <= 0) return $t("等待确认状态");
+  if (countdown.value <= 0) return $t("等待確認狀態");
   const m = Math.floor(countdown.value / 60);
   const s = countdown.value % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
@@ -238,7 +238,7 @@ const countdownDanger = computed(() => countdown.value !== null && countdown.val
 
 const itemCount = computed(() => order.value?.items?.reduce((s, i) => s + i.quantity, 0) || 0);
 
-// 渠道 → 收银台方式级选项（共享逻辑见 composables/pay-options.ts）
+// 渠道 → 收銀台方式級選項（共享邏輯見 composables/pay-options.ts）
 const walletBalance = ref<number | null>(null);
 const walletState = ref<'loading' | 'ready' | 'error'>('loading');
 const balanceRefreshing = ref(false);
@@ -253,14 +253,14 @@ const payOptions = computed(() => flattenPayOptions(channels.value).map(option =
   const ready = walletState.value === 'ready' && available !== null;
   const shortage = ready ? Math.max(0, need - available) : 0;
   return { ...option, disabled: !ready || shortage > 0,
-    availability: !ready ? (walletState.value === 'error' ? $t("余额查询失败，请重试") : $t("正在查询可用余额…"))
-      : $t("可用余额 {0}{1}", [formatMoney(available), shortage > 0 ? $t("，还差 {0}", [formatMoney(shortage)]) : '']) };
+    availability: !ready ? (walletState.value === 'error' ? $t("餘額查詢失敗，請重試") : $t("正在查詢可用餘額…"))
+      : $t("可用餘額 {0}{1}", [formatMoney(available), shortage > 0 ? $t("，還差 {0}", [formatMoney(shortage)]) : '']) };
 }));
 const selectedAvailable = computed(() => payOptions.value.some(o => !o.disabled && o.channel === selected.value.channel && o.method === selected.value.method));
 watch(payOptions, options => {
   if (options.some(o => !o.disabled && o.channel === selected.value.channel && o.method === selected.value.method)) return;
   // A selected wallet becoming unavailable requires a deliberate new choice.
-  if (selected.value.channel) { selectionTouched = true; error.value = $t("所选支付方式暂不可用，请刷新余额或选择其他支付方式"); selected.value = { channel: '', method: '' }; return; }
+  if (selected.value.channel) { selectionTouched = true; error.value = $t("所選支付方式暫不可用，請刷新餘額或選擇其他支付方式"); selected.value = { channel: '', method: '' }; return; }
   if (selectionTouched) return;
   const first = options.find(o => !o.disabled);
   if (first) selected.value = { channel: first.channel, method: first.method };
@@ -285,7 +285,7 @@ function refreshOnFocus() { if (phase.value === 'select') void refreshBalance();
 
 
 onMounted(async () => {
-  // 支付回跳/分享兜底：?pwd= 直填会话记忆（不落 URL 历史——replace 清参）
+  // 支付回跳/分享兜底：?pwd= 直填會話記憶（不落 URL 歷史——replace 清參）
   const qpwd = route.query.pwd;
   if (typeof qpwd === 'string' && qpwd) {
     rememberOrderPassword(orderNo, qpwd);
@@ -318,14 +318,14 @@ async function retryOrder() {
 
 onUnmounted(() => { disposed = true; balanceRequest++; window.removeEventListener('focus', refreshOnFocus); window.removeEventListener('storage', refreshOnFocus); stopPolling(); stopCountdown(); });
 
-// ── 订单加载与状态分发 ──
-// 游客订单查询需带下单时密码（会话记忆）；登录本人订单免密——两参数都传由后端裁决
+// ── 訂單加載與狀態分發 ──
+// 遊客訂單查詢需帶下單時密碼（會話記憶）；登錄本人訂單免密——兩參數都傳由後端裁決
 async function refreshOrder() {
   const pwd = getOrderPassword(orderNo);
-  const { data, error: loadError } = await getOrder(orderNo, pwd || undefined).catch(() => ({ data: null, get error() { return $t("网络异常，请重试"); } }));
+  const { data, error: loadError } = await getOrder(orderNo, pwd || undefined).catch(() => ({ data: null, get error() { return $t("網絡異常，請重試"); } }));
   if (disposed) return false;
   if (!data) {
-    error.value = loadError || $t("订单加载失败，请重试");
+    error.value = loadError || $t("訂單加載失敗，請重試");
     if (!order.value) phase.value = 'error';
     return false;
   }
@@ -344,7 +344,7 @@ function decidePhase() {
   else if (phase.value === 'loading' || phase.value === 'error') phase.value = 'select';
 }
 
-// ── 轮询 ──
+// ── 輪詢 ──
 function startPolling() {
   stopPolling();
   pollCount = 0;
@@ -371,11 +371,11 @@ async function checkOnce(manual = false) {
   await refreshOrder();
   decidePhase();
   if (phase.value === 'success') { await loadDelivery(); if (!order.value?.commerce_version && !['delivered', 'completed'].includes(order.value?.status || '')) startPolling(); return; }
-  if (manual && phase.value === 'waiting') window.alert($t("暂未检测到支付，请稍后再试"));
+  if (manual && phase.value === 'waiting') window.alert($t("暫未檢測到支付，請稍後再試"));
   if (phase.value === 'qrcode' || phase.value === 'redirect' || phase.value === 'waiting') startPolling();
 }
 
-// ── 倒计时 ──
+// ── 倒計時 ──
 function startCountdown(expiresAt: number) {
   stopCountdown();
   const tick = () => { countdown.value = Math.max(0, expiresAt - Math.floor(Date.now() / 1000)); };
@@ -386,7 +386,7 @@ function stopCountdown() {
   if (cdTimer) { clearInterval(cdTimer); cdTimer = null; }
 }
 
-// ── 支付创建 ──
+// ── 支付創建 ──
 async function pay() {
   if (!selectedAvailable.value || submitting.value || !quote.value || quoteLoading.value) return;
   submitting.value = true;
@@ -397,11 +397,11 @@ async function pay() {
   payingChannel.value = channels.value.find((c) => c.code === selected.value.channel) || null;
   const { data, error: err } = await createPayment(orderNo, selected.value.channel, selected.value.method, quote.value.quote_key, getOrderPassword(orderNo));
   submitting.value = false;
-  if (err || !data) { error.value = err || $t("创建支付失败"); if (payingChannel.value?.driver === 'wallet') { walletBalance.value = null; await refreshBalance(); } await refreshQuote(); return; }
+  if (err || !data) { error.value = err || $t("創建支付失敗"); if (payingChannel.value?.driver === 'wallet') { walletBalance.value = null; await refreshBalance(); } await refreshQuote(); return; }
   paidQuote.value = data.quote || quote.value;
 
   const payload = data.payload || '';
-  // 余额支付：同步扣款即完成，不走收银台跳转（后端 payload 为本页地址，避免弹窗）
+  // 餘額支付：同步扣款即完成，不走收銀台跳轉（後端 payload 為本頁地址，避免彈窗）
   if (payingChannel.value?.driver === 'wallet') {
     await refreshOrder();
     decidePhase();
@@ -410,18 +410,18 @@ async function pay() {
   }
   if (data.type === 'qrcode') {
     let content = payload;
-    try { const parsed = JSON.parse(payload); content = parsed.code_url || payload; } catch { /* 原文即内容 */ }
+    try { const parsed = JSON.parse(payload); content = parsed.code_url || payload; } catch { /* 原文即內容 */ }
     qrDataUrl.value = await makeQr(content);
     phase.value = 'qrcode';
   } else if (data.type === 'params') {
-    // 易支付表单 POST：自动提交
+    // 易支付表單 POST：自動提交
     try {
       const p = JSON.parse(payload);
       redirectUrl.value = p.url || '';
       redirectParams.value = p.params || {};
       phase.value = 'redirect';
       openRedirect();
-    } catch { error.value = $t("支付参数异常"); }
+    } catch { error.value = $t("支付參數異常"); }
   } else {
     let url = payload;
     try { const parsed = JSON.parse(payload); url = parsed.url || payload; } catch { /* 原文即 URL */ }
@@ -444,14 +444,14 @@ async function makeQr(content: string): Promise<string> {
 function openRedirect() {
   if (!redirectUrl.value) return;
   if (redirectParams.value) { submitForm(redirectUrl.value, redirectParams.value); return; }
-  // 新窗口打开 + noopener 防反向控制（大厂同款纪律）
+  // 新窗口打開 + noopener 防反向控制（大廠同款紀律）
   window.open(redirectUrl.value, '_blank', 'noopener');
 }
 
 async function copyLink() {
   try {
     await navigator.clipboard.writeText(redirectUrl.value);
-    window.alert($t("支付链接已复制"));
+    window.alert($t("支付鏈接已複製"));
   } catch { /* 忽略 */ }
 }
 
@@ -464,7 +464,7 @@ function backToSelect() {
   redirectParams.value = null;
 }
 
-// ── 支付成功：自动取货（会话内记忆的查询密码；失败降级去取货页）──
+// ── 支付成功：自動取貨（會話內記憶的查詢密碼；失敗降級去取貨頁）──
 async function loadDelivery() {
  if(order.value?.items.every(i=>i.goods_type==='physical'))return;
   const pwd = getOrderPassword(orderNo);
@@ -497,7 +497,7 @@ function fmtTime(ts?: number): string {
 <style scoped>
 .pay-page { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
-/* ── 居中态卡（成功/等待/关闭/跳转）── */
+/* ── 居中態卡（成功/等待/關閉/跳轉）── */
 .pay-center-card {
   background: #fff; border: 1px solid #e5e7eb; border-radius: 14px;
   padding: 36px 24px; text-align: center;
@@ -524,7 +524,7 @@ function fmtTime(ts?: number): string {
 .pay-btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
 .pay-mono { font-family: ui-monospace, Menlo, monospace; font-size: 13px; word-break: break-all; }
 
-/* ── 成功态卡密 ── */
+/* ── 成功態卡密 ── */
 .pay-cards { text-align: left; background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 14px; margin-top: 18px; }
 .pay-cards-head { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
 .pay-copy-all { border: none; background: none; color: var(--zc-primary); font-size: 13px; cursor: pointer; }
@@ -548,7 +548,7 @@ function fmtTime(ts?: number): string {
   background: var(--zc-primary-soft); border: 1px solid var(--zc-primary-tint); border-radius: 10px; padding: 14px; margin-top: 18px; font-size: 13px;
 }
 
-/* ── 扫码态 ── */
+/* ── 掃碼態 ── */
 .pay-qr-layout { display: grid; grid-template-columns: 1fr; gap: 16px; }
 @media (min-width: 768px) { .pay-qr-layout { grid-template-columns: 1.6fr 1fr; } }
 .pay-qr-main { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px; text-align: center; }
@@ -576,7 +576,7 @@ function fmtTime(ts?: number): string {
 }
 .pay-change:hover { text-decoration: underline; }
 
-/* 点动画（检测中） */
+/* 點動畫（檢測中） */
 .dot-loader { display: inline-flex; gap: 4px; }
 .dot-loader span {
   width: 6px; height: 6px; border-radius: 999px; background: var(--zc-primary);
@@ -586,7 +586,7 @@ function fmtTime(ts?: number): string {
 .dot-loader span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
-/* ── 侧栏摘要 ── */
+/* ── 側欄摘要 ── */
 .pay-side {
   background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px;
   display: flex; flex-direction: column; gap: 12px; align-self: start;
@@ -597,7 +597,7 @@ function fmtTime(ts?: number): string {
   justify-content: space-between;
 }
 
-/* ── 选择态 ── */
+/* ── 選擇態 ── */
 .pay-select { display: flex; flex-direction: column; gap: 16px; }
 .pay-summary { background: linear-gradient(135deg, var(--zc-primary-soft), #fff); border: 1px solid var(--zc-primary-tint); border-radius: 14px; padding: 20px; }
 .pay-summary-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

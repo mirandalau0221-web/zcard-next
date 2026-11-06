@@ -34,11 +34,11 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 	allowed := map[string]bool{}
 	for _, it := range in.Items {
 		if it.Quantity <= 0 || it.Quantity > 100000 {
-			return nil, fmt.Errorf("order.FORM_INVALID: 购买数量无效")
+			return nil, fmt.Errorf("order.FORM_INVALID: 購買數量無效")
 		}
 		key := itemKey(it.ProductID, it.SkuID)
 		if _, ok := out[key]; ok {
-			return nil, fmt.Errorf("order.FORM_INVALID: 同一商品规格请合并数量；不同账号请分别下单")
+			return nil, fmt.Errorf("order.FORM_INVALID: 同一商品規格請合併數量；不同賬號請分別下單")
 		}
 		p, err := c.Product.Query().Where(product.ID(it.ProductID), product.SubsiteID(in.SubsiteID)).Only(ctx)
 		if err != nil {
@@ -56,7 +56,7 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 			return nil, err
 		}
 		if p.LockVersion != revisions[p.ID] {
-			return nil, fmt.Errorf("商品发货设置已变化，请刷新后重新下单")
+			return nil, fmt.Errorf("商品發貨設置已變化，請刷新後重新下單")
 		}
 		var sku *ent.ProductSku
 		if it.SkuID > 0 {
@@ -68,7 +68,7 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 		v := serviceItem{mode: data.FulfillmentMode(p, sku), name: p.Name}
 		if v.mode == "shipping" {
 			if p.UpstreamSourceID != 0 {
-				return nil, fmt.Errorf("实体商品不支持上游代发")
+				return nil, fmt.Errorf("實體商品不支持上游代發")
 			}
 			if sku == nil {
 				n, e := c.ProductSku.Query().Where(productsku.ProductID(p.ID)).Count(ctx)
@@ -76,13 +76,13 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 					return nil, e
 				}
 				if n > 0 {
-					return nil, fmt.Errorf("order.SKU_INVALID: 请选择实体规格")
+					return nil, fmt.Errorf("order.SKU_INVALID: 請選擇實體規格")
 				}
 			}
 		}
 		if v.mode == "reuse" {
 			if it.Quantity != 1 {
-				return nil, fmt.Errorf("重复发货规格每单限购一份")
+				return nil, fmt.Errorf("重複發貨規格每單限購一份")
 			}
 			v.sourceID, err = data.AdmitDeliverySource(ctx, uc.Data, p, it.SkuID)
 			if err != nil {
@@ -97,7 +97,7 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 			return nil, err
 		}
 		if (v.mode == "upstream" || v.mode == "reuse") && len(controls) > 0 {
-			return nil, fmt.Errorf("order.FORM_INVALID: 上游暂不支持传递填写资料，请联系客服")
+			return nil, fmt.Errorf("order.FORM_INVALID: 上游暫不支持傳遞填寫資料，請聯繫客服")
 		}
 		answers := it.ControlAnswers
 		if answers == nil {
@@ -119,7 +119,7 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 		if it.ControlAnswers != nil {
 			for k := range answers {
 				if !own[k] {
-					return nil, fmt.Errorf("order.FORM_INVALID: 存在不属于该商品的填写字段")
+					return nil, fmt.Errorf("order.FORM_INVALID: 存在不屬於該商品的填寫字段")
 				}
 			}
 		}
@@ -149,7 +149,7 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 	}
 	for k := range in.ControlAnswers {
 		if !allowed[k] {
-			return nil, fmt.Errorf("order.FORM_INVALID: 存在无效的填写字段")
+			return nil, fmt.Errorf("order.FORM_INVALID: 存在無效的填寫字段")
 		}
 	}
 	return out, nil
@@ -158,7 +158,7 @@ func (uc *OrderUsecase) prepareServices(ctx context.Context, in CreateOrderInput
 func validateAnswer(f *ent.ProductControl, v string) error {
 	if v == "" {
 		if f.Required {
-			return fmt.Errorf("请填写此项")
+			return fmt.Errorf("請填寫此項")
 		}
 		return nil
 	}
@@ -167,13 +167,13 @@ func validateAnswer(f *ent.ProductControl, v string) error {
 		limit = 500
 	}
 	if utf8.RuneCountInString(v) > limit {
-		return fmt.Errorf("最多填写 %d 个字符", limit)
+		return fmt.Errorf("最多填寫 %d 個字符", limit)
 	}
 	switch string(f.Type) {
 	case "number":
 		n, e := strconv.ParseFloat(v, 64)
 		if e != nil || math.IsNaN(n) || math.IsInf(n, 0) {
-			return fmt.Errorf("请输入有效数字")
+			return fmt.Errorf("請輸入有效數字")
 		}
 	case "select", "radio", "checkbox":
 		vals := []string{v}
@@ -189,7 +189,7 @@ func validateAnswer(f *ent.ProductControl, v string) error {
 				}
 			}
 			if !ok || seen[x] {
-				return fmt.Errorf("请选择有效选项")
+				return fmt.Errorf("請選擇有效選項")
 			}
 			seen[x] = true
 		}
@@ -198,15 +198,15 @@ func validateAnswer(f *ent.ProductControl, v string) error {
 	case "url":
 		u, e := url.Parse(v)
 		if e != nil || u.Hostname() == "" || u.User != nil || (u.Scheme != "https" && u.Scheme != "http") {
-			return fmt.Errorf("请输入完整的 http/https 链接")
+			return fmt.Errorf("請輸入完整的 http/https 鏈接")
 		}
 	case "username":
 		if !regexp.MustCompile(`^@?[A-Za-z0-9_\.\-]{1,64}$`).MatchString(v) {
-			return fmt.Errorf("请输入有效用户名")
+			return fmt.Errorf("請輸入有效用户名")
 		}
 	case "tron":
 		if !validTronAddress(v) {
-			return fmt.Errorf("请输入有效的 TRON 地址")
+			return fmt.Errorf("請輸入有效的 TRON 地址")
 		}
 	}
 	return nil

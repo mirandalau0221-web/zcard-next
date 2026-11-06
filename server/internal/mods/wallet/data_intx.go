@@ -1,15 +1,15 @@
 package wallet
 
-// InTx 账务内核（ 核心——全模块最高纪律要求）：
+// InTx 賬務內核（ 核心——全模塊最高紀律要求）：
 //
-// 一切余额变动必须经 InTx：
-// 1. 按 reference 查流水——存在直接返回成功（幂等重入，跨模块幂等）
-// 2. ensureAccountForUpdate（FOR UPDATE 锁账户，不存在则建——并发竞态处理）
-// 3. 非负校验（Debit 时 available-amount ≥ 0）
-// 4. 更新余额（乐观锁 version 兜底重试 ≤3 次）
-// 5. 写流水（balance_before/after 快照 + reference 唯一索引兜底）
+// 一切餘額變動必須經 InTx：
+// 1. 按 reference 查流水——存在直接返回成功（冪等重入，跨模塊冪等）
+// 2. ensureAccountForUpdate（FOR UPDATE 鎖賬户，不存在則建——併發競態處理）
+// 3. 非負校驗（Debit 時 available-amount ≥ 0）
+// 4. 更新餘額（樂觀鎖 version 兜底重試 ≤3 次）
+// 5. 寫流水（balance_before/after 快照 + reference 唯一索引兜底）
 //
-// 不变量：total = available + locked 恒真；余额永可由流水重算。
+// 不變量：total = available + locked 恆真；餘額永可由流水重算。
 
 import (
 	"context"
@@ -26,29 +26,29 @@ import (
 	kerrors "github.com/go-kratos/kratos/v3/errors"
 )
 
-// Entry 账务入账请求。
+// Entry 賬務入賬請求。
 type Entry struct {
 	UserID     uint64
 	Direction  string // "in" | "out"
 	Type       string // order_pay / order_refund / recharge / commission / adjust ...
-	Amount     int64  // 分（正数）
-	Reference  string // 幂等键（重复提交直接返回成功）
+	Amount     int64  // 分（正數）
+	Reference  string // 冪等鍵（重複提交直接返回成功）
 	OrderID    uint64
 	OperatorID uint64
 	Remark     string
 }
 
-// WalletRepoImpl 钱包仓储。
+// WalletRepoImpl 錢包倉儲。
 type WalletRepoImpl struct {
 	data        *data.Data
-	commissions CommissionConsumer // 佣金 FIFO 消耗（打款；nil=跳过）
+	commissions CommissionConsumer // 佣金 FIFO 消耗（打款；nil=跳過）
 }
 
-// NewWalletRepoImpl 构造。
+// NewWalletRepoImpl 構造。
 func NewWalletRepoImpl(d *data.Data) *WalletRepoImpl { return &WalletRepoImpl{data: d} }
 
-// CreateRechargeOrder 落充值单（pending；赠送金额服务端已算定）。
-// 入账只发生在支付回调成功后——本方法绝不写钱包流水（铁律 16）。
+// CreateRechargeOrder 落充值單（pending；贈送金額服務端已算定）。
+// 入賬只發生在支付回調成功後——本方法絕不寫錢包流水（鐵律 16）。
 func (r *WalletRepoImpl) createRechargeOrder(ctx context.Context, userID uint64, amount, giftAmount int64, giftPoints int32) (*ent.RechargeOrder, error) {
 	return data.Client(ctx, r.data).RechargeOrder.Create().
 		SetUserID(userID).
@@ -59,21 +59,21 @@ func (r *WalletRepoImpl) createRechargeOrder(ctx context.Context, userID uint64,
 		Save(ctx)
 }
 
-// CreditInTx 入账（幂等重入：reference 已存在直接返回成功）。
+// CreditInTx 入賬（冪等重入：reference 已存在直接返回成功）。
 func (r *WalletRepoImpl) creditInTx(ctx context.Context, e Entry) error {
 	client := data.Client(ctx, r.data)
 
-	// 1) 幂等重入
+	// 1) 冪等重入
 	exists, err := client.WalletTransaction.Query().
 		Where(wallettransaction.Reference(e.Reference)).Exist(ctx)
 	if err != nil {
-		return fmt.Errorf("wallet: 幂等检查失败: %w", err)
+		return fmt.Errorf("wallet: 冪等檢查失敗: %w", err)
 	}
 	if exists {
-		return nil // 已入账，幂等返回
+		return nil // 已入賬，冪等返回
 	}
 
-	// 2) 锁账户（不存在则建）
+	// 2) 鎖賬户（不存在則建）
 	acc, err := r.ensureAccount(ctx, e.UserID)
 	if err != nil {
 		return err
@@ -88,11 +88,11 @@ func (r *WalletRepoImpl) creditInTx(ctx context.Context, e Entry) error {
 			currency = data.DefaultBaseCurrency
 		}
 		if currency != acc.Currency {
-			return fmt.Errorf("wallet.CURRENCY_MISMATCH: 订单与钱包币种不一致")
+			return fmt.Errorf("wallet.CURRENCY_MISMATCH: 訂單與錢包幣種不一致")
 		}
 	}
 
-	// 3) 更新余额（乐观锁）
+	// 3) 更新餘額（樂觀鎖）
 	newBalance := acc.Available + e.Amount
 	affected, err := client.WalletAccount.Update().
 		Where(walletaccount.ID(acc.ID), walletaccount.VersionEQ(acc.Version)).
@@ -100,13 +100,13 @@ func (r *WalletRepoImpl) creditInTx(ctx context.Context, e Entry) error {
 		SetVersion(acc.Version + 1).
 		Save(ctx)
 	if err != nil {
-		return fmt.Errorf("wallet: 更新余额失败: %w", err)
+		return fmt.Errorf("wallet: 更新餘額失敗: %w", err)
 	}
 	if affected == 0 {
-		return fmt.Errorf("wallet: 乐观锁冲突（并发更新）")
+		return fmt.Errorf("wallet: 樂觀鎖衝突（併發更新）")
 	}
 
-	// 4) 写流水
+	// 4) 寫流水
 	_, err = client.WalletTransaction.Create().
 		SetUserID(e.UserID).
 		SetDirection(e.Direction).
@@ -121,16 +121,16 @@ func (r *WalletRepoImpl) creditInTx(ctx context.Context, e Entry) error {
 		SetRemark(e.Remark).
 		Save(ctx)
 	if err != nil {
-		return fmt.Errorf("wallet: 写流水失败: %w", err)
+		return fmt.Errorf("wallet: 寫流水失敗: %w", err)
 	}
 	return nil
 }
 
-// DebitInTx 扣款（余额不足返回 ErrInsufficient）。
+// DebitInTx 扣款（餘額不足返回 ErrInsufficient）。
 func (r *WalletRepoImpl) debitInTx(ctx context.Context, e Entry) error {
 	client := data.Client(ctx, r.data)
 
-	// 1) 幂等重入
+	// 1) 冪等重入
 	exists, err := client.WalletTransaction.Query().
 		Where(wallettransaction.Reference(e.Reference)).Exist(ctx)
 	if err != nil {
@@ -140,7 +140,7 @@ func (r *WalletRepoImpl) debitInTx(ctx context.Context, e Entry) error {
 		return nil
 	}
 
-	// 2) 锁账户
+	// 2) 鎖賬户
 	acc, err := r.ensureAccount(ctx, e.UserID)
 	if err != nil {
 		return err
@@ -155,16 +155,16 @@ func (r *WalletRepoImpl) debitInTx(ctx context.Context, e Entry) error {
 			currency = data.DefaultBaseCurrency
 		}
 		if currency != acc.Currency {
-			return fmt.Errorf("wallet.CURRENCY_MISMATCH: 订单与钱包币种不一致")
+			return fmt.Errorf("wallet.CURRENCY_MISMATCH: 訂單與錢包幣種不一致")
 		}
 	}
 
-	// 3) 非负校验
+	// 3) 非負校驗
 	if acc.Available < e.Amount {
 		return fmt.Errorf("%w: avail=%d need=%d", walletport.ErrInsufficientBalance, acc.Available, e.Amount)
 	}
 
-	// 4) 乐观锁更新
+	// 4) 樂觀鎖更新
 	newBalance := acc.Available - e.Amount
 	affected, err := client.WalletAccount.Update().
 		Where(walletaccount.ID(acc.ID), walletaccount.VersionEQ(acc.Version)).
@@ -175,10 +175,10 @@ func (r *WalletRepoImpl) debitInTx(ctx context.Context, e Entry) error {
 		return err
 	}
 	if affected == 0 {
-		return fmt.Errorf("wallet: 乐观锁冲突")
+		return fmt.Errorf("wallet: 樂觀鎖衝突")
 	}
 
-	// 5) 写流水
+	// 5) 寫流水
 	_, err = client.WalletTransaction.Create().
 		SetUserID(e.UserID).
 		SetDirection(e.Direction).
@@ -195,7 +195,7 @@ func (r *WalletRepoImpl) debitInTx(ctx context.Context, e Entry) error {
 	return err
 }
 
-// ensureAccount 锁账户（不存在则建——并发建号竞态处理）。
+// ensureAccount 鎖賬户（不存在則建——併發建號競態處理）。
 func (r *WalletRepoImpl) ensureAccount(ctx context.Context, userID uint64) (*ent.WalletAccount, error) {
 	client := data.Client(ctx, r.data)
 	var lockedCurrency string
@@ -225,7 +225,7 @@ func (r *WalletRepoImpl) ensureAccount(ctx context.Context, userID uint64) (*ent
 		}
 	}
 	if err != nil {
-		return nil, fmt.Errorf("wallet: 获取账户失败: %w", err)
+		return nil, fmt.Errorf("wallet: 獲取賬户失敗: %w", err)
 	}
 	code := lockedCurrency
 	if code == "" {
@@ -235,17 +235,17 @@ func (r *WalletRepoImpl) ensureAccount(ctx context.Context, userID uint64) (*ent
 		}
 	}
 	if acc.Currency != code {
-		return nil, fmt.Errorf("wallet.CURRENCY_MISMATCH: 钱包币种与基础货币不一致，需要迁移")
+		return nil, fmt.Errorf("wallet.CURRENCY_MISMATCH: 錢包幣種與基礎貨幣不一致，需要遷移")
 	}
 	return acc, nil
 }
 
-// GetBalance 查余额。
+// GetBalance 查餘額。
 func (r *WalletRepoImpl) GetBalance(ctx context.Context, userID uint64) (available, locked int64, err error) {
 	acc, err := data.Client(ctx, r.data).WalletAccount.Query().
 		Where(walletaccount.UserID(userID)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return 0, 0, nil // 未开户 = 零余额
+		return 0, 0, nil // 未開户 = 零餘額
 	}
 	if err != nil {
 		return 0, 0, err
@@ -255,12 +255,12 @@ func (r *WalletRepoImpl) GetBalance(ctx context.Context, userID uint64) (availab
 		return 0, 0, err
 	}
 	if acc.Currency != base {
-		return 0, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "账户币种与基础货币不一致，请联系管理员迁移")
+		return 0, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "賬户幣種與基礎貨幣不一致，請聯繫管理員遷移")
 	}
 	return acc.Available, acc.Locked, nil
 }
 
-// ListTransactions 流水列表（userID = 0 表示全站——账单管理场景，按时间倒序）。
+// ListTransactions 流水列表（userID = 0 表示全站——賬單管理場景，按時間倒序）。
 func (r *WalletRepoImpl) ListTransactions(ctx context.Context, userID uint64, page, size int) ([]*ent.WalletTransaction, int64, error) {
 	client := data.Client(ctx, r.data)
 	q := client.WalletTransaction.Query()
@@ -282,13 +282,13 @@ func (r *WalletRepoImpl) ListTransactions(ctx context.Context, userID uint64, pa
 	}
 	for _, row := range rows {
 		if row.Currency != base {
-			return nil, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "账户币种与基础货币不一致，请联系管理员迁移")
+			return nil, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "賬户幣種與基礎貨幣不一致，請聯繫管理員遷移")
 		}
 	}
 	return rows, int64(total), err
 }
 
-// UsernamesByIDs 批量取用户名（全站流水回填归属人；缺失的 id 不出现在结果里）。
+// UsernamesByIDs 批量取用户名（全站流水回填歸屬人；缺失的 id 不出現在結果裏）。
 func (r *WalletRepoImpl) UsernamesByIDs(ctx context.Context, ids []uint64) (map[uint64]string, error) {
 	if len(ids) == 0 {
 		return map[uint64]string{}, nil
@@ -306,7 +306,7 @@ func (r *WalletRepoImpl) UsernamesByIDs(ctx context.Context, ids []uint64) (map[
 	return out, nil
 }
 
-// RebuildBalance 余额重算（对账用——从流水重放验证余额一致）。
+// RebuildBalance 餘額重算（對賬用——從流水重放驗證餘額一致）。
 func (r *WalletRepoImpl) RebuildBalance(ctx context.Context, userID uint64) (int64, error) {
 	rows, err := data.Client(ctx, r.data).WalletTransaction.Query().
 		Where(wallettransaction.UserID(userID)).
@@ -326,11 +326,11 @@ func (r *WalletRepoImpl) RebuildBalance(ctx context.Context, userID uint64) (int
 	return balance, nil
 }
 
-// Lock 冻结（available → locked；availableAt 到期时间戳——佣金/分站利润冻结期）。
-// 幂等口径：金额校验 available >= amount，乐观锁 CAS。
+// Lock 凍結（available → locked；availableAt 到期時間戳——佣金/分站利潤凍結期）。
+// 冪等口徑：金額校驗 available >= amount，樂觀鎖 CAS。
 func (r *WalletRepoImpl) Lock(ctx context.Context, userID uint64, amount int64, availableAt int64) error {
 	if amount <= 0 {
-		return fmt.Errorf("wallet: 冻结金额必须为正")
+		return fmt.Errorf("wallet: 凍結金額必須為正")
 	}
 	client := data.Client(ctx, r.data)
 	acc, err := client.WalletAccount.Query().
@@ -352,7 +352,7 @@ func (r *WalletRepoImpl) Lock(ctx context.Context, userID uint64, amount int64, 
 	if affected == 0 {
 		return fmt.Errorf("wallet.CONCURRENT_UPDATE")
 	}
-	// 冻结流水（reference 幂等由调用方保证）
+	// 凍結流水（reference 冪等由調用方保證）
 	_, _ = client.WalletTransaction.Create().
 		SetUserID(userID).
 		SetDirection("out").
@@ -360,15 +360,15 @@ func (r *WalletRepoImpl) Lock(ctx context.Context, userID uint64, amount int64, 
 		SetAmount(amount).
 		SetCurrency(acc.Currency).
 		SetReference(fmt.Sprintf("lock:%d:%d", userID, availableAt)).
-		SetRemark("冻结").
+		SetRemark("凍結").
 		Save(ctx)
 	return nil
 }
 
-// Unlock 解冻（locked → available；提现拒绝/佣金退回）。
+// Unlock 解凍（locked → available；提現拒絕/佣金退回）。
 func (r *WalletRepoImpl) Unlock(ctx context.Context, userID uint64, amount int64) error {
 	if amount <= 0 {
-		return fmt.Errorf("wallet: 解冻金额必须为正")
+		return fmt.Errorf("wallet: 解凍金額必須為正")
 	}
 	client := data.Client(ctx, r.data)
 	acc, err := client.WalletAccount.Query().

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// 工单工作台（）：urgent_paid 置顶由后端排序保证；前台筛选状态/类型/订单号。
-// 会话式详情：用户左灰泡 / 客服右蓝泡 / 内部备注左橙虚线（仅 ticket:read 可见）。
+// 工單工作台（）：urgent_paid 置頂由後端排序保證；前台篩選狀態/類型/訂單號。
+// 會話式詳情：用户左灰泡 / 客服右藍泡 / 內部備註左橙虛線（僅 ticket:read 可見）。
 import TablePager from "@/components/common/table-pager.vue";
 import FilterTabs from "@/components/common/filter-tabs.vue";
 import { ref, computed, onMounted, onActivated, onDeactivated, watch, h } from "vue";
@@ -28,22 +28,22 @@ const statusFilter = ref<string>(routeStatus());
 const typeFilter = ref<string>("");
 const orderNoFilter = ref<string>("");
 
-// 状态筛选：空=未关闭（open+processing，工作台默认视角）
+// 狀態篩選：空=未關閉（open+processing，工作台默認視角）
 const statusTabs = [
-  { label: "进行中", value: "", type: "info" as const },
-  { label: "待回复", value: "open", type: "warning" as const },
-  { label: "处理中", value: "processing", type: "info" as const },
-  { label: "已解决", value: "resolved", type: "success" as const },
-  { label: "已关闭", value: "closed", type: "default" as const },
+  { label: "進行中", value: "", type: "info" as const },
+  { label: "待回覆", value: "open", type: "warning" as const },
+  { label: "處理中", value: "processing", type: "info" as const },
+  { label: "已解決", value: "resolved", type: "success" as const },
+  { label: "已關閉", value: "closed", type: "default" as const },
 ];
 
 const typeOptions = [
-  { label: "全部类型", value: "" },
-  { label: "售前咨询", value: "presale" },
-  { label: "售后工单", value: "aftersale" },
+  { label: "全部類型", value: "" },
+  { label: "售前諮詢", value: "presale" },
+  { label: "售後工單", value: "aftersale" },
 ];
 
-const statusTextMap: Record<string, string> = { open: "待回复", processing: "处理中", resolved: "已解决", closed: "已关闭" };
+const statusTextMap: Record<string, string> = { open: "待回覆", processing: "處理中", resolved: "已解決", closed: "已關閉" };
 function statusType(s: string): "success" | "warning" | "info" | "default" {
   if (s === "resolved") return "success";
   if (s === "open") return "warning";
@@ -51,7 +51,7 @@ function statusType(s: string): "success" | "warning" | "info" | "default" {
   return "default";
 }
 function typeText(t: string) {
-  return t === "presale" ? "售前" : t === "aftersale" ? "售后" : t || "-";
+  return t === "presale" ? "售前" : t === "aftersale" ? "售後" : t || "-";
 }
 function priorityText(p: string) {
   const map: Record<string, string> = { urgent_paid: "已加急", high: "高", normal: "普通", low: "低" };
@@ -63,19 +63,19 @@ function priorityType(p: string): "error" | "warning" | "default" {
   return "default";
 }
 
-// SLA：加急工单 2 小时时限；未超时显示剩余小时，超时高亮
+// SLA：加急工單 2 小時時限；未超時顯示剩餘小時，超時高亮
 const nowTs = ref(Math.floor(Date.now() / 1000));
 function slaText(row: any) {
   if (!row.sla_due_at) return "-";
   if (["resolved", "closed"].includes(row.status)) return "-";
   const remain = row.sla_due_at - nowTs.value;
-  if (remain <= 0) return "已超时";
-  return remain >= 3600 ? `剩 ${Math.floor(remain / 3600)} 小时` : `剩 ${Math.ceil(remain / 60)} 分钟`;
+  if (remain <= 0) return "已超時";
+  return remain >= 3600 ? `剩 ${Math.floor(remain / 3600)} 小時` : `剩 ${Math.ceil(remain / 60)} 分鐘`;
 }
 
 function contactText(row: any) {
   if (row.user_id) return `用户 #${row.user_id}`;
-  return row.guest_contact || "游客";
+  return row.guest_contact || "遊客";
 }
 
 function satisfactionText(v: number) {
@@ -88,27 +88,27 @@ function formatTime(ts?: number) {
 }
 
 const columns: DataTableColumns<any> = [
-  { title: "工单号", key: "ticket_no", width: 170, ellipsis: { tooltip: true } },
+  { title: "工單號", key: "ticket_no", width: 170, ellipsis: { tooltip: true } },
   {
-    title: "类型",
+    title: "類型",
     key: "type",
     width: 70,
     render: (row) => h(NTag, { size: "small", type: row.type === "aftersale" ? "warning" : "info", bordered: false }, { default: () => typeText(row.type) }),
   },
   {
-    title: "优先级",
+    title: "優先級",
     key: "priority",
     width: 84,
     render: (row) => h(NTag, { size: "small", type: priorityType(row.priority), bordered: row.priority === "urgent_paid" }, { default: () => priorityText(row.priority) }),
   },
   {
-    title: "状态",
+    title: "狀態",
     key: "status",
     width: 84,
     render: (row) => h(NTag, { size: "small", type: statusType(row.status) }, { default: () => statusTextMap[row.status] || row.status }),
   },
-  { title: "用户 / 联系方式", key: "contact", minWidth: 140, ellipsis: { tooltip: true }, render: (row) => contactText(row) },
-  { title: "关联订单", key: "order_id", width: 110, render: (row) => (row.order_id ? `#${row.order_id}` : "-") },
+  { title: "用户 / 聯繫方式", key: "contact", minWidth: 140, ellipsis: { tooltip: true }, render: (row) => contactText(row) },
+  { title: "關聯訂單", key: "order_id", width: 110, render: (row) => (row.order_id ? `#${row.order_id}` : "-") },
   {
     title: "SLA",
     key: "sla",
@@ -116,15 +116,15 @@ const columns: DataTableColumns<any> = [
     render: (row) => {
       const t = slaText(row);
       if (t === "-") return "-";
-      return h(NTag, { size: "small", type: t === "已超时" ? "error" : "info", bordered: false }, { default: () => t });
+      return h(NTag, { size: "small", type: t === "已超時" ? "error" : "info", bordered: false }, { default: () => t });
     },
   },
-  { title: "创建时间", key: "created_at", width: 160, render: (row) => formatTime(row.created_at) },
+  { title: "創建時間", key: "created_at", width: 160, render: (row) => formatTime(row.created_at) },
   {
     title: "操作",
     key: "actions",
     width: 70,
-    render: (row) => h(NButton, { size: "tiny", onClick: () => openDetail(row.ticket_no) }, { default: () => "详情" }),
+    render: (row) => h(NButton, { size: "tiny", onClick: () => openDetail(row.ticket_no) }, { default: () => "詳情" }),
   },
 ];
 
@@ -155,7 +155,7 @@ function resetList() {
   loadTickets();
 }
 
-// ── 详情 + 会话 ──
+// ── 詳情 + 會話 ──
 const showDetail = ref(false);
 const detailLoading = ref(false);
 const detail = ref<any>(null);
@@ -191,7 +191,7 @@ async function handleReply() {
   try {
     const { error } = await replyTicket(detail.value.ticket_no, { content: replyContent.value.trim(), is_internal: replyInternal.value });
     if (!error) {
-      window.$message?.success(replyInternal.value ? "内部备注已添加" : "已回复（open 工单自动转处理中）");
+      window.$message?.success(replyInternal.value ? "內部備註已添加" : "已回覆（open 工單自動轉處理中）");
       replyContent.value = "";
       await openDetail(detail.value.ticket_no);
       loadTickets();
@@ -207,7 +207,7 @@ async function handleResolve() {
   try {
     const { error } = await resolveTicket(detail.value.ticket_no);
     if (!error) {
-      window.$message?.success("已标记解决（7 天后自动关闭）");
+      window.$message?.success("已標記解決（7 天后自動關閉）");
       await openDetail(detail.value.ticket_no);
       loadTickets();
     }
@@ -222,7 +222,7 @@ async function handleClose() {
   try {
     const { error } = await closeTicket(detail.value.ticket_no);
     if (!error) {
-      window.$message?.success("工单已关闭");
+      window.$message?.success("工單已關閉");
       await openDetail(detail.value.ticket_no);
       loadTickets();
     }
@@ -234,7 +234,7 @@ async function handleClose() {
 function senderName(m: any) {
   if (m.sender_type === "user") return detail.value?.user_id ? `用户 #${detail.value.user_id}` : "用户";
   if (m.sender_type === "admin") return "客服";
-  if (m.sender_type === "system") return "系统";
+  if (m.sender_type === "system") return "系統";
   return m.sender_type;
 }
 
@@ -256,22 +256,22 @@ onActivated(() => {
 
 <template>
   <div class="min-h-500px flex-col gap-16px overflow-hidden">
-    <NCard title="工单管理" class="flex-1">
+    <NCard title="工單管理" class="flex-1">
       <div class="mb-16px flex flex-wrap items-center justify-between gap-12px">
         <FilterTabs v-model:value="statusFilter" :options="statusTabs" @change="resetList" />
         <div class="flex flex-wrap items-center gap-8px">
-          <!-- naive cssr 后置注入会覆盖 uno 宽度类，定宽须用内联 style -->
+          <!-- naive cssr 後置注入會覆蓋 uno 寬度類，定寬須用內聯 style -->
           <NSelect v-model:value="typeFilter" :options="typeOptions" size="small" style="width: 120px" @update:value="resetList" />
           <NInput
             v-model:value="orderNoFilter"
             size="small"
-            placeholder="按订单号筛选"
+            placeholder="按訂單號篩選"
             style="width: 180px"
             clearable
             @keyup.enter="resetList"
             @clear="resetList"
           />
-          <NButton size="small" @click="resetList">查询</NButton>
+          <NButton size="small" @click="resetList">查詢</NButton>
           <NButton size="small" quaternary @click="loadTickets">刷新</NButton>
         </div>
       </div>
@@ -281,73 +281,73 @@ onActivated(() => {
       <TablePager v-model:page="page" v-model:page-size="pageSize" :total="total" @change="loadTickets" />
     </NCard>
 
-    <!-- 工单详情 + 会话 -->
-    <NModal v-model:show="showDetail" preset="card" :title="detail ? `工单 ${detail.ticket_no}` : '工单详情'" style="width: 720px; max-width: 96vw" display-directive="show">
+    <!-- 工單詳情 + 會話 -->
+    <NModal v-model:show="showDetail" preset="card" :title="detail ? `工單 ${detail.ticket_no}` : '工單詳情'" style="width: 720px; max-width: 96vw" display-directive="show">
       <NDescriptions v-if="detail" :column="3" bordered size="small">
-        <NDescriptionsItem label="类型">{{ typeText(detail.type) }}</NDescriptionsItem>
-        <NDescriptionsItem label="状态">
+        <NDescriptionsItem label="類型">{{ typeText(detail.type) }}</NDescriptionsItem>
+        <NDescriptionsItem label="狀態">
           <NTag size="small" :type="statusType(detail.status)">{{ statusTextMap[detail.status] || detail.status }}</NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem label="优先级">
+        <NDescriptionsItem label="優先級">
           <NTag size="small" :type="priorityType(detail.priority)" :bordered="detail.priority === 'urgent_paid'">{{ priorityText(detail.priority) }}</NTag>
         </NDescriptionsItem>
         <NDescriptionsItem label="用户">{{ contactText(detail) }}</NDescriptionsItem>
-        <NDescriptionsItem label="游客联系">{{ detail.guest_contact || "-" }}</NDescriptionsItem>
-        <NDescriptionsItem label="关联订单">{{ detail.order_id ? `#${detail.order_id}` : "-" }}</NDescriptionsItem>
-        <NDescriptionsItem label="创建时间">{{ formatTime(detail.created_at) }}</NDescriptionsItem>
-        <NDescriptionsItem label="首次回复">{{ formatTime(detail.first_reply_at) }}</NDescriptionsItem>
-        <NDescriptionsItem label="满意度">{{ satisfactionText(detail.satisfaction) }}</NDescriptionsItem>
+        <NDescriptionsItem label="遊客聯繫">{{ detail.guest_contact || "-" }}</NDescriptionsItem>
+        <NDescriptionsItem label="關聯訂單">{{ detail.order_id ? `#${detail.order_id}` : "-" }}</NDescriptionsItem>
+        <NDescriptionsItem label="創建時間">{{ formatTime(detail.created_at) }}</NDescriptionsItem>
+        <NDescriptionsItem label="首次回覆">{{ formatTime(detail.first_reply_at) }}</NDescriptionsItem>
+        <NDescriptionsItem label="滿意度">{{ satisfactionText(detail.satisfaction) }}</NDescriptionsItem>
       </NDescriptions>
 
-      <div class="mt-16px mb-8px text-13px font-600">对话记录（{{ messages.length }} 条）</div>
+      <div class="mt-16px mb-8px text-13px font-600">對話記錄（{{ messages.length }} 條）</div>
       <div class="flex flex-col gap-10px max-h-360px overflow-y-auto p-4px">
         <template v-if="messages.length">
           <div v-for="m in messages" :key="m.id" class="msg-row" :class="{ mine: m.sender_type === 'admin' }">
             <div class="msg-meta">
               {{ senderName(m) }}
-              <NTag v-if="m.is_internal" size="tiny" type="warning" :bordered="false" class="ml-4px">内部备注</NTag>
+              <NTag v-if="m.is_internal" size="tiny" type="warning" :bordered="false" class="ml-4px">內部備註</NTag>
               <span class="ml-6px text-11px text-gray-400">{{ formatTime(m.created_at) }}</span>
             </div>
             <div class="msg-bubble" :class="{ internal: m.is_internal }">{{ m.content }}</div>
           </div>
         </template>
-        <div v-else-if="!detailLoading" class="text-center text-12px text-gray-400">暂无消息</div>
+        <div v-else-if="!detailLoading" class="text-center text-12px text-gray-400">暫無消息</div>
       </div>
 
-      <!-- 回复区（ticket:write；关闭后只读） -->
+      <!-- 回覆區（ticket:write；關閉後只讀） -->
       <div v-if="canWrite() && !ticketClosed" class="mt-12px flex flex-col gap-8px">
-        <NInput v-model:value="replyContent" type="textarea" :rows="3" :placeholder="replyInternal ? '内部备注内容（用户不可见）' : '输入回复内容…'" />
+        <NInput v-model:value="replyContent" type="textarea" :rows="3" :placeholder="replyInternal ? '內部備註內容（用户不可見）' : '輸入回覆內容…'" />
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-6px text-13px">
             <NSwitch v-model:value="replyInternal" size="small" />
-            <span>内部备注</span>
+            <span>內部備註</span>
           </div>
           <NSpace :size="8">
             <NPopconfirm v-if="!ticketResolved" @positive-click="handleResolve">
               <template #trigger>
-                <NButton size="small" type="success" secondary :loading="acting">标记解决</NButton>
+                <NButton size="small" type="success" secondary :loading="acting">標記解決</NButton>
               </template>
-              确认已解决该工单？用户可继续追加或重新开启。
+              確認已解決該工單？用户可繼續追加或重新開啓。
             </NPopconfirm>
             <NPopconfirm @positive-click="handleClose">
               <template #trigger>
-                <NButton size="small" type="warning" secondary :loading="acting">关闭工单</NButton>
+                <NButton size="small" type="warning" secondary :loading="acting">關閉工單</NButton>
               </template>
-              确认关闭该工单？关闭后不可再回复。
+              確認關閉該工單？關閉後不可再回復。
             </NPopconfirm>
             <NButton size="small" type="primary" :loading="replying" :disabled="!replyContent.trim()" @click="handleReply">
-              {{ replyInternal ? "添加备注" : "回复" }}
+              {{ replyInternal ? "添加備註" : "回覆" }}
             </NButton>
           </NSpace>
         </div>
       </div>
-      <div v-else-if="ticketClosed" class="mt-12px text-12px text-gray-400">工单已关闭，仅供查看。</div>
+      <div v-else-if="ticketClosed" class="mt-12px text-12px text-gray-400">工單已關閉，僅供查看。</div>
     </NModal>
   </div>
 </template>
 
 <style scoped>
-/* 会话气泡（大厂客服工作台惯例）：用户左灰、客服右蓝、内部备注橙虚线 */
+/* 會話氣泡（大廠客服工作台慣例）：用户左灰、客服右藍、內部備註橙虛線 */
 .msg-row { display: flex; flex-direction: column; align-items: flex-start; }
 .msg-row.mine { align-items: flex-end; }
 .msg-meta { font-size: 11px; color: #9ca3af; margin-bottom: 3px; }

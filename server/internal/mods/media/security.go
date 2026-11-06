@@ -23,10 +23,10 @@ const maxImagePixels = 40_000_000
 const maxAnimationPixels = 100_000_000
 const SupportedImages = "JPG/JPEG/JFIF、PNG/APNG、GIF、WebP、AVIF、BMP、ICO、SVG、TIFF、HEIC/HEIF"
 
-var ErrInvalidType = fmt.Errorf("media.INVALID_TYPE: 支持 %s 图片", SupportedImages)
-var ErrTooLarge = fmt.Errorf("media.TOO_LARGE: 超过 10MB 上限")
-var ErrNotImage = fmt.Errorf("media.NOT_IMAGE: 文件内容不是合法图片")
-var ErrImageDimensions = fmt.Errorf("media.DIMENSIONS: 图片尺寸或动画总像素过大")
+var ErrInvalidType = fmt.Errorf("media.INVALID_TYPE: 支持 %s 圖片", SupportedImages)
+var ErrTooLarge = fmt.Errorf("media.TOO_LARGE: 超過 10MB 上限")
+var ErrNotImage = fmt.Errorf("media.NOT_IMAGE: 文件內容不是合法圖片")
+var ErrImageDimensions = fmt.Errorf("media.DIMENSIONS: 圖片尺寸或動畫總像素過大")
 
 func validDimensions(w, h int) bool { return w > 0 && h > 0 && int64(w)*int64(h) <= maxImagePixels }
 

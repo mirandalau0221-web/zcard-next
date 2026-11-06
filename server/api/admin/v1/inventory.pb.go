@@ -28,8 +28,8 @@ type ImportPreviewRequest struct {
 	ProductId     uint64                 `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	Lines         []string               `protobuf:"bytes,2,rep,name=lines,proto3" json:"lines,omitempty"`
 	Dedup         bool                   `protobuf:"varint,3,opt,name=dedup,proto3" json:"dedup,omitempty"`
-	SkuId         uint64                 `protobuf:"varint,4,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`                     // 有规格商品必须明确选择；无规格商品使用 0。
-	ImportFormat  string                 `protobuf:"bytes,5,opt,name=import_format,json=importFormat,proto3" json:"import_format,omitempty"` // 默认/line=整行完整卡密；premium=显式旧靓号格式，仅交付首段。
+	SkuId         uint64                 `protobuf:"varint,4,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`                     // 有規格商品必須明確選擇；無規格商品使用 0。
+	ImportFormat  string                 `protobuf:"bytes,5,opt,name=import_format,json=importFormat,proto3" json:"import_format,omitempty"` // 默認/line=整行完整卡密；premium=顯式舊靚號格式，僅交付首段。
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -300,10 +300,10 @@ type ImportBatch struct {
 	Skipped       int32                  `protobuf:"varint,5,opt,name=skipped,proto3" json:"skipped,omitempty"`
 	Failed        int32                  `protobuf:"varint,6,opt,name=failed,proto3" json:"failed,omitempty"`
 	Status        string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
-	SkuId         *uint64                `protobuf:"varint,8,opt,name=sku_id,json=skuId,proto3,oneof" json:"sku_id,omitempty"` // 导入时的目标；旧批次缺失表示历史未记录。
-	SkuName       string                 `protobuf:"bytes,9,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`  // 导入时名称快照。
+	SkuId         *uint64                `protobuf:"varint,8,opt,name=sku_id,json=skuId,proto3,oneof" json:"sku_id,omitempty"` // 導入時的目標；舊批次缺失表示歷史未記錄。
+	SkuName       string                 `protobuf:"bytes,9,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`  // 導入時名稱快照。
 	ProductName   string                 `protobuf:"bytes,10,opt,name=product_name,json=productName,proto3" json:"product_name,omitempty"`
-	Remaining     []*InventorySkuCount   `protobuf:"bytes,11,rep,name=remaining,proto3" json:"remaining,omitempty"` // 当前卡密分布，不改写导入来源。
+	Remaining     []*InventorySkuCount   `protobuf:"bytes,11,rep,name=remaining,proto3" json:"remaining,omitempty"` // 當前卡密分佈，不改寫導入來源。
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -418,8 +418,8 @@ func (x *ImportBatch) GetRemaining() []*InventorySkuCount {
 type ListImportsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ProductId     uint64                 `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
-	SkuId         *uint64                `protobuf:"varint,2,opt,name=sku_id,json=skuId,proto3,oneof" json:"sku_id,omitempty"`          // 按原导入目标筛选，省略为全部。
-	LegacyOnly    bool                   `protobuf:"varint,3,opt,name=legacy_only,json=legacyOnly,proto3" json:"legacy_only,omitempty"` // 仅历史未记录目标的批次。
+	SkuId         *uint64                `protobuf:"varint,2,opt,name=sku_id,json=skuId,proto3,oneof" json:"sku_id,omitempty"`          // 按原導入目標篩選，省略為全部。
+	LegacyOnly    bool                   `protobuf:"varint,3,opt,name=legacy_only,json=legacyOnly,proto3" json:"legacy_only,omitempty"` // 僅歷史未記錄目標的批次。
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -522,7 +522,7 @@ func (x *ListImportsReply) GetBatches() []*ImportBatch {
 type CancelImportRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Id               uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	ExpectedRevision string                 `protobuf:"bytes,2,opt,name=expected_revision,json=expectedRevision,proto3" json:"expected_revision,omitempty"` // 新界面使用预览返回的批次分布指纹。
+	ExpectedRevision string                 `protobuf:"bytes,2,opt,name=expected_revision,json=expectedRevision,proto3" json:"expected_revision,omitempty"` // 新界面使用預覽返回的批次分佈指紋。
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -577,7 +577,7 @@ type ListCardsRequest struct {
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"` // available | reserved | used | disabled
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	SkuId         *uint64                `protobuf:"varint,5,opt,name=sku_id,json=skuId,proto3,oneof" json:"sku_id,omitempty"` // 省略=全部，0=NULL/0 默认池，正数=指定规格。
+	SkuId         *uint64                `protobuf:"varint,5,opt,name=sku_id,json=skuId,proto3,oneof" json:"sku_id,omitempty"` // 省略=全部，0=NULL/0 默認池，正數=指定規格。
 	ImportId      *uint64                `protobuf:"varint,6,opt,name=import_id,json=importId,proto3,oneof" json:"import_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -707,7 +707,7 @@ func (x *ListCardsReply) GetTotal() int64 {
 	return 0
 }
 
-// CardInfo 卡密信息（内容默认掩码 ****尾4位）。
+// CardInfo 卡密信息（內容默認掩碼 ****尾4位）。
 type CardInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -717,7 +717,7 @@ type CardInfo struct {
 	Note          string                 `protobuf:"bytes,5,opt,name=note,proto3" json:"note,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UsedAt        int64                  `protobuf:"varint,7,opt,name=used_at,json=usedAt,proto3" json:"used_at,omitempty"`
-	LotteryDrawNo string                 `protobuf:"bytes,8,opt,name=lottery_draw_no,json=lotteryDrawNo,proto3" json:"lottery_draw_no,omitempty"` // 抽奖发放的中奖编号，不改变卡密库存状态
+	LotteryDrawNo string                 `protobuf:"bytes,8,opt,name=lottery_draw_no,json=lotteryDrawNo,proto3" json:"lottery_draw_no,omitempty"` // 抽獎發放的中獎編號，不改變卡密庫存狀態
 	SkuId         uint64                 `protobuf:"varint,9,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
 	SkuName       string                 `protobuf:"bytes,10,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`
 	ImportId      uint64                 `protobuf:"varint,11,opt,name=import_id,json=importId,proto3" json:"import_id,omitempty"`
@@ -886,7 +886,7 @@ func (x *ExportCardsRequest) GetSkuId() uint64 {
 
 type ExportCardsReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Lines         []string               `protobuf:"bytes,1,rep,name=lines,proto3" json:"lines,omitempty"` // CsvSafe 处理后的卡密行
+	Lines         []string               `protobuf:"bytes,1,rep,name=lines,proto3" json:"lines,omitempty"` // CsvSafe 處理後的卡密行
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1027,7 +1027,7 @@ func (x *ViewCardContentRequest) GetId() uint64 {
 type ViewCardContentReply struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Content         string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"` // 完整明文（一次性下发；Cache-Control: no-store 由 transport 保证）
+	Content         string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"` // 完整明文（一次性下發；Cache-Control: no-store 由 transport 保證）
 	Version         int32                  `protobuf:"varint,3,opt,name=version,proto3" json:"version,omitempty"`
 	CanEdit         bool                   `protobuf:"varint,4,opt,name=can_edit,json=canEdit,proto3" json:"can_edit,omitempty"`
 	EditBlockReason string                 `protobuf:"bytes,5,opt,name=edit_block_reason,json=editBlockReason,proto3" json:"edit_block_reason,omitempty"`
@@ -1316,15 +1316,15 @@ func (x *ListPremiumCardsReply) GetTotal() int64 {
 	return 0
 }
 
-// PremiumCardInfo 靓号卡（内容掩码；draft_premium 预选加价）。
+// PremiumCardInfo 靚號卡（內容掩碼；draft_premium 預選加價）。
 type PremiumCardInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	ProductId     uint64                 `protobuf:"varint,2,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	MaskedContent string                 `protobuf:"bytes,3,opt,name=masked_content,json=maskedContent,proto3" json:"masked_content,omitempty"` // ****尾4位
-	DraftPremium  int64                  `protobuf:"varint,4,opt,name=draft_premium,json=draftPremium,proto3" json:"draft_premium,omitempty"`   // 预选加价（分）
-	DraftCost     int64                  `protobuf:"varint,5,opt,name=draft_cost,json=draftCost,proto3" json:"draft_cost,omitempty"`            // 预选成本（分）
-	PriceCents    int64                  `protobuf:"varint,6,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`         // 靓号自选价（0=商品价+premium）
+	DraftPremium  int64                  `protobuf:"varint,4,opt,name=draft_premium,json=draftPremium,proto3" json:"draft_premium,omitempty"`   // 預選加價（分）
+	DraftCost     int64                  `protobuf:"varint,5,opt,name=draft_cost,json=draftCost,proto3" json:"draft_cost,omitempty"`            // 預選成本（分）
+	PriceCents    int64                  `protobuf:"varint,6,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`         // 靚號自選價（0=商品價+premium）
 	Status        string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
 	SkuId         uint64                 `protobuf:"varint,8,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
 	SkuName       string                 `protobuf:"bytes,9,opt,name=sku_name,json=skuName,proto3" json:"sku_name,omitempty"`
@@ -1879,7 +1879,7 @@ type AssignCardsRequest struct {
 	SkuId            uint64                 `protobuf:"varint,2,opt,name=sku_id,json=skuId,proto3" json:"sku_id,omitempty"`
 	CardIds          []uint64               `protobuf:"varint,3,rep,packed,name=card_ids,json=cardIds,proto3" json:"card_ids,omitempty"`
 	ExpectedRevision *int64                 `protobuf:"varint,4,opt,name=expected_revision,json=expectedRevision,proto3,oneof" json:"expected_revision,omitempty"`
-	RequestKey       string                 `protobuf:"bytes,5,opt,name=request_key,json=requestKey,proto3" json:"request_key,omitempty"` // 审计关联标识。
+	RequestKey       string                 `protobuf:"bytes,5,opt,name=request_key,json=requestKey,proto3" json:"request_key,omitempty"` // 審計關聯標識。
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }

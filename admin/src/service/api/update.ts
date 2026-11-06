@@ -1,4 +1,4 @@
-// 在线更新 API（system:update 超管专属；doc/在线更新方案.md §9）。
+// 在線更新 API（system:update 超管專屬；doc/在線更新方案.md §9）。
 
 import { request } from "../request";
 
@@ -59,7 +59,7 @@ export function rollbackUpdate() {
   return request<UpdateStatus>({ url: "/api/v1/admin/update/rollback", method: "post", data: {} });
 }
 
-// 源配置（settings system/update;保存走通用设置接口）。
+// 源配置（settings system/update;保存走通用設置接口）。
 export interface UpdateSourceConfig {
   mode: string; // auto | github | accel | static
   repo: string;

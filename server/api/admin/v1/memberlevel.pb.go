@@ -32,10 +32,10 @@ type MemberLevel struct {
 	ThresholdType     string                 `protobuf:"bytes,3,opt,name=threshold_type,json=thresholdType,proto3" json:"threshold_type,omitempty"`
 	ThresholdRecharge int64                  `protobuf:"varint,4,opt,name=threshold_recharge,json=thresholdRecharge,proto3" json:"threshold_recharge,omitempty"`
 	ThresholdConsume  int64                  `protobuf:"varint,5,opt,name=threshold_consume,json=thresholdConsume,proto3" json:"threshold_consume,omitempty"`
-	Discount          int32                  `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"` // 万分比
+	Discount          int32                  `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"` // 萬分比
 	Sort              int32                  `protobuf:"varint,7,opt,name=sort,proto3" json:"sort,omitempty"`
 	Enabled           bool                   `protobuf:"varint,8,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	// 积分产生规则 JSON：{"spend_cents": 每消费多少分, "points": 产出积分数}
+	// 積分產生規則 JSON：{"spend_cents": 每消費多少分, "points": 產出積分數}
 	PointsRuleJson string `protobuf:"bytes,9,opt,name=points_rule_json,json=pointsRuleJson,proto3" json:"points_rule_json,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

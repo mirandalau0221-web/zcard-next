@@ -35,24 +35,24 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminSettingsService 设置中心（settings 表 = 运行时业务开关真理源，铁律 7）。
-// 读写 API；起补齐安装向导状态与分组目录。
+// AdminSettingsService 設置中心（settings 表 = 運行時業務開關真理源，鐵律 7）。
+// 讀寫 API；起補齊安裝嚮導狀態與分組目錄。
 type AdminSettingsServiceClient interface {
-	// ListSettings 按分组列出设置项。
+	// ListSettings 按分組列出設置項。
 	ListSettings(ctx context.Context, in *ListSettingsRequest, opts ...grpc.CallOption) (*ListSettingsReply, error)
-	// ListTemplates 可用模板清单（扫描 web/storefront/templates/*/theme.json；
-	// 目录缺失回退内置 classic 清单）。
+	// ListTemplates 可用模板清單（掃描 web/storefront/templates/*/theme.json；
+	// 目錄缺失回退內置 classic 清單）。
 	ListTemplates(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TemplateList, error)
-	// InstallTemplate 安装主题（zip base64；解压校验后原子落盘到模板目录）。
+	// InstallTemplate 安裝主題（zip base64；解壓校驗後原子落盤到模板目錄）。
 	InstallTemplate(ctx context.Context, in *InstallTemplateRequest, opts ...grpc.CallOption) (*TemplateItem, error)
 	GetThemeSettings(ctx context.Context, in *ThemeSettingsRequest, opts ...grpc.CallOption) (*ThemeSettingsReply, error)
 	SaveThemeSettings(ctx context.Context, in *SaveThemeSettingsRequest, opts ...grpc.CallOption) (*ThemeSettingsReply, error)
 	PreviewThemeSettings(ctx context.Context, in *SaveThemeSettingsRequest, opts ...grpc.CallOption) (*ThemePreviewReply, error)
-	// GetSetting 读取单个设置项。
+	// GetSetting 讀取單個設置項。
 	GetSetting(ctx context.Context, in *GetSettingRequest, opts ...grpc.CallOption) (*Setting, error)
-	// UpdateSetting 更新单个设置项（value 为任意 JSON 文档）。
+	// UpdateSetting 更新單個設置項（value 為任意 JSON 文檔）。
 	UpdateSetting(ctx context.Context, in *UpdateSettingRequest, opts ...grpc.CallOption) (*Setting, error)
-	// UpdateSettings 批量更新（表单级保存；单事务原子写入）。
+	// UpdateSettings 批量更新（表單級保存；單事務原子寫入）。
 	UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*UpdateSettingsReply, error)
 }
 
@@ -158,24 +158,24 @@ func (c *adminSettingsServiceClient) UpdateSettings(ctx context.Context, in *Upd
 // All implementations must embed UnimplementedAdminSettingsServiceServer
 // for forward compatibility.
 //
-// AdminSettingsService 设置中心（settings 表 = 运行时业务开关真理源，铁律 7）。
-// 读写 API；起补齐安装向导状态与分组目录。
+// AdminSettingsService 設置中心（settings 表 = 運行時業務開關真理源，鐵律 7）。
+// 讀寫 API；起補齊安裝嚮導狀態與分組目錄。
 type AdminSettingsServiceServer interface {
-	// ListSettings 按分组列出设置项。
+	// ListSettings 按分組列出設置項。
 	ListSettings(context.Context, *ListSettingsRequest) (*ListSettingsReply, error)
-	// ListTemplates 可用模板清单（扫描 web/storefront/templates/*/theme.json；
-	// 目录缺失回退内置 classic 清单）。
+	// ListTemplates 可用模板清單（掃描 web/storefront/templates/*/theme.json；
+	// 目錄缺失回退內置 classic 清單）。
 	ListTemplates(context.Context, *emptypb.Empty) (*TemplateList, error)
-	// InstallTemplate 安装主题（zip base64；解压校验后原子落盘到模板目录）。
+	// InstallTemplate 安裝主題（zip base64；解壓校驗後原子落盤到模板目錄）。
 	InstallTemplate(context.Context, *InstallTemplateRequest) (*TemplateItem, error)
 	GetThemeSettings(context.Context, *ThemeSettingsRequest) (*ThemeSettingsReply, error)
 	SaveThemeSettings(context.Context, *SaveThemeSettingsRequest) (*ThemeSettingsReply, error)
 	PreviewThemeSettings(context.Context, *SaveThemeSettingsRequest) (*ThemePreviewReply, error)
-	// GetSetting 读取单个设置项。
+	// GetSetting 讀取單個設置項。
 	GetSetting(context.Context, *GetSettingRequest) (*Setting, error)
-	// UpdateSetting 更新单个设置项（value 为任意 JSON 文档）。
+	// UpdateSetting 更新單個設置項（value 為任意 JSON 文檔）。
 	UpdateSetting(context.Context, *UpdateSettingRequest) (*Setting, error)
-	// UpdateSettings 批量更新（表单级保存；单事务原子写入）。
+	// UpdateSettings 批量更新（表單級保存；單事務原子寫入）。
 	UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsReply, error)
 	mustEmbedUnimplementedAdminSettingsServiceServer()
 }

@@ -1,6 +1,6 @@
 package coupon
 
-// 扩展：券范围矩阵/每人限用/领取/返还 + 秒杀（同锁防超卖）+ 促销（多促最优）。
+// 擴展：券範圍矩陣/每人限用/領取/返還 + 秒殺（同鎖防超賣）+ 促銷（多促最優）。
 
 import (
 	"context"
@@ -23,9 +23,9 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/money"
 )
 
-// ── / 券：范围矩阵 + 每人限用 + 领取/返还 ──────────────
+// ── / 券：範圍矩陣 + 每人限用 + 領取/返還 ──────────────
 
-// ResolveScoped 范围矩阵版校验（port.CouponResolver 实现）。
+// ResolveScoped 範圍矩陣版校驗（port.CouponResolver 實現）。
 func (r *CouponRepoImpl) ResolveScoped(ctx context.Context, code string, userID, levelID uint64, items []port.CartItem) (money.Cents, uint64, error) {
 	if code == "" {
 		return 0, 0, nil
@@ -44,12 +44,12 @@ func (r *CouponRepoImpl) ResolveScoped(ctx context.Context, code string, userID,
 	if c.UserID != 0 && c.UserID != userID {
 		return 0, 0, fmt.Errorf("coupon.USER_MISMATCH")
 	}
-	// 范围矩阵（全场默认命中；商品/分类/等级三清单任一配置即精确匹配）
+	// 範圍矩陣（全場默認命中；商品/分類/等級三清單任一配置即精確匹配）
 	eligible := scopeItems(c.Scope, items, levelID)
 	if len(eligible) == 0 {
 		return 0, 0, fmt.Errorf("coupon.SCOPE_MISMATCH")
 	}
-	// 每人限用：多次码按已用累计（同 code 历史核销次数）；单次码由 status 保证
+	// 每人限用：多次碼按已用累計（同 code 歷史核銷次數）；單次碼由 status 保證
 	if c.PerUserLimit > 1 && userID > 0 {
 		used, err := client.Coupon.Query().
 			Where(coupon.Code(code), coupon.StatusEQ(coupon.StatusUsed)).
@@ -58,13 +58,13 @@ func (r *CouponRepoImpl) ResolveScoped(ctx context.Context, code string, userID,
 			return 0, 0, fmt.Errorf("coupon.PER_USER_LIMIT")
 		}
 	}
-	// 面额（percent 按命中行小计折算——范围受限时以命中商品金额为基数）
+	// 面額（percent 按命中行小計折算——範圍受限時以命中商品金額為基數）
 	value, err := couponDiscount(c.Type, c.Value, orderAmountOf(eligible))
 	return value, c.ID, err
 }
 
-// scopeItems 返回命中范围的商品行：空 scope/无清单 = 全场；配置任一清单则精确匹配
-// （商品 ∨ 分类 ∨ 等级——多清单间 OR，清单内多值 OR）。
+// scopeItems 返回命中範圍的商品行：空 scope/無清單 = 全場；配置任一清單則精確匹配
+// （商品 ∨ 分類 ∨ 等級——多清單間 OR，清單內多值 OR）。
 func scopeItems(scope map[string]any, items []port.CartItem, levelID uint64) []port.CartItem {
 	if len(scope) == 0 {
 		return items
@@ -73,7 +73,7 @@ func scopeItems(scope map[string]any, items []port.CartItem, levelID uint64) []p
 	categoryIDs := idList(scope["category_ids"])
 	levelIDs := idList(scope["level_ids"])
 	if len(productIDs) == 0 && len(categoryIDs) == 0 && len(levelIDs) == 0 {
-		return items // 空清单语义 = 全场
+		return items // 空清單語義 = 全場
 	}
 	if len(levelIDs) > 0 && levelID > 0 && levelIDs[levelID] {
 		return items
@@ -87,7 +87,7 @@ func scopeItems(scope map[string]any, items []port.CartItem, levelID uint64) []p
 	return matched
 }
 
-// idList any 列表 → set（JSON 数字解析为 float64）。
+// idList any 列表 → set（JSON 數字解析為 float64）。
 func idList(v any) map[uint64]bool {
 	out := map[uint64]bool{}
 	list, ok := v.([]any)
@@ -117,7 +117,7 @@ func orderAmountOf(items []port.CartItem) money.Cents {
 	return money.Cents(total)
 }
 
-// ReturnByOrder 返还券（取消/退款路径调用；过期不返）。
+// ReturnByOrder 返還券（取消/退款路徑調用；過期不返）。
 func (r *CouponRepoImpl) ReturnByOrder(ctx context.Context, orderID uint64) error {
 	// A stale cancellation must never clear a coupon reused by a newer order.
 	_, err := data.Client(ctx, r.data).Coupon.Update().
@@ -129,7 +129,7 @@ func (r *CouponRepoImpl) ReturnByOrder(ctx context.Context, orderID uint64) erro
 	return err
 }
 
-// Redeem 兑换码领券（用户凭 code 领取：未指派券回填 user_id）。
+// Redeem 兑換碼領券（用户憑 code 領取：未指派券回填 user_id）。
 func (r *CouponRepoImpl) Redeem(ctx context.Context, code string, userID uint64) error {
 	client := data.Client(ctx, r.data)
 	c, err := client.Coupon.Query().Where(coupon.Code(code)).Only(ctx)
@@ -146,13 +146,13 @@ func (r *CouponRepoImpl) Redeem(ctx context.Context, code string, userID uint64)
 		return fmt.Errorf("coupon.USER_MISMATCH")
 	}
 	if c.UserID == userID {
-		return nil // 重复领取幂等
+		return nil // 重複領取冪等
 	}
 	_, err = client.Coupon.UpdateOneID(c.ID).SetUserID(userID).Save(ctx)
 	return err
 }
 
-// GrantToUser 后台赠送（按批次取未指派券回填 user_id，返回实际赠送数）。
+// GrantToUser 後台贈送（按批次取未指派券回填 user_id，返回實際贈送數）。
 func (r *CouponRepoImpl) GrantToUser(ctx context.Context, batchID string, userID uint64, count int32) (int32, error) {
 	client := data.Client(ctx, r.data)
 	rows, err := client.Coupon.Query().
@@ -174,7 +174,7 @@ func (r *CouponRepoImpl) GrantToUser(ctx context.Context, batchID string, userID
 	return int32(len(rows)), nil
 }
 
-// ListMyCoupons 用户可用券（未用未过期）。
+// ListMyCoupons 用户可用券（未用未過期）。
 func (r *CouponRepoImpl) ListMyCoupons(ctx context.Context, userID uint64) ([]*ent.Coupon, error) {
 	return data.Client(ctx, r.data).Coupon.Query().
 		Where(coupon.UserID(userID), coupon.StatusEQ(coupon.StatusUnused), unexpiredCoupon(time.Now().UTC())).
@@ -183,9 +183,9 @@ func (r *CouponRepoImpl) ListMyCoupons(ctx context.Context, userID uint64) ([]*e
 		All(ctx)
 }
 
-// ── 秒杀（同锁防超卖）──────────────────────────────────
+// ── 秒殺（同鎖防超賣）──────────────────────────────────
 
-// Active 生效中秒杀（窗口判定无状态）。
+// Active 生效中秒殺（窗口判定無狀態）。
 func (r *CouponRepoImpl) Active(ctx context.Context, productID, skuID uint64) (*port.FlashInfo, error) {
 	rows, err := r.ActiveBatch(ctx, []uint64{productID})
 	if err != nil {
@@ -241,11 +241,11 @@ func (r *CouponRepoImpl) Consume(ctx context.Context, flashID uint64, qty int32)
 	return nil
 }
 
-// UserPurchasedCount 秒杀窗口内已购（paid+pending 累计；order_items×orders 联查）。
+// UserPurchasedCount 秒殺窗口內已購（paid+pending 累計；order_items×orders 聯查）。
 func (r *CouponRepoImpl) UserPurchasedCount(ctx context.Context, productID, userID uint64, since time.Time) (int32, error) {
 	client := data.Client(ctx, r.data)
-	// 联查口径：该用户窗口内 paid/pending 单中命中商品的数量合计。
-	// ent 无跨表 join 表达式——经 order_items 反查（product × order 归属过滤）。
+	// 聯查口徑：該用户窗口內 paid/pending 單中命中商品的數量合計。
+	// ent 無跨表 join 表達式——經 order_items 反查（product × order 歸屬過濾）。
 	itemRows, err := client.OrderItem.Query().
 		Where(
 			orderitem.ProductID(productID),
@@ -266,7 +266,7 @@ func (r *CouponRepoImpl) UserPurchasedCount(ctx context.Context, productID, user
 	return n, nil
 }
 
-// ListFlash 秒杀列表（进行中/即将开始；storefront 营销位）。
+// ListFlash 秒殺列表（進行中/即將開始；storefront 營銷位）。
 func (r *CouponRepoImpl) ListFlash(ctx context.Context, now time.Time, upcoming bool) ([]*ent.FlashSale, error) {
 	q := data.Client(ctx, r.data).FlashSale.Query()
 	if upcoming {
@@ -277,9 +277,9 @@ func (r *CouponRepoImpl) ListFlash(ctx context.Context, now time.Time, upcoming 
 	return q.Limit(50).All(ctx)
 }
 
-// ── 促销（多促最优）────────────────────────────────────
+// ── 促銷（多促最優）────────────────────────────────────
 
-// BestFor 商品命中最优促销（同时窗取折让最大；无则 nil）。
+// BestFor 商品命中最優促銷（同時窗取折讓最大；無則 nil）。
 func (r *CouponRepoImpl) BestFor(ctx context.Context, productID, categoryID uint64, unitPrice money.Cents) (*port.PromotionInfo, error) {
 	now := time.Now().UTC()
 	rows, err := data.Client(ctx, r.data).Promotion.Query().
@@ -310,16 +310,16 @@ func (r *CouponRepoImpl) BestFor(ctx context.Context, productID, categoryID uint
 			if p.Discount <= 0 || p.Discount > 10000 {
 				continue
 			}
-			info.DiscountRate = int32(p.Discount) // percent：discount 列存万分比
+			info.DiscountRate = int32(p.Discount) // percent：discount 列存萬分比
 		case promotion.TypeSpecialPrice:
 			info.SpecialPrice = money.Cents(p.SpecialPrice)
 		}
-		// 门槛判定（满 X 按单价口径；多品购物车场景由调用方按行判定后聚合——管线为逐行）
+		// 門檻判定（滿 X 按單價口徑；多品購物車場景由調用方按行判定後聚合——管線為逐行）
 		if info.Threshold > 0 && unitPrice < info.Threshold {
 			continue
 		}
-		// 与价格管线保持一致：促销必须产生正折让，且不将单价减为零。
-		// 不可应用的促销不能遮挡其他有效候选。
+		// 與價格管線保持一致：促銷必須產生正折讓，且不將單價減為零。
+		// 不可應用的促銷不能遮擋其他有效候選。
 		discount := info.DiscountFor(unitPrice)
 		if discount <= 0 || discount >= unitPrice {
 			continue
@@ -331,7 +331,7 @@ func (r *CouponRepoImpl) BestFor(ctx context.Context, productID, categoryID uint
 	return best, nil
 }
 
-// promoScopeHit 促销范围（空=全场；product_ids/category_ids OR）。
+// promoScopeHit 促銷範圍（空=全場；product_ids/category_ids OR）。
 func promoScopeHit(scope map[string]any, productID, categoryID uint64) bool {
 	if len(scope) == 0 {
 		return true
@@ -350,9 +350,9 @@ func promoScopeHit(scope map[string]any, productID, categoryID uint64) bool {
 	return false
 }
 
-// ── admin CRUD（秒杀/促销）────────────────────────────────
+// ── admin CRUD（秒殺/促銷）────────────────────────────────
 
-// CreateFlash 创建秒杀。
+// CreateFlash 創建秒殺。
 func (r *CouponRepoImpl) createFlash(ctx context.Context, productID, skuID uint64, flashPrice int64, startAt, endAt time.Time, limitQty, perUserLimit int32) (*ent.FlashSale, error) {
 	return data.Client(ctx, r.data).FlashSale.Create().
 		SetProductID(productID).
@@ -365,7 +365,7 @@ func (r *CouponRepoImpl) createFlash(ctx context.Context, productID, skuID uint6
 		Save(ctx)
 }
 
-// ListFlashAll 秒杀管理列表。
+// ListFlashAll 秒殺管理列表。
 func (r *CouponRepoImpl) ListFlashAll(ctx context.Context, page, size int) ([]*ent.FlashSale, int, error) {
 	q := data.Client(ctx, r.data).FlashSale.Query().Order(ent.Desc(flashsale.FieldID))
 	total, err := q.Count(ctx)
@@ -376,19 +376,19 @@ func (r *CouponRepoImpl) ListFlashAll(ctx context.Context, page, size int) ([]*e
 	return rows, total, err
 }
 
-// DeleteFlash 删除秒杀。
+// DeleteFlash 刪除秒殺。
 func (r *CouponRepoImpl) DeleteFlash(ctx context.Context, id uint64) error {
 	n, err := data.Client(ctx, r.data).FlashSale.Delete().Where(flashsale.ID(id), flashsale.ReservedQtyEQ(0)).Exec(ctx)
 	if err != nil {
 		return err
 	}
 	if n == 0 {
-		return fmt.Errorf("存在待付款秒杀订单，取消或完成支付后再删除活动")
+		return fmt.Errorf("存在待付款秒殺訂單，取消或完成支付後再刪除活動")
 	}
 	return nil
 }
 
-// UpsertPromotion 创建/更新促销。
+// UpsertPromotion 創建/更新促銷。
 func (r *CouponRepoImpl) upsertPromotion(ctx context.Context, id uint64, name string, scope map[string]any, typ string, threshold, discount, specialPrice int64, startAt, endAt time.Time, enabled bool) (*ent.Promotion, error) {
 	if typ == "percent" && (discount <= 0 || discount > 10000) {
 		return nil, fmt.Errorf("coupon.PROMO_RATE_INVALID")
@@ -420,7 +420,7 @@ func (r *CouponRepoImpl) upsertPromotion(ctx context.Context, id uint64, name st
 		Save(ctx)
 }
 
-// ListPromotions 促销列表。
+// ListPromotions 促銷列表。
 func (r *CouponRepoImpl) ListPromotions(ctx context.Context, page, size int) ([]*ent.Promotion, int, error) {
 	q := data.Client(ctx, r.data).Promotion.Query().Order(ent.Desc(promotion.FieldID))
 	total, err := q.Count(ctx)
@@ -431,7 +431,7 @@ func (r *CouponRepoImpl) ListPromotions(ctx context.Context, page, size int) ([]
 	return rows, total, err
 }
 
-// ProductCategoryOf 商品分类（管线促销范围判定输入）。
+// ProductCategoryOf 商品分類（管線促銷範圍判定輸入）。
 func (r *CouponRepoImpl) ProductCategoryOf(ctx context.Context, productID uint64) uint64 {
 	p, err := data.Client(ctx, r.data).Product.Get(ctx, productID)
 	if err != nil {

@@ -1,7 +1,7 @@
 package catalog
 
-// 商品仓储 Ent 实现（租户过滤经 tenancy.Context； 交付 Ent interceptor 后
-// 本处显式条件作为双保险保留——interceptor 负责注入，业务不依赖「忘了写」）。
+// 商品倉儲 Ent 實現（租户過濾經 tenancy.Context； 交付 Ent interceptor 後
+// 本處顯式條件作為雙保險保留——interceptor 負責注入，業務不依賴「忘了寫」）。
 
 import (
 	mediaport "github.com/NovaWorks/zcard-next/server/internal/mods/media/port"
@@ -23,10 +23,10 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/tenancy"
 )
 
-// ErrProductNotFound 商品不存在或不可见。
+// ErrProductNotFound 商品不存在或不可見。
 var ErrProductNotFound = errors.New("catalog.PRODUCT_NOT_FOUND")
 
-// ProductRepoImpl 商品仓储实现。
+// ProductRepoImpl 商品倉儲實現。
 type ProductRepoImpl struct {
 	stockLookup     port.StockLookup
 	stockRefreshing sync.Map
@@ -38,7 +38,7 @@ func NewProductRepoImpl(d *data.Data, _ mediaport.Referencer) *ProductRepoImpl {
 	return &ProductRepoImpl{data: d}
 }
 
-// ListVisible 上架商品分页（INDEX(subsite_id, status) 命中；只取列表所需列避免回表）。
+// ListVisible 上架商品分頁（INDEX(subsite_id, status) 命中；只取列表所需列避免回表）。
 func (r *ProductRepoImpl) ListVisible(ctx context.Context, f port.VisibleFilter) ([]port.Product, int64, error) {
 	client := data.Client(ctx, r.data)
 	hidden, err := data.HiddenCategoryIDs(ctx, client, f.SubsiteID)
@@ -50,17 +50,17 @@ func (r *ProductRepoImpl) ListVisible(ctx context.Context, f port.VisibleFilter)
 			product.SubsiteID(f.SubsiteID),
 			product.Status(1),
 		)
-	// 排序（sales 由 service 层全量排序，此处不处理）
+	// 排序（sales 由 service 層全量排序，此處不處理）
 	switch f.Sort {
 	case "price_asc":
 		q = q.Order(ent.Asc(product.FieldPrice))
 	case "price_desc":
 		q = q.Order(ent.Desc(product.FieldPrice))
 	case "newest":
-		// 最新上架：创建先后降序（区别于综合排序的运营权重 FieldSort 优先）
+		// 最新上架：創建先後降序（區別於綜合排序的運營權重 FieldSort 優先）
 		q = q.Order(ent.Desc(product.FieldID))
 	default:
-		// 综合排序（default）：运营权重优先，同权重内新商品在前
+		// 綜合排序（default）：運營權重優先，同權重內新商品在前
 		if f.CategoryID > 0 {
 			q = q.Order(func(s *sql.Selector) {
 				t := sql.Table(placement.Table).As("category_placement")
@@ -76,7 +76,7 @@ func (r *ProductRepoImpl) ListVisible(ctx context.Context, f port.VisibleFilter)
 		q = q.Order(ent.Asc(product.FieldSort), ent.Desc(product.FieldID))
 	}
 	if f.CategoryID > 0 {
-		// 选择父分类时递归包含全部子分类商品（与后台列表同口径）
+		// 選擇父分類時遞歸包含全部子分類商品（與後台列表同口徑）
 		desc, err := descendantCategoryIDs(ctx, client, f.CategoryID)
 		if err != nil {
 			return nil, 0, err
@@ -88,22 +88,22 @@ func (r *ProductRepoImpl) ListVisible(ctx context.Context, f port.VisibleFilter)
 		q = q.Where(product.CategoryIDIn(ids...))
 	}
 	if f.Keyword != "" {
-		// 商品名搜索用包含匹配（用户预期：名称中段词也要能命中； 禁 %xx% 针对的是
-		// order_no/username 等等值索引列，商品名模糊检索不在此列，当前量级 LIKE 可接受）
+		// 商品名搜索用包含匹配（用户預期：名稱中段詞也要能命中； 禁 %xx% 針對的是
+		// order_no/username 等等值索引列，商品名模糊檢索不在此列，當前量級 LIKE 可接受）
 		q = q.Where(product.NameContains(f.Keyword))
 	}
 	if f.PointsOnly {
-		q = q.Where(product.PointsRequiredGT(0)) // 积分商城视图（）
+		q = q.Where(product.PointsRequiredGT(0)) // 積分商城視圖（）
 	}
 	if f.RecommendOnly {
-		q = q.Where(product.IsRecommend(true)) // 推荐位视图（首页推荐区块）
+		q = q.Where(product.IsRecommend(true)) // 推薦位視圖（首頁推薦區塊）
 	}
 	total, err := q.Clone().Count(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
 	query := q.Clone()
-	// 分页（Page=0 = 全量拉取，sales 排序用）
+	// 分頁（Page=0 = 全量拉取，sales 排序用）
 	if f.Page > 0 && f.PageSize > 0 {
 		query = query.Offset((int(f.Page) - 1) * int(f.PageSize)).Limit(int(f.PageSize))
 	}
@@ -138,8 +138,8 @@ func (r *ProductRepoImpl) ListVisible(ctx context.Context, f port.VisibleFilter)
 	return items, int64(total), nil
 }
 
-// Get 单个商品。
-// SkuUpstreamCode 本地 SKU 的上游标识（procurement 规格采购还原；不存在 → 空串）。
+// Get 單個商品。
+// SkuUpstreamCode 本地 SKU 的上游標識（procurement 規格採購還原；不存在 → 空串）。
 func (r *ProductRepoImpl) SkuUpstreamCode(ctx context.Context, subsiteID, skuID uint64) string {
 	sku, err := data.Client(ctx, r.data).ProductSku.Get(ctx, skuID)
 	if err != nil || sku.SubsiteID != subsiteID {
@@ -191,16 +191,16 @@ func toPortProduct(row *ent.Product) port.Product {
 		DeliveryMode: string(row.DeliveryMode),
 		Status:       row.Status,
 		StockVisible: row.StockVisible,
-		// ：积分兑换价（积分商城商品判定）
+		// ：積分兑換價（積分商城商品判定）
 		PointsRequired: row.PointsRequired,
-		// ：货源信息（procurement 判定上游项）
+		// ：貨源信息（procurement 判定上游項）
 		UpstreamSourceID:    row.UpstreamSourceID,
 		UpstreamProductCode: row.UpstreamProductCode,
 		IsRecommend:         row.IsRecommend,
 	}
 }
 
-// ListVisibleCategories 可见分类（hide=false + 分站白名单；导航/筛选用）。
+// ListVisibleCategories 可見分類（hide=false + 分站白名單；導航/篩選用）。
 func (r *ProductRepoImpl) ListVisibleCategories(ctx context.Context, subsiteID uint64) ([]port.Category, error) {
 	rows, err := data.Client(ctx, r.data).Category.Query().
 		Where(
@@ -221,7 +221,7 @@ func (r *ProductRepoImpl) ListVisibleCategories(ctx context.Context, subsiteID u
 		if data.CategoryHidden(hidden, c.ID) {
 			continue
 		}
-		// 分站可见性白名单（空=全部可见；非空且不含本站 → 跳过）
+		// 分站可見性白名單（空=全部可見；非空且不含本站 → 跳過）
 		if len(c.VisibleSubsites) > 0 && !containsUint64(c.VisibleSubsites, subsiteID) {
 			continue
 		}
@@ -239,7 +239,7 @@ func containsUint64(list []uint64, v uint64) bool {
 	return false
 }
 
-// ListControls 商品自定义控件（按 sort 升序）。
+// ListControls 商品自定義控件（按 sort 升序）。
 func (r *ProductRepoImpl) ListControls(ctx context.Context, productID uint64) ([]port.Control, error) {
 	rows, err := data.Client(ctx, r.data).ProductControl.Query().
 		Where(productcontrol.ProductID(productID)).
@@ -259,4 +259,4 @@ func (r *ProductRepoImpl) ListControls(ctx context.Context, productID uint64) ([
 	return out, nil
 }
 
-var _ = tenancy.Main // interceptor 接入后移除占位引用
+var _ = tenancy.Main // interceptor 接入後移除佔位引用

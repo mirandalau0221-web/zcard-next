@@ -1,17 +1,17 @@
 <template>
   <div class="products-layout">
-    <!-- PC 左侧多级分类树（template.category_nav_style=list 时显示） -->
+    <!-- PC 左側多級分類樹（template.category_nav_style=list 時顯示） -->
     <CategoryTree v-if="navStyle !== 'grid'" :categories="categories" :loading="categoriesLoading" :error="!!categoriesError" @retry="loadCategories" :show-recommended="hasRecommended" :model-value="categoryId" @update:model-value="pickCategory" />
     <div class="products-content">
-      <!-- 分类导航：grid=顶部胶囊全断点；list 时 PC 左树，移动端「全部分类」折叠树（含全部层级） -->
+      <!-- 分類導航：grid=頂部膠囊全斷點；list 時 PC 左樹，移動端「全部分類」摺疊樹（含全部層級） -->
       <div v-if="navStyle === 'grid' && (categories.length || hasRecommended)" class="card category-chips" style="margin-bottom: 12px;">
         <div class="cat-chips-row" :class="{ expanded: chipsExpanded }">
           <button class="chip" :class="{ active: !categoryId }" @click="pickCategory(0)"><ThemeIcon name="grid" class="chip-icon" />{{ $t('全部') }}</button>
-          <button v-if="hasRecommended" class="chip" :class="{ active: categoryId === -1 }" @click="pickCategory(-1)">{{ $t('推荐商品') }}</button>
+          <button v-if="hasRecommended" class="chip" :class="{ active: categoryId === -1 }" @click="pickCategory(-1)">{{ $t('推薦商品') }}</button>
           <button v-for="c in categories.filter((x) => !x.parent_id)" :key="c.id" class="chip" :class="{ active: categoryId === c.id }" @click="pickCategory(c.id)">
             <CategoryIcon :icon="c.icon" class="chip-icon" />{{ c.name }}
           </button>
-          <!-- 移动端展开/收起：贴右悬浮，免逐个横滑找分类（与首页同款） -->
+          <!-- 移動端展開/收起：貼右懸浮，免逐個橫滑找分類（與首頁同款） -->
           <button class="chip chip-more" @click="chipsExpanded = !chipsExpanded">
             {{ chipsExpanded ? $t('收起 ⌃') : $t('更多 ⌄') }}
           </button>
@@ -21,30 +21,30 @@
         <CategoryTree variant="panel" :categories="categories" :loading="categoriesLoading" :error="!!categoriesError" @retry="loadCategories" :show-recommended="hasRecommended" :model-value="categoryId" @update:model-value="pickCategory" />
       </div>
 
-      <!-- 排序 + 搜索 + 视图切换 -->
+      <!-- 排序 + 搜索 + 視圖切換 -->
       <div class="card" style="margin-bottom: 16px;">
         <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
           <input v-model="keyword" class="input" :placeholder="$t('搜索商品名')" @keyup.enter="onSearch" style="max-width: 240px;" />
           <button class="btn secondary" @click="onSearch">{{ $t('搜索') }}</button>
           <span class="muted" style="font-size: 13px;">{{ $t('排序：') }}</span>
           <select v-model="sort" class="input" style="max-width: 160px;" @change="onSearch">
-            <option value="default">{{ $t('综合排序') }}</option>
-            <option v-if="showSales" value="sales">{{ $t('销量优先') }}</option>
+            <option value="default">{{ $t('綜合排序') }}</option>
+            <option v-if="showSales" value="sales">{{ $t('銷量優先') }}</option>
             <option value="newest">{{ $t('最新上架') }}</option>
-            <option value="price_asc">{{ $t('价格从低到高') }}</option>
-            <option value="price_desc">{{ $t('价格从高到低') }}</option>
+            <option value="price_asc">{{ $t('價格從低到高') }}</option>
+            <option value="price_desc">{{ $t('價格從高到低') }}</option>
           </select>
           <span style="flex: 1;"></span>
           <div class="view-toggle">
-            <button class="vt-btn" :class="{ active: viewMode === 'grid' }" :title="$t('网格视图')" @click="viewMode = 'grid'; bigGrid = false">▦</button>
-            <button class="vt-btn" :class="{ active: viewMode === 'list' }" :title="$t('列表视图')" @click="viewMode = 'list'">☰</button>
+            <button class="vt-btn" :class="{ active: viewMode === 'grid' }" :title="$t('網格視圖')" @click="viewMode = 'grid'; bigGrid = false">▦</button>
+            <button class="vt-btn" :class="{ active: viewMode === 'list' }" :title="$t('列表視圖')" @click="viewMode = 'list'">☰</button>
           </div>
         </div>
       </div>
 
-      <div v-if="categoriesError && navStyle === 'grid'" class="error" role="alert">{{ $t('分类加载失败') }} <button class="btn secondary" :disabled="categoriesLoading" @click="loadCategories">{{ $t('重试') }}</button></div>
-      <div v-if="error" class="error" role="alert" style="margin-bottom: 12px;">{{ uiText(error) }} <button class="btn secondary" :disabled="loading" @click="load">{{ $t('重新加载') }}</button></div>
-      <div v-if="loading && !products.length" role="status">{{ $t('正在加载商品…') }}</div>
+      <div v-if="categoriesError && navStyle === 'grid'" class="error" role="alert">{{ $t('分類加載失敗') }} <button class="btn secondary" :disabled="categoriesLoading" @click="loadCategories">{{ $t('重試') }}</button></div>
+      <div v-if="error" class="error" role="alert" style="margin-bottom: 12px;">{{ uiText(error) }} <button class="btn secondary" :disabled="loading" @click="load">{{ $t('重新加載') }}</button></div>
+      <div v-if="loading && !products.length" role="status">{{ $t('正在加載商品…') }}</div>
 
       <div v-if="viewMode === 'grid'" class="grid" :class="{ 'catalog-big': bigGrid }" :style="gridStyle">
         <ProductCard v-for="p in products" :key="p.id" :p="p" mode="grid" :show-sales="showSales" :show-stock="showStock" />
@@ -52,13 +52,13 @@
       <div v-else class="list-rows">
         <ProductCard v-for="p in products" :key="p.id" :p="p" mode="list" :show-sales="showSales" :show-stock="showStock" />
       </div>
-      <div v-if="products.length === 0 && !loading && !error" class="muted" style="margin-top: 24px; text-align: center;">{{ $t('暂无商品') }}</div>
+      <div v-if="products.length === 0 && !loading && !error" class="muted" style="margin-top: 24px; text-align: center;">{{ $t('暫無商品') }}</div>
 
-      <!-- 分页 -->
+      <!-- 分頁 -->
       <div v-if="total > pageSize" class="actions" style="margin-top: 20px; justify-content: center;">
-        <button class="btn secondary" :disabled="page <= 1" @click="go(page - 1)">{{ $t('上一页') }}</button>
+        <button class="btn secondary" :disabled="page <= 1" @click="go(page - 1)">{{ $t('上一頁') }}</button>
         <span class="muted">{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-        <button class="btn secondary" :disabled="page >= Math.ceil(total / pageSize)" @click="go(page + 1)">{{ $t('下一页') }}</button>
+        <button class="btn secondary" :disabled="page >= Math.ceil(total / pageSize)" @click="go(page + 1)">{{ $t('下一頁') }}</button>
       </div>
     </div>
   </div>
@@ -90,28 +90,28 @@ const categoriesError = ref('');
 const hasRecommended = ref(false);
 const keyword = ref('');
 const categoryId = ref(0);
-// 排序：default=综合（运营权重）| sales | newest | price_asc | price_desc（与后台 sort_by 同值域）
+// 排序：default=綜合（運營權重）| sales | newest | price_asc | price_desc（與後台 sort_by 同值域）
 const sort = ref('default');
 const page = ref(1);
 const pageSize = ref(20);
 const total = ref(0);
 const loading = ref(true);
 const error = ref('');
-const chipsExpanded = ref(false); // 移动端 grid 胶囊：单行横滑 → 展开多行
+const chipsExpanded = ref(false); // 移動端 grid 膠囊：單行橫滑 → 展開多行
 
-// ── 模板设置（后台 系统设置 → 模板；公开配置下发，客户端生效）──
-const viewMode = ref<'grid' | 'list'>('grid'); // template.default_view（big 归入网格+更宽卡片）
-const bigGrid = ref(false); // default_view=big：大图卡片（更宽的列）
-const navStyle = ref('list'); // template.category_nav_style：list=左侧树 | grid=顶部胶囊
-const gridMinPx = computed(() => (bigGrid.value ? 300 : 200)); // per_row 未设置时的自适应列宽
-const perRow = ref(0); // template.per_row：每行商品数（2-8 固定列数；0=自适应）
+// ── 模板設置（後台 系統設置 → 模板；公開配置下發，客户端生效）──
+const viewMode = ref<'grid' | 'list'>('grid'); // template.default_view（big 歸入網格+更寬卡片）
+const bigGrid = ref(false); // default_view=big：大圖卡片（更寬的列）
+const navStyle = ref('list'); // template.category_nav_style：list=左側樹 | grid=頂部膠囊
+const gridMinPx = computed(() => (bigGrid.value ? 300 : 200)); // per_row 未設置時的自適應列寬
+const perRow = ref(0); // template.per_row：每行商品數（2-8 固定列數；0=自適應）
 const gridStyle = computed(() =>
   !bigGrid.value && perRow.value
     ? { gridTemplateColumns: `repeat(${perRow.value}, 1fr)` }
     : { gridTemplateColumns: `repeat(auto-fill, minmax(${gridMinPx.value}px, 1fr))` },
 );
 const { showSales, applySalesConfig, normalizeSalesSort } = useSalesVisibility();
-const showStock = ref(false); // template.show_stock：卡片「库存」显示开关（叠加商品级 stock_visible）
+const showStock = ref(false); // template.show_stock：卡片「庫存」顯示開關（疊加商品級 stock_visible）
 
 let appliedDefaultView = '';
 let appliedDefaultSort = '';
@@ -124,7 +124,7 @@ async function loadTemplateSettings() {
       if (raw === undefined) return undefined;
       try { return JSON.parse(raw); } catch { return raw; }
     };
-    // 商品默认视图：list=列表行 | grid=网格 | big=大图（网格加宽）
+    // 商品默認視圖：list=列表行 | grid=網格 | big=大圖（網格加寬）
     const dv = val('template.default_view');
     const nextView = ['list', 'big'].includes(dv) ? dv : 'grid';
     if (nextView !== appliedDefaultView) {
@@ -132,14 +132,14 @@ async function loadTemplateSettings() {
       viewMode.value = nextView === 'list' ? 'list' : 'grid';
       appliedDefaultView = nextView;
     }
-    // 每页商品数（防滥用夹在 6~60；与首页同源消费，默认 20 一致时免重查）
+    // 每頁商品數（防濫用夾在 6~60；與首頁同源消費，默認 20 一致時免重查）
     const pp = Number(val('template.per_page'));
     let reload = false;
     if (Number.isInteger(pp) && pp >= 6 && pp <= 60 && pp !== pageSize.value) {
       pageSize.value = Math.floor(pp);
       reload = true;
     }
-    // 默认排序方式（与后台 sort_by 同值域；default=综合）
+    // 默認排序方式（與後台 sort_by 同值域；default=綜合）
     const sb = val('template.sort_by');
     if (['default', 'newest', 'sales', 'price_asc', 'price_desc'].includes(sb) && sb !== appliedDefaultSort) {
       appliedDefaultSort = sb;
@@ -150,12 +150,12 @@ async function loadTemplateSettings() {
       reload = true;
     }
     if (reload) page.value = 1;
-    // 库存显示沿用原有开关。
+    // 庫存顯示沿用原有開關。
     showStock.value = val('template.show_stock') !== false;
-    // 分类导航样式：grid=顶部胶囊（隐藏左侧树）
+    // 分類導航樣式：grid=頂部膠囊（隱藏左側樹）
     const ns = val('template.category_nav_style');
     if (ns === 'grid' || ns === 'list') navStyle.value = ns;
-    // 每行商品数（2-8）：显式固定列数
+    // 每行商品數（2-8）：顯式固定列數
     const pr = val('template.per_row');
     if (typeof pr === 'number' && pr >= 2 && pr <= 8) perRow.value = Math.floor(pr);
   } catch { sort.value = normalizeSalesSort(sort.value); }
@@ -200,7 +200,7 @@ function go(p: number) {
 
 function pickCategory(id: number) {
   categoryId.value = id;
-  chipsExpanded.value = false; // 选完即收起，回紧凑单行
+  chipsExpanded.value = false; // 選完即收起，回緊湊單行
   onSearch();
 }
 
@@ -267,13 +267,13 @@ usePageRecovery(async () => {
   await Promise.all([loadCategories(), load(), applyListSeo()]);
 }, () => route.path === '/products' && !loading.value);
 
-/** 列表页 SEO：分类名进 title；canonical 恒为 /products（分类筛选是同一列表的
- 变体，服务端静态页与爬虫视图均为 /products——水合后保持一致避免规范信号打架） */
+/** 列表頁 SEO：分類名進 title；canonical 恆為 /products（分類篩選是同一列表的
+ 變體，服務端靜態頁與爬蟲視圖均為 /products——水合後保持一致避免規範信號打架） */
 watch(locale, () => { if (route.path === '/products') void applyListSeo(); });
 async function applyListSeo() {
   const site = await fetchSiteSeo();
   const origin = typeof window !== "undefined" ? window.location.origin : site.url;
-  const catName = categoryId.value === -1 ? $t("推荐商品") : categories.value.find((c) => c.id === categoryId.value)?.name;
+  const catName = categoryId.value === -1 ? $t("推薦商品") : categories.value.find((c) => c.id === categoryId.value)?.name;
   const title = catName ? `${catName} - ${site.name}` : $t("全部商品 - {0}", [site.name]);
   applySeo({ title, canonical: `${origin}/products`, ogType: 'website' }, site);
 }
@@ -293,9 +293,9 @@ async function applyListSeo() {
 .chip:hover { border-color: var(--zc-primary); color: var(--zc-primary); background: var(--zc-primary-soft); }
 .chip.active { background: var(--zc-primary); color: #fff; font-weight: 600; box-shadow: 0 3px 10px color-mix(in srgb, var(--zc-primary) 30%, transparent); }
 .chip-icon { margin-right: 5px; }
-/* 胶囊行：桌面多行 wrap；移动端单行横滑 + 「更多」展开（与首页同款） */
+/* 膠囊行：桌面多行 wrap；移動端單行橫滑 + 「更多」展開（與首頁同款） */
 .cat-chips-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-/* 「更多」按钮：仅移动端显示；sticky 贴滚动行右缘 */
+/* 「更多」按鈕：僅移動端顯示；sticky 貼滾動行右緣 */
 .chip-more {
   display: none; position: sticky; right: 0; flex-shrink: 0;
   background: #fff; border-color: #e5e7eb; box-shadow: -8px 0 12px -6px rgba(15, 23, 42, 0.18);
@@ -312,8 +312,8 @@ async function applyListSeo() {
   .cat-chips-row.expanded .chip-more { margin-left: auto; position: static; box-shadow: none; }
 }
 
-/* 移动端「全部分类」折叠面板（与首页同款：橙竖条标题 + 层级树） */
-/* mobile-only 会给容器 display:flex，这里必须转纵向，防止头/体横排挤压树体 */
+/* 移動端「全部分類」摺疊面板（與首頁同款：橙豎條標題 + 層級樹） */
+/* mobile-only 會給容器 display:flex，這裏必須轉縱向，防止頭/體橫排擠壓樹體 */
 .mobile-cat { padding: 0; overflow: hidden; flex-direction: column; }
 .mobile-cat-head {
   width: 100%; display: flex; align-items: center; gap: 8px;
@@ -341,7 +341,7 @@ async function applyListSeo() {
 }
 .vt-btn + .vt-btn { border-left: 1px solid #e5e7eb; }
 
-/* 移动端：商品网格双列（与首页一致；auto-fill minmax 在手机只能出 1 列） */
+/* 移動端：商品網格雙列（與首頁一致；auto-fill minmax 在手機只能出 1 列） */
 @media (max-width: 768px) {
   .grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
 }

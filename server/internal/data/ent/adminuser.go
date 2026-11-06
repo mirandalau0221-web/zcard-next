@@ -29,9 +29,9 @@ type AdminUser struct {
 	Nickname string `json:"nickname,omitempty"`
 	// Avatar holds the value of the "avatar" field.
 	Avatar string `json:"avatar,omitempty"`
-	// 所属角色
+	// 所屬角色
 	RoleID uint64 `json:"role_id,omitempty"`
-	// AES-256-GCM 加密的 TOTP 密钥
+	// AES-256-GCM 加密的 TOTP 密鑰
 	TotpSecret []byte `json:"totp_secret,omitempty"`
 	// AuthVersion holds the value of the "auth_version" field.
 	AuthVersion int `json:"auth_version,omitempty"`

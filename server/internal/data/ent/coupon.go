@@ -22,25 +22,25 @@ type Coupon struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 批次标识（按批作废）
+	// 批次標識（按批作廢）
 	BatchID string `json:"batch_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Type holds the value of the "type" field.
 	Type coupon.Type `json:"type,omitempty"`
-	// fixed=分；percent=万分比
+	// fixed=分；percent=萬分比
 	Value int64 `json:"value,omitempty"`
 	// Code holds the value of the "code" field.
 	Code string `json:"code,omitempty"`
-	// 全场/商品IDs/分类IDs/等级IDs
+	// 全場/商品IDs/分類IDs/等級IDs
 	Scope map[string]interface{} `json:"scope,omitempty"`
 	// ExpireAt holds the value of the "expire_at" field.
 	ExpireAt time.Time `json:"expire_at,omitempty"`
-	// 单码次数（多次码放开）
+	// 單碼次數（多次碼放開）
 	PerUserLimit int32 `json:"per_user_limit,omitempty"`
 	// Status holds the value of the "status" field.
 	Status coupon.Status `json:"status,omitempty"`
-	// 领取人（兑换码/后台赠送回填）
+	// 領取人（兑換碼/後台贈送回填）
 	UserID uint64 `json:"user_id,omitempty"`
 	// UsedAt holds the value of the "used_at" field.
 	UsedAt time.Time `json:"used_at,omitempty"`

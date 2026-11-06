@@ -1,0 +1,19 @@
+{
+  "common.ok": "成功",
+  "common.bad_request": "請求參數錯誤",
+  "common.unauthorized": "未登錄或令牌已過期",
+  "common.forbidden": "沒有權限執行此操作",
+  "common.not_found": "資源不存在",
+  "common.internal": "服務器內部錯誤",
+  "identity.login_failed": "賬號或密碼錯誤",
+  "identity.admin_disabled": "賬號已禁用",
+  "identity.totp_required": "需要兩步驗證碼",
+  "authz.permission_denied": "權限不足：{permission}",
+  "settings.not_found": "設置項不存在",
+  "order.access_required": "訂單訪問憑證無效，請使用保存的訪問鏈接或通過下單郵箱驗證",
+  "order.access_code_invalid": "訂單或郵箱不匹配，或驗證碼無效、已使用或已過期",
+  "order.access_contact_invalid": "請填寫訂單號和下單郵箱",
+  "order.access_recovery_unavailable": "訂單郵件驗證暫時不可用，請稍後重試",
+  "order.access_email_unavailable": "郵箱驗證通道尚未配置，請聯繫客服",
+  "order.access_email_failed": "驗證碼郵件暫未送達，請稍後重試或聯繫客服"
+}

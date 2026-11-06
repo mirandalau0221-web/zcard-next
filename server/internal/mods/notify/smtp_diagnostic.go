@@ -16,23 +16,23 @@ import (
 )
 
 var smtpStageLabels = map[string]string{
-	"configuration": "SMTP 配置检查失败", "connect": "SMTP 连接失败", "greeting": "SMTP 握手失败",
-	"tls": "SMTP TLS 连接失败", "starttls": "SMTP STARTTLS 失败", "auth": "SMTP 认证失败",
-	"from": "SMTP 发件地址被拒绝", "recipient": "SMTP 收件地址被拒绝",
-	"data": "SMTP DATA 失败", "body": "SMTP 正文发送失败", "accept": "SMTP 服务器拒绝邮件",
+	"configuration": "SMTP 配置檢查失敗", "connect": "SMTP 連接失敗", "greeting": "SMTP 握手失敗",
+	"tls": "SMTP TLS 連接失敗", "starttls": "SMTP STARTTLS 失敗", "auth": "SMTP 認證失敗",
+	"from": "SMTP 發件地址被拒絕", "recipient": "SMTP 收件地址被拒絕",
+	"data": "SMTP DATA 失敗", "body": "SMTP 正文發送失敗", "accept": "SMTP 服務器拒絕郵件",
 }
 var smtpStageHints = map[string]string{
-	"configuration": "核对服务器地址（不含协议和端口）、端口、发件邮箱、连接与认证方式，然后保存配置。",
-	"connect":       "检查服务器域名、端口、防火墙和服务器出站网络；确认邮件服务正在监听此端口。",
-	"greeting":      "检查该端口是否为 SMTP 服务；SSL/TLS 通常使用 465，STARTTLS 通常使用 587，普通 SMTP 通常使用 25。",
-	"tls":           "核对 SSL/TLS 方式和端口，并检查邮件服务器证书及其完整证书链。",
-	"starttls":      "确认服务器及端口支持 STARTTLS；此方式要求升级成功，请勿使用只支持隐式 TLS 的端口。",
-	"auth":          "核对 SMTP 用户名、密码或授权码、认证方式，以及服务器是否已开启 SMTP 登录。",
-	"from":          "核对发件邮箱是否属于当前账号、发件域名是否获准，以及中继发信权限。",
-	"recipient":     "核对收件地址、服务器中继策略和收件限制；部分服务商要求测试收件人已验证。",
-	"data":          "检查服务器发信权限、限额和邮件大小限制，并查看邮件服务日志。",
-	"body":          "检查网络是否中断或超时，再查看邮件服务器日志。",
-	"accept":        "按服务器返回的状态码检查内容策略、发信限额、域名验证和邮件服务日志。",
+	"configuration": "核對服務器地址（不含協議和端口）、端口、發件郵箱、連接與認證方式，然後保存配置。",
+	"connect":       "檢查服務器域名、端口、防火牆和服務器出站網絡；確認郵件服務正在監聽此端口。",
+	"greeting":      "檢查該端口是否為 SMTP 服務；SSL/TLS 通常使用 465，STARTTLS 通常使用 587，普通 SMTP 通常使用 25。",
+	"tls":           "核對 SSL/TLS 方式和端口，並檢查郵件服務器證書及其完整證書鏈。",
+	"starttls":      "確認服務器及端口支持 STARTTLS；此方式要求升級成功，請勿使用只支持隱式 TLS 的端口。",
+	"auth":          "核對 SMTP 用户名、密碼或授權碼、認證方式，以及服務器是否已開啓 SMTP 登錄。",
+	"from":          "核對發件郵箱是否屬於當前賬號、發件域名是否獲准，以及中繼發信權限。",
+	"recipient":     "核對收件地址、服務器中繼策略和收件限制；部分服務商要求測試收件人已驗證。",
+	"data":          "檢查服務器發信權限、限額和郵件大小限制，並查看郵件服務日誌。",
+	"body":          "檢查網絡是否中斷或超時，再查看郵件服務器日誌。",
+	"accept":        "按服務器返回的狀態碼檢查內容策略、發信限額、域名驗證和郵件服務日誌。",
 }
 
 // SMTPDiagnostic carries the failure stage and sanitized provider response.
@@ -61,31 +61,31 @@ func smtpFailure(stage string, err error, cfg *notifyport.SMTPConfig) *SMTPDiagn
 	var record tls.RecordHeaderError
 	switch {
 	case errors.As(err, &dns) && dns.IsNotFound:
-		d.Hint = "服务器域名无法解析；请检查 SMTP 主机名和服务器 DNS 配置。"
+		d.Hint = "服務器域名無法解析；請檢查 SMTP 主機名和服務器 DNS 配置。"
 	case errors.As(err, &network) && network.Timeout():
-		d.Hint = "连接或服务器响应超时；检查防火墙、出站端口，以及连接方式是否与端口匹配。"
+		d.Hint = "連接或服務器響應超時；檢查防火牆、出站端口，以及連接方式是否與端口匹配。"
 	case errors.Is(err, syscall.ECONNREFUSED):
-		d.Hint = "连接被拒绝；确认端口正确、邮件服务已启动，并允许服务器访问此端口。"
+		d.Hint = "連接被拒絕；確認端口正確、郵件服務已啓動，並允許服務器訪問此端口。"
 	case errors.As(err, &unknown):
-		d.Hint = "证书不受信任（可能是自签名或缺少证书链）；为邮件服务安装可信证书及完整链。自建可信服务可自行选择是否校验证书。"
+		d.Hint = "證書不受信任（可能是自簽名或缺少證書鏈）；為郵件服務安裝可信證書及完整鏈。自建可信服務可自行選擇是否校驗證書。"
 	case errors.As(err, &hostname):
-		d.Hint = "证书中的域名与 SMTP 服务器地址不匹配；使用证书覆盖的主机名或更新证书。"
+		d.Hint = "證書中的域名與 SMTP 服務器地址不匹配；使用證書覆蓋的主機名或更新證書。"
 	case errors.As(err, &certificate):
-		d.Hint = "证书已过期、尚未生效或用途不正确；检查服务器时间及邮件服务证书。"
+		d.Hint = "證書已過期、尚未生效或用途不正確；檢查服務器時間及郵件服務證書。"
 	case errors.As(err, &record):
-		d.Hint = "此端口返回的不是 TLS 握手；核对连接方式，隐式 SSL/TLS 与 STARTTLS 不能混用。"
+		d.Hint = "此端口返回的不是 TLS 握手；核對連接方式，隱式 SSL/TLS 與 STARTTLS 不能混用。"
 	case d.Code == 530 || d.Code == 538:
-		d.Hint = "服务器要求认证或加密；检查用户名和密码，并选择 STARTTLS 或 SSL/TLS。"
+		d.Hint = "服務器要求認證或加密；檢查用户名和密碼，並選擇 STARTTLS 或 SSL/TLS。"
 	case stage == "auth" && d.Code == 535:
-		d.Hint = "服务器拒绝登录；检查账号、密码或 SMTP 专用授权码，以及是否启用了 SMTP 登录。"
+		d.Hint = "服務器拒絕登錄；檢查賬號、密碼或 SMTP 專用授權碼，以及是否啓用了 SMTP 登錄。"
 	case d.Code == 421 || d.Code == 450 || d.Code == 451 || d.Code == 452:
-		d.Hint = "服务器暂时不可用、限流或资源不足；查看服务日志与限额，稍后再试。"
+		d.Hint = "服務器暫時不可用、限流或資源不足；查看服務日誌與限額，稍後再試。"
 	}
 	if cfg != nil {
 		d.Host, d.Port, d.Security, d.Authentication, d.TLSVerify = cfg.Host, cfg.Port, cfg.Security, cfg.Auth, cfg.TLSVerify
 		if cfg.Password != "" {
 			for _, secret := range []string{base64.StdEncoding.EncodeToString([]byte("\x00" + cfg.Username + "\x00" + cfg.Password)), base64.StdEncoding.EncodeToString([]byte(cfg.Password)), cfg.Password} {
-				d.Detail = strings.ReplaceAll(d.Detail, secret, "[已隐藏]")
+				d.Detail = strings.ReplaceAll(d.Detail, secret, "[已隱藏]")
 			}
 		}
 	}
@@ -94,8 +94,8 @@ func smtpFailure(stage string, err error, cfg *notifyport.SMTPConfig) *SMTPDiagn
 
 func smtpTestError(err error) *kerrors.Error {
 	if errors.Is(err, ErrSkipped) {
-		return kerrors.BadRequest("notify.EMAIL_NOT_READY", "邮件通道未配置").WithMetadata(map[string]string{
-			"stage": "configuration", "stage_label": smtpStageLabels["configuration"], "hint": "请先保存 SMTP 服务器、端口、连接方式和发件账号。",
+		return kerrors.BadRequest("notify.EMAIL_NOT_READY", "郵件通道未配置").WithMetadata(map[string]string{
+			"stage": "configuration", "stage_label": smtpStageLabels["configuration"], "hint": "請先保存 SMTP 服務器、端口、連接方式和發件賬號。",
 		})
 	}
 	reply := kerrors.BadRequest("notify.EMAIL_TEST_FAILED", err.Error())

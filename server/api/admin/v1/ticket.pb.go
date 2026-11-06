@@ -25,9 +25,9 @@ const (
 
 type ListTicketsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`                  // open | processing | resolved | closed；空=未关闭（open+processing）
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`                  // open | processing | resolved | closed；空=未關閉（open+processing）
 	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`                      // presale | aftersale
-	OrderNo       string                 `protobuf:"bytes,3,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"` // 关联订单号（精确）
+	OrderNo       string                 `protobuf:"bytes,3,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"` // 關聯訂單號（精確）
 	Page          int32                  `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,5,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -446,7 +446,7 @@ func (x *AdminTicketMessage) GetCreatedAt() int64 {
 type GetTicketReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ticket        *AdminTicket           `protobuf:"bytes,1,opt,name=ticket,proto3" json:"ticket,omitempty"`
-	Messages      []*AdminTicketMessage  `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"` // 含内部备注
+	Messages      []*AdminTicketMessage  `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"` // 含內部備註
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -499,7 +499,7 @@ type AdminReplyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TicketNo      string                 `protobuf:"bytes,1,opt,name=ticket_no,json=ticketNo,proto3" json:"ticket_no,omitempty"`
 	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	IsInternal    bool                   `protobuf:"varint,3,opt,name=is_internal,json=isInternal,proto3" json:"is_internal,omitempty"` // 内部备注（用户不可见）
+	IsInternal    bool                   `protobuf:"varint,3,opt,name=is_internal,json=isInternal,proto3" json:"is_internal,omitempty"` // 內部備註（用户不可見）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

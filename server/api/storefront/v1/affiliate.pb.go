@@ -25,17 +25,17 @@ const (
 
 type MyAffiliateReply struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	UserId         uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                         // 推广码 = user_id
-	InviteUrl      string                 `protobuf:"bytes,2,opt,name=invite_url,json=inviteUrl,proto3" json:"invite_url,omitempty"`                 // 邀请链接（?ref=）
-	PendingCents   int64                  `protobuf:"varint,3,opt,name=pending_cents,json=pendingCents,proto3" json:"pending_cents,omitempty"`       // 冻结中
+	UserId         uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                         // 推廣碼 = user_id
+	InviteUrl      string                 `protobuf:"bytes,2,opt,name=invite_url,json=inviteUrl,proto3" json:"invite_url,omitempty"`                 // 邀請鏈接（?ref=）
+	PendingCents   int64                  `protobuf:"varint,3,opt,name=pending_cents,json=pendingCents,proto3" json:"pending_cents,omitempty"`       // 凍結中
 	AvailableCents int64                  `protobuf:"varint,4,opt,name=available_cents,json=availableCents,proto3" json:"available_cents,omitempty"` // 可提
-	WithdrawnCents int64                  `protobuf:"varint,5,opt,name=withdrawn_cents,json=withdrawnCents,proto3" json:"withdrawn_cents,omitempty"` // 已提现
-	TotalCents     int64                  `protobuf:"varint,6,opt,name=total_cents,json=totalCents,proto3" json:"total_cents,omitempty"`             // 累计
-	DebtCents      int64                  `protobuf:"varint,7,opt,name=debt_cents,json=debtCents,proto3" json:"debt_cents,omitempty"`                // 负债
-	TeamL1         int64                  `protobuf:"varint,8,opt,name=team_l1,json=teamL1,proto3" json:"team_l1,omitempty"`                         // 直推人数
+	WithdrawnCents int64                  `protobuf:"varint,5,opt,name=withdrawn_cents,json=withdrawnCents,proto3" json:"withdrawn_cents,omitempty"` // 已提現
+	TotalCents     int64                  `protobuf:"varint,6,opt,name=total_cents,json=totalCents,proto3" json:"total_cents,omitempty"`             // 累計
+	DebtCents      int64                  `protobuf:"varint,7,opt,name=debt_cents,json=debtCents,proto3" json:"debt_cents,omitempty"`                // 負債
+	TeamL1         int64                  `protobuf:"varint,8,opt,name=team_l1,json=teamL1,proto3" json:"team_l1,omitempty"`                         // 直推人數
 	TeamL2         int64                  `protobuf:"varint,9,opt,name=team_l2,json=teamL2,proto3" json:"team_l2,omitempty"`
 	TeamL3         int64                  `protobuf:"varint,10,opt,name=team_l3,json=teamL3,proto3" json:"team_l3,omitempty"`
-	PromoCode      string                 `protobuf:"bytes,11,opt,name=promo_code,json=promoCode,proto3" json:"promo_code,omitempty"` // 推广码（8 位随机）
+	PromoCode      string                 `protobuf:"bytes,11,opt,name=promo_code,json=promoCode,proto3" json:"promo_code,omitempty"` // 推廣碼（8 位隨機）
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -401,7 +401,7 @@ type CommissionItem struct {
 	OrderId       uint64                 `protobuf:"varint,2,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	Tier          int32                  `protobuf:"varint,3,opt,name=tier,proto3" json:"tier,omitempty"`
 	BaseAmount    int64                  `protobuf:"varint,4,opt,name=base_amount,json=baseAmount,proto3" json:"base_amount,omitempty"`
-	Amount        int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"` // 负数 = 负债行
+	Amount        int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"` // 負數 = 負債行
 	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`  // pending_confirm | available | withdrawn | reversed
 	AvailableAt   int64                  `protobuf:"varint,7,opt,name=available_at,json=availableAt,proto3" json:"available_at,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`

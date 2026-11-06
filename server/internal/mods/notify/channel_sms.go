@@ -1,20 +1,20 @@
 package notify
 
-// SMS 通道（ 收尾）：阿里云/腾讯云/七牛三通道——零 SDK REST。
-// 配置运行时读取 settings notify 组扁平键（后台「邮件短信」页保存）：
+// SMS 通道（ 收尾）：阿里雲/騰訊雲/七牛三通道——零 SDK REST。
+// 配置運行時讀取 settings notify 組扁平鍵（後台「郵件短信」頁保存）：
 // sms_provider / sms_key / sms_secret / sms_sign / sms_template_code / sms_sdk_app_id
-// 兼容旧版 notify.sms JSON blob（access_key 等；存量部署无缝迁移），
-// 未配置/缺凭据 → skipped 降级。
+// 兼容舊版 notify.sms JSON blob（access_key 等；存量部署無縫遷移），
+// 未配置/缺憑據 → skipped 降級。
 //
-// 消息体 Body = 模板变量 JSON 键值对象（如 {"code":"123456","minutes":"5"}），
-// 各通道按自身模板变量规范转换（阿里云/七牛键值对象；腾讯云按变量名排序转数组）。
+// 消息體 Body = 模板變量 JSON 鍵值對象（如 {"code":"123456","minutes":"5"}），
+// 各通道按自身模板變量規範轉換（阿里雲/七牛鍵值對象；騰訊雲按變量名排序轉數組）。
 //
-// 阿里云签名算法（RPC 风格）：
-// 1. 参数去 Signature 后 ksort
-// 2. RFC 3986 变体编码（+ → %20）
+// 阿里雲簽名算法（RPC 風格）：
+// 1. 參數去 Signature 後 ksort
+// 2. RFC 3986 變體編碼（+ → %20）
 // 3. stringToSign = "POST" & enc("/") & enc(canonicalQuery)
 // 4. sig = base64(HMAC-SHA1(stringToSign, accessSecret + "&"))
-// golden vector 见 data_notify_test.go（Python 独立计算固化）。
+// golden vector 見 data_notify_test.go（Python 獨立計算固化）。
 
 import (
 	"context"
@@ -37,30 +37,30 @@ import (
 // aliyunEndpoint Dysmsapi 地址。
 const aliyunEndpoint = "https://dysmsapi.aliyuncs.com/"
 
-// SMSConfig 短信通道配置（settings notify 组扁平键）。
+// SMSConfig 短信通道配置（settings notify 組扁平鍵）。
 type SMSConfig struct {
 	Provider     string // aliyun | tencent | qiniu
 	AccessKey    string
 	AccessSecret string
-	SignName     string // 签名（阿里云/腾讯云：签名名称；七牛：签名 ID）
+	SignName     string // 簽名（阿里雲/騰訊雲：簽名名稱；七牛：簽名 ID）
 	TemplateCode string // 模板 ID
-	SdkAppID     string // 腾讯云专属（SmsSdkAppId）
+	SdkAppID     string // 騰訊雲專屬（SmsSdkAppId）
 }
 
-// SMSChannel 短信通道（provider 分发）。
+// SMSChannel 短信通道（provider 分發）。
 type SMSChannel struct {
 	settings notifyport.SettingsReader
-	client   *http.Client // httpx 安全客户端（SSRF 防护）
+	client   *http.Client // httpx 安全客户端（SSRF 防護）
 }
 
-// NewSMSChannel 构造。
+// NewSMSChannel 構造。
 func NewSMSChannel(settings notifyport.SettingsReader) *SMSChannel {
 	return &SMSChannel{settings: settings, client: httpx.NewSafeClient(10 * time.Second)}
 }
 
 func (*SMSChannel) Name() string { return "sms" }
 
-// smsConfig 运行时读配置（变更不重启；扁平键缺失 → 回退旧 notify.sms JSON blob）。
+// smsConfig 運行時讀配置（變更不重啓；扁平鍵缺失 → 回退舊 notify.sms JSON blob）。
 func (c *SMSChannel) smsConfig(ctx context.Context) (*SMSConfig, error) {
 	readStr := func(group, key string) string {
 		raw, err := c.settings.GetJSON(ctx, group, key)
@@ -84,7 +84,7 @@ func (c *SMSChannel) smsConfig(ctx context.Context) (*SMSConfig, error) {
 	if cfg.Provider == "" {
 		cfg.Provider = "aliyun"
 	}
-	// 扁平键未配置 → 兼容旧版 notify.sms 复合键（阿里云口径；enabled 显式开关）
+	// 扁平鍵未配置 → 兼容舊版 notify.sms 複合鍵（阿里雲口徑；enabled 顯式開關）
 	if cfg.AccessKey == "" || cfg.AccessSecret == "" {
 		raw, err := c.settings.GetJSON(ctx, "notify", "sms")
 		if err == nil && len(raw) > 0 && string(raw) != "null" {
@@ -111,8 +111,8 @@ func (c *SMSChannel) smsConfig(ctx context.Context) (*SMSConfig, error) {
 	return cfg, nil
 }
 
-// Deliver 发送短信（Recipient = 手机号；Body = 模板变量 JSON 键值对象）。
-// Ready 短信凭据齐全（Deliver 的 ErrSkipped 同源判定）。
+// Deliver 發送短信（Recipient = 手機號；Body = 模板變量 JSON 鍵值對象）。
+// Ready 短信憑據齊全（Deliver 的 ErrSkipped 同源判定）。
 func (c *SMSChannel) Ready(ctx context.Context) bool {
 	cfg, err := c.smsConfig(ctx)
 	return err == nil && cfg != nil && cfg.AccessKey != "" && cfg.AccessSecret != ""
@@ -128,7 +128,7 @@ func (c *SMSChannel) Deliver(ctx context.Context, msg notifyport.Message) error 
 	}
 	phone := strings.TrimSpace(msg.Recipient)
 	if len(phone) != 11 || !strings.HasPrefix(phone, "1") {
-		return fmt.Errorf("notify: 手机号无效 %q", phone)
+		return fmt.Errorf("notify: 手機號無效 %q", phone)
 	}
 	params, err := parseSmsParams(msg.Body)
 	if err != nil {
@@ -144,7 +144,7 @@ func (c *SMSChannel) Deliver(ctx context.Context, msg notifyport.Message) error 
 	}
 }
 
-// parseSmsParams 模板变量解析（Body 必须为 JSON 键值对象；非法 → 空参数继续走通道）。
+// parseSmsParams 模板變量解析（Body 必須為 JSON 鍵值對象；非法 → 空參數繼續走通道）。
 func parseSmsParams(body string) (map[string]string, error) {
 	out := map[string]string{}
 	body = strings.TrimSpace(body)
@@ -158,7 +158,7 @@ func parseSmsParams(body string) (map[string]string, error) {
 	return out, nil
 }
 
-// deliverAliyun 阿里云 Dysmsapi SendSms（TemplateParam 键值对象）。
+// deliverAliyun 阿里雲 Dysmsapi SendSms（TemplateParam 鍵值對象）。
 func (c *SMSChannel) deliverAliyun(ctx context.Context, cfg *SMSConfig, phone string, params map[string]string) error {
 	if cfg.TemplateCode == "" {
 		return ErrSkipped
@@ -193,7 +193,7 @@ func (c *SMSChannel) deliverAliyun(ctx context.Context, cfg *SMSConfig, phone st
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("notify: SMS 请求失败: %w", err)
+		return fmt.Errorf("notify: SMS 請求失敗: %w", err)
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
@@ -203,12 +203,12 @@ func (c *SMSChannel) deliverAliyun(ctx context.Context, cfg *SMSConfig, phone st
 	}
 	_ = json.Unmarshal(body, &out)
 	if out.Code != "OK" {
-		return fmt.Errorf("notify: SMS 发送失败 %s: %s", out.Code, out.Message)
+		return fmt.Errorf("notify: SMS 發送失敗 %s: %s", out.Code, out.Message)
 	}
 	return nil
 }
 
-// aliyunSign 阿里云 RPC 签名（HMAC-SHA1 + Base64；golden vector 契约测试目标）。
+// aliyunSign 阿里雲 RPC 簽名（HMAC-SHA1 + Base64；golden vector 契約測試目標）。
 func aliyunSign(params map[string]string, accessSecret string) string {
 	keys := make([]string, 0, len(params))
 	for k := range params {
@@ -229,7 +229,7 @@ func aliyunSign(params map[string]string, accessSecret string) string {
 	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }
 
-// rfc3986Encode URL 编码（Go QueryEscape 的 + 空格 → %20；-_.~ 保留）。
+// rfc3986Encode URL 編碼（Go QueryEscape 的 + 空格 → %20；-_.~ 保留）。
 func rfc3986Encode(s string) string {
 	encoded := url.QueryEscape(s)
 	return strings.ReplaceAll(encoded, "+", "%20")

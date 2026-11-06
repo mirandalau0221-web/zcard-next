@@ -1,84 +1,84 @@
 <template>
   <div class="install-page">
     <div class="install-card">
-      <!-- 头部：无商城品牌，纯安装向导 + 步骤条 -->
+      <!-- 頭部：無商城品牌，純安裝嚮導 + 步驟條 -->
       <div class="install-head">
-        <h1 class="install-title">{{ $t('安装向导') }}</h1>
+        <h1 class="install-title">{{ $t('安裝嚮導') }}</h1>
         <ol class="steps">
           <li :class="{ active: step === 1, done: step > 1 }">
-            <span class="step-no">{{ step > 1 ? '✓' : '1' }}</span> {{ $t('数据库配置') }} </li>
+            <span class="step-no">{{ step > 1 ? '✓' : '1' }}</span> {{ $t('數據庫配置') }} </li>
           <li :class="{ active: step === 2, done: step > 2 }">
-            <span class="step-no">{{ step > 2 ? '✓' : '2' }}</span> {{ $t('管理员设置') }} </li>
+            <span class="step-no">{{ step > 2 ? '✓' : '2' }}</span> {{ $t('管理員設置') }} </li>
           <li :class="{ active: step === 3 }">
             <span class="step-no">3</span> {{ $t('完成') }} </li>
         </ol>
       </div>
 
-      <!-- 加载中 -->
-      <div v-if="loading" class="install-body muted">{{ $t('正在检测安装状态…') }}</div>
+      <!-- 加載中 -->
+      <div v-if="loading" class="install-body muted">{{ $t('正在檢測安裝狀態…') }}</div>
 
-      <!-- 已安装 -->
+      <!-- 已安裝 -->
       <div v-else-if="status?.installed && !done" class="install-body">
         <div class="done-icon">🔒</div>
-        <div class="done-title">{{ $t('系统已安装') }}</div>
-        <div class="muted"> {{ $t('数据库：') }}{{ dialectLabel(status.dialect) }}<br /> {{ $t('安装时间：') }}{{ status.installed_at ? new Date(status.installed_at).toLocaleString(localeTag) : '-' }}<br /> {{ $t('如需重新安装，请清空数据库后重启服务。') }} </div>
+        <div class="done-title">{{ $t('系統已安裝') }}</div>
+        <div class="muted"> {{ $t('數據庫：') }}{{ dialectLabel(status.dialect) }}<br /> {{ $t('安裝時間：') }}{{ status.installed_at ? new Date(status.installed_at).toLocaleString(localeTag) : '-' }}<br /> {{ $t('如需重新安裝，請清空數據庫後重啓服務。') }} </div>
         <div class="done-actions">
-          <router-link class="btn" to="/">{{ $t('进入前台') }}</router-link>
-          <router-link class="btn secondary" to="/login">{{ $t('会员登录') }}</router-link>
+          <router-link class="btn" to="/">{{ $t('進入前台') }}</router-link>
+          <router-link class="btn secondary" to="/login">{{ $t('會員登錄') }}</router-link>
         </div>
       </div>
 
-      <!-- 库切换重启轮询态 -->
+      <!-- 庫切換重啓輪詢態 -->
       <div v-else-if="restarting" class="install-body">
         <div class="done-icon spin">⏳</div>
-        <div class="done-title">{{ $t('正在切换数据库并重启服务…') }}</div>
-        <div class="muted"> {{ $t('目标库：') }}{{ dialectLabel(form.dialect) }} {{ $t('· 已写入配置，服务自重启后将在新库完成安装。') }}<br /> {{ $t('已等待') }} {{ waited }} {{ $t('秒（通常 10~30 秒；超过 120 秒请查看服务日志）') }} </div>
+        <div class="done-title">{{ $t('正在切換數據庫並重啓服務…') }}</div>
+        <div class="muted"> {{ $t('目標庫：') }}{{ dialectLabel(form.dialect) }} {{ $t('· 已寫入配置，服務自重啓後將在新庫完成安裝。') }}<br /> {{ $t('已等待') }} {{ waited }} {{ $t('秒（通常 10~30 秒；超過 120 秒請查看服務日誌）') }} </div>
       </div>
 
-      <!-- 安装成功 -->
+      <!-- 安裝成功 -->
       <div v-else-if="done" class="install-body">
         <div class="done-icon">✅</div>
-        <div class="done-title">{{ $t('安装完成！') }}</div>
-        <div class="muted"> {{ $t('数据库：') }}{{ dialectLabel(doneDialect) }}<br /> {{ $t('管理员：') }}<b>{{ form.admin_username }}</b><br /> {{ $t('后台入口：') }}<code>/admin</code>{{ $t('（用上方账号登录）') }}<br />
-          <span class="pw-hint">{{ $t('请妥善保管管理员密码——系统不存储明文，丢失只能重置。') }}</span>
+        <div class="done-title">{{ $t('安裝完成！') }}</div>
+        <div class="muted"> {{ $t('數據庫：') }}{{ dialectLabel(doneDialect) }}<br /> {{ $t('管理員：') }}<b>{{ form.admin_username }}</b><br /> {{ $t('後台入口：') }}<code>/admin</code>{{ $t('（用上方賬號登錄）') }}<br />
+          <span class="pw-hint">{{ $t('請妥善保管管理員密碼——系統不存儲明文，丟失只能重置。') }}</span>
         </div>
         <div class="done-actions">
-          <router-link class="btn" to="/">{{ $t('进入前台') }}</router-link>
+          <router-link class="btn" to="/">{{ $t('進入前台') }}</router-link>
         </div>
       </div>
 
-      <!-- 未安装：分步向导 -->
+      <!-- 未安裝：分步向導 -->
       <div v-else class="install-body">
-        <!-- 步骤① 数据库配置 -->
+        <!-- 步驟① 數據庫配置 -->
         <div v-if="step === 1" class="section">
-          <div class="section-title">{{ $t('选择数据库') }}</div>
+          <div class="section-title">{{ $t('選擇數據庫') }}</div>
           <div class="dialect-grid">
             <div class="dialect-card" :class="{ active: form.dialect === 'postgres' }" @click="pickDialect('postgres')">
               <div class="dialect-head">
                 <b>PostgreSQL</b>
-                <span class="rec-badge">{{ $t('推荐') }}</span>
+                <span class="rec-badge">{{ $t('推薦') }}</span>
               </div>
-              <div class="dialect-desc">{{ $t('完整高级能力：分站多租户 / Schema 隔离 / 高并发稳定，适合正式运营。') }}</div>
+              <div class="dialect-desc">{{ $t('完整高級能力：分站多租户 / Schema 隔離 / 高併發穩定，適合正式運營。') }}</div>
             </div>
             <div class="dialect-card" :class="{ active: form.dialect === 'mysql' }" @click="pickDialect('mysql')">
               <div class="dialect-head"><b>MySQL</b></div>
-              <div class="dialect-desc">{{ $t('自托管标准形态，分站 Row 级隔离；已有 MySQL 的站长可直接复用实例。') }}</div>
+              <div class="dialect-desc">{{ $t('自託管標準形態，分站 Row 級隔離；已有 MySQL 的站長可直接複用實例。') }}</div>
             </div>
             <div class="dialect-card" :class="{ active: form.dialect === 'sqlite' }" @click="pickDialect('sqlite')">
-              <div class="dialect-head"><b>SQLite</b><span class="test-badge">{{ $t('本地测试') }}</span></div>
-              <div class="dialect-desc">{{ $t('内嵌零依赖，开箱即用。') }}</div>
+              <div class="dialect-head"><b>SQLite</b><span class="test-badge">{{ $t('本地測試') }}</span></div>
+              <div class="dialect-desc">{{ $t('內嵌零依賴，開箱即用。') }}</div>
             </div>
           </div>
 
           <!-- SQLite 警告 -->
-          <div v-if="form.dialect === 'sqlite'" class="warn-box"> {{ $t('⚠️ SQLite 仅适用于') }}<b>{{ $t('本地测试 / 功能体验') }}</b>{{ $t('：不支持分站多租户等高级功能，高并发与多进程场景受限。 正式运营请选择') }} <b>{{ $t('PostgreSQL（推荐）') }}</b>。
+          <div v-if="form.dialect === 'sqlite'" class="warn-box"> {{ $t('⚠️ SQLite 僅適用於') }}<b>{{ $t('本地測試 / 功能體驗') }}</b>{{ $t('：不支持分站多租户等高級功能，高併發與多進程場景受限。 正式運營請選擇') }} <b>{{ $t('PostgreSQL（推薦）') }}</b>。
           </div>
 
-          <!-- MySQL / PG 连接表单 -->
+          <!-- MySQL / PG 連接表單 -->
           <div v-else class="server-form">
             <div class="form-grid">
               <div class="form-row">
-                <label>{{ $t('数据库主机') }}</label>
+                <label>{{ $t('數據庫主機') }}</label>
                 <input v-model="form.db_host" class="input" placeholder="127.0.0.1" />
               </div>
               <div class="form-row">
@@ -90,11 +90,11 @@
                 <input v-model="form.db_user" class="input" placeholder="root / postgres" />
               </div>
               <div class="form-row">
-                <label>{{ $t('密码') }}</label>
-                <input v-model="form.db_password" class="input" type="password" :placeholder="$t('数据库密码')" />
+                <label>{{ $t('密碼') }}</label>
+                <input v-model="form.db_password" class="input" type="password" :placeholder="$t('數據庫密碼')" />
               </div>
               <div class="form-row span2">
-                <label>{{ $t('数据库名') }}<span class="req">*</span>{{ $t('（不存在将自动创建）') }}</label>
+                <label>{{ $t('數據庫名') }}<span class="req">*</span>{{ $t('（不存在將自動創建）') }}</label>
                 <input v-model="form.db_name" class="input" placeholder="zcard" />
               </div>
             </div>
@@ -106,12 +106,12 @@
                 <input v-model="form.redis_addr" class="input" placeholder="127.0.0.1:6379" />
               </div>
               <div class="form-row">
-                <label>{{ $t('Redis 密码（无则留空）') }}</label>
+                <label>{{ $t('Redis 密碼（無則留空）') }}</label>
                 <input v-model="form.redis_password" class="input" type="password" placeholder="" />
               </div>
             </div>
             <button class="btn secondary test-btn" :disabled="testing" @click="testConnection">
-              {{ testing ? $t('测试中…') : testOk ? $t('✓ 连接成功（再测一次）') : $t('测试数据库与 Redis 连接') }}
+              {{ testing ? $t('測試中…') : testOk ? $t('✓ 連接成功（再測一次）') : $t('測試數據庫與 Redis 連接') }}
             </button>
             <div v-if="testMsg" class="test-msg" :class="testOk ? 'ok' : 'bad'">{{ uiText(testMsg) }}</div>
           </div>
@@ -121,34 +121,34 @@
           </div>
         </div>
 
-        <!-- 步骤② 管理员设置 -->
+        <!-- 步驟② 管理員設置 -->
         <div v-else class="section">
-          <div class="section-title">{{ $t('设置管理员') }}</div>
+          <div class="section-title">{{ $t('設置管理員') }}</div>
           <div class="form-row">
-            <label>{{ $t('管理员用户名') }}</label>
+            <label>{{ $t('管理員用户名') }}</label>
             <input v-model="form.admin_username" class="input" placeholder="admin" maxlength="32" />
           </div>
           <div class="form-row">
-            <label>{{ $t('管理员密码') }}<span class="req">*</span>{{ $t('（≥8 位）') }}</label>
+            <label>{{ $t('管理員密碼') }}<span class="req">*</span>{{ $t('（≥8 位）') }}</label>
             <div class="pw-wrap">
-              <input v-model="form.admin_password" class="input" :type="showPwd ? 'text' : 'password'" :placeholder="$t('至少 8 位，建议字母+数字组合')" />
-              <button class="pw-toggle" type="button" @click="showPwd = !showPwd">{{ showPwd ? $t('隐藏') : $t('显示') }}</button>
+              <input v-model="form.admin_password" class="input" :type="showPwd ? 'text' : 'password'" :placeholder="$t('至少 8 位，建議字母+數字組合')" />
+              <button class="pw-toggle" type="button" @click="showPwd = !showPwd">{{ showPwd ? $t('隱藏') : $t('顯示') }}</button>
             </div>
-            <button v-if="!form.admin_password" class="pw-gen" type="button" @click="form.admin_password = genPassword()">{{ $t('帮我生成强密码') }}</button>
+            <button v-if="!form.admin_password" class="pw-gen" type="button" @click="form.admin_password = genPassword()">{{ $t('幫我生成強密碼') }}</button>
           </div>
           <div class="form-row">
-            <label>{{ $t('站点名称') }}</label>
-            <input v-model="form.site_name" class="input" :placeholder="$t('站点名称')" maxlength="50" />
+            <label>{{ $t('站點名稱') }}</label>
+            <input v-model="form.site_name" class="input" :placeholder="$t('站點名稱')" maxlength="50" />
           </div>
           <div class="form-row">
-            <label>{{ $t('站点网址（选填）') }}</label>
+            <label>{{ $t('站點網址（選填）') }}</label>
             <input v-model="form.site_url" class="input" :placeholder="origin" maxlength="200" />
           </div>
           <div v-if="error" class="error">{{ uiText(error) }}</div>
           <div class="nav-row">
             <button class="btn secondary" @click="step = 1">{{ $t('上一步') }}</button>
             <button class="btn install-btn" :disabled="submitting || !form.admin_username || !form.admin_password" @click="submit">
-              {{ submitting ? $t('提交中…') : form.dialect === 'sqlite' ? $t('开始安装') : $t('切换到 {0} 并安装', [dialectLabel(form.dialect)]) }}
+              {{ submitting ? $t('提交中…') : form.dialect === 'sqlite' ? $t('開始安裝') : $t('切換到 {0} 並安裝', [dialectLabel(form.dialect)]) }}
             </button>
           </div>
         </div>
@@ -176,7 +176,7 @@ const error = ref('');
 const done = ref(false);
 const doneDialect = ref('sqlite');
 const origin = typeof location !== 'undefined' ? location.origin : '';
-// 连接测试 / 重启轮询
+// 連接測試 / 重啓輪詢
 const testing = ref(false);
 const testOk = ref(false);
 const testMsg = ref('');
@@ -184,7 +184,7 @@ const restarting = ref(false);
 const waited = ref(0);
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
-// 下一步可点：PG/MySQL 需已填主机与库名；SQLite 恒可
+// 下一步可點：PG/MySQL 需已填主機與庫名；SQLite 恆可
 const canNext = computed(() =>
   form.value.dialect === 'sqlite' || (!!form.value.db_host && !!form.value.db_name),
 );
@@ -197,7 +197,7 @@ function pickDialect(d: string) {
 }
 
 function dialectLabel(d: string) {
-  return ({ postgres: 'PostgreSQL', mysql: 'MySQL', get sqlite() { return $t("SQLite（内嵌）"); } } as any)[d] || d;
+  return ({ postgres: 'PostgreSQL', mysql: 'MySQL', get sqlite() { return $t("SQLite（內嵌）"); } } as any)[d] || d;
 }
 
 function genPassword() {
@@ -237,7 +237,7 @@ async function testConnection() {
     testMsg.value = json.message || '';
   } catch (e: any) {
     testOk.value = false;
-    testMsg.value = e?.message || $t("网络错误");
+    testMsg.value = e?.message || $t("網絡錯誤");
   } finally {
     testing.value = false;
   }
@@ -246,7 +246,7 @@ async function testConnection() {
 async function submit() {
   error.value = '';
   if (form.value.admin_password.length < 8) {
-    error.value = $t("管理员密码至少 8 位");
+    error.value = $t("管理員密碼至少 8 位");
     return;
   }
   submitting.value = true;
@@ -267,11 +267,11 @@ async function submit() {
     });
     const json = await res.json();
     if (!res.ok) {
-      error.value = json?.message || $t("安装失败，请重试");
+      error.value = json?.message || $t("安裝失敗，請重試");
       return;
     }
     if (json.restart_required) {
-      // 库切换：服务即将自重启 → 轮询直到新库装完
+      // 庫切換：服務即將自重啓 → 輪詢直到新庫裝完
       step.value = 3;
       restarting.value = true;
       waited.value = 0;
@@ -286,11 +286,11 @@ async function submit() {
             restarting.value = false;
             if (pollTimer) clearInterval(pollTimer);
           }
-        } catch { /* 重启窗口期连接失败——继续轮询 */ }
+        } catch { /* 重啓窗口期連接失敗——繼續輪詢 */ }
         if (waited.value >= 120 && pollTimer) {
           clearInterval(pollTimer);
           restarting.value = false;
-          error.value = $t("等待超时：服务可能未能在新数据库上启动，请查看日志后重试");
+          error.value = $t("等待超時：服務可能未能在新數據庫上啓動，請查看日誌後重試");
         }
       }, 2000);
       return;
@@ -299,7 +299,7 @@ async function submit() {
     doneDialect.value = form.value.dialect;
     done.value = true;
   } catch (e: any) {
-    error.value = e?.message || $t("网络错误");
+    error.value = e?.message || $t("網絡錯誤");
   } finally {
     submitting.value = false;
   }
@@ -327,7 +327,7 @@ onUnmounted(() => { if (pollTimer) clearInterval(pollTimer); });
   box-shadow: 0 24px 64px rgba(15, 23, 42, 0.12);
   overflow: hidden;
 }
-/* 头部：无品牌，仅标题 + 步骤条 */
+/* 頭部：無品牌，僅標題 + 步驟條 */
 .install-head { padding: 24px 28px 0; }
 .install-title {
   font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 16px;
@@ -354,7 +354,7 @@ onUnmounted(() => { if (pollTimer) clearInterval(pollTimer); });
 .install-body { padding: 20px 28px 28px; max-height: 74vh; overflow-y: auto; }
 .section { margin-bottom: 4px; }
 .section-title { font-weight: 700; font-size: 14px; color: #1f2937; margin-bottom: 10px; }
-/* 数据库选择卡片 */
+/* 數據庫選擇卡片 */
 .dialect-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
 .dialect-card {
   border: 2px solid #e5e7eb; border-radius: 12px; padding: 12px 14px;
@@ -377,7 +377,7 @@ onUnmounted(() => { if (pollTimer) clearInterval(pollTimer); });
   margin-top: 10px; font-size: 12.5px; color: #92400e; line-height: 1.7;
   background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 12px;
 }
-/* 连接表单 */
+/* 連接表單 */
 .server-form { margin-top: 12px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .span2 { grid-column: span 2; }
@@ -387,7 +387,7 @@ onUnmounted(() => { if (pollTimer) clearInterval(pollTimer); });
 .test-msg { margin-top: 8px; font-size: 12.5px; }
 .test-msg.ok { color: #15803d; }
 .test-msg.bad { color: #dc2626; }
-/* 表单行 */
+/* 表單行 */
 .form-row { margin-bottom: 12px; }
 .form-row label { display: block; font-size: 13px; color: #374151; margin-bottom: 6px; font-weight: 600; }
 .req { color: #dc2626; margin-left: 2px; }
@@ -401,7 +401,7 @@ onUnmounted(() => { if (pollTimer) clearInterval(pollTimer); });
   font-size: 12.5px; cursor: pointer; padding: 0;
 }
 .pw-gen:hover { text-decoration: underline; }
-/* 分步导航 */
+/* 分步導航 */
 .nav-row { display: flex; gap: 10px; margin-top: 16px; }
 .nav-row .install-btn { flex: 1; }
 .nav-row .btn.secondary { flex: 1; }

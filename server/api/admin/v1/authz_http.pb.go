@@ -27,19 +27,19 @@ const OperationRoleServiceUpdateRole = "/zcard.api.admin.v1.RoleService/UpdateRo
 const OperationRoleServiceUpdateRolePermissions = "/zcard.api.admin.v1.RoleService/UpdateRolePermissions"
 
 type RoleServiceHTTPServer interface {
-	// CreateRole CreateRole 创建角色。
+	// CreateRole CreateRole 創建角色。
 	CreateRole(context.Context, *CreateRoleRequest) (*Role, error)
-	// DeleteRole DeleteRole 删除角色（内置角色拒绝；仍有员工挂载拒绝）。
+	// DeleteRole DeleteRole 刪除角色（內置角色拒絕；仍有員工掛載拒絕）。
 	DeleteRole(context.Context, *DeleteRoleRequest) (*emptypb.Empty, error)
-	// GetPermissionTree GetPermissionTree 权限目录树（域分组 + 中文描述；前端勾选与菜单数据源）。
+	// GetPermissionTree GetPermissionTree 權限目錄樹（域分組 + 中文描述；前端勾選與菜單數據源）。
 	GetPermissionTree(context.Context, *emptypb.Empty) (*PermissionTree, error)
-	// GetRole GetRole 角色详情（含权限点清单）。
+	// GetRole GetRole 角色詳情（含權限點清單）。
 	GetRole(context.Context, *GetRoleRequest) (*Role, error)
-	// ListRoles ListRoles 角色列表（含权限点数量）。
+	// ListRoles ListRoles 角色列表（含權限點數量）。
 	ListRoles(context.Context, *emptypb.Empty) (*ListRolesReply, error)
-	// UpdateRole UpdateRole 修改角色（名称/描述；内置角色 code 不可改）。
+	// UpdateRole UpdateRole 修改角色（名稱/描述；內置角色 code 不可改）。
 	UpdateRole(context.Context, *UpdateRoleRequest) (*Role, error)
-	// UpdateRolePermissions UpdateRolePermissions 全量替换角色权限点集（变更实时生效）。
+	// UpdateRolePermissions UpdateRolePermissions 全量替換角色權限點集（變更實時生效）。
 	UpdateRolePermissions(context.Context, *UpdateRolePermissionsRequest) (*Role, error)
 }
 
@@ -200,19 +200,19 @@ func _RoleService_GetPermissionTree0_HTTP_Handler(srv RoleServiceHTTPServer) fun
 }
 
 type RoleServiceHTTPClient interface {
-	// CreateRole CreateRole 创建角色。
+	// CreateRole CreateRole 創建角色。
 	CreateRole(ctx context.Context, req *CreateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
-	// DeleteRole DeleteRole 删除角色（内置角色拒绝；仍有员工挂载拒绝）。
+	// DeleteRole DeleteRole 刪除角色（內置角色拒絕；仍有員工掛載拒絕）。
 	DeleteRole(ctx context.Context, req *DeleteRoleRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// GetPermissionTree GetPermissionTree 权限目录树（域分组 + 中文描述；前端勾选与菜单数据源）。
+	// GetPermissionTree GetPermissionTree 權限目錄樹（域分組 + 中文描述；前端勾選與菜單數據源）。
 	GetPermissionTree(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *PermissionTree, err error)
-	// GetRole GetRole 角色详情（含权限点清单）。
+	// GetRole GetRole 角色詳情（含權限點清單）。
 	GetRole(ctx context.Context, req *GetRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
-	// ListRoles ListRoles 角色列表（含权限点数量）。
+	// ListRoles ListRoles 角色列表（含權限點數量）。
 	ListRoles(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListRolesReply, err error)
-	// UpdateRole UpdateRole 修改角色（名称/描述；内置角色 code 不可改）。
+	// UpdateRole UpdateRole 修改角色（名稱/描述；內置角色 code 不可改）。
 	UpdateRole(ctx context.Context, req *UpdateRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
-	// UpdateRolePermissions UpdateRolePermissions 全量替换角色权限点集（变更实时生效）。
+	// UpdateRolePermissions UpdateRolePermissions 全量替換角色權限點集（變更實時生效）。
 	UpdateRolePermissions(ctx context.Context, req *UpdateRolePermissionsRequest, opts ...http.CallOption) (rsp *Role, err error)
 }
 
@@ -224,7 +224,7 @@ func NewRoleServiceHTTPClient(client *http.Client) RoleServiceHTTPClient {
 	return &RoleServiceHTTPClientImpl{client}
 }
 
-// CreateRole CreateRole 创建角色。
+// CreateRole CreateRole 創建角色。
 func (c *RoleServiceHTTPClientImpl) CreateRole(ctx context.Context, in *CreateRoleRequest, opts ...http.CallOption) (*Role, error) {
 	var out Role
 	pattern := "/api/v1/admin/authz/roles"
@@ -242,7 +242,7 @@ func (c *RoleServiceHTTPClientImpl) CreateRole(ctx context.Context, in *CreateRo
 	return &out, nil
 }
 
-// DeleteRole DeleteRole 删除角色（内置角色拒绝；仍有员工挂载拒绝）。
+// DeleteRole DeleteRole 刪除角色（內置角色拒絕；仍有員工掛載拒絕）。
 func (c *RoleServiceHTTPClientImpl) DeleteRole(ctx context.Context, in *DeleteRoleRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/authz/roles/{id}"
@@ -259,7 +259,7 @@ func (c *RoleServiceHTTPClientImpl) DeleteRole(ctx context.Context, in *DeleteRo
 	return &out, nil
 }
 
-// GetPermissionTree GetPermissionTree 权限目录树（域分组 + 中文描述；前端勾选与菜单数据源）。
+// GetPermissionTree GetPermissionTree 權限目錄樹（域分組 + 中文描述；前端勾選與菜單數據源）。
 func (c *RoleServiceHTTPClientImpl) GetPermissionTree(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*PermissionTree, error) {
 	var out PermissionTree
 	pattern := "/api/v1/admin/authz/permissions"
@@ -276,7 +276,7 @@ func (c *RoleServiceHTTPClientImpl) GetPermissionTree(ctx context.Context, in *e
 	return &out, nil
 }
 
-// GetRole GetRole 角色详情（含权限点清单）。
+// GetRole GetRole 角色詳情（含權限點清單）。
 func (c *RoleServiceHTTPClientImpl) GetRole(ctx context.Context, in *GetRoleRequest, opts ...http.CallOption) (*Role, error) {
 	var out Role
 	pattern := "/api/v1/admin/authz/roles/{id}"
@@ -293,7 +293,7 @@ func (c *RoleServiceHTTPClientImpl) GetRole(ctx context.Context, in *GetRoleRequ
 	return &out, nil
 }
 
-// ListRoles ListRoles 角色列表（含权限点数量）。
+// ListRoles ListRoles 角色列表（含權限點數量）。
 func (c *RoleServiceHTTPClientImpl) ListRoles(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListRolesReply, error) {
 	var out ListRolesReply
 	pattern := "/api/v1/admin/authz/roles"
@@ -310,7 +310,7 @@ func (c *RoleServiceHTTPClientImpl) ListRoles(ctx context.Context, in *emptypb.E
 	return &out, nil
 }
 
-// UpdateRole UpdateRole 修改角色（名称/描述；内置角色 code 不可改）。
+// UpdateRole UpdateRole 修改角色（名稱/描述；內置角色 code 不可改）。
 func (c *RoleServiceHTTPClientImpl) UpdateRole(ctx context.Context, in *UpdateRoleRequest, opts ...http.CallOption) (*Role, error) {
 	var out Role
 	pattern := "/api/v1/admin/authz/roles/{id}"
@@ -328,7 +328,7 @@ func (c *RoleServiceHTTPClientImpl) UpdateRole(ctx context.Context, in *UpdateRo
 	return &out, nil
 }
 
-// UpdateRolePermissions UpdateRolePermissions 全量替换角色权限点集（变更实时生效）。
+// UpdateRolePermissions UpdateRolePermissions 全量替換角色權限點集（變更實時生效）。
 func (c *RoleServiceHTTPClientImpl) UpdateRolePermissions(ctx context.Context, in *UpdateRolePermissionsRequest, opts ...http.CallOption) (*Role, error) {
 	var out Role
 	pattern := "/api/v1/admin/authz/roles/{id}/permissions"
@@ -355,19 +355,19 @@ const OperationAdminUserServiceToggleAdmin = "/zcard.api.admin.v1.AdminUserServi
 const OperationAdminUserServiceUpdateAdmin = "/zcard.api.admin.v1.AdminUserService/UpdateAdmin"
 
 type AdminUserServiceHTTPServer interface {
-	// CreateAdmin CreateAdmin 创建员工（密码 bcrypt）。
+	// CreateAdmin CreateAdmin 創建員工（密碼 bcrypt）。
 	CreateAdmin(context.Context, *CreateAdminRequest) (*Admin, error)
-	// DeleteAdmin DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话一并清除）。
+	// DeleteAdmin DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話一併清除）。
 	DeleteAdmin(context.Context, *DeleteAdminRequest) (*emptypb.Empty, error)
-	// ListAdmins ListAdmins 员工列表。
+	// ListAdmins ListAdmins 員工列表。
 	ListAdmins(context.Context, *emptypb.Empty) (*ListAdminsReply, error)
-	// ResetAdminPassword ResetAdminPassword 重置员工密码（≥8 位 bcrypt；吊销其全部管理面会话强制重登）。
+	// ResetAdminPassword ResetAdminPassword 重置員工密碼（≥8 位 bcrypt；吊銷其全部管理面會話強制重登）。
 	ResetAdminPassword(context.Context, *ResetAdminPasswordRequest) (*Admin, error)
-	// ResetAdminTOTP ResetAdminTOTP 解绑员工 TOTP（吊销其全部管理面会话强制重登）。
+	// ResetAdminTOTP ResetAdminTOTP 解綁員工 TOTP（吊銷其全部管理面會話強制重登）。
 	ResetAdminTOTP(context.Context, *ResetAdminTOTPRequest) (*Admin, error)
-	// ToggleAdmin ToggleAdmin 启用/禁用员工。
+	// ToggleAdmin ToggleAdmin 啓用/禁用員工。
 	ToggleAdmin(context.Context, *ToggleAdminRequest) (*Admin, error)
-	// UpdateAdmin UpdateAdmin 修改员工（昵称/头像/角色）。
+	// UpdateAdmin UpdateAdmin 修改員工（暱稱/頭像/角色）。
 	UpdateAdmin(context.Context, *UpdateAdminRequest) (*Admin, error)
 }
 
@@ -531,19 +531,19 @@ func _AdminUserService_DeleteAdmin0_HTTP_Handler(srv AdminUserServiceHTTPServer)
 }
 
 type AdminUserServiceHTTPClient interface {
-	// CreateAdmin CreateAdmin 创建员工（密码 bcrypt）。
+	// CreateAdmin CreateAdmin 創建員工（密碼 bcrypt）。
 	CreateAdmin(ctx context.Context, req *CreateAdminRequest, opts ...http.CallOption) (rsp *Admin, err error)
-	// DeleteAdmin DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话一并清除）。
+	// DeleteAdmin DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話一併清除）。
 	DeleteAdmin(ctx context.Context, req *DeleteAdminRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ListAdmins ListAdmins 员工列表。
+	// ListAdmins ListAdmins 員工列表。
 	ListAdmins(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListAdminsReply, err error)
-	// ResetAdminPassword ResetAdminPassword 重置员工密码（≥8 位 bcrypt；吊销其全部管理面会话强制重登）。
+	// ResetAdminPassword ResetAdminPassword 重置員工密碼（≥8 位 bcrypt；吊銷其全部管理面會話強制重登）。
 	ResetAdminPassword(ctx context.Context, req *ResetAdminPasswordRequest, opts ...http.CallOption) (rsp *Admin, err error)
-	// ResetAdminTOTP ResetAdminTOTP 解绑员工 TOTP（吊销其全部管理面会话强制重登）。
+	// ResetAdminTOTP ResetAdminTOTP 解綁員工 TOTP（吊銷其全部管理面會話強制重登）。
 	ResetAdminTOTP(ctx context.Context, req *ResetAdminTOTPRequest, opts ...http.CallOption) (rsp *Admin, err error)
-	// ToggleAdmin ToggleAdmin 启用/禁用员工。
+	// ToggleAdmin ToggleAdmin 啓用/禁用員工。
 	ToggleAdmin(ctx context.Context, req *ToggleAdminRequest, opts ...http.CallOption) (rsp *Admin, err error)
-	// UpdateAdmin UpdateAdmin 修改员工（昵称/头像/角色）。
+	// UpdateAdmin UpdateAdmin 修改員工（暱稱/頭像/角色）。
 	UpdateAdmin(ctx context.Context, req *UpdateAdminRequest, opts ...http.CallOption) (rsp *Admin, err error)
 }
 
@@ -555,7 +555,7 @@ func NewAdminUserServiceHTTPClient(client *http.Client) AdminUserServiceHTTPClie
 	return &AdminUserServiceHTTPClientImpl{client}
 }
 
-// CreateAdmin CreateAdmin 创建员工（密码 bcrypt）。
+// CreateAdmin CreateAdmin 創建員工（密碼 bcrypt）。
 func (c *AdminUserServiceHTTPClientImpl) CreateAdmin(ctx context.Context, in *CreateAdminRequest, opts ...http.CallOption) (*Admin, error) {
 	var out Admin
 	pattern := "/api/v1/admin/admins"
@@ -573,7 +573,7 @@ func (c *AdminUserServiceHTTPClientImpl) CreateAdmin(ctx context.Context, in *Cr
 	return &out, nil
 }
 
-// DeleteAdmin DeleteAdmin 删除员工（内置超管角色与本人不可删；其管理面会话一并清除）。
+// DeleteAdmin DeleteAdmin 刪除員工（內置超管角色與本人不可刪；其管理面會話一併清除）。
 func (c *AdminUserServiceHTTPClientImpl) DeleteAdmin(ctx context.Context, in *DeleteAdminRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/admins/{id}"
@@ -590,7 +590,7 @@ func (c *AdminUserServiceHTTPClientImpl) DeleteAdmin(ctx context.Context, in *De
 	return &out, nil
 }
 
-// ListAdmins ListAdmins 员工列表。
+// ListAdmins ListAdmins 員工列表。
 func (c *AdminUserServiceHTTPClientImpl) ListAdmins(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListAdminsReply, error) {
 	var out ListAdminsReply
 	pattern := "/api/v1/admin/admins"
@@ -607,7 +607,7 @@ func (c *AdminUserServiceHTTPClientImpl) ListAdmins(ctx context.Context, in *emp
 	return &out, nil
 }
 
-// ResetAdminPassword ResetAdminPassword 重置员工密码（≥8 位 bcrypt；吊销其全部管理面会话强制重登）。
+// ResetAdminPassword ResetAdminPassword 重置員工密碼（≥8 位 bcrypt；吊銷其全部管理面會話強制重登）。
 func (c *AdminUserServiceHTTPClientImpl) ResetAdminPassword(ctx context.Context, in *ResetAdminPasswordRequest, opts ...http.CallOption) (*Admin, error) {
 	var out Admin
 	pattern := "/api/v1/admin/admins/{id}/reset-password"
@@ -625,7 +625,7 @@ func (c *AdminUserServiceHTTPClientImpl) ResetAdminPassword(ctx context.Context,
 	return &out, nil
 }
 
-// ResetAdminTOTP ResetAdminTOTP 解绑员工 TOTP（吊销其全部管理面会话强制重登）。
+// ResetAdminTOTP ResetAdminTOTP 解綁員工 TOTP（吊銷其全部管理面會話強制重登）。
 func (c *AdminUserServiceHTTPClientImpl) ResetAdminTOTP(ctx context.Context, in *ResetAdminTOTPRequest, opts ...http.CallOption) (*Admin, error) {
 	var out Admin
 	pattern := "/api/v1/admin/admins/{id}/totp-reset"
@@ -643,7 +643,7 @@ func (c *AdminUserServiceHTTPClientImpl) ResetAdminTOTP(ctx context.Context, in 
 	return &out, nil
 }
 
-// ToggleAdmin ToggleAdmin 启用/禁用员工。
+// ToggleAdmin ToggleAdmin 啓用/禁用員工。
 func (c *AdminUserServiceHTTPClientImpl) ToggleAdmin(ctx context.Context, in *ToggleAdminRequest, opts ...http.CallOption) (*Admin, error) {
 	var out Admin
 	pattern := "/api/v1/admin/admins/{id}/toggle"
@@ -661,7 +661,7 @@ func (c *AdminUserServiceHTTPClientImpl) ToggleAdmin(ctx context.Context, in *To
 	return &out, nil
 }
 
-// UpdateAdmin UpdateAdmin 修改员工（昵称/头像/角色）。
+// UpdateAdmin UpdateAdmin 修改員工（暱稱/頭像/角色）。
 func (c *AdminUserServiceHTTPClientImpl) UpdateAdmin(ctx context.Context, in *UpdateAdminRequest, opts ...http.CallOption) (*Admin, error) {
 	var out Admin
 	pattern := "/api/v1/admin/admins/{id}"

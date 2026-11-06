@@ -1,6 +1,6 @@
 package dashboard
 
-// AdminDashboardService 工作台服务（ v1）。
+// AdminDashboardService 工作台服務（ v1）。
 
 import (
 	"context"
@@ -17,22 +17,22 @@ import (
 	"github.com/go-kratos/kratos/v3/errors"
 )
 
-// AdminDashboardService 服务。
+// AdminDashboardService 服務。
 type AdminDashboardService struct {
 	adminv1.UnimplementedAdminDashboardServiceServer
 	repo       *DashboardRepoImpl
-	reconciler *Reconciler                    // 货源对账（job/item 四态）
+	reconciler *Reconciler                    // 貨源對賬（job/item 四態）
 	commission affiliateport.CommissionReader // 佣金列表（通道 A）
-	settings   dashboardport.SettingsReader   // 低库存阈值等（通道 A；nil = 默认值）
-	traffic    auditport.TrafficReader        // 访问统计（在线用户/PV/UV，通道 A）
+	settings   dashboardport.SettingsReader   // 低庫存閾值等（通道 A；nil = 默認值）
+	traffic    auditport.TrafficReader        // 訪問統計（在線用户/PV/UV，通道 A）
 }
 
-// NewAdminDashboardService 构造。
+// NewAdminDashboardService 構造。
 func NewAdminDashboardService(repo *DashboardRepoImpl, reconciler *Reconciler, commission affiliateport.CommissionReader, settings dashboardport.SettingsReader, traffic auditport.TrafficReader) *AdminDashboardService {
 	return &AdminDashboardService{repo: repo, reconciler: reconciler, commission: commission, settings: settings, traffic: traffic}
 }
 
-// ListCommissions 佣金列表（；port 消费——跨模块零 ent 依赖）。
+// ListCommissions 佣金列表（；port 消費——跨模塊零 ent 依賴）。
 func (s *AdminDashboardService) ListCommissions(ctx context.Context, req *adminv1.ListCommissionsRequest) (*adminv1.ListCommissionsReply, error) {
 	page := int(req.GetPage())
 	if page < 1 {
@@ -60,31 +60,31 @@ func (s *AdminDashboardService) ListCommissions(ctx context.Context, req *adminv
 	return reply, nil
 }
 
-// GetDashboard 工作台指标（6 统计窗口 + 趋势 + 商品/渠道排行 + 待办）。
+// GetDashboard 工作台指標（6 統計窗口 + 趨勢 + 商品/渠道排行 + 待辦）。
 func (s *AdminDashboardService) GetDashboard(ctx context.Context, req *adminv1.GetDashboardRequest) (*adminv1.DashboardReply, error) {
 	now := s.repo.now().UTC().Truncate(time.Second)
 	repo := *s.repo
 	repo.now = func() time.Time { return now }
 	today, yesterday, last7d, prev7d, last30d, prev30d, err := repo.GetOverview(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "统计失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "統計失敗: "+err.Error())
 	}
 	trendDays := int(req.GetTrendDays())
 	trend, err := repo.GetTrend(ctx, trendDays)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "趋势失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "趨勢失敗: "+err.Error())
 	}
 	top, err := repo.GetTopProducts(ctx, trendDays)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "排行失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "排行失敗: "+err.Error())
 	}
 	channels, err := repo.GetTopChannels(ctx, trendDays)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "渠道统计失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "渠道統計失敗: "+err.Error())
 	}
 	withdrawals, refunds, fulfilling, err := repo.GetPending(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "待办统计失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "待辦統計失敗: "+err.Error())
 	}
 	alertsEnabled := true
 	if s.settings != nil {
@@ -98,21 +98,21 @@ func (s *AdminDashboardService) GetDashboard(ctx context.Context, req *adminv1.G
 		lowStock, err = repo.GetLowStockCount(ctx, s.lowStockThreshold(ctx))
 	}
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "库存统计失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "庫存統計失敗: "+err.Error())
 	}
 	openTickets, processingTickets, urgentTickets, err := repo.GetTicketPending(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "工单统计失败")
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "工單統計失敗")
 	}
 	pendingSupplierApps, err := repo.GetPendingSupplierApplications(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "对接申请统计失败")
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "對接申請統計失敗")
 	}
 	onlineUsers := s.onlineUsers(ctx)
 
 	reviews, err := repo.PaymentReviewCount(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "到账核对统计失败")
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "到賬核對統計失敗")
 	}
 	start, end := reportWindow(now, trendDays)
 	reply := &adminv1.DashboardReply{
@@ -156,7 +156,7 @@ func (s *AdminDashboardService) GetDashboard(ctx context.Context, req *adminv1.G
 	return reply, nil
 }
 
-// onlineUsers 在线用户数（5 分钟活跃窗口；失败回落 0 不阻断主统计）。
+// onlineUsers 在線用户數（5 分鐘活躍窗口；失敗回落 0 不阻斷主統計）。
 func (s *AdminDashboardService) onlineUsers(ctx context.Context) int64 {
 	if s.traffic == nil {
 		return 0
@@ -168,18 +168,18 @@ func (s *AdminDashboardService) onlineUsers(ctx context.Context) int64 {
 	return n
 }
 
-// GetTraffic 流量统计（PV/UV 按天；缺日补 0，与趋势图同口径连续日期）。
+// GetTraffic 流量統計（PV/UV 按天；缺日補 0，與趨勢圖同口徑連續日期）。
 func (s *AdminDashboardService) GetTraffic(ctx context.Context, req *adminv1.GetTrafficRequest) (*adminv1.GetTrafficReply, error) {
 	days := int(req.GetDays())
 	if days != 1 && days != 14 && days != 30 {
 		days = 7
 	}
 	if s.traffic == nil {
-		return nil, errors.InternalServer("dashboard.TRAFFIC_UNBOUND", "访问统计未装配")
+		return nil, errors.InternalServer("dashboard.TRAFFIC_UNBOUND", "訪問統計未裝配")
 	}
 	rows, err := s.traffic.TrafficByDay(ctx, tenancy.FromContext(ctx).SubsiteID, days)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "流量统计失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.QUERY_FAILED", "流量統計失敗: "+err.Error())
 	}
 	byDay := make(map[string]*adminv1.TrafficPoint, len(rows))
 	for _, r := range rows {
@@ -208,7 +208,7 @@ func toStatPB(m Metric) *adminv1.DashboardStat {
 	}
 }
 
-// lowStockThreshold 库存预警阈值（settings.supply.low_stock_threshold；默认 5）。
+// lowStockThreshold 庫存預警閾值（settings.supply.low_stock_threshold；默認 5）。
 func (s *AdminDashboardService) lowStockThreshold(ctx context.Context) int {
 	if s.settings == nil {
 		return 5
@@ -224,7 +224,7 @@ func (s *AdminDashboardService) lowStockThreshold(ctx context.Context) int {
 	return v
 }
 
-// GetDailyStats 历史日结（分站视角自动隔离：subsite 取自 tenancy 上下文）。
+// GetDailyStats 歷史日結（分站視角自動隔離：subsite 取自 tenancy 上下文）。
 func (s *AdminDashboardService) GetDailyStats(ctx context.Context, req *adminv1.GetDailyStatsRequest) (*adminv1.GetDailyStatsReply, error) {
 	subsite := tenancy.FromContext(ctx).SubsiteID
 	start, end := req.GetStartDate(), req.GetEndDate()
@@ -235,7 +235,7 @@ func (s *AdminDashboardService) GetDailyStats(ctx context.Context, req *adminv1.
 	}
 	points, err := s.repo.GetDailyStats(ctx, subsite, start, end)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.DAILY_FAILED", "读取日结失败")
+		return nil, errors.InternalServer("dashboard.DAILY_FAILED", "讀取日結失敗")
 	}
 	reply := &adminv1.GetDailyStatsReply{}
 	for _, p := range points {
@@ -246,41 +246,41 @@ func (s *AdminDashboardService) GetDailyStats(ctx context.Context, req *adminv1.
 	return reply, nil
 }
 
-// CreateReconciliationJob 创建对账任务。
+// CreateReconciliationJob 創建對賬任務。
 func (s *AdminDashboardService) CreateReconciliationJob(ctx context.Context, req *adminv1.CreateReconciliationJobRequest) (*adminv1.ReconciliationJobItem, error) {
 	if s.reconciler == nil {
-		return nil, errors.InternalServer("dashboard.RECONCILE_UNBOUND", "对账引擎未装配")
+		return nil, errors.InternalServer("dashboard.RECONCILE_UNBOUND", "對賬引擎未裝配")
 	}
 	job, err := s.reconciler.CreateJob(ctx, req.GetConnectionId(),
 		time.Unix(req.GetStart(), 0).UTC(), time.Unix(req.GetEnd(), 0).UTC())
 	if err != nil {
-		return nil, errors.BadRequest("dashboard.RANGE_INVALID", "时间窗非法（或超过 31 天）")
+		return nil, errors.BadRequest("dashboard.RANGE_INVALID", "時間窗非法（或超過 31 天）")
 	}
 	return toJobPB(job), nil
 }
 
-// GetReconciliationJob 任务详情。
+// GetReconciliationJob 任務詳情。
 func (s *AdminDashboardService) GetReconciliationJob(ctx context.Context, req *adminv1.GetReconciliationJobRequest) (*adminv1.ReconciliationJobItem, error) {
 	job, err := s.reconciler.GetJob(ctx, req.GetId())
 	if err != nil {
-		return nil, errors.NotFound("dashboard.JOB_NOT_FOUND", "对账任务不存在")
+		return nil, errors.NotFound("dashboard.JOB_NOT_FOUND", "對賬任務不存在")
 	}
 	return toJobPB(job), nil
 }
 
-// RunReconciliationJob 执行任务（幂等：非 pending 直接返回当前状态）。
+// RunReconciliationJob 執行任務（冪等：非 pending 直接返回當前狀態）。
 func (s *AdminDashboardService) RunReconciliationJob(ctx context.Context, req *adminv1.RunReconciliationJobRequest) (*adminv1.ReconciliationJobItem, error) {
 	if err := s.reconciler.RunJob(ctx, req.GetId()); err != nil {
-		return nil, errors.InternalServer("dashboard.RECONCILE_FAILED", "对账执行失败: "+err.Error())
+		return nil, errors.InternalServer("dashboard.RECONCILE_FAILED", "對賬執行失敗: "+err.Error())
 	}
 	job, err := s.reconciler.GetJob(ctx, req.GetId())
 	if err != nil {
-		return nil, errors.NotFound("dashboard.JOB_NOT_FOUND", "对账任务不存在")
+		return nil, errors.NotFound("dashboard.JOB_NOT_FOUND", "對賬任務不存在")
 	}
 	return toJobPB(job), nil
 }
 
-// ListReconciliationItems 明细分页。
+// ListReconciliationItems 明細分頁。
 func (s *AdminDashboardService) ListReconciliationItems(ctx context.Context, req *adminv1.ListReconciliationItemsRequest) (*adminv1.ListReconciliationItemsReply, error) {
 	page, size := int(req.GetPage()), int(req.GetPageSize())
 	if page < 1 {
@@ -291,7 +291,7 @@ func (s *AdminDashboardService) ListReconciliationItems(ctx context.Context, req
 	}
 	rows, total, err := s.reconciler.ListItems(ctx, req.GetId(), req.GetStatus(), page, size)
 	if err != nil {
-		return nil, errors.InternalServer("dashboard.ITEMS_FAILED", "读取明细失败")
+		return nil, errors.InternalServer("dashboard.ITEMS_FAILED", "讀取明細失敗")
 	}
 	reply := &adminv1.ListReconciliationItemsReply{Total: total}
 	for _, it := range rows {
@@ -328,7 +328,7 @@ func toJobPB(job *ent.ReconciliationJob) *adminv1.ReconciliationJobItem {
 	return out
 }
 
-// GetReconciliation 对账总览（）。
+// GetReconciliation 對賬總覽（）。
 func (s *AdminDashboardService) GetReconciliation(ctx context.Context, req *adminv1.GetReconciliationRequest) (*adminv1.GetReconciliationReply, error) {
 	sum, err := s.repo.GetReconciliation(ctx, req.GetDate())
 	if err != nil {

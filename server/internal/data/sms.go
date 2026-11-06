@@ -39,7 +39,7 @@ func GuardSMSConnection(ctx context.Context, c *ent.Client, id uint64) error {
 		return err
 	}
 	if busy {
-		return fmt.Errorf("货源仍有待确认的接码订单，不能修改账号身份或删除")
+		return fmt.Errorf("貨源仍有待確認的接碼訂單，不能修改賬號身份或刪除")
 	}
 	return nil
 }
@@ -55,7 +55,7 @@ func GuardSMSRefund(ctx context.Context, c *ent.Client, orderID uint64) error {
 	}
 	for _, s := range rows {
 		if !SMSRefundConfirmed(s) {
-			return fmt.Errorf("接码供货结果尚未确认退款，不能退还零售余额")
+			return fmt.Errorf("接碼供貨結果尚未確認退款，不能退還零售餘額")
 		}
 	}
 	has, err := HasSMSOrder(ctx, c, orderID)
@@ -63,7 +63,7 @@ func GuardSMSRefund(ctx context.Context, c *ent.Client, orderID uint64) error {
 		return err
 	}
 	if has && len(rows) == 0 {
-		return fmt.Errorf("接码采购凭证缺失，请核对")
+		return fmt.Errorf("接碼採購憑證缺失，請核對")
 	}
 	return nil
 }
@@ -76,7 +76,7 @@ func ValidateSMSPayment(ctx context.Context, c *ent.Client, orderID uint64) erro
 	for _, it := range items {
 		var f FrozenSMS
 		if json.Unmarshal([]byte(it.SmsPurchaseSnapshot), &f) != nil {
-			return fmt.Errorf("接码购买意图无效")
+			return fmt.Errorf("接碼購買意圖無效")
 		}
 		conn, e := c.SupplyConnection.Get(ctx, f.ConnectionID)
 		if e != nil {
@@ -86,7 +86,7 @@ func ValidateSMSPayment(ctx context.Context, c *ent.Client, orderID uint64) erro
 			RequiredCapability string `json:"required_capability"`
 		}
 		if json.Unmarshal([]byte(f.Request), &req) != nil {
-			return fmt.Errorf("接码购买意图无效")
+			return fmt.Errorf("接碼購買意圖無效")
 		}
 		if req.RequiredCapability == "sms_channel_purchase.v1" {
 			o, e := c.Order.Get(ctx, orderID)
@@ -95,7 +95,7 @@ func ValidateSMSPayment(ctx context.Context, c *ent.Client, orderID uint64) erro
 			}
 			q, e := c.SMSRetailQuote.Query().Where(smsretailquote.ConsumedBy(o.OrderNo), smsretailquote.ProductID(it.ProductID), smsretailquote.UserID(o.UserID), smsretailquote.SubsiteID(o.SubsiteID)).Only(ctx)
 			if e != nil || q.ExpiresAt <= time.Now().Unix() {
-				return fmt.Errorf("接码报价已过期，请取消未付款订单后重新选价")
+				return fmt.Errorf("接碼報價已過期，請取消未付款訂單後重新選價")
 			}
 			p, e := c.Product.Get(ctx, it.ProductID)
 			if e != nil {
@@ -106,11 +106,11 @@ func ValidateSMSPayment(ctx context.Context, c *ent.Client, orderID uint64) erro
 				return e
 			}
 			if p.Status < 1 || p.ProductKind != "sms_channel" || p.LockVersion != q.ProductRevision || rev != q.PricingRevision {
-				return fmt.Errorf("接码商品或加价规则已变化，请取消未付款订单后重新选价")
+				return fmt.Errorf("接碼商品或加價規則已變化，請取消未付款訂單後重新選價")
 			}
 		}
 		if string(conn.Status) != "active" || SMSConnectionIdentity(conn) != f.Identity {
-			return fmt.Errorf("接码货源账号已变化或停用，请重新购买")
+			return fmt.Errorf("接碼貨源賬號已變化或停用，請重新購買")
 		}
 	}
 	return nil

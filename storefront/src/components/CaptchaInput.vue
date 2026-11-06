@@ -7,7 +7,7 @@
       :inputmode="charset === 'digit' ? 'numeric' : 'text'"
       :placeholder="placeholder"
       :maxlength="length"
-      :aria-label="$t('验证码')"
+      :aria-label="$t('驗證碼')"
       autocapitalize="off"
       :spellcheck="false"
       @input="onInput"
@@ -16,11 +16,11 @@
       v-if="image"
       :src="image"
       class="captcha-img"
-      :alt="$t('验证码')"
-      :title="$t('点击刷新')"
+      :alt="$t('驗證碼')"
+      :title="$t('點擊刷新')"
       @click="refresh"
     />
-    <div v-else class="captcha-loading">{{ $t('加载中…') }}</div>
+    <div v-else class="captcha-loading">{{ $t('加載中…') }}</div>
   </div>
 </template>
 
@@ -28,14 +28,14 @@
 import { t as $t } from '@/i18n';
 
 /**
- * 图形验证码输入（长度和字符格式随图片下发）：图片自动加载 + 点击刷新 + 提交 payload 同步。
- * 验证失败后父组件调 refresh() 自动换图。
+ * 圖形驗證碼輸入（長度和字符格式隨圖片下發）：圖片自動加載 + 點擊刷新 + 提交 payload 同步。
+ * 驗證失敗後父組件調 refresh() 自動換圖。
  */
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { fetchCaptcha } from '@/api';
 
 const props = defineProps<{
-  /** 初始是否自动加载（默认 true） */
+  /** 初始是否自動加載（默認 true） */
   autoLoad?: boolean;
 }>();
 const emit = defineEmits<{
@@ -49,16 +49,16 @@ const captchaId = ref('');
 const length = ref(4);
 const charset = ref<'digit' | 'letter' | 'mixed'>('digit');
 const placeholder = computed(() => charset.value === 'letter'
-  ? $t('{0} 位字母（不区分大小写）', [length.value])
+  ? $t('{0} 位字母（不區分大小寫）', [length.value])
   : charset.value === 'mixed'
-    ? $t('{0} 位数字和字母（不区分大小写）', [length.value])
-    : $t('{0} 位数字', [length.value]));
+    ? $t('{0} 位數字和字母（不區分大小寫）', [length.value])
+    : $t('{0} 位數字', [length.value]));
 let loaded = false;
 let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
 
 onMounted(() => {
   if (props.autoLoad !== false) refresh();
-  // 兜底：500ms 后仍未加载（时序/瞬态网络）自动补拉一次
+  // 兜底：500ms 後仍未加載（時序/瞬態網絡）自動補拉一次
   fallbackTimer = setTimeout(() => { if (!loaded) refresh(); }, 500);
 });
 onUnmounted(() => { if (fallbackTimer) clearTimeout(fallbackTimer); });
@@ -76,7 +76,7 @@ async function refresh() {
       emit('update:captchaId', data.captcha_id);
       emit('update:code', '');
     }
-  } catch { /* 拉取失败保留占位——用户点击可重试 */ }
+  } catch { /* 拉取失敗保留佔位——用户點擊可重試 */ }
 }
 
 function onInput(e: Event) {
@@ -87,7 +87,7 @@ function onInput(e: Event) {
   emit('update:code', v);
 }
 
-/** 暴露：验证失败后刷新 */
+/** 暴露：驗證失敗後刷新 */
 defineExpose({ refresh });
 </script>
 

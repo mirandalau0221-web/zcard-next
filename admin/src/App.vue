@@ -9,7 +9,7 @@ import { initCurrency } from "./utils/money";
 import RecoveryCodes from "@/components/security/recovery-codes.vue";
 import MediaPickerHost from "@/components/common/media-picker/media-picker-host.vue";
 
-// 启动加载默认货币（i18n.base_currency → 符号/小数位；失败回退默认符号）
+// 啓動加載默認貨幣（i18n.base_currency → 符號/小數位；失敗回退默認符號）
 initCurrency();
 
 defineOptions({
@@ -57,7 +57,7 @@ const watermarkProps = computed<WatermarkProps>(() => {
     <AppProvider>
       <RouterView class="bg-layout" />
       <NWatermark v-if="themeStore.watermark.visible" v-bind="watermarkProps" />
-      <!-- 素材选择器全局挂载（pickMedia() Promise API；所有图片入口共用） -->
+      <!-- 素材選擇器全局掛載（pickMedia() Promise API；所有圖片入口共用） -->
       <MediaPickerHost />
       <RecoveryCodes />
     </AppProvider>

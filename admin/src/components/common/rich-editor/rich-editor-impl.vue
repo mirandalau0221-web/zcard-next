@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * 富文本编辑器（wangEditor 5，开源 MIT——中文后台事实标准）：
- *   - 所见即所得 HTML 输出（服务端 bluemonday 白名单 sanitize 兜底，防 XSS）
- *   - 插图统一走素材库（自定义菜单「素材库图片」→ pickMedia 弹窗）——
- *     禁用 base64/本地上传（data: URL 会被服务端白名单剥离，且图片必须沉淀素材库可复用）
+ * 富文本編輯器（wangEditor 5，開源 MIT——中文後台事實標準）：
+ *   - 所見即所得 HTML 輸出（服務端 bluemonday 白名單 sanitize 兜底，防 XSS）
+ *   - 插圖統一走素材庫（自定義菜單「素材庫圖片」→ pickMedia 彈窗）——
+ *     禁用 base64/本地上傳（data: URL 會被服務端白名單剝離，且圖片必須沉澱素材庫可複用）
  */
 import { onBeforeUnmount, shallowRef, computed } from "vue";
 import "@wangeditor/editor/dist/css/style.css";
@@ -20,16 +20,16 @@ const props = withDefaults(
     placeholder?: string;
     height?: string;
   }>(),
-  { modelValue: "", placeholder: "请输入内容…", height: "320px" },
+  { modelValue: "", placeholder: "請輸入內容…", height: "320px" },
 );
 
 const emit = defineEmits<{ (e: "update:modelValue", v: string): void }>();
 
-// ── 自定义菜单：素材库插图（模块级注册一次；编辑器销毁后菜单类仍可复用）──
+// ── 自定義菜單：素材庫插圖（模塊級註冊一次；編輯器銷燬後菜單類仍可複用）──
 
 registerMediaMenu();
 
-// ── 编辑器装配 ──
+// ── 編輯器裝配 ──
 
 const editorRef = shallowRef<IDomEditor>();
 const value = computed({
@@ -37,7 +37,7 @@ const value = computed({
   set: (v: string) => emit("update:modelValue", v),
 });
 
-// 工具栏：精选键集（禁 uploadImage/insertVideo——图片一律素材库；data: URL 会被服务端剥离）
+// 工具欄：精選鍵集（禁 uploadImage/insertVideo——圖片一律素材庫；data: URL 會被服務端剝離）
 const toolbarConfig: Partial<IToolbarConfig> = {
   toolbarKeys: [
     "headerSelect",
@@ -74,8 +74,8 @@ function handleCreated(editor: IDomEditor) {
   editorRef.value = editor;
 }
 
-// 销毁（wangEditor 强纪律：不销毁会内存泄漏；防御性包裹——Slate 实例
-// 异常时不让卸载钩子抛错中断组件树）
+// 銷燬（wangEditor 強紀律：不銷燬會內存泄漏；防禦性包裹——Slate 實例
+// 異常時不讓卸載鈎子拋錯中斷組件樹）
 onBeforeUnmount(() => {
   try {
     const editor = editorRef.value;
@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
     editor.destroy();
     editorRef.value = undefined;
   } catch {
-    // 忽略销毁异常（重复销毁/实例已失效）
+    // 忽略銷燬異常（重複銷燬/實例已失效）
   }
 });
 </script>
@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style>
-/* wangEditor 亮色渲染——暗色模式下容器底色兜底（编辑区保持白底保证可读性） */
+/* wangEditor 亮色渲染——暗色模式下容器底色兜底（編輯區保持白底保證可讀性） */
 .w-e-text-container {
   background-color: #fff;
 }

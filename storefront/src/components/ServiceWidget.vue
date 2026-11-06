@@ -1,12 +1,12 @@
 <template>
-  <!-- 客服代码（service.widget_script）：第三方客服脚本自带悬浮球，本站不渲染 UI -->
+  <!-- 客服代碼（service.widget_script）：第三方客服腳本自帶懸浮球，本站不渲染 UI -->
 </template>
 
 <script setup lang="ts">
 import { loadPublicConfig } from '@/config';
 import { onMounted } from 'vue';
 
-/** 提取嵌入代码中的 <script> 内容并执行（DOMParser 提取，防 XSS 依赖后端 sanitize/管理员自配） */
+/** 提取嵌入代碼中的 <script> 內容並執行（DOMParser 提取，防 XSS 依賴後端 sanitize/管理員自配） */
 let injected = false;
 function injectScript(html: string) {
   if (injected) return;
@@ -23,7 +23,7 @@ function injectScript(html: string) {
       el.dataset.zcardServiceWidget = 'true';
       document.head.appendChild(el);
     }
-  } catch { /* 脚本注入失败忽略（客服功能降级为不可用） */ }
+  } catch { /* 腳本注入失敗忽略（客服功能降級為不可用） */ }
 }
 
 onMounted(async () => {
@@ -35,6 +35,6 @@ onMounted(async () => {
       try { script = JSON.parse(entry.value_json); } catch { script = entry.value_json; }
     }
     if (typeof script === 'string' && script.trim()) injectScript(script);
-  } catch { /* 配置接口失败：客服不显示 */ }
+  } catch { /* 配置接口失敗：客服不顯示 */ }
 });
 </script>

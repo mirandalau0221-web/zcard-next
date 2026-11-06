@@ -66,7 +66,7 @@ func (x *ListPaymentChannelsRequest) GetScene() string {
 	return ""
 }
 
-// ChannelListReply 启用渠道列表。
+// ChannelListReply 啓用渠道列表。
 type ChannelListReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Channels      []*ChannelItem         `protobuf:"bytes,1,rep,name=channels,proto3" json:"channels,omitempty"`
@@ -114,16 +114,16 @@ func (x *ChannelListReply) GetChannels() []*ChannelItem {
 type ChannelItem struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Code                 string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	Name                 string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"` // 渠道名称（管理端配置）
+	Name                 string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"` // 渠道名稱（管理端配置）
 	Driver               string                 `protobuf:"bytes,3,opt,name=driver,proto3" json:"driver,omitempty"`
-	Icon                 string                 `protobuf:"bytes,4,opt,name=icon,proto3" json:"icon,omitempty"` // 渠道自定义图标 URL（空=前端回落内置徽标）
+	Icon                 string                 `protobuf:"bytes,4,opt,name=icon,proto3" json:"icon,omitempty"` // 渠道自定義圖標 URL（空=前端回落內置徽標）
 	Fee                  int64                  `protobuf:"varint,6,opt,name=fee,proto3" json:"fee,omitempty"`
 	FeeType              string                 `protobuf:"bytes,7,opt,name=fee_type,json=feeType,proto3" json:"fee_type,omitempty"`
 	FeeBearer            string                 `protobuf:"bytes,8,opt,name=fee_bearer,json=feeBearer,proto3" json:"fee_bearer,omitempty"`
 	Recommended          bool                   `protobuf:"varint,9,opt,name=recommended,proto3" json:"recommended,omitempty"`
 	RecommendLabel       string                 `protobuf:"bytes,10,opt,name=recommend_label,json=recommendLabel,proto3" json:"recommend_label,omitempty"`
 	RecommendDescription string                 `protobuf:"bytes,11,opt,name=recommend_description,json=recommendDescription,proto3" json:"recommend_description,omitempty"`
-	Methods              []*MethodItem          `protobuf:"bytes,5,rep,name=methods,proto3" json:"methods,omitempty"` // 支付方式列表（聚合网关；空=单方式渠道）
+	Methods              []*MethodItem          `protobuf:"bytes,5,rep,name=methods,proto3" json:"methods,omitempty"` // 支付方式列表（聚合網關；空=單方式渠道）
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -235,7 +235,7 @@ func (x *ChannelItem) GetMethods() []*MethodItem {
 	return nil
 }
 
-// MethodItem 支付方式（收银台顾客看到的选项：支付宝/微信/USDT-TRC20…）。
+// MethodItem 支付方式（收銀台顧客看到的選項：支付寶/微信/USDT-TRC20…）。
 type MethodItem struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Code                 string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
@@ -243,7 +243,7 @@ type MethodItem struct {
 	Recommended          bool                   `protobuf:"varint,4,opt,name=recommended,proto3" json:"recommended,omitempty"`
 	RecommendLabel       string                 `protobuf:"bytes,5,opt,name=recommend_label,json=recommendLabel,proto3" json:"recommend_label,omitempty"`
 	RecommendDescription string                 `protobuf:"bytes,6,opt,name=recommend_description,json=recommendDescription,proto3" json:"recommend_description,omitempty"`
-	Icon                 string                 `protobuf:"bytes,3,opt,name=icon,proto3" json:"icon,omitempty"` // 方式级自定义图标（空=回落渠道图标/内置徽标）
+	Icon                 string                 `protobuf:"bytes,3,opt,name=icon,proto3" json:"icon,omitempty"` // 方式級自定義圖標（空=回落渠道圖標/內置徽標）
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -327,7 +327,7 @@ type CreatePaymentRequest struct {
 	QueryPassword    string                 `protobuf:"bytes,5,opt,name=query_password,json=queryPassword,proto3" json:"query_password,omitempty"`
 	OrderNo          string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
 	Channel          string                 `protobuf:"bytes,2,opt,name=channel,proto3" json:"channel,omitempty"`
-	Method           string                 `protobuf:"bytes,3,opt,name=method,proto3" json:"method,omitempty"` // 支付方式 code（多方式渠道必选；单方式渠道可空）
+	Method           string                 `protobuf:"bytes,3,opt,name=method,proto3" json:"method,omitempty"` // 支付方式 code（多方式渠道必選；單方式渠道可空）
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -409,7 +409,7 @@ type CreatePaymentReply struct {
 	Quote         *PaymentQuote          `protobuf:"bytes,4,opt,name=quote,proto3" json:"quote,omitempty"`
 	PaymentId     uint64                 `protobuf:"varint,1,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`
 	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`       // redirect | qrcode | params
-	Payload       string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"` // URL / 二维码内容 / 参数 JSON
+	Payload       string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"` // URL / 二維碼內容 / 參數 JSON
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

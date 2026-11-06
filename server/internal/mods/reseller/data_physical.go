@@ -47,12 +47,12 @@ func (s *SettleService) reconcilePhysical(ctx context.Context, id uint64) error 
 				return e
 			}
 			if n != 1 {
-				return fmt.Errorf("分站利润状态已变化，请重试")
+				return fmt.Errorf("分站利潤狀態已變化，請重試")
 			}
 			if e = s.repo.updateBalance(ctx, o.SubsiteID, -take, 0, 0); e != nil {
 				return e
 			}
-			if e = c.ResellerLedgerEntry.Create().SetSubsiteID(o.SubsiteID).SetOrderID(id).SetType("refund_deduct").SetAmount(-take).SetStatus(resellerledgerentry.StatusWithdrawn).SetIdempotencyKey(fmt.Sprintf("physical_markup_pending:%d:%d:%d", id, row.ID, target)).SetRemark("未确认商品利润退款扣回").Exec(ctx); e != nil {
+			if e = c.ResellerLedgerEntry.Create().SetSubsiteID(o.SubsiteID).SetOrderID(id).SetType("refund_deduct").SetAmount(-take).SetStatus(resellerledgerentry.StatusWithdrawn).SetIdempotencyKey(fmt.Sprintf("physical_markup_pending:%d:%d:%d", id, row.ID, target)).SetRemark("未確認商品利潤退款扣回").Exec(ctx); e != nil {
 				return e
 			}
 			delta -= take

@@ -68,7 +68,7 @@ func (s *StoreService) GetLotteryActivity(ctx context.Context, v *storefrontv1.L
 		return nil, e
 	}
 	if !a.Published || a.Status == "archived" {
-		return nil, bad("活动未开放")
+		return nil, bad("活動未開放")
 	}
 	return s.publicActivity(ctx, a, true)
 }

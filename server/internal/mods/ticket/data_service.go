@@ -1,6 +1,6 @@
 package ticket
 
-// 客服工作台（ admin）：urgent_paid 置顶、回复/内部备注/解决/关闭、筛选。
+// 客服工作台（ admin）：urgent_paid 置頂、回覆/內部備註/解決/關閉、篩選。
 
 import (
 	"context"
@@ -21,12 +21,12 @@ type AdminTicketService struct {
 	outbox events.Writer
 }
 
-// NewAdminTicketService 构造。
+// NewAdminTicketService 構造。
 func NewAdminTicketService(repo *TicketRepo, outbox events.Writer) *AdminTicketService {
 	return &AdminTicketService{repo: repo, outbox: outbox}
 }
 
-// ListTickets 工作台列表（urgent_paid 置顶）。
+// ListTickets 工作台列表（urgent_paid 置頂）。
 func (s *AdminTicketService) ListTickets(ctx context.Context, req *adminv1.ListTicketsRequest) (*adminv1.ListTicketsReply, error) {
 	page, size := ticketPage(req.GetPage(), req.GetPageSize())
 	var orderID uint64
@@ -47,7 +47,7 @@ func (s *AdminTicketService) ListTickets(ctx context.Context, req *adminv1.ListT
 	return reply, nil
 }
 
-// GetTicket 详情（含内部备注）。
+// GetTicket 詳情（含內部備註）。
 func (s *AdminTicketService) GetTicket(ctx context.Context, req *adminv1.GetTicketRequest) (*adminv1.GetTicketReply, error) {
 	t, err := s.repo.GetByNo(ctx, req.GetTicketNo())
 	if err != nil {
@@ -64,7 +64,7 @@ func (s *AdminTicketService) GetTicket(ctx context.Context, req *adminv1.GetTick
 	return reply, nil
 }
 
-// ReplyTicket 客服回复（is_internal 内部备注不触发状态机；正常回复 open→processing）。
+// ReplyTicket 客服回覆（is_internal 內部備註不觸發狀態機；正常回復 open→processing）。
 func (s *AdminTicketService) ReplyTicket(ctx context.Context, req *adminv1.AdminReplyRequest) (*emptypb.Empty, error) {
 	t, err := s.repo.GetByNo(ctx, req.GetTicketNo())
 	if err != nil {
@@ -75,7 +75,7 @@ func (s *AdminTicketService) ReplyTicket(ctx context.Context, req *adminv1.Admin
 		return nil, err
 	}
 	if !req.GetIsInternal() {
-		// 首次客服回复：open → processing（首响回填）
+		// 首次客服回覆：open → processing（首響回填）
 		if err := s.repo.MarkProcessingOnReply(ctx, t.ID); err != nil {
 			return nil, err
 		}
@@ -84,7 +84,7 @@ func (s *AdminTicketService) ReplyTicket(ctx context.Context, req *adminv1.Admin
 	return &emptypb.Empty{}, nil
 }
 
-// ResolveTicket 解决。
+// ResolveTicket 解決。
 func (s *AdminTicketService) ResolveTicket(ctx context.Context, req *adminv1.TicketNoRequest) (*emptypb.Empty, error) {
 	t, err := s.repo.GetByNo(ctx, req.GetTicketNo())
 	if err != nil {
@@ -97,7 +97,7 @@ func (s *AdminTicketService) ResolveTicket(ctx context.Context, req *adminv1.Tic
 	return &emptypb.Empty{}, nil
 }
 
-// CloseTicket 关闭。
+// CloseTicket 關閉。
 func (s *AdminTicketService) CloseTicket(ctx context.Context, req *adminv1.TicketNoRequest) (*emptypb.Empty, error) {
 	t, err := s.repo.GetByNo(ctx, req.GetTicketNo())
 	if err != nil {
@@ -109,7 +109,7 @@ func (s *AdminTicketService) CloseTicket(ctx context.Context, req *adminv1.Ticke
 	return &emptypb.Empty{}, nil
 }
 
-// AutoCloseResolved resolved 超 7 天自动关闭（cron）。
+// AutoCloseResolved resolved 超 7 天自動關閉（cron）。
 func (s *AdminTicketService) AutoCloseResolved(ctx context.Context) {
 	older := time.Now().UTC().Add(-7 * 24 * time.Hour)
 	rows, err := s.repo.ListAutoCloseable(ctx, older, 100)
@@ -187,8 +187,8 @@ func itoaU64(v uint64) string {
 	return string(b[i:])
 }
 
-// orderIDOf 按订单号反查 ID（工作台筛选；order_no → orders.id，直查 ent——ticket 无 order port 依赖，
-// 属跨模块读约束豁免？否——经 data 层直查同库 orders 表为既定模式（supply 同款），保留。
+// orderIDOf 按訂單號反查 ID（工作台篩選；order_no → orders.id，直查 ent——ticket 無 order port 依賴，
+// 屬跨模塊讀約束豁免？否——經 data 層直查同庫 orders 表為既定模式（supply 同款），保留。
 func orderIDOf(ctx context.Context, s *AdminTicketService, orderNo string) uint64 {
 	return s.repo.OrderIDByNo(ctx, orderNo)
 }

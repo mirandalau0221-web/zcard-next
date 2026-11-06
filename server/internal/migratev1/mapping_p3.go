@@ -1,12 +1,12 @@
 package migratev1
 
-// P3 卡密域迁移：card_imports → cards 全链（1.x CBC 解密 → 2.0 GCM Seal +
-// HMAC hash 全量重算 → 商品内重复跳过 → 状态映射与锁超时释放）→
-// order_deliveries 缺失卡密回填（delivery_mode=delete 已物理删的唯一副本）。
-// 映射规格《数据迁移工具开发计划》§5.4；order_id 置 0 由 P4 迁完订单后回填。
+// P3 卡密域遷移：card_imports → cards 全鏈（1.x CBC 解密 → 2.0 GCM Seal +
+// HMAC hash 全量重算 → 商品內重複跳過 → 狀態映射與鎖超時釋放）→
+// order_deliveries 缺失卡密回填（delivery_mode=delete 已物理刪的唯一副本）。
+// 映射規格《數據遷移工具開發計劃》§5.4；order_id 置 0 由 P4 遷完訂單後回填。
 //
-// 性能：cards 走专用批量循环（keyset 分页 + 批级幂等 IN 查询 + CreateBulk），
-// 目标 ≥5k 行/s；同商品重复卡密撞唯一索引时该批回退逐行并计 skipped_dup。
+// 性能：cards 走專用批量循環（keyset 分頁 + 批級冪等 IN 查詢 + CreateBulk），
+// 目標 ≥5k 行/s；同商品重複卡密撞唯一索引時該批迴退逐行並計 skipped_dup。
 
 import (
 	"context"
@@ -24,11 +24,11 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/inventory"
 )
 
-// lockReleaseTTL 1.x 锁卡超时释放口径：locked_at 早于此阈值的 locked 卡按
-// available 迁移（对齐 1.x 超时关单释放语义；订单 TTL 为分钟量级，取保守上界）。
+// lockReleaseTTL 1.x 鎖卡超時釋放口徑：locked_at 早於此閾值的 locked 卡按
+// available 遷移（對齊 1.x 超時關單釋放語義；訂單 TTL 為分鐘量級，取保守上界）。
 const lockReleaseTTL = 30 * time.Minute
 
-// MigrateInventory P3 阶段。
+// MigrateInventory P3 階段。
 func (m *Migrator) MigrateInventory(ctx context.Context) error {
 	if err := m.migrateCardImports(ctx); err != nil {
 		return err
@@ -39,7 +39,7 @@ func (m *Migrator) MigrateInventory(ctx context.Context) error {
 	return m.backfillOrderDeliveries(ctx)
 }
 
-// migrateCardImports 1.x card_imports → card_imports（导入批次历史）。
+// migrateCardImports 1.x card_imports → card_imports（導入批次歷史）。
 func (m *Migrator) migrateCardImports(ctx context.Context) error {
 	var (
 		id, productID, operatorID int64
@@ -63,7 +63,7 @@ func (m *Migrator) migrateCardImports(ctx context.Context) error {
 			}
 			newPID, ok := m.IDs.Get(ctx, "products", uint64(productID))
 			if !ok {
-				m.st.Record("card_imports", "skip") // 分站商品：P6 补
+				m.st.Record("card_imports", "skip") // 分站商品：P6 補
 				return nil
 			}
 			ca, caOK, err := mustTime(nullStr(createdAt), m.TZ)
@@ -76,7 +76,7 @@ func (m *Migrator) migrateCardImports(ctx context.Context) error {
 			}
 			b := m.Client.CardImport.Create().
 				SetProductID(newPID).
-				SetOperatorID(0). // 1.x operator 是普通用户表；2.0 语义为管理员，不直迁
+				SetOperatorID(0). // 1.x operator 是普通用户表；2.0 語義為管理員，不直遷
 				SetFilename(orString(nullStr(source), "v1-import-"+fmt.Sprint(id))).
 				SetTotal(int32(total)).
 				SetImported(int32(success)).
@@ -111,7 +111,7 @@ func mapCardImportStatus(s string) string {
 	}
 }
 
-// cardRow 扫描中间结构（cards 专用批量循环）。
+// cardRow 掃描中間結構（cards 專用批量循環）。
 type cardRow struct {
 	id                      int64
 	productID, importID     sql.NullInt64
@@ -127,7 +127,7 @@ type cardRow struct {
 	numberHash              sql.NullString
 }
 
-// migrateCards 卡密全链批量迁移。
+// migrateCards 卡密全鏈批量遷移。
 func (m *Migrator) migrateCards(ctx context.Context) error {
 	t := m.st.table("cards")
 	if m.dry {
@@ -151,7 +151,7 @@ func (m *Migrator) migrateCards(ctx context.Context) error {
 	for {
 		rows, err := m.Src.DB.QueryContext(ctx, query, cursor, m.Opts.Batch)
 		if err != nil {
-			return fmt.Errorf("扫描 cards 失败: %w", err)
+			return fmt.Errorf("掃描 cards 失敗: %w", err)
 		}
 		var batch []cardRow
 		for rows.Next() {
@@ -161,7 +161,7 @@ func (m *Migrator) migrateCards(ctx context.Context) error {
 				&r.note, &r.cardType, &r.ownerID, &r.draftPremium, &r.draftCost, &r.price,
 				&r.numberHash); err != nil {
 				rows.Close()
-				return fmt.Errorf("扫描 cards 行失败: %w", err)
+				return fmt.Errorf("掃描 cards 行失敗: %w", err)
 			}
 			batch = append(batch, r)
 		}
@@ -184,7 +184,7 @@ func (m *Migrator) migrateCards(ctx context.Context) error {
 	}
 }
 
-// migrateCardBatch 单批：批级幂等 + 转换 + CreateBulk（唯一冲突回退逐行）。
+// migrateCardBatch 單批：批級冪等 + 轉換 + CreateBulk（唯一衝突回退逐行）。
 func (m *Migrator) migrateCardBatch(ctx context.Context, cipher *inventory.CardCipher, batch []cardRow) error {
 	t := m.st.table("cards")
 
@@ -196,7 +196,7 @@ func (m *Migrator) migrateCardBatch(ctx context.Context, cipher *inventory.CardC
 
 	var (
 		preparedRows []preparedCard
-		seen         = map[string]bool{} // 批内 (product,hash) 去重
+		seen         = map[string]bool{} // 批內 (product,hash) 去重
 	)
 	for _, r := range batch {
 		if _, ok := existing[uint64(r.id)]; ok {
@@ -205,32 +205,32 @@ func (m *Migrator) migrateCardBatch(ctx context.Context, cipher *inventory.CardC
 		}
 		newPID, ok := m.IDs.Get(ctx, "products", uint64(nullInt(r.productID)))
 		if !ok {
-			t.SkippedExists++ // 分站商品：P6 补
+			t.SkippedExists++ // 分站商品：P6 補
 			continue
 		}
 		plain, wasEnc, err := openV1Card(r.content, m.CardKey)
 		if err != nil {
 			if m.Opts.OnError == "abort" {
-				return fmt.Errorf("卡密 %d 解密失败（abort）: %w", r.id, err)
+				return fmt.Errorf("卡密 %d 解密失敗（abort）: %w", r.id, err)
 			}
 			t.Failed++
-			m.RW.AddError("cards", uint64(r.id), "解密失败: "+err.Error())
+			m.RW.AddError("cards", uint64(r.id), "解密失敗: "+err.Error())
 			continue
 		}
-		// 1.x content_hash 校验（裸 sha256）：漂移仅告警不阻断（老库存在不可信 hash）
+		// 1.x content_hash 校驗（裸 sha256）：漂移僅告警不阻斷（老庫存在不可信 hash）
 		if sum := sha256.Sum256([]byte(plain)); hex.EncodeToString(sum[:]) != r.contentHash {
-			m.RW.AddError("cards", uint64(r.id), "content_hash 与明文不一致（按明文重算迁移）")
+			m.RW.AddError("cards", uint64(r.id), "content_hash 與明文不一致（按明文重算遷移）")
 		}
 		hash := cipher.ContentHash(plain)
 		sealed, err := cipher.Seal(plain, newPID, m.productSubsite(ctx, newPID))
 		if err != nil {
 			t.Failed++
-			m.RW.AddError("cards", uint64(r.id), "重加密失败: "+err.Error())
+			m.RW.AddError("cards", uint64(r.id), "重加密失敗: "+err.Error())
 			continue
 		}
 		dedupKey := fmt.Sprintf("%d:%s", newPID, hash)
 		if seen[dedupKey] {
-			t.SkippedExists++ // 同商品重复卡密（1.x dedup_hash 可空导致）：跳过
+			t.SkippedExists++ // 同商品重複卡密（1.x dedup_hash 可空導致）：跳過
 			continue
 		}
 		seen[dedupKey] = true
@@ -245,8 +245,8 @@ func (m *Migrator) migrateCardBatch(ctx context.Context, cipher *inventory.CardC
 	for _, p := range preparedRows {
 		builders = append(builders, m.cardBuilder(ctx, cipher, p.row, p.newPID, p.content, p.hash))
 	}
-	// 性能关键路径：bulk 插入前取 MAX(id) 基线，插入后一次回查区间连续 ID，
-	// 再批量写 v1id_maps（3 次往返替代原先的 2N 次）；回查异常回退逐行保正确性。
+	// 性能關鍵路徑：bulk 插入前取 MAX(id) 基線，插入後一次回查區間連續 ID，
+	// 再批量寫 v1id_maps（3 次往返替代原先的 2N 次）；回查異常回退逐行保正確性。
 	base, err := m.Client.Card.Query().
 		Aggregate(ent.Max(card.FieldID)).
 		Int(ctx)
@@ -254,7 +254,7 @@ func (m *Migrator) migrateCardBatch(ctx context.Context, cipher *inventory.CardC
 		base = 0
 	}
 	if _, err := m.Client.Card.CreateBulk(builders...).Save(ctx); err != nil {
-		// 唯一冲突（目标库已有同商品同 hash）→ 回退逐行，冲突行计跳过
+		// 唯一衝突（目標庫已有同商品同 hash）→ 回退逐行，衝突行計跳過
 		for _, p := range preparedRows {
 			c, err := m.cardBuilder(ctx, cipher, p.row, p.newPID, p.content, p.hash).Save(ctx)
 			if err != nil {
@@ -281,7 +281,7 @@ func (m *Migrator) migrateCardBatch(ctx context.Context, cipher *inventory.CardC
 		Order(ent.Asc(card.FieldID)).
 		IDs(ctx)
 	if err != nil || len(newIDs) != len(preparedRows) {
-		// 回查异常（行数不符=自增不连续假设被打破）：回退逐行回查保正确性
+		// 回查異常（行數不符=自增不連續假設被打破）：回退逐行回查保正確性
 		t.Migrated += int64(len(preparedRows))
 		return m.recordBulkIDs(ctx, preparedRows)
 	}
@@ -296,7 +296,7 @@ func (m *Migrator) migrateCardBatch(ctx context.Context, cipher *inventory.CardC
 	return nil
 }
 
-// preparedCard 已完成解密+重加密的待写行。
+// preparedCard 已完成解密+重加密的待寫行。
 type preparedCard struct {
 	row     cardRow
 	newPID  uint64
@@ -304,8 +304,8 @@ type preparedCard struct {
 	hash    string
 }
 
-// recordBulkIDs bulk 插入后按内容回查真实新 ID 写 idmap（bulk 不返回逐行 ID；
-// 以 (subsite=0, product, content_hash) 定位，唯一索引保证至多一行）。
+// recordBulkIDs bulk 插入後按內容回查真實新 ID 寫 idmap（bulk 不返回逐行 ID；
+// 以 (subsite=0, product, content_hash) 定位，唯一索引保證至多一行）。
 func (m *Migrator) recordBulkIDs(ctx context.Context, prepared []preparedCard) error {
 	for _, p := range prepared {
 		row, err := m.Client.Card.Query().
@@ -314,7 +314,7 @@ func (m *Migrator) recordBulkIDs(ctx context.Context, prepared []preparedCard) e
 				card.ContentHash(p.hash),
 			).Only(ctx)
 		if err != nil {
-			return fmt.Errorf("bulk 卡密回查失败（product=%d hash=%s）: %w", p.newPID, p.hash, err)
+			return fmt.Errorf("bulk 卡密回查失敗（product=%d hash=%s）: %w", p.newPID, p.hash, err)
 		}
 		if _, err := m.IDs.Put(ctx, m.Client, "cards", uint64(p.row.id), row.ID); err != nil {
 			return err
@@ -323,13 +323,13 @@ func (m *Migrator) recordBulkIDs(ctx context.Context, prepared []preparedCard) e
 	return nil
 }
 
-// openV1Card 1.x content 解密（形态识别直通明文；等价 CardCipher::decrypt 非 strict）。
+// openV1Card 1.x content 解密（形態識別直通明文；等價 CardCipher::decrypt 非 strict）。
 func openV1Card(content string, cardKey []byte) (string, bool, error) {
 	if !laracrypt.LooksEncrypted(content) {
 		return content, false, nil
 	}
 	if len(cardKey) == 0 {
-		return "", true, fmt.Errorf("密文卡但旧卡密钥匙不可用")
+		return "", true, fmt.Errorf("密文卡但舊卡密鑰匙不可用")
 	}
 	c, err := laracrypt.New(cardKey)
 	if err != nil {
@@ -342,7 +342,7 @@ func openV1Card(content string, cardKey []byte) (string, bool, error) {
 	return plain, true, nil
 }
 
-// cardBuilder 单行构建。
+// cardBuilder 單行構建。
 func (m *Migrator) cardBuilder(ctx context.Context, cipher *inventory.CardCipher, r cardRow,
 	newPID uint64, sealed []byte, hash string) *ent.CardCreate {
 
@@ -387,7 +387,7 @@ func (m *Migrator) cardBuilder(ctx context.Context, cipher *inventory.CardCipher
 	if t, ok, err := mustTime(nullStr(r.updatedAt), m.TZ); err == nil && ok {
 		b.SetUpdatedAt(t)
 	}
-	// order_id：1.x 订单 P4 才迁——置 0，P4 迁完订单后按 v1id_maps(cards) 回填
+	// order_id：1.x 訂單 P4 才遷——置 0，P4 遷完訂單後按 v1id_maps(cards) 回填
 	return b
 }
 
@@ -399,7 +399,7 @@ func mapCardStatus(status, lockedAt string, tz *time.Location) string {
 		return "disabled"
 	case "locked":
 		if t, ok := parseNaiveTime(lockedAt, tz); ok && time.Since(t) > lockReleaseTTL {
-			return "available" // 锁超时释放（1.x 超时关单语义）
+			return "available" // 鎖超時釋放（1.x 超時關單語義）
 		}
 		return "reserved"
 	default: // unused
@@ -407,9 +407,9 @@ func mapCardStatus(status, lockedAt string, tz *time.Location) string {
 	}
 }
 
-// backfillOrderDeliveries delivery_mode=delete 的订单已物理删卡，
+// backfillOrderDeliveries delivery_mode=delete 的訂單已物理刪卡，
 // order_deliveries.card_content 是唯一明文副本 → 重建 used 卡（order_id 置 0，
-// v1id_maps("order_deliveries") 记 old delivery id → new card id 供 P4 关联）。
+// v1id_maps("order_deliveries") 記 old delivery id → new card id 供 P4 關聯）。
 func (m *Migrator) backfillOrderDeliveries(ctx context.Context) error {
 	t := m.st.table("order_deliveries_backfill")
 	if m.dry {
@@ -422,7 +422,7 @@ func (m *Migrator) backfillOrderDeliveries(ctx context.Context) error {
 	rows, err := m.Src.DB.QueryContext(ctx,
 		"SELECT `id`, `order_id`, `product_id`, `card_content`, `delivered_at` FROM `order_deliveries` ORDER BY `id`")
 	if err != nil {
-		return fmt.Errorf("扫描 order_deliveries 失败: %w", err)
+		return fmt.Errorf("掃描 order_deliveries 失敗: %w", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -440,10 +440,10 @@ func (m *Migrator) backfillOrderDeliveries(ctx context.Context) error {
 		}
 		newPID, ok := m.IDs.Get(ctx, "products", uint64(nullInt(productID)))
 		if !ok {
-			t.SkippedExists++ // 分站商品：P6 补
+			t.SkippedExists++ // 分站商品：P6 補
 			continue
 		}
-		// 源库 cards 仍有该卡（status 模式未物理删）→ 无需重建，仅记 delivery 映射占位
+		// 源庫 cards 仍有該卡（status 模式未物理刪）→ 無需重建，僅記 delivery 映射佔位
 		sum := sha256.Sum256([]byte(content))
 		var exists int
 		if err := m.Src.DB.QueryRowContext(ctx,
@@ -470,7 +470,7 @@ func (m *Migrator) backfillOrderDeliveries(ctx context.Context) error {
 		}
 		c, err := b.Save(ctx)
 		if err != nil {
-			if isUniqueViolation(err) { // 与已迁卡密同明文（回填与主迁移重叠）
+			if isUniqueViolation(err) { // 與已遷卡密同明文（回填與主遷移重疊）
 				t.SkippedExists++
 				continue
 			}

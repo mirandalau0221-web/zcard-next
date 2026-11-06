@@ -73,24 +73,24 @@ func ManualAvailable(ctx context.Context, c *ent.Client, p *ent.Product, current
 // RejectServiceProduct protects synchronous card-only purchasing entrypoints.
 func RejectServiceProduct(ctx context.Context, c *ent.Client, p *ent.Product) error {
 	if p.GoodsType == "physical" {
-		return fmt.Errorf("该入口不支持实体商品，请在商城下单")
+		return fmt.Errorf("該入口不支持實體商品，請在商城下單")
 	}
 	if p.FulfillmentMode == "manual" {
-		return fmt.Errorf("该入口不支持人工服务商品")
+		return fmt.Errorf("該入口不支持人工服務商品")
 	}
 	manual, err := c.ProductSku.Query().Where(productsku.ProductID(p.ID), productsku.FulfillmentMode("manual")).Exist(ctx)
 	if err != nil {
 		return err
 	}
 	if manual {
-		return fmt.Errorf("该入口不支持含人工规格的商品")
+		return fmt.Errorf("該入口不支持含人工規格的商品")
 	}
 	forms, err := c.ProductControl.Query().Where(productcontrol.ProductID(p.ID)).Exist(ctx)
 	if err != nil {
 		return err
 	}
 	if forms {
-		return fmt.Errorf("该商品需要填写资料，请在商城下单")
+		return fmt.Errorf("該商品需要填寫資料，請在商城下單")
 	}
 	return nil
 }

@@ -49,7 +49,7 @@ async function onFile(event: Event) {
   el.value = "";
   if (!file) return;
   if (!/\.mp4$/i.test(file.name) || file.size > limit.value) {
-    error.value = `请选择不超过 ${Math.round(limit.value / 1024 / 1024)} MB 的 MP4 视频`;
+    error.value = `請選擇不超過 ${Math.round(limit.value / 1024 / 1024)} MB 的 MP4 視頻`;
     return;
   }
   controller = new AbortController();
@@ -65,7 +65,7 @@ async function onFile(event: Event) {
     );
     if (active.signal.aborted) return;
     if (data) src.value = data.url;
-    else error.value = failed ? "上传失败，请检查文件格式、大小或网络后重试" : "上传失败";
+    else error.value = failed ? "上傳失敗，請檢查文件格式、大小或網絡後重試" : "上傳失敗";
   } finally {
     if (controller === active) {
       uploading.value = false;
@@ -75,11 +75,11 @@ async function onFile(event: Event) {
 }
 function insert() {
   if (!validVideoURL(src.value.trim()) || (poster.value && !validVideoURL(poster.value.trim()))) {
-    error.value = "请输入 HTTPS 视频文件直链，或从素材库选择";
+    error.value = "請輸入 HTTPS 視頻文件直鏈，或從素材庫選擇";
     return;
   }
   if (!previewOK.value) {
-    error.value = "请先确认视频预览可播放；平台页面链接不属于视频直链";
+    error.value = "請先確認視頻預覽可播放；平台頁面鏈接不屬於視頻直鏈";
     return;
   }
   closeVideo(videoHTML(src.value.trim(), poster.value.trim()));
@@ -89,42 +89,42 @@ function insert() {
   <NModal
     :show="videoPicker.show"
     preset="card"
-    title="插入视频"
+    title="插入視頻"
     style="width: min(640px, 94vw)"
     :mask-closable="false"
     @update:show="(v) => !v && closeVideo()"
   >
     <div class="flex flex-col gap-12px">
-      <label for="video-url">视频地址</label>
+      <label for="video-url">視頻地址</label>
       <NInput
         id="video-url"
         v-model:value="src"
         :disabled="uploading"
-        placeholder="HTTPS 视频文件直链（不支持平台播放页面）"
+        placeholder="HTTPS 視頻文件直鏈（不支持平台播放頁面）"
       />
       <div class="flex flex-wrap gap-8px">
-        <NButton :disabled="uploading" @click="chooseVideo">从视频素材库选择</NButton>
+        <NButton :disabled="uploading" @click="chooseVideo">從視頻素材庫選擇</NButton>
         <NButton v-auth="'media:upload'" :disabled="uploading" @click="input?.click()"
-          >上传本地视频</NButton
+          >上傳本地視頻</NButton
         >
         <input ref="input" type="file" accept="video/mp4,.mp4" hidden @change="onFile" />
       </div>
       <p class="text-12px text-gray-500">
         MP4（H.264 / AAC），最大
-        {{ Math.round(limit / 1024 / 1024) }} MB。上传的视频为公开素材，支持重复使用。
+        {{ Math.round(limit / 1024 / 1024) }} MB。上傳的視頻為公開素材，支持重複使用。
       </p>
       <div v-if="uploading" aria-live="polite">
         <NProgress type="line" :percentage="progress" /><NButton size="small" @click="cancelUpload"
-          >取消上传</NButton
+          >取消上傳</NButton
         >
       </div>
-      <label for="video-poster">视频封面（可选）</label>
+      <label for="video-poster">視頻封面（可選）</label>
       <div class="flex gap-8px">
         <NInput
           id="video-poster"
           v-model:value="poster"
-          placeholder="选择图片或填写 HTTPS 图片地址"
-        /><NButton @click="choosePoster">选择封面</NButton>
+          placeholder="選擇圖片或填寫 HTTPS 圖片地址"
+        /><NButton @click="choosePoster">選擇封面</NButton>
       </div>
       <video
         v-if="validVideoURL(src)"
@@ -137,7 +137,7 @@ function insert() {
         style="width: 100%; max-height: 300px; background: #111; border-radius: 8px"
         @loadeddata="previewOK = true"
         @error="
-          error = '视频无法播放，请检查地址、有效期、防盗链或编码格式';
+          error = '視頻無法播放，請檢查地址、有效期、防盜鏈或編碼格式';
           previewOK = false;
         "
       />

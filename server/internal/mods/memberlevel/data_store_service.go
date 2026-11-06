@@ -1,6 +1,6 @@
 package memberlevel
 
-// StoreMemberLevelService 会员等级 storefront 面（：我的等级 + 进度 + 积分余额）。
+// StoreMemberLevelService 會員等級 storefront 面（：我的等級 + 進度 + 積分餘額）。
 
 import (
 	"context"
@@ -17,27 +17,27 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// StoreMemberLevelService 服务。
+// StoreMemberLevelService 服務。
 type StoreMemberLevelService struct {
 	storefrontv1.UnimplementedStoreMemberLevelServiceServer
 	repo   *MemberLevelRepoImpl
 	points walletport.PointsReader
 }
 
-// NewStoreMemberLevelService 构造。
+// NewStoreMemberLevelService 構造。
 func NewStoreMemberLevelService(repo *MemberLevelRepoImpl, points walletport.PointsReader) *StoreMemberLevelService {
 	return &StoreMemberLevelService{repo: repo, points: points}
 }
 
-// GetMyLevel 我的等级（阈值即时评估；未登录 401）。
+// GetMyLevel 我的等級（閾值即時評估；未登錄 401）。
 func (s *StoreMemberLevelService) GetMyLevel(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.MyLevelReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	p, err := s.repo.ResolveProgress(ctx, claims.Subject)
 	if err != nil {
-		return nil, errors.InternalServer("memberlevel.PROGRESS_FAILED", "等级解析失败")
+		return nil, errors.InternalServer("memberlevel.PROGRESS_FAILED", "等級解析失敗")
 	}
 	reply := &storefrontv1.MyLevelReply{
 		Source: p.Source, HasReferralLevel: p.HasReferral, PrivateLevel: p.Current != nil && p.Current.DisplayMode == "hidden",
@@ -63,7 +63,7 @@ func (s *StoreMemberLevelService) GetMyLevel(ctx context.Context, _ *emptypb.Emp
 	}
 	levels, err := s.repo.ListLevels(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("memberlevel.LIST_FAILED", "读取等级列表失败")
+		return nil, errors.InternalServer("memberlevel.LIST_FAILED", "讀取等級列表失敗")
 	}
 	for _, lv := range levels {
 		if lv.Enabled && lv.DisplayMode != "hidden" {
@@ -78,7 +78,7 @@ func toLevelBrief(lv *ent.MemberLevel) *storefrontv1.LevelBrief {
 		return nil
 	}
 	if lv.DisplayMode == "contact" {
-		return &storefrontv1.LevelBrief{Name: lv.Name, DisplayMode: "contact", DisplayText: "联系客服", AcquireMode: lv.AcquireMode}
+		return &storefrontv1.LevelBrief{Name: lv.Name, DisplayMode: "contact", DisplayText: "聯繫客服", AcquireMode: lv.AcquireMode}
 	}
 	brief := &storefrontv1.LevelBrief{
 		DisplayMode: lv.DisplayMode, AcquireMode: lv.AcquireMode,
@@ -99,7 +99,7 @@ func toLevelBrief(lv *ent.MemberLevel) *storefrontv1.LevelBrief {
 func (s *StoreMemberLevelService) GetInviteBenefit(ctx context.Context, req *storefrontv1.InviteBenefitRequest) (*storefrontv1.InviteBenefitReply, error) {
 	u, err := identity.NewUserRepo(s.repo.data).ResolvePromoCodeChecked(ctx, req.Code)
 	if err != nil {
-		return nil, errors.InternalServer("memberlevel.INVITE_LOOKUP_FAILED", "推荐权益查询失败，请重试")
+		return nil, errors.InternalServer("memberlevel.INVITE_LOOKUP_FAILED", "推薦權益查詢失敗，請重試")
 	}
 	reply := &storefrontv1.InviteBenefitReply{}
 	if u == nil || u.Status != user.StatusActive {
@@ -111,7 +111,7 @@ func (s *StoreMemberLevelService) GetInviteBenefit(ctx context.Context, req *sto
 	}
 	lv, err := data.Client(ctx, s.repo.data).MemberLevel.Get(ctx, u.InviteLevelID)
 	if err != nil {
-		return nil, errors.InternalServer("memberlevel.INVITE_LOOKUP_FAILED", "推荐权益暂不可用")
+		return nil, errors.InternalServer("memberlevel.INVITE_LOOKUP_FAILED", "推薦權益暫不可用")
 	}
 	if !lv.Enabled {
 		return reply, nil

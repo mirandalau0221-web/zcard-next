@@ -25,27 +25,27 @@ type OrderDelivery struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// OrderID holds the value of the "order_id" field.
 	OrderID uint64 `json:"order_id,omitempty"`
-	// 订单子项
+	// 訂單子項
 	ItemID uint64 `json:"item_id,omitempty"`
-	// 卡密引用（现场解密，绝不存明文）
+	// 卡密引用（現場解密，絕不存明文）
 	CardID uint64 `json:"card_id,omitempty"`
-	// 一次性取货令牌哈希
+	// 一次性取貨令牌哈希
 	DeliveryTokenHash string `json:"delivery_token_hash,omitempty"`
 	// ServiceContent holds the value of the "service_content" field.
 	ServiceContent []byte `json:"service_content,omitempty"`
 	// DeliveredQuantity holds the value of the "delivered_quantity" field.
 	DeliveredQuantity int32 `json:"delivered_quantity,omitempty"`
-	// 标记/即删/直发（direct = 商品级直发内容，无卡密）
+	// 標記/即刪/直髮（direct = 商品級直髮內容，無卡密）
 	DeliveredMode orderdelivery.DeliveredMode `json:"delivered_mode,omitempty"`
-	// 人工发货管理员（auto 为 0）
+	// 人工發貨管理員（auto 為 0）
 	DeliveredBy uint64 `json:"delivered_by,omitempty"`
-	// 结构化交付信息（物流单号/追踪链接）
+	// 結構化交付信息（物流單號/追蹤鏈接）
 	Logistics map[string]interface{} `json:"logistics,omitempty"`
-	// 已取货次数（默认 1 次后掩码）
+	// 已取貨次數（默認 1 次後掩碼）
 	FetchCount int32 `json:"fetch_count,omitempty"`
 	// DeliveredAt holds the value of the "delivered_at" field.
 	DeliveredAt time.Time `json:"delivered_at,omitempty"`
-	// 取货 IP（审计，不含明文）
+	// 取貨 IP（審計，不含明文）
 	FetchedIP string `json:"fetched_ip,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the OrderDeliveryQuery when eager-loading is set.

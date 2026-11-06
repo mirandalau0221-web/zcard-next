@@ -20,7 +20,7 @@ const _ = http.SupportPackageIsVersion3
 const OperationStoreMediaServiceUpload = "/zcard.api.storefront.v1.StoreMediaService/Upload"
 
 type StoreMediaServiceHTTPServer interface {
-	// Upload Upload base64 上传（图片白名单/魔数/重编码；≤2MB）。
+	// Upload Upload base64 上傳（圖片白名單/魔數/重編碼；≤2MB）。
 	Upload(context.Context, *StoreUploadRequest) (*StoreUploadReply, error)
 }
 
@@ -49,7 +49,7 @@ func _StoreMediaService_Upload0_HTTP_Handler(srv StoreMediaServiceHTTPServer) fu
 }
 
 type StoreMediaServiceHTTPClient interface {
-	// Upload Upload base64 上传（图片白名单/魔数/重编码；≤2MB）。
+	// Upload Upload base64 上傳（圖片白名單/魔數/重編碼；≤2MB）。
 	Upload(ctx context.Context, req *StoreUploadRequest, opts ...http.CallOption) (rsp *StoreUploadReply, err error)
 }
 
@@ -61,7 +61,7 @@ func NewStoreMediaServiceHTTPClient(client *http.Client) StoreMediaServiceHTTPCl
 	return &StoreMediaServiceHTTPClientImpl{client}
 }
 
-// Upload Upload base64 上传（图片白名单/魔数/重编码；≤2MB）。
+// Upload Upload base64 上傳（圖片白名單/魔數/重編碼；≤2MB）。
 func (c *StoreMediaServiceHTTPClientImpl) Upload(ctx context.Context, in *StoreUploadRequest, opts ...http.CallOption) (*StoreUploadReply, error) {
 	var out StoreUploadReply
 	pattern := "/api/v1/storefront/media/upload"

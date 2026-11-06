@@ -1,8 +1,8 @@
 package data
 
-// 运行时版本化迁移执行器（规划 §10.4）：启动时检测待执行迁移并加锁串行执行，
-// 失败拒绝启动。迁移文件 go:embed 内嵌（migrations/<dialect>），生成走
-// make migrate-diff（ent NamedDiff + dev-db），禁止手写 DDL。
+// 運行時版本化遷移執行器（規劃 §10.4）：啓動時檢測待執行遷移並加鎖串行執行，
+// 失敗拒絕啓動。遷移文件 go:embed 內嵌（migrations/<dialect>），生成走
+// make migrate-diff（ent NamedDiff + dev-db），禁止手寫 DDL。
 
 import (
 	"context"
@@ -26,31 +26,31 @@ import (
 	"github.com/NovaWorks/zcard-next/server/migrations"
 )
 
-// revisionTable Atlas 迁移版本表（与 atlas CLI 互通）。
+// revisionTable Atlas 遷移版本表（與 atlas CLI 互通）。
 const revisionTable = "atlas_schema_revisions"
 
-// ApplyMigrations 应用内嵌迁移：加锁 → 执行 pending 文件 → 记录版本。
-// 幂等：已应用文件跳过（atlas_schema_revisions 版本比对）。
-// dsn 用于 PG：经 sqlclient.OpenURL 打开（URL 注入 search_path 绑定 schema，
-// 否则 atlas 的 CheckClean 会因 realm 含 public schema 误报 not clean）。
+// ApplyMigrations 應用內嵌遷移：加鎖 → 執行 pending 文件 → 記錄版本。
+// 冪等：已應用文件跳過（atlas_schema_revisions 版本比對）。
+// dsn 用於 PG：經 sqlclient.OpenURL 打開（URL 注入 search_path 綁定 schema，
+// 否則 atlas 的 CheckClean 會因 realm 含 public schema 誤報 not clean）。
 func ApplyMigrations(ctx context.Context, handle *sql.DB, d db.Dialect, dsn string) error {
 	dirFS, err := migrations.FS(string(d))
 	if err != nil {
 		return err
 	}
-	// 无迁移文件（如全新方言线未生成）时静默跳过——生成流程见 Makefile
+	// 無遷移文件（如全新方言線未生成）時靜默跳過——生成流程見 Makefile
 	if !hasMigrationFiles(dirFS) {
 		return nil
 	}
 
 	unlock, err := lockMigrations(ctx, handle, d)
 	if err != nil {
-		return fmt.Errorf("migrate: 获取迁移锁失败: %w", err)
+		return fmt.Errorf("migrate: 獲取遷移鎖失敗: %w", err)
 	}
 	defer unlock()
 
-	// PG 经 sqlclient.OpenURL 打开（atlas 需从 URL search_path 绑定 schema）；
-	// MySQL/SQLite 直接复用主连接句柄
+	// PG 經 sqlclient.OpenURL 打開（atlas 需從 URL search_path 綁定 schema）；
+	// MySQL/SQLite 直接複用主連接句柄
 	var (
 		drv     atlasmigrate.Driver
 		revConn *sql.DB = handle
@@ -59,7 +59,7 @@ func ApplyMigrations(ctx context.Context, handle *sql.DB, d db.Dialect, dsn stri
 	if d == db.Postgres {
 		u, err := url.Parse(dsn)
 		if err != nil {
-			return fmt.Errorf("migrate: 解析 PG DSN 失败: %w", err)
+			return fmt.Errorf("migrate: 解析 PG DSN 失敗: %w", err)
 		}
 		q := u.Query()
 		if q.Get("search_path") == "" {
@@ -68,7 +68,7 @@ func ApplyMigrations(ctx context.Context, handle *sql.DB, d db.Dialect, dsn stri
 		}
 		client, err := sqlclient.OpenURL(ctx, u)
 		if err != nil {
-			return fmt.Errorf("migrate: 打开 PG 连接失败: %w", err)
+			return fmt.Errorf("migrate: 打開 PG 連接失敗: %w", err)
 		}
 		closer = func() { _ = client.Close() }
 		drv = client
@@ -96,8 +96,8 @@ func ApplyMigrations(ctx context.Context, handle *sql.DB, d db.Dialect, dsn stri
 	if err != nil {
 		return err
 	}
-	// ExecuteN(ctx, 0)：应用全部 pending 迁移文件（记录版本到 atlas_schema_revisions）；
-	// 全部已应用时返回 ErrNoPendingFiles，视为成功
+	// ExecuteN(ctx, 0)：應用全部 pending 遷移文件（記錄版本到 atlas_schema_revisions）；
+	// 全部已應用時返回 ErrNoPendingFiles，視為成功
 	if err := ex.ExecuteN(ctx, 0); err != nil && !errors.Is(err, atlasmigrate.ErrNoPendingFiles) {
 		return err
 	}
@@ -118,7 +118,7 @@ func hasMigrationFiles(fsys fs.FS) bool {
 	return found
 }
 
-// atlasDriver 由 *sql.DB 构造 atlas 迁移驱动（不经 sqlclient URL，直连已开句柄）。
+// atlasDriver 由 *sql.DB 構造 atlas 遷移驅動（不經 sqlclient URL，直連已開句柄）。
 func atlasDriver(handle *sql.DB, d db.Dialect) (atlasmigrate.Driver, error) {
 	switch d {
 	case db.MySQL:
@@ -131,14 +131,14 @@ func atlasDriver(handle *sql.DB, d db.Dialect) (atlasmigrate.Driver, error) {
 	return nil, fmt.Errorf("migrate: 未知方言 %q", d)
 }
 
-// lockMigrations 启动迁移串行锁（§10.4）：MySQL GET_LOCK / PG pg_advisory_lock；
-// SQLite 单写者天然串行（BEGIN IMMEDIATE），无需额外锁。
+// lockMigrations 啓動遷移串行鎖（§10.4）：MySQL GET_LOCK / PG pg_advisory_lock；
+// SQLite 單寫者天然串行（BEGIN IMMEDIATE），無需額外鎖。
 func lockMigrations(ctx context.Context, handle *sql.DB, d db.Dialect) (func(), error) {
 	switch d {
 	case db.MySQL:
 		var got int
 		if err := handle.QueryRowContext(ctx, "SELECT GET_LOCK(?, 60)", d.LockName()).Scan(&got); err != nil || got != 1 {
-			return nil, fmt.Errorf("migrate: MySQL GET_LOCK 未获取（got=%d err=%v）", got, err)
+			return nil, fmt.Errorf("migrate: MySQL GET_LOCK 未獲取（got=%d err=%v）", got, err)
 		}
 		return func() {
 			_, _ = handle.ExecContext(context.WithoutCancel(ctx), "SELECT RELEASE_LOCK(?)", d.LockName())
@@ -154,7 +154,7 @@ func lockMigrations(ctx context.Context, handle *sql.DB, d db.Dialect) (func(), 
 	return func() {}, nil
 }
 
-// embedToMemDir 把内嵌迁移文件复制进 atlas MemDir（跳过 README 等非迁移文件）。
+// embedToMemDir 把內嵌遷移文件複製進 atlas MemDir（跳過 README 等非遷移文件）。
 func embedToMemDir(fsys fs.FS) (*atlasmigrate.MemDir, error) {
 	dir := &atlasmigrate.MemDir{}
 	err := fs.WalkDir(fsys, ".", func(p string, e fs.DirEntry, err error) error {
@@ -177,16 +177,16 @@ func embedToMemDir(fsys fs.FS) (*atlasmigrate.MemDir, error) {
 	return dir, err
 }
 
-// revisionReadWriter DB 版本记录器（写 atlas_schema_revisions，与 atlas CLI 互通）。
+// revisionReadWriter DB 版本記錄器（寫 atlas_schema_revisions，與 atlas CLI 互通）。
 type revisionReadWriter struct {
 	handle  *sql.DB
 	dialect db.Dialect
 }
 
 func newRevisionReadWriter(handle *sql.DB, d db.Dialect) (*revisionReadWriter, error) {
-	// 跨方言通用 DDL：version 用 VARCHAR(191) 作主键（MySQL 不允许 TEXT 主键，
-	// 与 atlas CLI 版本表口径一致；191 为 utf8mb4 索引安全长度）；operator_version
-	// 用 varchar——MySQL 8 严格模式禁止 TEXT 列带字面量默认值（Error 1101/1170）
+	// 跨方言通用 DDL：version 用 VARCHAR(191) 作主鍵（MySQL 不允許 TEXT 主鍵，
+	// 與 atlas CLI 版本表口徑一致；191 為 utf8mb4 索引安全長度）；operator_version
+	// 用 varchar——MySQL 8 嚴格模式禁止 TEXT 列帶字面量默認值（Error 1101/1170）
 	const ddl = `CREATE TABLE IF NOT EXISTS ` + revisionTable + ` (
 		version            VARCHAR(191) NOT NULL PRIMARY KEY,
 		description        TEXT NOT NULL,
@@ -202,17 +202,17 @@ func newRevisionReadWriter(handle *sql.DB, d db.Dialect) (*revisionReadWriter, e
 		operator_version   VARCHAR(64) NOT NULL DEFAULT ''
 	)`
 	if _, err := handle.Exec(ddl); err != nil {
-		return nil, fmt.Errorf("migrate: 创建版本表失败: %w", err)
+		return nil, fmt.Errorf("migrate: 創建版本表失敗: %w", err)
 	}
 	return &revisionReadWriter{handle: handle, dialect: d}, nil
 }
 
-// Ident 版本表标识。
+// Ident 版本表標識。
 func (w *revisionReadWriter) Ident() *atlasmigrate.TableIdent {
 	return &atlasmigrate.TableIdent{Name: revisionTable}
 }
 
-// ph 第 i 个占位符（PG $i / MySQL、SQLite ?）。
+// ph 第 i 個佔位符（PG $i / MySQL、SQLite ?）。
 func (w *revisionReadWriter) ph(i int) string {
 	if w.dialect == db.Postgres {
 		return fmt.Sprintf("$%d", i)
@@ -220,7 +220,7 @@ func (w *revisionReadWriter) ph(i int) string {
 	return "?"
 }
 
-// ReadRevisions 读取全部已应用版本。
+// ReadRevisions 讀取全部已應用版本。
 func (w *revisionReadWriter) ReadRevisions(ctx context.Context) ([]*atlasmigrate.Revision, error) {
 	rows, err := w.handle.QueryContext(ctx, `SELECT version, description, type, applied, total,
 		executed_at, execution_time, error, error_stmt, hash, partial_hashes, operator_version
@@ -255,7 +255,7 @@ func (w *revisionReadWriter) ReadRevisions(ctx context.Context) ([]*atlasmigrate
 	return revs, rows.Err()
 }
 
-// ReadRevision 读单条。
+// ReadRevision 讀單條。
 func (w *revisionReadWriter) ReadRevision(ctx context.Context, version string) (*atlasmigrate.Revision, error) {
 	revs, err := w.ReadRevisions(ctx)
 	if err != nil {
@@ -269,9 +269,9 @@ func (w *revisionReadWriter) ReadRevision(ctx context.Context, version string) (
 	return nil, atlasmigrate.ErrRevisionNotExist
 }
 
-// WriteRevision 写版本记录。atlas executor 协议是 UPSERT 语义：
-// 执行前先写入（标记 started）、每条语句后更新进度（partial hashes/applied 计数）、
-// 完成或失败后终写（error/error_stmt）——纯 INSERT 会在第二条语句后撞唯一键。
+// WriteRevision 寫版本記錄。atlas executor 協議是 UPSERT 語義：
+// 執行前先寫入（標記 started）、每條語句後更新進度（partial hashes/applied 計數）、
+// 完成或失敗後終寫（error/error_stmt）——純 INSERT 會在第二條語句後撞唯一鍵。
 func (w *revisionReadWriter) WriteRevision(ctx context.Context, r *atlasmigrate.Revision) error {
 	cols := []string{"version", "description", "type", "applied", "total",
 		"executed_at", "execution_time", "error", "error_stmt", "hash", "partial_hashes", "operator_version"}
@@ -283,7 +283,7 @@ func (w *revisionReadWriter) WriteRevision(ctx context.Context, r *atlasmigrate.
 	if err != nil {
 		return err
 	}
-	// 冲突时全量更新（进度推进/错误覆盖/完成态清理 partial）
+	// 衝突時全量更新（進度推進/錯誤覆蓋/完成態清理 partial）
 	var conflict string
 	switch w.dialect {
 	case db.MySQL:
@@ -304,7 +304,7 @@ func (w *revisionReadWriter) WriteRevision(ctx context.Context, r *atlasmigrate.
 	return err
 }
 
-// DeleteRevision 删除版本记录。
+// DeleteRevision 刪除版本記錄。
 func (w *revisionReadWriter) DeleteRevision(ctx context.Context, version string) error {
 	_, err := w.handle.ExecContext(ctx,
 		`DELETE FROM `+revisionTable+` WHERE version = `+w.ph(1), version)

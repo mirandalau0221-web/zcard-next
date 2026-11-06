@@ -39,34 +39,34 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminContentService 内容管理：横幅/文章/分类 CRUD。
-// content_json 入库前经 sanitize（与商品描述同一策略）；slug 唯一。
+// AdminContentService 內容管理：橫幅/文章/分類 CRUD。
+// content_json 入庫前經 sanitize（與商品描述同一策略）；slug 唯一。
 type AdminContentServiceClient interface {
-	// CreateBanner 创建横幅（时间窗/跳转类型）。
+	// CreateBanner 創建橫幅（時間窗/跳轉類型）。
 	CreateBanner(ctx context.Context, in *CreateBannerRequest, opts ...grpc.CallOption) (*Banner, error)
-	// UpdateBanner 更新横幅。
+	// UpdateBanner 更新橫幅。
 	UpdateBanner(ctx context.Context, in *UpdateBannerRequest, opts ...grpc.CallOption) (*Banner, error)
-	// DeleteBanner 删除横幅。
+	// DeleteBanner 刪除橫幅。
 	DeleteBanner(ctx context.Context, in *DeleteBannerRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListBanners 横幅列表（全量含停用）。
+	// ListBanners 橫幅列表（全量含停用）。
 	ListBanners(ctx context.Context, in *ListBannersRequest, opts ...grpc.CallOption) (*ListBannersReply, error)
-	// CreatePost 创建文章（草稿/发布）。
+	// CreatePost 創建文章（草稿/發佈）。
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Post, error)
 	// UpdatePost 更新文章。
 	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*Post, error)
-	// PublishPost 发布/取消发布（首发回填 published_at）。
+	// PublishPost 發佈/取消發佈（首發回填 published_at）。
 	PublishPost(ctx context.Context, in *PublishPostRequest, opts ...grpc.CallOption) (*Post, error)
-	// DeletePost 删除文章。
+	// DeletePost 刪除文章。
 	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// ListPosts 文章列表（全量含草稿）。
 	ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsReply, error)
-	// CreateCategory 创建文章分类。
+	// CreateCategory 創建文章分類。
 	CreateCategory(ctx context.Context, in *CreatePostCategoryRequest, opts ...grpc.CallOption) (*PostCategory, error)
-	// UpdateCategory 更新分类。
+	// UpdateCategory 更新分類。
 	UpdateCategory(ctx context.Context, in *UpdatePostCategoryRequest, opts ...grpc.CallOption) (*PostCategory, error)
-	// DeleteCategory 删除分类（存在文章时拒绝）。
+	// DeleteCategory 刪除分類（存在文章時拒絕）。
 	DeleteCategory(ctx context.Context, in *DeletePostCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListCategories 分类列表。
+	// ListCategories 分類列表。
 	ListCategories(ctx context.Context, in *ListPostCategoriesAdminRequest, opts ...grpc.CallOption) (*ListPostCategoriesAdminReply, error)
 }
 
@@ -212,34 +212,34 @@ func (c *adminContentServiceClient) ListCategories(ctx context.Context, in *List
 // All implementations must embed UnimplementedAdminContentServiceServer
 // for forward compatibility.
 //
-// AdminContentService 内容管理：横幅/文章/分类 CRUD。
-// content_json 入库前经 sanitize（与商品描述同一策略）；slug 唯一。
+// AdminContentService 內容管理：橫幅/文章/分類 CRUD。
+// content_json 入庫前經 sanitize（與商品描述同一策略）；slug 唯一。
 type AdminContentServiceServer interface {
-	// CreateBanner 创建横幅（时间窗/跳转类型）。
+	// CreateBanner 創建橫幅（時間窗/跳轉類型）。
 	CreateBanner(context.Context, *CreateBannerRequest) (*Banner, error)
-	// UpdateBanner 更新横幅。
+	// UpdateBanner 更新橫幅。
 	UpdateBanner(context.Context, *UpdateBannerRequest) (*Banner, error)
-	// DeleteBanner 删除横幅。
+	// DeleteBanner 刪除橫幅。
 	DeleteBanner(context.Context, *DeleteBannerRequest) (*emptypb.Empty, error)
-	// ListBanners 横幅列表（全量含停用）。
+	// ListBanners 橫幅列表（全量含停用）。
 	ListBanners(context.Context, *ListBannersRequest) (*ListBannersReply, error)
-	// CreatePost 创建文章（草稿/发布）。
+	// CreatePost 創建文章（草稿/發佈）。
 	CreatePost(context.Context, *CreatePostRequest) (*Post, error)
 	// UpdatePost 更新文章。
 	UpdatePost(context.Context, *UpdatePostRequest) (*Post, error)
-	// PublishPost 发布/取消发布（首发回填 published_at）。
+	// PublishPost 發佈/取消發佈（首發回填 published_at）。
 	PublishPost(context.Context, *PublishPostRequest) (*Post, error)
-	// DeletePost 删除文章。
+	// DeletePost 刪除文章。
 	DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error)
 	// ListPosts 文章列表（全量含草稿）。
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsReply, error)
-	// CreateCategory 创建文章分类。
+	// CreateCategory 創建文章分類。
 	CreateCategory(context.Context, *CreatePostCategoryRequest) (*PostCategory, error)
-	// UpdateCategory 更新分类。
+	// UpdateCategory 更新分類。
 	UpdateCategory(context.Context, *UpdatePostCategoryRequest) (*PostCategory, error)
-	// DeleteCategory 删除分类（存在文章时拒绝）。
+	// DeleteCategory 刪除分類（存在文章時拒絕）。
 	DeleteCategory(context.Context, *DeletePostCategoryRequest) (*emptypb.Empty, error)
-	// ListCategories 分类列表。
+	// ListCategories 分類列表。
 	ListCategories(context.Context, *ListPostCategoriesAdminRequest) (*ListPostCategoriesAdminReply, error)
 	mustEmbedUnimplementedAdminContentServiceServer()
 }

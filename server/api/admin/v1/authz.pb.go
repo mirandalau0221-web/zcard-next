@@ -335,7 +335,7 @@ func (x *UpdateRolePermissionsRequest) GetPermissions() []string {
 	return nil
 }
 
-// Role 角色详情。
+// Role 角色詳情。
 type Role struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -420,7 +420,7 @@ func (x *Role) GetPermissions() []string {
 	return nil
 }
 
-// PermissionTree 权限目录树。
+// PermissionTree 權限目錄樹。
 type PermissionTree struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Groups        []*Group               `protobuf:"bytes,1,rep,name=groups,proto3" json:"groups,omitempty"`
@@ -465,7 +465,7 @@ func (x *PermissionTree) GetGroups() []*Group {
 	return nil
 }
 
-// Group 域分组。
+// Group 域分組。
 type Group struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Domain        string                 `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
@@ -526,7 +526,7 @@ func (x *Group) GetPerms() []*Perm {
 	return nil
 }
 
-// Perm 权限点。
+// Perm 權限點。
 type Perm struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
@@ -639,7 +639,7 @@ func (x *ListAdminsReply) GetAdmins() []*Admin {
 	return nil
 }
 
-// Admin 员工（不含密码哈希等敏感字段）。
+// Admin 員工（不含密碼哈希等敏感字段）。
 type Admin struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -903,7 +903,7 @@ func (x *UpdateAdminRequest) GetRemark() string {
 type ToggleAdminRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Enabled       bool                   `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"` // 不标 REQUIRED:false=禁用是合法值(零值会被当未传拒绝,同 batch-status status 坑)
+	Enabled       bool                   `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"` // 不標 REQUIRED:false=禁用是合法值(零值會被當未傳拒絕,同 batch-status status 坑)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

@@ -6,8 +6,8 @@ const emit = defineEmits<{ (e: "update:modelValue", value: string): void }>();
 const Editor = defineAsyncComponent({
   loader: () => import("./rich-editor-impl.vue"),
   delay: 150,
-  loadingComponent: { render: () => h("div", { role: "status", class: "p-16px text-gray-500" }, "编辑器加载中…") },
-  errorComponent: { render: () => h("div", { role: "alert", class: "p-16px text-red-500" }, "编辑器加载失败，请刷新页面后重试") },
+  loadingComponent: { render: () => h("div", { role: "status", class: "p-16px text-gray-500" }, "編輯器加載中…") },
+  errorComponent: { render: () => h("div", { role: "alert", class: "p-16px text-red-500" }, "編輯器加載失敗，請刷新頁面後重試") },
 });
 </script>
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 首页横幅管理（storefront 首页消费）：表格 + 新增弹窗（原内容管理横幅区独立成页）。
+// 首頁橫幅管理（storefront 首頁消費）：表格 + 新增彈窗（原內容管理橫幅區獨立成頁）。
 import { computed, h, onMounted, ref, watch } from "vue";
 import { NButton, NDataTable, NInput, NModal, NForm, NFormItem, NInputNumber, NPopconfirm, NSelect, NSwitch, NTag } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
@@ -18,7 +18,7 @@ const showBanner = ref(false);
 const bannerSaving = ref(false);
 const bannerForm = ref({ name: "", position: "top", title_json: "", image: [] as string[], link_type: "url", link_value: "", is_active: true, sort: 0 });
 
-// 生效状态快捷筛选（客户端过滤，带实时计数）
+// 生效狀態快捷篩選（客户端過濾，帶實時計數）
 const bannerFilter = ref<"" | "on" | "off">("");
 const bannerTabs = [
   { label: "全部", value: "", type: "default" as const },
@@ -34,19 +34,19 @@ const filteredBanners = computed(() =>
   bannerFilter.value === "" ? banners.value : banners.value.filter((b) => (bannerFilter.value === "on" ? b.is_active : !b.is_active)),
 );
 
-// 跳转类型：post=文章详情、notice=点击打开公告弹窗（无需跳转目标）
+// 跳轉類型：post=文章詳情、notice=點擊打開公告彈窗（無需跳轉目標）
 const linkTypeOptions = [
   { label: "文章（/posts/:slug）", value: "post" },
-  { label: "公告弹窗（点击弹出全局公告）", value: "notice" },
-  { label: "外部链接", value: "url" },
+  { label: "公告彈窗（點擊彈出全局公告）", value: "notice" },
+  { label: "外部鏈接", value: "url" },
   { label: "商品", value: "product" },
-  { label: "分类", value: "category" },
+  { label: "分類", value: "category" },
 ];
 const postSlugOptions = ref<{ label: string; value: string }[]>([]);
 watch(
   () => bannerForm.value.link_type,
   (t) => {
-    // 切换类型时清掉旧值，避免把商品 ID 当 slug 用
+    // 切換類型時清掉舊值，避免把商品 ID 當 slug 用
     if (t !== "url" && t !== "product" && t !== "category" && t !== "post") bannerForm.value.link_value = "";
   },
 );
@@ -63,10 +63,10 @@ function zhValue(json: string): string {
 
 const bannerColumns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 50 },
-  { title: "名称", key: "name", width: 120, ellipsis: { tooltip: true } },
-  { title: "位置", key: "position", width: 120, render: (row) => ({ top: "顶部", middle: "商品列表中部", bottom: "商品列表下方" }[row.position as string] || row.position) },
+  { title: "名稱", key: "name", width: 120, ellipsis: { tooltip: true } },
+  { title: "位置", key: "position", width: 120, render: (row) => ({ top: "頂部", middle: "商品列表中部", bottom: "商品列表下方" }[row.position as string] || row.position) },
   {
-    title: "图片",
+    title: "圖片",
     key: "image",
     width: 200,
     render: (row) =>
@@ -88,8 +88,8 @@ const bannerColumns: DataTableColumns<any> = [
           )
         : "-",
   },
-  { title: "跳转", key: "link_value", width: 150, ellipsis: true, render: (row) => {
-    const label = ({ url: "外链", product: "商品", category: "分类", post: "文章", notice: "公告弹窗", ad: "广告" } as Record<string, string>)[row.link_type] || row.link_type;
+  { title: "跳轉", key: "link_value", width: 150, ellipsis: true, render: (row) => {
+    const label = ({ url: "外鏈", product: "商品", category: "分類", post: "文章", notice: "公告彈窗", ad: "廣告" } as Record<string, string>)[row.link_type] || row.link_type;
     return h("span", { class: "flex items-center gap-4px" }, [
       h(NTag, { size: "tiny", bordered: false, type: row.link_type === "notice" ? "warning" : "info" }, { default: () => label }),
       h("span", { class: "truncate" }, row.link_value || (row.link_type === "notice" ? "—" : "-")),
@@ -97,7 +97,7 @@ const bannerColumns: DataTableColumns<any> = [
   } },
   { title: "排序", key: "sort", width: 56 },
   {
-    title: "状态",
+    title: "狀態",
     key: "is_active",
     width: 70,
     render: (row) => h(NTag, { size: "small", type: row.is_active ? "success" : "default" }, { default: () => (row.is_active ? "生效" : "停用") }),
@@ -109,8 +109,8 @@ const bannerColumns: DataTableColumns<any> = [
     render: (row) =>
       canWrite()
         ? h("div", { class: "flex gap-4px" }, [
-            h(NButton, { size: "tiny", quaternary: true, onClick: () => openEditBanner(row) }, { default: () => "编辑" }),
-            h(NPopconfirm, { onPositiveClick: () => handleDeleteBanner(row.id) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "删除" }), default: () => "确定删除该横幅？" }),
+            h(NButton, { size: "tiny", quaternary: true, onClick: () => openEditBanner(row) }, { default: () => "編輯" }),
+            h(NPopconfirm, { onPositiveClick: () => handleDeleteBanner(row.id) }, { trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "刪除" }), default: () => "確定刪除該橫幅？" }),
           ])
         : null,
   },
@@ -126,7 +126,7 @@ async function loadBanners() {
   }
 }
 
-// 跳转类型=文章时需要 slug 下拉（横幅与文章松耦合：仅打开弹窗时拉一次）
+// 跳轉類型=文章時需要 slug 下拉（橫幅與文章松耦合：僅打開彈窗時拉一次）
 async function loadPostSlugOptions() {
   const { data, error } = await fetchPosts();
   if (!error && data) {
@@ -146,7 +146,7 @@ function openCreateBanner() {
   showBanner.value = true;
 }
 
-/** 编辑：回填现有值（图片 URL 回填进 MediaField 单值数组；多语言 title 原文回填） */
+/** 編輯：回填現有值（圖片 URL 回填進 MediaField 單值數組；多語言 title 原文回填） */
 function openEditBanner(row: any) {
   editingBannerId.value = row.id;
   bannerForm.value = {
@@ -173,7 +173,7 @@ async function handleBanner() {
       ? await updateBanner(editingBannerId.value, payload)
       : await createBanner(payload);
     if (!error) {
-      window.$message?.success(editingBannerId.value ? "横幅已更新，刷新首页即可查看" : "横幅已创建，刷新首页即可查看");
+      window.$message?.success(editingBannerId.value ? "橫幅已更新，刷新首頁即可查看" : "橫幅已創建，刷新首頁即可查看");
       showBanner.value = false;
       loadBanners();
     }
@@ -185,7 +185,7 @@ async function handleBanner() {
 async function handleDeleteBanner(id: number) {
   const { error } = await deleteBanner(id);
   if (!error) {
-    window.$message?.success("已删除");
+    window.$message?.success("已刪除");
     loadBanners();
   }
 }
@@ -197,38 +197,38 @@ onMounted(loadBanners);
   <div class="flex flex-col gap-12px">
     <div class="flex items-center justify-between gap-12px">
       <FilterTabs v-model:value="bannerFilter" :options="bannerTabs" :counts="bannerCounts" size="small" />
-      <NButton v-if="canWrite()" size="small" type="primary" @click="openCreateBanner">新增横幅</NButton>
+      <NButton v-if="canWrite()" size="small" type="primary" @click="openCreateBanner">新增橫幅</NButton>
     </div>
     <NDataTable :columns="bannerColumns" :data="filteredBanners" :loading="bannerLoading" size="small" :max-height="560" />
 
-    <NModal v-model:show="showBanner" preset="dialog" :title="editingBannerId ? '编辑横幅' : '新增横幅'" style="width: 520px">
+    <NModal v-model:show="showBanner" preset="dialog" :title="editingBannerId ? '編輯橫幅' : '新增橫幅'" style="width: 520px">
       <NForm :model="bannerForm" label-placement="left" label-width="72">
-        <NFormItem label="名称" required>
+        <NFormItem label="名稱" required>
           <NInput v-model:value="bannerForm.name" />
         </NFormItem>
         <NFormItem label="位置">
-          <NSelect v-model:value="bannerForm.position" :options="[{ label: '顶部', value: 'top' }, { label: '中部（商品列表内）', value: 'middle' }, { label: '底部（商品列表下方）', value: 'bottom' }]" />
+          <NSelect v-model:value="bannerForm.position" :options="[{ label: '頂部', value: 'top' }, { label: '中部（商品列表內）', value: 'middle' }, { label: '底部（商品列表下方）', value: 'bottom' }]" />
         </NFormItem>
         <p v-if="bannerForm.position === 'middle'" style="margin: -4px 0 16px 72px; line-height: 1.6; color: var(--text-color-2)">
-          显示在当前页商品中段，网格视图会对齐完整商品行。多个横幅在电脑端并排、手机端横滑；仅一行商品时显示在该行之后，无商品时隐藏。建议使用宽幅图片。
+          顯示在當前頁商品中段，網格視圖會對齊完整商品行。多個橫幅在電腦端並排、手機端橫滑；僅一行商品時顯示在該行之後，無商品時隱藏。建議使用寬幅圖片。
         </p>
-        <NFormItem label="图片" required>
-          <MediaField v-model:value="bannerForm.image" :tip="bannerForm.position === 'top' ? '推荐宽 1200 px × 高 400 px（3:1）；默认主题会随屏幕裁切，文字和主体请居中，多张图片建议尺寸一致。' : '从素材库选择或上传横幅图片'" />
+        <NFormItem label="圖片" required>
+          <MediaField v-model:value="bannerForm.image" :tip="bannerForm.position === 'top' ? '推薦寬 1200 px × 高 400 px（3:1）；默認主題會隨屏幕裁切，文字和主體請居中，多張圖片建議尺寸一致。' : '從素材庫選擇或上傳橫幅圖片'" />
         </NFormItem>
-        <NFormItem label="跳转类型">
+        <NFormItem label="跳轉類型">
           <NSelect v-model:value="bannerForm.link_type" :options="linkTypeOptions" />
         </NFormItem>
-        <NFormItem v-if="bannerForm.link_type === 'post'" label="跳转文章">
+        <NFormItem v-if="bannerForm.link_type === 'post'" label="跳轉文章">
           <NSelect
             v-model:value="bannerForm.link_value"
             :options="postSlugOptions"
             filterable
-            placeholder="选择点击横幅后打开的文章"
+            placeholder="選擇點擊橫幅後打開的文章"
             @focus="!postSlugOptions.length && loadPostSlugOptions()"
           />
         </NFormItem>
-        <NFormItem v-else-if="bannerForm.link_type !== 'notice'" label="跳转目标">
-          <NInput v-model:value="bannerForm.link_value" placeholder="URL 或商品/分类 ID" />
+        <NFormItem v-else-if="bannerForm.link_type !== 'notice'" label="跳轉目標">
+          <NInput v-model:value="bannerForm.link_value" placeholder="URL 或商品/分類 ID" />
         </NFormItem>
         <NFormItem label="排序">
           <NInputNumber v-model:value="bannerForm.sort" class="w-full" />
@@ -239,14 +239,14 @@ onMounted(loadBanners);
       </NForm>
       <template #action>
         <NButton @click="showBanner = false">取消</NButton>
-        <NButton type="primary" :loading="bannerSaving" @click="handleBanner">{{ editingBannerId ? "保存" : "创建" }}</NButton>
+        <NButton type="primary" :loading="bannerSaving" @click="handleBanner">{{ editingBannerId ? "保存" : "創建" }}</NButton>
       </template>
     </NModal>
   </div>
 </template>
 
 <style scoped>
-/* 横幅图片悬停预览（原生 :hover 命中测试，无 JS 依赖） */
+/* 橫幅圖片懸停預覽（原生 :hover 命中測試，無 JS 依賴） */
 :deep(.img-preview-trigger:hover .img-preview-pop) {
   display: block !important;
 }

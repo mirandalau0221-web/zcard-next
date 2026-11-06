@@ -2,34 +2,34 @@
   <div>
     <MemberTabs active="tickets" />
     <div class="card" style="margin-bottom: 16px;">
-      <h2 style="margin-bottom: 12px;">{{ $t('新建工单') }}</h2>
+      <h2 style="margin-bottom: 12px;">{{ $t('新建工單') }}</h2>
       <div class="field">
-        <label>{{ $t('类型') }}</label>
+        <label>{{ $t('類型') }}</label>
         <select v-model="newType">
-          <option value="presale">{{ $t('售前咨询') }}</option>
-          <option value="aftersale">{{ $t('售后问题') }}</option>
+          <option value="presale">{{ $t('售前諮詢') }}</option>
+          <option value="aftersale">{{ $t('售後問題') }}</option>
         </select>
       </div>
       <div class="field">
-        <label>{{ $t('问题描述 *') }}</label>
-        <textarea class="input" v-model="newContent" rows="3" :placeholder="$t('请描述您遇到的问题（订单号、发生时间、期望结果）')"></textarea>
+        <label>{{ $t('問題描述 *') }}</label>
+        <textarea class="input" v-model="newContent" rows="3" :placeholder="$t('請描述您遇到的問題（訂單號、發生時間、期望結果）')"></textarea>
       </div>
       <div class="field">
-        <label>{{ $t('联系方式（游客必填）') }}</label>
-        <input class="input" v-model="newContact" type="text" :placeholder="$t('邮箱或 QQ（登录用户可留空）')" />
+        <label>{{ $t('聯繫方式（遊客必填）') }}</label>
+        <input class="input" v-model="newContact" type="text" :placeholder="$t('郵箱或 QQ（登錄用户可留空）')" />
       </div>
       <div v-if="newError" class="error" style="margin-bottom: 8px;">{{ uiText(newError) }}</div>
-      <button class="btn" :disabled="creating" @click="doCreate">{{ creating ? $t('提交中…') : $t('提交工单') }}</button>
+      <button class="btn" :disabled="creating" @click="doCreate">{{ creating ? $t('提交中…') : $t('提交工單') }}</button>
     </div>
 
     <div class="card">
-      <h2 style="margin-bottom: 12px;">{{ $t('我的工单') }}</h2>
+      <h2 style="margin-bottom: 12px;">{{ $t('我的工單') }}</h2>
       <table class="list table-desktop">
-        <thead><tr><th>{{ $t('工单号') }}</th><th>{{ $t('类型') }}</th><th>{{ $t('优先级') }}</th><th>{{ $t('状态') }}</th><th>{{ $t('创建时间') }}</th><th></th></tr></thead>
+        <thead><tr><th>{{ $t('工單號') }}</th><th>{{ $t('類型') }}</th><th>{{ $t('優先級') }}</th><th>{{ $t('狀態') }}</th><th>{{ $t('創建時間') }}</th><th></th></tr></thead>
         <tbody>
           <tr v-for="t in tickets" :key="t.id">
             <td>{{ t.ticket_no }}</td>
-            <td>{{ t.type === 'presale' ? $t('售前') : $t('售后') }}</td>
+            <td>{{ t.type === 'presale' ? $t('售前') : $t('售後') }}</td>
             <td>
               <span :class="t.priority === 'urgent_paid' ? 'badge red' : t.priority === 'high' ? 'badge orange' : 'badge gray'">
                 {{ priorityText(t.priority) }}
@@ -39,10 +39,10 @@
             <td class="muted">{{ fmtTime(t.created_at) }}</td>
             <td><router-link class="btn secondary" :to="`/tickets/${t.ticket_no}`">{{ $t('查看') }}</router-link></td>
           </tr>
-          <tr v-if="!tickets.length"><td colspan="6" class="muted" style="text-align: center;">{{ $t('暂无工单') }}</td></tr>
+          <tr v-if="!tickets.length"><td colspan="6" class="muted" style="text-align: center;">{{ $t('暫無工單') }}</td></tr>
         </tbody>
       </table>
-      <!-- 移动端工单卡片 -->
+      <!-- 移動端工單卡片 -->
       <div class="table-cards">
         <div v-for="t in tickets" :key="t.id" class="mcard">
           <div class="mcard-row">
@@ -51,19 +51,19 @@
           </div>
           <div class="mcard-row">
             <span class="muted">
-              {{ t.type === 'presale' ? $t('售前') : $t('售后') }} ·
+              {{ t.type === 'presale' ? $t('售前') : $t('售後') }} ·
               <span :class="t.priority === 'urgent_paid' ? 'badge red' : t.priority === 'high' ? 'badge orange' : 'badge gray'">{{ priorityText(t.priority) }}</span>
               · {{ fmtTime(t.created_at) }}
             </span>
             <router-link class="btn secondary" :to="`/tickets/${t.ticket_no}`">{{ $t('查看') }}</router-link>
           </div>
         </div>
-        <div v-if="!tickets.length" class="muted" style="text-align: center; padding: 16px 0;">{{ $t('暂无工单') }}</div>
+        <div v-if="!tickets.length" class="muted" style="text-align: center; padding: 16px 0;">{{ $t('暫無工單') }}</div>
       </div>
       <div class="actions" style="margin-top: 12px;" v-if="total > pageSize">
-        <button class="btn secondary" :disabled="page <= 1" @click="load(page - 1)">{{ $t('上一页') }}</button>
+        <button class="btn secondary" :disabled="page <= 1" @click="load(page - 1)">{{ $t('上一頁') }}</button>
         <span class="muted">{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-        <button class="btn secondary" :disabled="page >= Math.ceil(total / pageSize)" @click="load(page + 1)">{{ $t('下一页') }}</button>
+        <button class="btn secondary" :disabled="page >= Math.ceil(total / pageSize)" @click="load(page + 1)">{{ $t('下一頁') }}</button>
       </div>
     </div>
   </div>
@@ -101,11 +101,11 @@ async function load(p: number) {
 
 async function doCreate() {
   if (!newContent.value.trim()) {
-    newError.value = $t("请描述问题");
+    newError.value = $t("請描述問題");
     return;
   }
   if (!authState.loggedIn && !newContact.value.trim()) {
-    newError.value = $t("游客请填写联系方式（邮箱或 QQ）");
+    newError.value = $t("遊客請填寫聯繫方式（郵箱或 QQ）");
     return;
   }
   creating.value = true;
@@ -117,7 +117,7 @@ async function doCreate() {
   });
   creating.value = false;
   if (error || !data) {
-    newError.value = error || $t("提交失败");
+    newError.value = error || $t("提交失敗");
     return;
   }
   newContent.value = '';
@@ -128,7 +128,7 @@ function priorityText(p: string): string {
   return ({ get low() { return $t("低"); }, get normal() { return $t("普通"); }, get high() { return $t("高"); }, get urgent_paid() { return $t("加急"); } } as Record<string, string>)[p] || p;
 }
 function statusText(s: string): string {
-  return ({ get open() { return $t("待处理"); }, get processing() { return $t("处理中"); }, get resolved() { return $t("已解决"); }, get closed() { return $t("已关闭"); } } as Record<string, string>)[s] || s;
+  return ({ get open() { return $t("待處理"); }, get processing() { return $t("處理中"); }, get resolved() { return $t("已解決"); }, get closed() { return $t("已關閉"); } } as Record<string, string>)[s] || s;
 }
 function ticketBadge(s: string): string {
   return ({ open: 'badge orange', processing: 'badge blue', resolved: 'badge green', closed: 'badge gray' } as Record<string, string>)[s] || 'badge gray';
@@ -139,7 +139,7 @@ function fmtTime(ts: number): string {
 </script>
 
 <style scoped>
-/* ── 移动端表格→卡片（桌面表格不受影响）── */
+/* ── 移動端表格→卡片（桌面表格不受影響）── */
 .table-cards { display: none; }
 .mcard {
   border: 1px solid #f3f4f6; border-radius: 10px; padding: 12px;

@@ -1,6 +1,6 @@
 package schema
 
-// 所有权：mods/catalog（M1；M0 先落表结构支撑 storefront 列表链路）
+// 所有權：mods/catalog（M1；M0 先落表結構支撐 storefront 列表鏈路）
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"fmt"
 )
 
-// Product 商品主表（《数据库架构设计.md》§4.1，字段精确对齐）。
+// Product 商品主表（《數據庫架構設計.md》§4.1，字段精確對齊）。
 type Product struct {
 	ent.Schema
 }
@@ -25,47 +25,47 @@ func (Product) Fields() []ent.Field {
 		field.String("delivery_kind").Default("card"),
 		field.JSON("sms_product", map[string]string{}).Optional(),
 		field.JSON("social_schema", map[string]any{}).Optional(),
-		field.Uint64("category_id").Optional().Comment("分类（软外键，仅索引）"),
+		field.Uint64("category_id").Optional().Comment("分類（軟外鍵，僅索引）"),
 		field.Bool("category_protected").Default(false),
 		field.String("name").MaxLen(1024),
 		field.String("goods_type").Default("virtual"),
 		field.String("product_property").Default("").MaxLen(16).Validate(func(v string) error {
 			if v != "" && v != "virtual" && v != "physical" {
-				return fmt.Errorf("商品属性无效")
+				return fmt.Errorf("商品屬性無效")
 			}
 			return nil
-		}).Comment("商品属性；goods_type 为旧客户端兼容镜像"),
-		field.Bool("track_inventory").Default(true).Comment("实体商品是否管理数量库存；规格继承"),
-		field.Bool("sales_visible").Default(true).Comment("是否向买家显示已售数量"),
+		}).Comment("商品屬性；goods_type 為舊客户端兼容鏡像"),
+		field.Bool("track_inventory").Default(true).Comment("實體商品是否管理數量庫存；規格繼承"),
+		field.Bool("sales_visible").Default(true).Comment("是否向買家顯示已售數量"),
 		field.String("shipping_mode").Default("free"),
 		field.Int64("shipping_fee").Default(0),
 		field.JSON("shipping_countries", []string{}).Optional(),
 		field.Int64("physical_stock").Default(0),
-		field.String("slug").MaxLen(150).Comment("唯一标识"),
-		field.Text("description").Optional().Comment("详情（服务端 sanitize 后存储）"),
+		field.String("slug").MaxLen(150).Comment("唯一標識"),
+		field.Text("description").Optional().Comment("詳情（服務端 sanitize 後存儲）"),
 		field.String("cover").MaxLen(255).Optional(),
-		field.JSON("images", []string{}).Optional().Comment("详情图集"),
+		field.JSON("images", []string{}).Optional().Comment("詳情圖集"),
 		field.Bool("cover_protected").Default(false),
 		field.Bool("description_protected").Default(false),
-		// 金额一律 int64 分（铁律 1）
-		field.Int64("price").Default(0).Comment("售价（分）"),
-		field.Int64("factory_price").Default(0).Comment("成本价（分，上游/自营成本快照）"),
-		field.Int64("draft_premium").Default(0).Comment("预选卡密默认加价（分）"),
-		field.JSON("member_price", map[string]int64{}).Optional().Comment("按会员等级价 {level_id: 分}"),
-		field.Int64("points_required").Default(0).Comment("积分兑换价（分单位积分；0=不参与积分商城，P3-01）"),
-		field.Enum("stock_type").Values("card", "url", "code").Default("card").Comment("卡密/链接/兑换码"),
-		field.Bytes("direct_content").Optional().Comment("直发内容密文（url/code 商品：网盘链接/兑换码，AES-GCM AAD=product/subsite；同一内容发给每个买家"),
-		field.Bool("stock_visible").Default(true).Comment("是否显示库存"),
+		// 金額一律 int64 分（鐵律 1）
+		field.Int64("price").Default(0).Comment("售價（分）"),
+		field.Int64("factory_price").Default(0).Comment("成本價（分，上游/自營成本快照）"),
+		field.Int64("draft_premium").Default(0).Comment("預選卡密默認加價（分）"),
+		field.JSON("member_price", map[string]int64{}).Optional().Comment("按會員等級價 {level_id: 分}"),
+		field.Int64("points_required").Default(0).Comment("積分兑換價（分單位積分；0=不參與積分商城，P3-01）"),
+		field.Enum("stock_type").Values("card", "url", "code").Default("card").Comment("卡密/鏈接/兑換碼"),
+		field.Bytes("direct_content").Optional().Comment("直髮內容密文（url/code 商品：網盤鏈接/兑換碼，AES-GCM AAD=product/subsite；同一內容發給每個買家"),
+		field.Bool("stock_visible").Default(true).Comment("是否顯示庫存"),
 		field.String("fulfillment_mode").Default("auto"),
-		field.Int64("manual_stock").Default(-1).Comment("人工共享总额度（含已售及预占），-1不限"),
-		field.Enum("delivery_mode").Values("status", "delete").Default("status").Comment("发货模式：标记/即删"),
-		field.JSON("control_config", map[string]any{}).Optional().Comment("自定义控件配置（结构化控件走 product_controls 表，M1）"),
-		field.Bool("dedup").Default(true).Comment("导入去重开关"),
+		field.Int64("manual_stock").Default(-1).Comment("人工共享總額度（含已售及預佔），-1不限"),
+		field.Enum("delivery_mode").Values("status", "delete").Default("status").Comment("發貨模式：標記/即刪"),
+		field.JSON("control_config", map[string]any{}).Optional().Comment("自定義控件配置（結構化控件走 product_controls 表，M1）"),
+		field.Bool("dedup").Default(true).Comment("導入去重開關"),
 		field.Int32("sort").Default(0),
-		field.Bool("is_recommend").Default(false).Comment("运营推荐（storefront 首页推荐位 recommend_only 过滤；admin 商品表单可标）"),
-		field.Int8("status").Default(1).Comment("1=上架 0=下架 2=隐藏（游客不可见会员可见）"),
-		field.Uint64("upstream_source_id").Optional().Comment("货源连接（NULL=自营；M2）"),
-		field.String("upstream_product_code").MaxLen(128).Optional().Comment("上游商品标识（M2）"),
+		field.Bool("is_recommend").Default(false).Comment("運營推薦（storefront 首頁推薦位 recommend_only 過濾；admin 商品表單可標）"),
+		field.Int8("status").Default(1).Comment("1=上架 0=下架 2=隱藏（遊客不可見會員可見）"),
+		field.Uint64("upstream_source_id").Optional().Comment("貨源連接（NULL=自營；M2）"),
+		field.String("upstream_product_code").MaxLen(128).Optional().Comment("上游商品標識（M2）"),
 		field.Time("upstream_synced_at").SchemaType(mysqlTime).Optional(),
 		field.Bool("auto_listing").Default(false),
 		field.String("listing_reason").Default("").MaxLen(40),
@@ -92,7 +92,7 @@ func (Product) Hooks() []ent.Hook {
 			p, _ := property.(string)
 			g, _ := legacy.(string)
 			if p != "" && g != "" && p != g && !m.Op().Is(ent.OpCreate) {
-				return nil, fmt.Errorf("商品属性与旧类型不一致")
+				return nil, fmt.Errorf("商品屬性與舊類型不一致")
 			}
 			if p != "" {
 				if err := m.SetField("goods_type", p); err != nil {
@@ -118,19 +118,19 @@ func (Product) Indexes() []ent.Index {
 		index.Fields("subsite_id", "category_id"),
 		index.Fields("subsite_id", "status"),
 		index.Fields("upstream_source_id"),
-		// 货源同步幂等判据（UpsertUpstreamProduct 唯一索引兜底，防并发重复）
+		// 貨源同步冪等判據（UpsertUpstreamProduct 唯一索引兜底，防併發重複）
 		index.Fields("subsite_id", "upstream_source_id", "upstream_product_code").Unique(),
 	}
 }
 
 func (Product) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("skus", ProductSku.Type).Comment("多规格"),
-		edge.To("cards", Card.Type).Comment("库存卡密（硬 FK）"),
+		edge.To("skus", ProductSku.Type).Comment("多規格"),
+		edge.To("cards", Card.Type).Comment("庫存卡密（硬 FK）"),
 	}
 }
 
-// ProductSku 多规格（《数据库架构设计.md》§4.1）。
+// ProductSku 多規格（《數據庫架構設計.md》§4.1）。
 type ProductSku struct {
 	ent.Schema
 }
@@ -140,15 +140,15 @@ func (ProductSku) Mixin() []ent.Mixin { return []ent.Mixin{TimeMixin{}, TenantMi
 func (ProductSku) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.Uint64("product_id").Comment("所属商品（硬外键 → products）"),
+		field.Uint64("product_id").Comment("所屬商品（硬外鍵 → products）"),
 		field.Int64("physical_stock").Default(0),
-		field.String("name").MaxLen(100).Comment("规格名（如「月卡」）"),
-		field.JSON("spec_values", map[string]string{}).Comment("规格值组合 {规格: 值}"),
-		field.Int64("price").Optional().Comment("独立售价（分，NULL=继承商品价）"),
-		field.Int64("cost").Optional().Comment("独立成本（分）"),
+		field.String("name").MaxLen(100).Comment("規格名（如「月卡」）"),
+		field.JSON("spec_values", map[string]string{}).Comment("規格值組合 {規格: 值}"),
+		field.Int64("price").Optional().Comment("獨立售價（分，NULL=繼承商品價）"),
+		field.Int64("cost").Optional().Comment("獨立成本（分）"),
 		field.String("fulfillment_mode").Default("follow"),
-		field.Int32("stock_offset").Default(0).Comment("独立库存位"),
-		field.String("upstream_sku_id").MaxLen(64).Optional().Comment("上游 SKU 标识（M2）"),
+		field.Int32("stock_offset").Default(0).Comment("獨立庫存位"),
+		field.String("upstream_sku_id").MaxLen(64).Optional().Comment("上游 SKU 標識（M2）"),
 	}
 }
 
@@ -161,7 +161,7 @@ func (ProductSku) Indexes() []ent.Index {
 
 func (ProductSku) Edges() []ent.Edge {
 	return []ent.Edge{
-		// 硬外键 → products（核心聚合内）
+		// 硬外鍵 → products（核心聚合內）
 		edge.From("product", Product.Type).
 			Ref("skus").
 			Field("product_id").

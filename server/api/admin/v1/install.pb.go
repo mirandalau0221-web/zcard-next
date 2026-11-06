@@ -25,13 +25,13 @@ const (
 
 type InstallStatusReply struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	Installed       bool                   `protobuf:"varint,1,opt,name=installed,proto3" json:"installed,omitempty"`                                    // 是否已安装
+	Installed       bool                   `protobuf:"varint,1,opt,name=installed,proto3" json:"installed,omitempty"`                                    // 是否已安裝
 	Dialect         string                 `protobuf:"bytes,2,opt,name=dialect,proto3" json:"dialect,omitempty"`                                         // sqlite | mysql | postgres
-	Version         string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`                                         // 构建版本
-	DatabaseOk      bool                   `protobuf:"varint,4,opt,name=database_ok,json=databaseOk,proto3" json:"database_ok,omitempty"`                // 数据库连通
-	MigrationsOk    bool                   `protobuf:"varint,5,opt,name=migrations_ok,json=migrationsOk,proto3" json:"migrations_ok,omitempty"`          // 迁移已应用
-	InstalledAt     string                 `protobuf:"bytes,6,opt,name=installed_at,json=installedAt,proto3" json:"installed_at,omitempty"`              // 安装时间（RFC3339；未安装为空）
-	RestartRequired bool                   `protobuf:"varint,7,opt,name=restart_required,json=restartRequired,proto3" json:"restart_required,omitempty"` // 已提交库切换，服务即将自重启（前端轮询至 installed）
+	Version         string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`                                         // 構建版本
+	DatabaseOk      bool                   `protobuf:"varint,4,opt,name=database_ok,json=databaseOk,proto3" json:"database_ok,omitempty"`                // 數據庫連通
+	MigrationsOk    bool                   `protobuf:"varint,5,opt,name=migrations_ok,json=migrationsOk,proto3" json:"migrations_ok,omitempty"`          // 遷移已應用
+	InstalledAt     string                 `protobuf:"bytes,6,opt,name=installed_at,json=installedAt,proto3" json:"installed_at,omitempty"`              // 安裝時間（RFC3339；未安裝為空）
+	RestartRequired bool                   `protobuf:"varint,7,opt,name=restart_required,json=restartRequired,proto3" json:"restart_required,omitempty"` // 已提交庫切換，服務即將自重啓（前端輪詢至 installed）
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -117,7 +117,7 @@ func (x *InstallStatusReply) GetRestartRequired() bool {
 
 type TestInstallConnectionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Dialect       string                 `protobuf:"bytes,1,opt,name=dialect,proto3" json:"dialect,omitempty"` // mysql | postgres（sqlite 无需测试）
+	Dialect       string                 `protobuf:"bytes,1,opt,name=dialect,proto3" json:"dialect,omitempty"` // mysql | postgres（sqlite 無需測試）
 	DbHost        string                 `protobuf:"bytes,2,opt,name=db_host,json=dbHost,proto3" json:"db_host,omitempty"`
 	DbPort        int32                  `protobuf:"varint,3,opt,name=db_port,json=dbPort,proto3" json:"db_port,omitempty"`
 	DbUser        string                 `protobuf:"bytes,4,opt,name=db_user,json=dbUser,proto3" json:"db_user,omitempty"`
@@ -218,7 +218,7 @@ func (x *TestInstallConnectionRequest) GetRedisPassword() string {
 type TestInstallConnectionReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` // 失败原因（连接/权限/库创建）
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` // 失敗原因（連接/權限/庫創建）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -269,12 +269,12 @@ func (x *TestInstallConnectionReply) GetMessage() string {
 
 type PerformInstallRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AdminUsername string                 `protobuf:"bytes,1,opt,name=admin_username,json=adminUsername,proto3" json:"admin_username,omitempty"` // 管理员用户名
-	AdminPassword string                 `protobuf:"bytes,2,opt,name=admin_password,json=adminPassword,proto3" json:"admin_password,omitempty"` // 管理员密码（≥8 位）
-	SiteName      string                 `protobuf:"bytes,3,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`                // 站点名称（默认 ZCard 商店）
-	SiteUrl       string                 `protobuf:"bytes,4,opt,name=site_url,json=siteUrl,proto3" json:"site_url,omitempty"`                   // 站点网址（可选）
-	// ── 数据库选择（在线安装库切换）──
-	Dialect       string `protobuf:"bytes,5,opt,name=dialect,proto3" json:"dialect,omitempty"` // sqlite（默认，当前库直装）| mysql | postgres
+	AdminUsername string                 `protobuf:"bytes,1,opt,name=admin_username,json=adminUsername,proto3" json:"admin_username,omitempty"` // 管理員用户名
+	AdminPassword string                 `protobuf:"bytes,2,opt,name=admin_password,json=adminPassword,proto3" json:"admin_password,omitempty"` // 管理員密碼（≥8 位）
+	SiteName      string                 `protobuf:"bytes,3,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`                // 站點名稱（默認 ZCard 商店）
+	SiteUrl       string                 `protobuf:"bytes,4,opt,name=site_url,json=siteUrl,proto3" json:"site_url,omitempty"`                   // 站點網址（可選）
+	// ── 數據庫選擇（在線安裝庫切換）──
+	Dialect       string `protobuf:"bytes,5,opt,name=dialect,proto3" json:"dialect,omitempty"` // sqlite（默認，當前庫直裝）| mysql | postgres
 	DbHost        string `protobuf:"bytes,6,opt,name=db_host,json=dbHost,proto3" json:"db_host,omitempty"`
 	DbPort        int32  `protobuf:"varint,7,opt,name=db_port,json=dbPort,proto3" json:"db_port,omitempty"`
 	DbUser        string `protobuf:"bytes,8,opt,name=db_user,json=dbUser,proto3" json:"db_user,omitempty"`

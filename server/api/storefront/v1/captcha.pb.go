@@ -25,10 +25,10 @@ const (
 
 type CaptchaImage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CaptchaId     string                 `protobuf:"bytes,1,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 验证码 ID（提交时回传）
-	ImageBase64   string                 `protobuf:"bytes,2,opt,name=image_base64,json=imageBase64,proto3" json:"image_base64,omitempty"` // 图片 data URL（<img src> 直用）
-	Length        uint32                 `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"`                             // 本次验证码位数（4–8）
-	Charset       string                 `protobuf:"bytes,4,opt,name=charset,proto3" json:"charset,omitempty"`                            // 本次字符类型：digit / letter / mixed（字母不区分大小写）
+	CaptchaId     string                 `protobuf:"bytes,1,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 驗證碼 ID（提交時回傳）
+	ImageBase64   string                 `protobuf:"bytes,2,opt,name=image_base64,json=imageBase64,proto3" json:"image_base64,omitempty"` // 圖片 data URL（<img src> 直用）
+	Length        uint32                 `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"`                             // 本次驗證碼位數（4–8）
+	Charset       string                 `protobuf:"bytes,4,opt,name=charset,proto3" json:"charset,omitempty"`                            // 本次字符類型：digit / letter / mixed（字母不區分大小寫）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

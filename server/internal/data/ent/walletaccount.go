@@ -19,13 +19,13 @@ type WalletAccount struct {
 	ID uint64 `json:"id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uint64 `json:"user_id,omitempty"`
-	// 基础货币
+	// 基礎貨幣
 	Currency string `json:"currency,omitempty"`
-	// 可用余额（分）
+	// 可用餘額（分）
 	Available int64 `json:"available,omitempty"`
-	// 冻结余额（分）：提现冻结/佣金冻结期
+	// 凍結餘額（分）：提現凍結/佣金凍結期
 	Locked int64 `json:"locked,omitempty"`
-	// 乐观锁（并发扣款/冻结，与行锁双保险）
+	// 樂觀鎖（併發扣款/凍結，與行鎖雙保險）
 	Version int32 `json:"version,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt    time.Time `json:"updated_at,omitempty"`

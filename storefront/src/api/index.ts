@@ -4,7 +4,7 @@ import { t as $t } from '@/i18n';
 import { loadPublicConfig } from '@/config';
 import { api } from './client';
 
-// ── 类型（字段名 snake_case，与 proto 一致）──
+// ── 類型（字段名 snake_case，與 proto 一致）──
 
 export interface ProductControl {
  placeholder?: string; validation?: string; max_length?: number;
@@ -64,7 +64,7 @@ export interface Product {
   controls: ProductControl[];
   reviews: ReviewItem[];
   skus: Sku[];
-  points_required?: number; // 积分商城视图（points_only 时 >0；）
+  points_required?: number; // 積分商城視圖（points_only 時 >0；）
 }
 
 export interface PageResp {
@@ -75,7 +75,7 @@ export interface PageResp {
 
 export interface ListProductsReply {
   items: Product[];
-  total: number;   // 平铺（与后端 proto 一致）
+  total: number;   // 平鋪（與後端 proto 一致）
   page: number;
   page_size: number;
 }
@@ -116,7 +116,7 @@ export interface BalanceReply {
   points: number;
 }
 
-// ── API 函数 ──
+// ── API 函數 ──
 
 export function listProducts(params?: {
   keyword?: string;
@@ -142,7 +142,7 @@ export interface CategoryItem {
   id: number;
   name: string;
   icon: string;
-  parent_id: number; // 0=根；多级分类树形
+  parent_id: number; // 0=根；多級分類樹形
 }
 
 export function listCategories() {
@@ -161,9 +161,9 @@ export interface CreateOrderInput {
   contact?: string;
   coupon_code?: string;
   control_answers?: Record<string, string>;
-  use_points?: boolean; // 积分兑换（：全积分商品直落 paid）
-  ref_code?: string;    // 推广归因码（游客/无链用户下单实时归因）
-  captcha_id?: string;  // 图形验证码（captcha_order 开启时游客必填）
+  use_points?: boolean; // 積分兑換（：全積分商品直落 paid）
+  ref_code?: string;    // 推廣歸因碼（遊客/無鏈用户下單實時歸因）
+  captcha_id?: string;  // 圖形驗證碼（captcha_order 開啓時遊客必填）
   captcha_code?: string;
 }
 export async function createOrder(body:CreateOrderInput, key?:string) { const r = await api.post<CreateOrderReply>('/orders',body,key?{'Idempotency-Key':key}:undefined); if(r.data?.order_access_token) rememberOrderAccessToken(r.data.order_no,r.data.order_access_token); return r; }
@@ -211,7 +211,7 @@ export function getBalance() {
   return api.get<BalanceReply>('/wallet');
 }
 
-// ── 用户体系（：注册即登录 / 登录 / 我的信息）──
+// ── 用户體系（：註冊即登錄 / 登錄 / 我的信息）──
 
 export interface RegisterReply {
   user_id: number;
@@ -231,26 +231,26 @@ export interface MeReply {
   email: string;
   created_at: number;
   reseller_profile_id?: number;
-  promo_code?: string; // 推广码（懒生成）
+  promo_code?: string; // 推廣碼（懶生成）
 }
 
 export function register(body: { username: string; password: string; email?: string; phone?: string; code?: string; invite_code?: string; captcha_id?: string; captcha_code?: string }) {
   return api.post<RegisterReply & { promo_code?: string }>('/user/register', body);
 }
 
-/** 发送注册验证码（channel：email|phone——按 security.register_method） */
+/** 發送註冊驗證碼（channel：email|phone——按 security.register_method） */
 export function sendRegisterCode(target: string, channel: 'email' | 'phone', captcha?: { captcha_id: string; captcha_code: string }) {
   return api.post<null>('/user/register/send-code', { target, channel, ...captcha });
 }
 
-// ── 图形验证码（settings.security.captcha_* 场景开关）──
+// ── 圖形驗證碼（settings.security.captcha_* 場景開關）──
 
-/** 获取图形验证码及该图片的输入格式；一次性消费。 */
+/** 獲取圖形驗證碼及該圖片的輸入格式；一次性消費。 */
 export function fetchCaptcha() {
   return api.get<{ captcha_id: string; image_base64: string; length?: number; charset?: 'digit' | 'letter' | 'mixed' }>('/captcha/image');
 }
 
-/** 四场景开关（config 公开下发） */
+/** 四場景開關（config 公開下發） */
 export interface CaptchaConfig {
   login: boolean;
   register: boolean;
@@ -278,10 +278,10 @@ export async function fetchCaptchaConfig(): Promise<CaptchaConfig> {
   }
 }
 
-/** 注册设置（config 公开下发：security.register_enabled / register_method 多选数组） */
+/** 註冊設置（config 公開下發：security.register_enabled / register_method 多選數組） */
 export interface RegisterConfig {
   enabled: boolean;
-  methods: string[]; // username | email | phone（勾选通道全部可用）
+  methods: string[]; // username | email | phone（勾選通道全部可用）
 }
 export async function fetchRegisterConfig(): Promise<RegisterConfig> {
   try {
@@ -290,14 +290,14 @@ export async function fetchRegisterConfig(): Promise<RegisterConfig> {
     let enabled = true;
     let methods: string[] = [];
     const e = find('security.register_enabled');
-    if (e !== undefined) { try { enabled = JSON.parse(e) !== false; } catch { /* 默认 */ } }
+    if (e !== undefined) { try { enabled = JSON.parse(e) !== false; } catch { /* 默認 */ } }
     const m = find('security.register_method');
     if (m) {
       try {
         const v = JSON.parse(m);
         if (Array.isArray(v)) methods = v.filter((x: unknown): x is string => typeof x === 'string');
-        else if (typeof v === 'string' && v) methods = [v]; // 旧单值兼容
-      } catch { /* 默认 */ }
+        else if (typeof v === 'string' && v) methods = [v]; // 舊單值兼容
+      } catch { /* 默認 */ }
     }
     if (!methods.length) methods = ['username'];
     return { enabled, methods };
@@ -314,15 +314,15 @@ export function me() {
   return api.get<MeReply>('/user/me');
 }
 
-// ── 用户自服务（：找回/改密/改资料）──
+// ── 用户自服務（：找回/改密/改資料）──
 
 export function forgotPassword(email: string, captcha?: { captcha_id: string; captcha_code: string }) {
-  // 防枚举：后端对任何输入都成功（仅真实邮箱收码）
+  // 防枚舉：後端對任何輸入都成功（僅真實郵箱收碼）
   return api.post<null>('/user/password/forgot', { email, ...captcha });
 }
 
 export function resetPassword(body: { email: string; code: string; new_password: string }) {
-  return api.post<{ token: string; expires_at: number }>('/user/password/reset', body); // 重置即登录
+  return api.post<{ token: string; expires_at: number }>('/user/password/reset', body); // 重置即登錄
 }
 
 export function changePassword(body: { old_password: string; new_password: string }) {
@@ -333,7 +333,7 @@ export function updateProfile(body: { email: string }) {
   return api.post<MeReply>('/user/profile', body);
 }
 
-// ── 购物车（：CRUD；结算复用 createOrder 多商品一单）──
+// ── 購物車（：CRUD；結算複用 createOrder 多商品一單）──
 
 export interface CartItem {
   max_quantity?: number;
@@ -349,11 +349,11 @@ export interface CartItem {
   points_required: number;
   valid: boolean;
   added_at: number;
-  product_cover?: string; // 商品封面（无图时前端显示默认占位）
+  product_cover?: string; // 商品封面（無圖時前端顯示默認佔位）
 }
 
 export function addCart(product_id: number, quantity = 1, sku_id = 0) {
-  // silent：token 失效时游客可降级本地购物车（不触发跳登录）
+  // silent：token 失效時遊客可降級本地購物車（不觸發跳登錄）
   return api.postSilent<CartItem>('/cart/items', { product_id, quantity, sku_id });
 }
 
@@ -369,7 +369,7 @@ export function removeCart(id: number) {
   return api.deleteSilent(`/cart/items/${id}`);
 }
 
-// ── 我的订单（ 补全）──
+// ── 我的訂單（ 補全）──
 
 export interface MyOrderItem {
   shipping_status?: string;
@@ -391,7 +391,7 @@ export function cancelMyOrder(orderNo: string) {
   return api.post<null>(`/orders/${orderNo}/cancel`, {});
 }
 
-// ── 游客订单查询（下单联系方式 + 密码取货闭环）──
+// ── 遊客訂單查詢（下單聯繫方式 + 密碼取貨閉環）──
 
 export interface GuestOrderItem {
   order_no: string;
@@ -401,12 +401,12 @@ export interface GuestOrderItem {
   expires_at: number;
 }
 
-/** 游客按下单联系方式查订单列表（精简信息；卡密需逐单查询密码） */
+/** 遊客按下單聯繫方式查訂單列表（精簡信息；卡密需逐單查詢密碼） */
 export function listGuestOrders(contact: string) {
   return api.get<{ orders: GuestOrderItem[] }>('/guest-orders', { contact });
 }
 
-// ── 订单详情（GetOrder：登录态本人或查询密码）──
+// ── 訂單詳情（GetOrder：登錄態本人或查詢密碼）──
 
 export interface OrderItemReply {
  social_schema?:SocialSchema;
@@ -438,12 +438,12 @@ export function getOrder(orderNo: string, queryPassword?: string) {
   return api.getSilent<OrderDetail>(`/orders/${orderNo}`, queryPassword ? { query_password: queryPassword } : undefined, token ? { 'X-Order-Access-Token': token } : undefined);
 }
 
-// 支付页/取货页共用：订单号 → 下单时设置的查询密码（sessionStorage 会话级记忆，
-// 支付成功自动取货用；不落 localStorage 防持久化敏感信息）
+// 支付頁/取貨頁共用：訂單號 → 下單時設置的查詢密碼（sessionStorage 會話級記憶，
+// 支付成功自動取貨用；不落 localStorage 防持久化敏感信息）
 export function rememberOrderPassword(orderNo: string, password?: string) {
   try {
     if (password) sessionStorage.setItem(`zc_pwd_${orderNo}`, password);
-  } catch { /* 存储不可用忽略 */ }
+  } catch { /* 存儲不可用忽略 */ }
 }
 export function getOrderPassword(orderNo: string): string {
   try {
@@ -453,15 +453,15 @@ export function getOrderPassword(orderNo: string): string {
   }
 }
 
-// ── 交易设置（config 下发 trade.query_password / trade.contact_required）──
+// ── 交易設置（config 下發 trade.query_password / trade.contact_required）──
 
 export interface TradeConfig {
-  queryPasswordRequired: boolean; // 下单必须设置查询密码
+  queryPasswordRequired: boolean; // 下單必須設置查詢密碼
   contactRequired: string;        // none | phone | email | qq | any
   contactScope?: 'guest' | 'all';
 }
 
-/** 拉取交易设置（失败走保守默认：强制密码 + any） */
+/** 拉取交易設置（失敗走保守默認：強制密碼 + any） */
 export async function fetchTradeConfig(): Promise<TradeConfig> {
   try {
     const json = await loadPublicConfig(true);
@@ -470,26 +470,26 @@ export async function fetchTradeConfig(): Promise<TradeConfig> {
     let contactMode = 'any';
     const pwd = find('trade.query_password');
     if (pwd !== undefined) {
-      try { pwdRequired = JSON.parse(pwd) !== false; } catch { /* 默认 */ }
+      try { pwdRequired = JSON.parse(pwd) !== false; } catch { /* 默認 */ }
     }
     const contact = find('trade.contact_required');
     if (contact) {
-      try { const v = JSON.parse(contact); if (typeof v === 'string' && v) contactMode = v; } catch { /* 默认 */ }
+      try { const v = JSON.parse(contact); if (typeof v === 'string' && v) contactMode = v; } catch { /* 默認 */ }
     }
     let contactScope: 'guest' | 'all' = 'guest';
-    try { if (JSON.parse(find('trade.contact_scope') || '"guest"') === 'all') contactScope = 'all'; } catch { /* 兼容旧配置 */ }
+    try { if (JSON.parse(find('trade.contact_scope') || '"guest"') === 'all') contactScope = 'all'; } catch { /* 兼容舊配置 */ }
     return { queryPasswordRequired: pwdRequired, contactRequired: contactMode, contactScope };
   } catch {
     return { queryPasswordRequired: true, contactRequired: 'any' };
   }
 }
 
-/** 联系方式要求显示名 */
+/** 聯繫方式要求顯示名 */
 export function contactRequiredLabel(mode: string): string {
-  return ({ get phone() { return $t("手机号"); }, get email() { return $t("邮箱"); }, get qq() { return $t("QQ 号"); } } as Record<string, string>)[mode] || $t("邮箱 / 手机号 / QQ");
+  return ({ get phone() { return $t("手機號"); }, get email() { return $t("郵箱"); }, get qq() { return $t("QQ 號"); } } as Record<string, string>)[mode] || $t("郵箱 / 手機號 / QQ");
 }
 
-/** 联系方式格式校验（与后端 contactMatchesMode 同口径） */
+/** 聯繫方式格式校驗（與後端 contactMatchesMode 同口徑） */
 export function contactValid(contact: string, mode: string): boolean {
   const s = contact.trim();
   if (!s) return false;
@@ -504,7 +504,7 @@ export function contactValid(contact: string, mode: string): boolean {
   }
 }
 
-// ── 钱包：流水/充值/礼品卡/提现（ /）──
+// ── 錢包：流水/充值/禮品卡/提現（ /）──
 
 export interface WalletTransaction {
   display_reference?: string;
@@ -526,7 +526,7 @@ export interface CreateRechargeReply {
   quote?: PaymentQuote;
   recharge_id: number;
   payment_id: number;
-  type: string; // redirect | qrcode | params（同支付管线）
+  type: string; // redirect | qrcode | params（同支付管線）
   payload: string;
 }
 
@@ -545,7 +545,7 @@ export function createWithdrawal(body: { amount_cents: number; method_type: stri
   );
 }
 
-// ── 提现记录 + 收款码上传（佣金提现闭环）──
+// ── 提現記錄 + 收款碼上傳（佣金提現閉環）──
 
 export interface MyWithdrawalItem {
   withdrawal_id: number;
@@ -556,7 +556,7 @@ export interface MyWithdrawalItem {
   account: string;
   status: string; // pending | approved | paid | rejected
   reject_reason: string;
-  receipt: string; // 打款回执（流水号/备注）
+  receipt: string; // 打款回執（流水號/備註）
   reviewed_at: number;
   paid_at: number;
   created_at: number;
@@ -566,12 +566,12 @@ export function listMyWithdrawals(page = 1, pageSize = 10) {
   return api.get<{ withdrawals: MyWithdrawalItem[]; total: number }>('/wallet/withdrawals/mine', { page, page_size: pageSize });
 }
 
-/** 收款码上传（登录态；图片 base64 → /uploads URL） */
+/** 收款碼上傳（登錄態；圖片 base64 → /uploads URL） */
 export function uploadQrCode(dataBase64: string) {
   return api.post<{ url: string }>('/media/upload', { data_base64: dataBase64 });
 }
 
-/** 提现配置（config 公开下发：withdraw 组） */
+/** 提現配置（config 公開下發：withdraw 組） */
 export interface WithdrawConfig {
   enabled: boolean;
   minAmountCents: number;
@@ -601,7 +601,7 @@ export async function fetchWithdrawConfig(): Promise<WithdrawConfig> {
   }
 }
 
-// ── 等级与积分（）──
+// ── 等級與積分（）──
 
 export interface LevelBrief {
  display_mode?: string; display_text?: string; acquire_mode?: string;
@@ -631,7 +631,7 @@ export function getMyLevel() {
   return api.get<MyLevelReply>('/member-level');
 }
 
-// ── 工单（）──
+// ── 工單（）──
 
 export interface TicketItem {
   id: number;
@@ -648,7 +648,7 @@ export interface TicketItem {
 
 export interface TicketMessage {
   id: number;
-  sender_type: string; // user | admin | system（内部备注后端已过滤）
+  sender_type: string; // user | admin | system（內部備註後端已過濾）
   content: string;
   created_at: number;
 }
@@ -677,13 +677,13 @@ export function payUrgent(ticketNo: string, expectedFee: number) {
   return api.post<{ paid: boolean; fee_cents: number; already_urgent?: boolean; error?: string }>(`/tickets/${ticketNo}/urgent`, { expected_fee_cents: expectedFee });
 }
 
-// ── 优惠券/秒杀（）──
+// ── 優惠券/秒殺（）──
 
 export interface MyCoupon {
   id: number;
   name: string;
   type: string; // fixed | percent
-  value: number; // fixed=分；percent=万分比
+  value: number; // fixed=分；percent=萬分比
   code: string;
   scope_json: string;
   expire_at: number;
@@ -710,7 +710,7 @@ export function listFlashSales(upcoming = false) {
   return api.get<{ items: FlashSale[] }>('/flash-sales', { upcoming });
 }
 
-// ── 分销（）──
+// ── 分銷（）──
 
 export interface AffiliateConfig {
   enabled: boolean;
@@ -731,7 +731,7 @@ export async function fetchAffiliateConfig(): Promise<AffiliateConfig | null> {
 }
 
 export interface MyAffiliateReply {
-  user_id: number; // 推广码 = user_id
+  user_id: number; // 推廣碼 = user_id
   invite_url: string;
   pending_cents: number;
   available_cents: number;
@@ -741,7 +741,7 @@ export interface MyAffiliateReply {
   team_l1: number;
   team_l2: number;
   team_l3: number;
-  promo_code: string; // 推广码（8 位随机；后端懒生成）
+  promo_code: string; // 推廣碼（8 位隨機；後端懶生成）
 }
 
 export interface TeamMember {
@@ -756,7 +756,7 @@ export interface CommissionItem {
   order_id: number;
   tier: number;
   base_amount: number;
-  amount: number; // 负数 = 负债行
+  amount: number; // 負數 = 負債行
   status: string; // pending_confirm | available | withdrawn | reversed
   available_at: number;
   created_at: number;
@@ -774,7 +774,7 @@ export function listCommissions(page = 1, pageSize = 15) {
   return api.get<{ commissions: CommissionItem[]; total: number }>('/affiliate/commissions', { page, page_size: pageSize });
 }
 
-// ── 内容（）──
+// ── 內容（）──
 
 export interface Banner {
   id: number;
@@ -824,13 +824,13 @@ export function listPostCategories(locale?: string) {
   return api.get<{ categories: PostCategory[] }>('/post-categories', { locale: locale || activeLocale.value });
 }
 
-/** 公告设置（config 公开下发：ops.announcement_type + ops.announcement） */
+/** 公告設置（config 公開下發：ops.announcement_type + ops.announcement） */
 export interface AnnouncementConfig {
   type: string;     // text | image | carousel
-  text: string;     // text 类型内容
-  images: string[]; // image/carousel 图片列表
-  html?: string;    // 服务端解析 Markdown 并过滤后的 HTML
-  summary?: string; // 首页公告条使用的纯文本
+  text: string;     // text 類型內容
+  images: string[]; // image/carousel 圖片列表
+  html?: string;    // 服務端解析 Markdown 並過濾後的 HTML
+  summary?: string; // 首頁公告條使用的純文本
 }
 export async function fetchAnnouncement(): Promise<AnnouncementConfig> {
   const def: AnnouncementConfig = { type: "text", text: "", images: [] };
@@ -843,7 +843,7 @@ export async function fetchAnnouncement(): Promise<AnnouncementConfig> {
       try {
         const v = JSON.parse(typeRaw);
         if (typeof v === "string") type = v;
-      } catch { /* 保留默认 */ }
+      } catch { /* 保留默認 */ }
     }
     const text = "";
     const images: string[] = [];
@@ -865,7 +865,7 @@ export async function fetchAnnouncement(): Promise<AnnouncementConfig> {
         } else if (Array.isArray(v)) {
           images.push(...v.filter((x): x is string => typeof x === "string" && !!x));
         }
-      } catch { /* 保留默认 */ }
+      } catch { /* 保留默認 */ }
     }
     return { type, text, images };
   } catch {
@@ -873,7 +873,7 @@ export async function fetchAnnouncement(): Promise<AnnouncementConfig> {
   }
 }
 
-// ── 供货对接申请（个人中心）：申请 → 后台审核 → 凭据管理 ──
+// ── 供貨對接申請（個人中心）：申請 → 後台審核 → 憑據管理 ──
 
 export interface SupplierAccount {
   id: number;
@@ -883,11 +883,11 @@ export interface SupplierAccount {
   contact: string;
   apply_reason: string;
   review_note: string;
-  api_key: string;       // app_id（明文常驻）
+  api_key: string;       // app_id（明文常駐）
   reviewed_at: number;
   created_at: number;
-  balance_cache: number; // 供货余额（分）
-  ip_whitelist?: string[]; // IP 白名单（空=所有 IP 放行）
+  balance_cache: number; // 供貨餘額（分）
+  ip_whitelist?: string[]; // IP 白名單（空=所有 IP 放行）
 }
 
 export interface SupplierCredentials {

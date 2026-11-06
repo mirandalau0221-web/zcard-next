@@ -1,16 +1,16 @@
 <template>
   <div class="card" style="max-width: 420px; margin: 40px auto;">
-    <h2 style="margin-bottom: 16px;">{{ $t('注册') }}</h2>
+    <h2 style="margin-bottom: 16px;">{{ $t('註冊') }}</h2>
 
-    <!-- 注册关闭 -->
+    <!-- 註冊關閉 -->
     <template v-if="cfg && !cfg.enabled">
-      <div class="muted" style="text-align: center; padding: 24px 0;">{{ $t('站点暂未开放注册') }}</div>
-      <div class="muted" style="text-align: center;"> {{ $t('已有账号？') }}<router-link to="/login">{{ $t('登录') }}</router-link>
+      <div class="muted" style="text-align: center; padding: 24px 0;">{{ $t('站點暫未開放註冊') }}</div>
+      <div class="muted" style="text-align: center;"> {{ $t('已有賬號？') }}<router-link to="/login">{{ $t('登錄') }}</router-link>
       </div>
     </template>
 
     <template v-else>
-      <!-- 注册方式切换（多选时显示；单选自动隐藏） -->
+      <!-- 註冊方式切換（多選時顯示；單選自動隱藏） -->
       <div v-if="methods.length > 1" class="method-tabs">
         <button
           v-for="m in methods"
@@ -28,63 +28,63 @@
         <input class="input" v-model="username" type="text" :placeholder="$t('用户名')" />
       </div>
       <div class="field">
-        <label>{{ $t('密码 *') }}</label>
+        <label>{{ $t('密碼 *') }}</label>
         <input class="input" v-model="password" type="password" :placeholder="$t('至少 6 位')" />
       </div>
 
-      <!-- 邮箱验证模式：邮箱必填 + 验证码 -->
+      <!-- 郵箱驗證模式：郵箱必填 + 驗證碼 -->
       <div v-if="activeMethod === 'email'" class="field">
-        <label>{{ $t('邮箱 *') }}</label>
+        <label>{{ $t('郵箱 *') }}</label>
         <div style="display: flex; gap: 8px;">
-          <input class="input" v-model="email" type="email" :placeholder="$t('用于登录和找回密码')" style="flex: 1;" />
+          <input class="input" v-model="email" type="email" :placeholder="$t('用於登錄和找回密碼')" style="flex: 1;" />
           <button class="btn secondary" :disabled="sending || cooldown > 0" @click="doSendCode('email')">
-            {{ cooldown > 0 ? `${cooldown}s` : sending ? $t('发送中') : $t('发验证码') }}
+            {{ cooldown > 0 ? `${cooldown}s` : sending ? $t('發送中') : $t('發驗證碼') }}
           </button>
         </div>
       </div>
       <div v-else class="field">
-        <label>{{ $t('邮箱') }}</label>
-        <input class="input" v-model="email" type="email" :placeholder="$t('选填')" />
+        <label>{{ $t('郵箱') }}</label>
+        <input class="input" v-model="email" type="email" :placeholder="$t('選填')" />
       </div>
 
-      <!-- 手机验证模式：手机号必填 + 短信验证码 -->
+      <!-- 手機驗證模式：手機號必填 + 短信驗證碼 -->
       <div v-if="activeMethod === 'phone'" class="field">
-        <label>{{ $t('手机号 *') }}</label>
+        <label>{{ $t('手機號 *') }}</label>
         <div style="display: flex; gap: 8px;">
-          <input class="input" v-model="phone" type="tel" :placeholder="$t('11 位手机号')" style="flex: 1;" />
+          <input class="input" v-model="phone" type="tel" :placeholder="$t('11 位手機號')" style="flex: 1;" />
           <button class="btn secondary" :disabled="sending || cooldown > 0" @click="doSendCode('phone')">
-            {{ cooldown > 0 ? `${cooldown}s` : sending ? $t('发送中') : $t('发验证码') }}
+            {{ cooldown > 0 ? `${cooldown}s` : sending ? $t('發送中') : $t('發驗證碼') }}
           </button>
         </div>
       </div>
 
-      <!-- 验证码输入（email/phone 模式） -->
+      <!-- 驗證碼輸入（email/phone 模式） -->
       <div v-if="activeMethod === 'email' || activeMethod === 'phone'" class="field">
-        <label>{{ $t('验证码 *') }}</label>
-        <input class="input" v-model="code" type="text" :placeholder="$t('6 位数字验证码')" maxlength="6" />
+        <label>{{ $t('驗證碼 *') }}</label>
+        <input class="input" v-model="code" type="text" :placeholder="$t('6 位數字驗證碼')" maxlength="6" />
       </div>
 
-      <!-- 图形验证码（captcha_register 开启时） -->
+      <!-- 圖形驗證碼（captcha_register 開啓時） -->
       <div v-if="captchaCfg.register" class="field">
-        <label>{{ $t('图形验证码 *') }}</label>
+        <label>{{ $t('圖形驗證碼 *') }}</label>
         <CaptchaInput ref="captchaRef" @update:code="captchaCode = $event" @update:captcha-id="captchaId = $event" />
       </div>
       <div class="field">
-        <label>{{ $t('推广码') }}</label>
-        <input class="input" v-model="inviteCode" type="text" :placeholder="$t('选填（好友的推广码，如 ABC12345）')" />
+        <label>{{ $t('推廣碼') }}</label>
+        <input class="input" v-model="inviteCode" type="text" :placeholder="$t('選填（好友的推廣碼，如 ABC12345）')" />
         <div class="muted" style="margin-top: 4px;" aria-live="polite">
-          <span v-if="benefitLoading">{{ $t('正在查询推荐权益…') }}</span>
+          <span v-if="benefitLoading">{{ $t('正在查詢推薦權益…') }}</span>
           <span v-else-if="benefitError">{{ uiText(benefitError) }}</span>
-          <span v-else-if="benefit?.has_benefit">{{ $t('注册成功即可获得 {0} 待遇', [benefit.level?.name || $t('专属会员')]) }}{{ benefit.level?.display_mode === 'public' ? $t('，会员价享 {0}', [levelDiscount(benefit.level.discount)]) : '' }}。</span>
-          <span v-else-if="benefit?.valid">{{ $t('推荐码有效，将绑定邀请关系。') }}</span>
-          <span v-else-if="benefit">{{ $t('推荐码无效或推荐人已停用，请检查或清空。') }}</span>
+          <span v-else-if="benefit?.has_benefit">{{ $t('註冊成功即可獲得 {0} 待遇', [benefit.level?.name || $t('專屬會員')]) }}{{ benefit.level?.display_mode === 'public' ? $t('，會員價享 {0}', [levelDiscount(benefit.level.discount)]) : '' }}。</span>
+          <span v-else-if="benefit?.valid">{{ $t('推薦碼有效，將綁定邀請關係。') }}</span>
+          <span v-else-if="benefit">{{ $t('推薦碼無效或推薦人已停用，請檢查或清空。') }}</span>
         </div>
       </div>
       <div v-if="error" class="error">{{ uiText(error) }}</div>
       <button class="btn" style="width: 100%; margin-top: 8px;" :disabled="loading" @click="submit">
-        {{ loading ? $t('注册中…') : $t('注册') }}
+        {{ loading ? $t('註冊中…') : $t('註冊') }}
       </button>
-      <div class="muted" style="margin-top: 12px; text-align: center;"> {{ $t('已有账号？') }}<router-link to="/login">{{ $t('登录') }}</router-link>
+      <div class="muted" style="margin-top: 12px; text-align: center;"> {{ $t('已有賬號？') }}<router-link to="/login">{{ $t('登錄') }}</router-link>
       </div>
     </template>
   </div>
@@ -126,7 +126,7 @@ watch(inviteCode, value => {
     const result = await getInviteBenefit(value.trim());
     if (version !== benefitVersion) return;
     benefitLoading.value = false;
-    if (result.error) benefitError.value = $t("推荐权益查询失败，可重试；注册时将再次校验。");
+    if (result.error) benefitError.value = $t("推薦權益查詢失敗，可重試；註冊時將再次校驗。");
     else benefit.value = result.data || null;
   }, 300);
 });
@@ -138,7 +138,7 @@ const captchaId = ref('');
 const captchaCode = ref('');
 const captchaRef = ref<InstanceType<typeof CaptchaInput> | null>(null);
 
-// 注册方式（多选数组；单选时无切换器）
+// 註冊方式（多選數組；單選時無切換器）
 type RegisterMethod = 'username' | 'email' | 'phone';
 const methods = computed<RegisterMethod[]>(() =>
   (cfg.value?.methods?.length ? cfg.value.methods : ['username']) as RegisterMethod[]
@@ -152,10 +152,10 @@ watch(methods, (list) => {
 });
 
 function methodLabel(m: string) {
-  return m === 'email' ? $t("邮箱验证") : m === 'phone' ? $t("手机验证") : $t("用户名");
+  return m === 'email' ? $t("郵箱驗證") : m === 'phone' ? $t("手機驗證") : $t("用户名");
 }
 
-// 验证码发送
+// 驗證碼發送
 const sending = ref(false);
 const cooldown = ref(0);
 let cdTimer: ReturnType<typeof setInterval> | null = null;
@@ -174,11 +174,11 @@ function startCooldown() {
 async function doSendCode(channel: 'email' | 'phone') {
   const target = channel === 'email' ? email.value.trim() : phone.value.trim();
   if (!target) {
-    error.value = channel === 'email' ? $t("请先填写邮箱") : $t("请先填写手机号");
+    error.value = channel === 'email' ? $t("請先填寫郵箱") : $t("請先填寫手機號");
     return;
   }
   if (captchaCfg.value.register && !captchaCode.value) {
-    error.value = $t("请先输入图形验证码");
+    error.value = $t("請先輸入圖形驗證碼");
     return;
   }
   sending.value = true;
@@ -190,11 +190,11 @@ async function doSendCode(channel: 'email' | 'phone') {
     captchaRef.value?.refresh();
     return;
   }
-  window.alert($t("验证码已发送，请查收"));
+  window.alert($t("驗證碼已發送，請查收"));
   startCooldown();
 }
 
-// 推广归因预填：URL ?ref= 优先；否则读 localStorage（推广链接进站捕获的 30 天归因）
+// 推廣歸因預填：URL ?ref= 優先；否則讀 localStorage（推廣鏈接進站捕獲的 30 天歸因）
 onMounted(async () => {
   const ref = Array.isArray(route.query.ref) ? route.query.ref[0] : route.query.ref;
   if (typeof ref === 'string' && ref) {
@@ -210,23 +210,23 @@ onUnmounted(() => { if (cdTimer) clearInterval(cdTimer); clearTimeout(benefitTim
 
 async function submit() {
   if (!username.value || !password.value) {
-    error.value = $t("用户名和密码必填");
+    error.value = $t("用户名和密碼必填");
     return;
   }
   if (activeMethod.value === 'email' && !email.value.trim()) {
-    error.value = $t("请填写邮箱");
+    error.value = $t("請填寫郵箱");
     return;
   }
   if (activeMethod.value === 'phone' && !phone.value.trim()) {
-    error.value = $t("请填写手机号");
+    error.value = $t("請填寫手機號");
     return;
   }
   if ((activeMethod.value === 'email' || activeMethod.value === 'phone') && !code.value.trim()) {
-    error.value = $t("请填写验证码");
+    error.value = $t("請填寫驗證碼");
     return;
   }
   if (captchaCfg.value.register && !captchaCode.value) {
-    error.value = $t("请输入图形验证码");
+    error.value = $t("請輸入圖形驗證碼");
     return;
   }
   loading.value = true;
@@ -243,7 +243,7 @@ async function submit() {
   });
   loading.value = false;
   if (err || !data) {
-    error.value = err || $t("注册失败");
+    error.value = err || $t("註冊失敗");
     captchaRef.value?.refresh();
     return;
   }

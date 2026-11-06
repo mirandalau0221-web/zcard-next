@@ -8,40 +8,40 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminCouponService 优惠券管理(基础版：批量生成/列表/作废）。
+// AdminCouponService 優惠券管理(基礎版：批量生成/列表/作廢）。
 service AdminCouponService {
-  // GrantCoupon 批次赠送指定用户。
+  // GrantCoupon 批次贈送指定用户。
   rpc GrantCoupon(GrantCouponRequest) returns (GrantCouponReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/coupons/grant"
       body: "*"
     };
   }
-  // CreateFlashSale 创建秒杀。
+  // CreateFlashSale 創建秒殺。
   rpc CreateFlashSale(CreateFlashSaleRequest) returns (FlashSaleItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/flash-sales"
       body: "*"
     };
   }
-  // ListFlashSales 秒杀列表。
+  // ListFlashSales 秒殺列表。
   rpc ListFlashSales(ListFlashSalesRequest) returns (ListFlashSalesReply) {
     option (google.api.http) = { get: "/api/v1/admin/flash-sales" };
   }
-  // DeleteFlashSale 删除秒杀。
+  // DeleteFlashSale 刪除秒殺。
   rpc DeleteFlashSale(DeleteFlashSaleRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/api/v1/admin/flash-sales/{id}"
     };
   }
-  // UpsertPromotion 创建/更新促销。
+  // UpsertPromotion 創建/更新促銷。
   rpc UpsertPromotion(UpsertPromotionRequest) returns (PromotionItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/promotions"
       body: "*"
     };
   }
-  // ListPromotions 促销列表。
+  // ListPromotions 促銷列表。
   rpc ListPromotions(ListPromotionsRequest) returns (ListPromotionsReply) {
     option (google.api.http) = { get: "/api/v1/admin/promotions" };
   }
@@ -54,11 +54,11 @@ service AdminCouponService {
   rpc DisableCoupon(DisableCouponRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { post: "/api/v1/admin/coupons/disable" body: "*" };
   }
-  // DeleteCoupons 批量删除券（仅未使用；可按 id 列表或整批未使用）。
+  // DeleteCoupons 批量刪除券（僅未使用；可按 id 列表或整批未使用）。
   rpc DeleteCoupons(DeleteCouponsRequest) returns (DeleteCouponsReply) {
     option (google.api.http) = { post: "/api/v1/admin/coupons/delete" body: "*" };
   }
-  // ExportCoupons 导出券码 CSV（按状态/批次，含表头）。
+  // ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
   rpc ExportCoupons(ExportCouponsRequest) returns (ExportCouponsReply) {
     option (google.api.http) = { get: "/api/v1/admin/coupons/export" };
   }
@@ -69,7 +69,7 @@ message Coupon {
   string batch_id = 2;
   string name = 3;
   string type = 4; // fixed | percent
-  int64 value = 5; // fixed=分；percent=万分比
+  int64 value = 5; // fixed=分；percent=萬分比
   string code = 6;
   string status = 7; // unused | used | disabled
 }
@@ -79,12 +79,12 @@ message CouponList {
   int64 total = 2;
   int32 page = 3;
   int32 page_size = 4;
-  repeated string batches = 5; // 去重批次列表（筛选下拉用）
+  repeated string batches = 5; // 去重批次列表（篩選下拉用）
 }
 
 message ListCouponsRequest {
   string status = 1;
-  string batch_id = 2; // 按批次筛选
+  string batch_id = 2; // 按批次篩選
   int32 page = 3;
   int32 page_size = 4;
 }
@@ -105,7 +105,7 @@ message DisableCouponRequest {
   string batch_id = 1;
 }
 
-// DeleteCoupons：ids 非空按 id 删；batch_id 非空删该批次全部未使用。两者只生效其一（ids 优先）。
+// DeleteCoupons：ids 非空按 id 刪；batch_id 非空刪該批次全部未使用。兩者只生效其一（ids 優先）。
 message DeleteCouponsRequest {
   repeated uint64 ids = 1;
   string batch_id = 2;
@@ -122,12 +122,12 @@ message ExportCouponsRequest {
 
 message ExportCouponsReply {
   string filename = 1;
-  string csv = 2; // 含 BOM + 表头，前端直接落盘
+  string csv = 2; // 含 BOM + 表頭，前端直接落盤
 }
 
-// ── 扩展：领取/秒杀/促销 ───────────────────────────────
+// ── 擴展：領取/秒殺/促銷 ───────────────────────────────
 
-// GrantCoupon 批次赠送指定用户（领取）。
+// GrantCoupon 批次贈送指定用户（領取）。
 message GrantCouponRequest {
   string batch_id = 1 [(google.api.field_behavior) = REQUIRED];
   uint64 user_id = 2 [(google.api.field_behavior) = REQUIRED];
@@ -138,7 +138,7 @@ message GrantCouponReply {
   int32 granted = 1;
 }
 
-// CreateFlashSale 创建秒杀（限量与卡密同锁）。
+// CreateFlashSale 創建秒殺（限量與卡密同鎖）。
 message CreateFlashSaleRequest {
   uint64 product_id = 1 [(google.api.field_behavior) = REQUIRED];
   uint64 sku_id = 2;
@@ -159,7 +159,7 @@ message FlashSaleItem {
   int32 limit_qty = 7;
   int32 sold_qty = 8;
   int32 per_user_limit = 9;
-  int32 reserved_qty = 10; // 待付款预占，不计已售
+  int32 reserved_qty = 10; // 待付款預佔，不計已售
 }
 
 message ListFlashSalesRequest {
@@ -178,14 +178,14 @@ message DeleteFlashSaleRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// UpsertPromotion 创建/更新促销。
+// UpsertPromotion 創建/更新促銷。
 message UpsertPromotionRequest {
-  uint64 id = 1; // 0=创建
+  uint64 id = 1; // 0=創建
   string name = 2 [(google.api.field_behavior) = REQUIRED];
-  string scope_json = 3; // {"product_ids":[1,2]} / {"category_ids":[3]} / 空=全场
+  string scope_json = 3; // {"product_ids":[1,2]} / {"category_ids":[3]} / 空=全場
   string type = 4 [(google.api.field_behavior) = REQUIRED]; // fixed | percent | special_price
-  int64 threshold = 5; // 满 X（分）
-  int64 discount = 6; // fixed=分；percent=万分比
+  int64 threshold = 5; // 滿 X（分）
+  int64 discount = 6; // fixed=分；percent=萬分比
   int64 special_price = 7; // special_price=分
   int64 start_at = 8 [(google.api.field_behavior) = REQUIRED];
   int64 end_at = 9 [(google.api.field_behavior) = REQUIRED];

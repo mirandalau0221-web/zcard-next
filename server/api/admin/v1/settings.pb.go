@@ -25,7 +25,7 @@ const (
 
 type ListSettingsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// 可选分组过滤（site/template/trade/security/ops/notify/...）
+	// 可選分組過濾（site/template/trade/security/ops/notify/...）
 	Group         string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -168,7 +168,7 @@ type UpdateSettingRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Group string                 `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
 	Key   string                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	// 任意 JSON 文档（对象/数组/标量均可），服务端原样存储
+	// 任意 JSON 文檔（對象/數組/標量均可），服務端原樣存儲
 	ValueJson     string `protobuf:"bytes,3,opt,name=value_json,json=valueJson,proto3" json:"value_json,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -225,17 +225,17 @@ func (x *UpdateSettingRequest) GetValueJson() string {
 	return ""
 }
 
-// Setting 设置项（value_json 为 JSON 文档字符串）。
+// Setting 設置項（value_json 為 JSON 文檔字符串）。
 type Setting struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Group     string                 `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
 	Key       string                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	ValueJson string                 `protobuf:"bytes,3,opt,name=value_json,json=valueJson,proto3" json:"value_json,omitempty"`
-	// 业务显示名称（目录裁决；缺失回落 key 本身）
+	// 業務顯示名稱（目錄裁決；缺失回落 key 本身）
 	Label string `protobuf:"bytes,4,opt,name=label,proto3" json:"label,omitempty"`
-	// 枚举选项（如 category_nav_style: list/grid）；非枚举键为空
+	// 枚舉選項（如 category_nav_style: list/grid）；非枚舉鍵為空
 	Options []*OptionItem `protobuf:"bytes,5,rep,name=options,proto3" json:"options,omitempty"`
-	// 敏感键（值已脱敏 ****；前端渲染密码框）
+	// 敏感鍵（值已脱敏 ****；前端渲染密碼框）
 	Secret        bool `protobuf:"varint,6,opt,name=secret,proto3" json:"secret,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -313,7 +313,7 @@ func (x *Setting) GetSecret() bool {
 	return false
 }
 
-// OptionItem 枚举选项（value 入库值，label 展示名）。
+// OptionItem 枚舉選項（value 入庫值，label 展示名）。
 type OptionItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Value         string                 `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
@@ -366,7 +366,7 @@ func (x *OptionItem) GetLabel() string {
 	return ""
 }
 
-// UpdateSettingsRequest 批量更新项。
+// UpdateSettingsRequest 批量更新項。
 type UpdateSettingsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Items         []*SettingUpdate       `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
@@ -527,12 +527,12 @@ func (x *UpdateSettingsReply) GetAdminBasePath() string {
 // TemplateItem 可用模板。
 type TemplateItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`         // 模板目录名（settings.template.pc_template 存该值）
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`       // 显示名称
+	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`         // 模板目錄名（settings.template.pc_template 存該值）
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`       // 顯示名稱
 	Desc          string                 `protobuf:"bytes,3,opt,name=desc,proto3" json:"desc,omitempty"`       // 描述
-	Preview       string                 `protobuf:"bytes,4,opt,name=preview,proto3" json:"preview,omitempty"` // 预览图 URL（可空）
+	Preview       string                 `protobuf:"bytes,4,opt,name=preview,proto3" json:"preview,omitempty"` // 預覽圖 URL（可空）
 	Author        string                 `protobuf:"bytes,5,opt,name=author,proto3" json:"author,omitempty"`   // 作者
-	Version       string                 `protobuf:"bytes,6,opt,name=version,proto3" json:"version,omitempty"` // 版本号
+	Version       string                 `protobuf:"bytes,6,opt,name=version,proto3" json:"version,omitempty"` // 版本號
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -609,7 +609,7 @@ func (x *TemplateItem) GetVersion() string {
 	return ""
 }
 
-// InstallTemplateRequest 主题安装（zip base64，对齐 media 上传模式）。
+// InstallTemplateRequest 主題安裝（zip base64，對齊 media 上傳模式）。
 type InstallTemplateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DataBase64    string                 `protobuf:"bytes,1,opt,name=data_base64,json=dataBase64,proto3" json:"data_base64,omitempty"`

@@ -28,22 +28,22 @@ const OperationAdminDashboardServiceListReconciliationItems = "/zcard.api.admin.
 const OperationAdminDashboardServiceRunReconciliationJob = "/zcard.api.admin.v1.AdminDashboardService/RunReconciliationJob"
 
 type AdminDashboardServiceHTTPServer interface {
-	// CreateReconciliationJob CreateReconciliationJob 创建货源对账任务（时间窗 ≤31 天）。
+	// CreateReconciliationJob CreateReconciliationJob 創建貨源對賬任務（時間窗 ≤31 天）。
 	CreateReconciliationJob(context.Context, *CreateReconciliationJobRequest) (*ReconciliationJobItem, error)
-	// GetDailyStats GetDailyStats 历史日结查询（只扫 daily_stats；分站视角自动隔离）。
+	// GetDailyStats GetDailyStats 歷史日結查詢（只掃 daily_stats；分站視角自動隔離）。
 	GetDailyStats(context.Context, *GetDailyStatsRequest) (*GetDailyStatsReply, error)
 	GetDashboard(context.Context, *GetDashboardRequest) (*DashboardReply, error)
-	// GetReconciliation GetReconciliation 对账总览。
+	// GetReconciliation GetReconciliation 對賬總覽。
 	GetReconciliation(context.Context, *GetReconciliationRequest) (*GetReconciliationReply, error)
-	// GetReconciliationJob GetReconciliationJob 对账任务详情（四态计数 + 状态可查）。
+	// GetReconciliationJob GetReconciliationJob 對賬任務詳情（四態計數 + 狀態可查）。
 	GetReconciliationJob(context.Context, *GetReconciliationJobRequest) (*ReconciliationJobItem, error)
-	// GetTraffic GetTraffic 流量统计（PV/UV 按天；page_views 明细表）。
+	// GetTraffic GetTraffic 流量統計（PV/UV 按天；page_views 明細表）。
 	GetTraffic(context.Context, *GetTrafficRequest) (*GetTrafficReply, error)
 	// ListCommissions ListCommissions 佣金列表(affiliate）。
 	ListCommissions(context.Context, *ListCommissionsRequest) (*ListCommissionsReply, error)
-	// ListReconciliationItems ListReconciliationItems 对账明细分页（四态筛选）。
+	// ListReconciliationItems ListReconciliationItems 對賬明細分頁（四態篩選）。
 	ListReconciliationItems(context.Context, *ListReconciliationItemsRequest) (*ListReconciliationItemsReply, error)
-	// RunReconciliationJob RunReconciliationJob 执行任务（pending → processing → done/failed）。
+	// RunReconciliationJob RunReconciliationJob 執行任務（pending → processing → done/failed）。
 	RunReconciliationJob(context.Context, *RunReconciliationJobRequest) (*ReconciliationJobItem, error)
 }
 
@@ -241,22 +241,22 @@ func _AdminDashboardService_ListReconciliationItems0_HTTP_Handler(srv AdminDashb
 }
 
 type AdminDashboardServiceHTTPClient interface {
-	// CreateReconciliationJob CreateReconciliationJob 创建货源对账任务（时间窗 ≤31 天）。
+	// CreateReconciliationJob CreateReconciliationJob 創建貨源對賬任務（時間窗 ≤31 天）。
 	CreateReconciliationJob(ctx context.Context, req *CreateReconciliationJobRequest, opts ...http.CallOption) (rsp *ReconciliationJobItem, err error)
-	// GetDailyStats GetDailyStats 历史日结查询（只扫 daily_stats；分站视角自动隔离）。
+	// GetDailyStats GetDailyStats 歷史日結查詢（只掃 daily_stats；分站視角自動隔離）。
 	GetDailyStats(ctx context.Context, req *GetDailyStatsRequest, opts ...http.CallOption) (rsp *GetDailyStatsReply, err error)
 	GetDashboard(ctx context.Context, req *GetDashboardRequest, opts ...http.CallOption) (rsp *DashboardReply, err error)
-	// GetReconciliation GetReconciliation 对账总览。
+	// GetReconciliation GetReconciliation 對賬總覽。
 	GetReconciliation(ctx context.Context, req *GetReconciliationRequest, opts ...http.CallOption) (rsp *GetReconciliationReply, err error)
-	// GetReconciliationJob GetReconciliationJob 对账任务详情（四态计数 + 状态可查）。
+	// GetReconciliationJob GetReconciliationJob 對賬任務詳情（四態計數 + 狀態可查）。
 	GetReconciliationJob(ctx context.Context, req *GetReconciliationJobRequest, opts ...http.CallOption) (rsp *ReconciliationJobItem, err error)
-	// GetTraffic GetTraffic 流量统计（PV/UV 按天；page_views 明细表）。
+	// GetTraffic GetTraffic 流量統計（PV/UV 按天；page_views 明細表）。
 	GetTraffic(ctx context.Context, req *GetTrafficRequest, opts ...http.CallOption) (rsp *GetTrafficReply, err error)
 	// ListCommissions ListCommissions 佣金列表(affiliate）。
 	ListCommissions(ctx context.Context, req *ListCommissionsRequest, opts ...http.CallOption) (rsp *ListCommissionsReply, err error)
-	// ListReconciliationItems ListReconciliationItems 对账明细分页（四态筛选）。
+	// ListReconciliationItems ListReconciliationItems 對賬明細分頁（四態篩選）。
 	ListReconciliationItems(ctx context.Context, req *ListReconciliationItemsRequest, opts ...http.CallOption) (rsp *ListReconciliationItemsReply, err error)
-	// RunReconciliationJob RunReconciliationJob 执行任务（pending → processing → done/failed）。
+	// RunReconciliationJob RunReconciliationJob 執行任務（pending → processing → done/failed）。
 	RunReconciliationJob(ctx context.Context, req *RunReconciliationJobRequest, opts ...http.CallOption) (rsp *ReconciliationJobItem, err error)
 }
 
@@ -268,7 +268,7 @@ func NewAdminDashboardServiceHTTPClient(client *http.Client) AdminDashboardServi
 	return &AdminDashboardServiceHTTPClientImpl{client}
 }
 
-// CreateReconciliationJob CreateReconciliationJob 创建货源对账任务（时间窗 ≤31 天）。
+// CreateReconciliationJob CreateReconciliationJob 創建貨源對賬任務（時間窗 ≤31 天）。
 func (c *AdminDashboardServiceHTTPClientImpl) CreateReconciliationJob(ctx context.Context, in *CreateReconciliationJobRequest, opts ...http.CallOption) (*ReconciliationJobItem, error) {
 	var out ReconciliationJobItem
 	pattern := "/api/v1/admin/dashboard/reconciliation-jobs"
@@ -286,7 +286,7 @@ func (c *AdminDashboardServiceHTTPClientImpl) CreateReconciliationJob(ctx contex
 	return &out, nil
 }
 
-// GetDailyStats GetDailyStats 历史日结查询（只扫 daily_stats；分站视角自动隔离）。
+// GetDailyStats GetDailyStats 歷史日結查詢（只掃 daily_stats；分站視角自動隔離）。
 func (c *AdminDashboardServiceHTTPClientImpl) GetDailyStats(ctx context.Context, in *GetDailyStatsRequest, opts ...http.CallOption) (*GetDailyStatsReply, error) {
 	var out GetDailyStatsReply
 	pattern := "/api/v1/admin/dashboard/daily-stats"
@@ -319,7 +319,7 @@ func (c *AdminDashboardServiceHTTPClientImpl) GetDashboard(ctx context.Context, 
 	return &out, nil
 }
 
-// GetReconciliation GetReconciliation 对账总览。
+// GetReconciliation GetReconciliation 對賬總覽。
 func (c *AdminDashboardServiceHTTPClientImpl) GetReconciliation(ctx context.Context, in *GetReconciliationRequest, opts ...http.CallOption) (*GetReconciliationReply, error) {
 	var out GetReconciliationReply
 	pattern := "/api/v1/admin/dashboard/reconciliation"
@@ -336,7 +336,7 @@ func (c *AdminDashboardServiceHTTPClientImpl) GetReconciliation(ctx context.Cont
 	return &out, nil
 }
 
-// GetReconciliationJob GetReconciliationJob 对账任务详情（四态计数 + 状态可查）。
+// GetReconciliationJob GetReconciliationJob 對賬任務詳情（四態計數 + 狀態可查）。
 func (c *AdminDashboardServiceHTTPClientImpl) GetReconciliationJob(ctx context.Context, in *GetReconciliationJobRequest, opts ...http.CallOption) (*ReconciliationJobItem, error) {
 	var out ReconciliationJobItem
 	pattern := "/api/v1/admin/dashboard/reconciliation-jobs/{id}"
@@ -353,7 +353,7 @@ func (c *AdminDashboardServiceHTTPClientImpl) GetReconciliationJob(ctx context.C
 	return &out, nil
 }
 
-// GetTraffic GetTraffic 流量统计（PV/UV 按天；page_views 明细表）。
+// GetTraffic GetTraffic 流量統計（PV/UV 按天；page_views 明細表）。
 func (c *AdminDashboardServiceHTTPClientImpl) GetTraffic(ctx context.Context, in *GetTrafficRequest, opts ...http.CallOption) (*GetTrafficReply, error) {
 	var out GetTrafficReply
 	pattern := "/api/v1/admin/dashboard/traffic"
@@ -387,7 +387,7 @@ func (c *AdminDashboardServiceHTTPClientImpl) ListCommissions(ctx context.Contex
 	return &out, nil
 }
 
-// ListReconciliationItems ListReconciliationItems 对账明细分页（四态筛选）。
+// ListReconciliationItems ListReconciliationItems 對賬明細分頁（四態篩選）。
 func (c *AdminDashboardServiceHTTPClientImpl) ListReconciliationItems(ctx context.Context, in *ListReconciliationItemsRequest, opts ...http.CallOption) (*ListReconciliationItemsReply, error) {
 	var out ListReconciliationItemsReply
 	pattern := "/api/v1/admin/dashboard/reconciliation-jobs/{id}/items"
@@ -404,7 +404,7 @@ func (c *AdminDashboardServiceHTTPClientImpl) ListReconciliationItems(ctx contex
 	return &out, nil
 }
 
-// RunReconciliationJob RunReconciliationJob 执行任务（pending → processing → done/failed）。
+// RunReconciliationJob RunReconciliationJob 執行任務（pending → processing → done/failed）。
 func (c *AdminDashboardServiceHTTPClientImpl) RunReconciliationJob(ctx context.Context, in *RunReconciliationJobRequest, opts ...http.CallOption) (*ReconciliationJobItem, error) {
 	var out ReconciliationJobItem
 	pattern := "/api/v1/admin/dashboard/reconciliation-jobs/{id}/run"

@@ -1,7 +1,7 @@
 package supply
 
-// 货源连接仓储（）：连接 CRUD（凭据 AES-GCM 加解密）、映射规则 CRUD、
-// 同步任务 CRUD（进度/心跳/取消）。
+// 貨源連接倉儲（）：連接 CRUD（憑據 AES-GCM 加解密）、映射規則 CRUD、
+// 同步任務 CRUD（進度/心跳/取消）。
 
 import (
 	"context"
@@ -20,43 +20,43 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/crypto"
 )
 
-// ErrNotFound 记录不存在（404 语义）。
-var ErrNotFound = errors.New("supply: 记录不存在")
+// ErrNotFound 記錄不存在（404 語義）。
+var ErrNotFound = errors.New("supply: 記錄不存在")
 
-// ErrHasMappings 连接存在映射，禁止删除。
-var ErrHasMappings = errors.New("supply: 连接存在映射，禁止删除")
+// ErrHasMappings 連接存在映射，禁止刪除。
+var ErrHasMappings = errors.New("supply: 連接存在映射，禁止刪除")
 
-// SupplyRepoImpl 货源仓储实现。
+// SupplyRepoImpl 貨源倉儲實現。
 type SupplyRepoImpl struct {
 	data *data.Data
-	box  *crypto.Box // ZCARD_DATA_KEY（凭据加密）
+	box  *crypto.Box // ZCARD_DATA_KEY（憑據加密）
 }
 
-// NewSupplyRepoImpl 构造。
+// NewSupplyRepoImpl 構造。
 func NewSupplyRepoImpl(d *data.Data, box *crypto.Box) *SupplyRepoImpl {
 	return &SupplyRepoImpl{data: d, box: box}
 }
 
-// entClient 取 ent client（同步服务等非 data*.go 文件经此访问；事务上下文自动携带）。
+// entClient 取 ent client（同步服務等非 data*.go 文件經此訪問；事務上下文自動攜帶）。
 func (r *SupplyRepoImpl) entClient(ctx context.Context) *ent.Client {
 	return data.Client(ctx, r.data)
 }
 
-// credAAD 凭据加密 AAD（按连接稳定标识绑定，防密文换库）。
+// credAAD 憑據加密 AAD（按連接穩定標識綁定，防密文換庫）。
 func credAAD(driver string, baseURL string) []byte {
 	return []byte("supply_connection:" + driver + ":" + baseURL)
 }
 
-// SealCredentials 加密凭据 JSON。
+// SealCredentials 加密憑據 JSON。
 func (r *SupplyRepoImpl) SealCredentials(driver, baseURL, credsJSON string) ([]byte, error) {
 	enc, err := r.box.Seal([]byte(credsJSON), credAAD(driver, baseURL))
 	if err != nil {
-		return nil, fmt.Errorf("supply: 凭据加密失败: %w", err)
+		return nil, fmt.Errorf("supply: 憑據加密失敗: %w", err)
 	}
 	return enc, nil
 }
 
-// OpenCredentials 解密凭据 JSON（失败 → 提示重配，列表永不因此 500）。
+// OpenCredentials 解密憑據 JSON（失敗 → 提示重配，列表永不因此 500）。
 func (r *SupplyRepoImpl) OpenCredentials(conn *ent.SupplyConnection) (string, error) {
 	plain, err := r.box.Open(conn.Credentials, credAAD(conn.Driver, conn.BaseURL))
 	if err != nil {
@@ -65,9 +65,9 @@ func (r *SupplyRepoImpl) OpenCredentials(conn *ent.SupplyConnection) (string, er
 	return string(plain), nil
 }
 
-// ── 连接 CRUD ──────────────────────────────────────────────
+// ── 連接 CRUD ──────────────────────────────────────────────
 
-// CreateConnection 创建连接（base_url SSRF 校验在 service 层）。
+// CreateConnection 創建連接（base_url SSRF 校驗在 service 層）。
 func (r *SupplyRepoImpl) createConnection(ctx context.Context, conn *ent.SupplyConnection) (*ent.SupplyConnection, error) {
 	return data.Client(ctx, r.data).SupplyConnection.Create().
 		SetName(conn.Name).
@@ -162,7 +162,7 @@ func (r *SupplyRepoImpl) UpdateConnection(ctx context.Context, id uint64, upd *C
 	return result, err
 }
 
-// UpdateCredentials 更新凭据（单独入口，避免全量更新误写密文）。
+// UpdateCredentials 更新憑據（單獨入口，避免全量更新誤寫密文）。
 func (r *SupplyRepoImpl) UpdateCredentials(ctx context.Context, id uint64, driver, baseURL, credsJSON string) error {
 	enc, err := r.SealCredentials(driver, baseURL, credsJSON)
 	if err != nil {
@@ -180,7 +180,7 @@ func (r *SupplyRepoImpl) UpdateCredentials(ctx context.Context, id uint64, drive
 	})
 }
 
-// DeleteConnection 删除连接（存在映射时拒绝）。
+// DeleteConnection 刪除連接（存在映射時拒絕）。
 func (r *SupplyRepoImpl) DeleteConnection(ctx context.Context, id uint64) error {
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		c := data.Client(ctx, r.data)
@@ -196,7 +196,7 @@ func (r *SupplyRepoImpl) DeleteConnection(ctx context.Context, id uint64) error 
 		if running, err := r.HasRunningTask(ctx, id); err != nil {
 			return err
 		} else if running {
-			return fmt.Errorf("货源仍有未完成任务，请先停止任务后再删除")
+			return fmt.Errorf("貨源仍有未完成任務，請先停止任務後再刪除")
 		}
 		n, err := c.SupplyMapping.Query().Where(supplymapping.ConnectionID(id)).Count(ctx)
 		if err != nil {
@@ -209,7 +209,7 @@ func (r *SupplyRepoImpl) DeleteConnection(ctx context.Context, id uint64) error 
 	})
 }
 
-// GetConnection 连接详情（含凭据密文列，调用方注意脱敏）。
+// GetConnection 連接詳情（含憑據密文列，調用方注意脱敏）。
 func (r *SupplyRepoImpl) GetConnection(ctx context.Context, id uint64) (*ent.SupplyConnection, error) {
 	conn, err := data.Client(ctx, r.data).SupplyConnection.Get(ctx, id)
 	if err != nil {
@@ -221,7 +221,7 @@ func (r *SupplyRepoImpl) GetConnection(ctx context.Context, id uint64) (*ent.Sup
 	return conn, nil
 }
 
-// ListConnections 连接列表。
+// ListConnections 連接列表。
 func (r *SupplyRepoImpl) ListConnections(ctx context.Context, page, pageSize int) ([]*ent.SupplyConnection, int, error) {
 	q := data.Client(ctx, r.data).SupplyConnection.Query().Order(ent.Desc(supplyconnection.FieldID))
 	total, err := q.Count(ctx)
@@ -232,7 +232,7 @@ func (r *SupplyRepoImpl) ListConnections(ctx context.Context, page, pageSize int
 	return conns, total, err
 }
 
-// ListActiveConnections 全部 active 连接（探活/巡检用）。
+// ListActiveConnections 全部 active 連接（探活/巡檢用）。
 func (r *SupplyRepoImpl) ListActiveConnections(ctx context.Context) ([]*ent.SupplyConnection, error) {
 	return data.Client(ctx, r.data).SupplyConnection.Query().
 		Where(supplyconnection.StatusEQ(supplyconnection.StatusActive)).
@@ -240,7 +240,7 @@ func (r *SupplyRepoImpl) ListActiveConnections(ctx context.Context) ([]*ent.Supp
 		All(ctx)
 }
 
-// UpdatePingResult 记录探活结果（含 settings 内累计统计：成功率/平均延迟）。
+// UpdatePingResult 記錄探活結果（含 settings 內累計統計：成功率/平均延遲）。
 func (r *SupplyRepoImpl) UpdatePingResult(ctx context.Context, id uint64, ok bool, latencyMs int64, balance int64, errMsg string) error {
 	conn, err := r.GetConnection(ctx, id)
 	if err != nil {
@@ -291,8 +291,8 @@ func toInt64(v any) int64 {
 
 // ── 映射 CRUD ──────────────────────────────────────────────
 
-// UpsertMapping 用原生 upsert 更新映射元数据；库存观测按查询开始时间
-// 单独写入，避免同步/调价覆盖并发查询得到的较新库存。
+// UpsertMapping 用原生 upsert 更新映射元數據；庫存觀測按查詢開始時間
+// 單獨寫入，避免同步/調價覆蓋併發查詢得到的較新庫存。
 func (r *SupplyRepoImpl) UpsertMapping(ctx context.Context, m *ent.SupplyMapping) error {
 	create := data.Client(ctx, r.data).SupplyMapping.Create().
 		SetConnectionID(m.ConnectionID).SetUpstreamCategory(m.UpstreamCategory).
@@ -314,7 +314,7 @@ func (r *SupplyRepoImpl) UpsertMapping(ctx context.Context, m *ent.SupplyMapping
 	return nil
 }
 
-// ListMappings 映射列表（按连接过滤）。
+// ListMappings 映射列表（按連接過濾）。
 func (r *SupplyRepoImpl) ListMappings(ctx context.Context, connectionID uint64, page, pageSize int) ([]*ent.SupplyMapping, int, error) {
 	q := data.Client(ctx, r.data).SupplyMapping.Query().Order(ent.Desc(supplymapping.FieldID))
 	if connectionID > 0 {
@@ -328,7 +328,7 @@ func (r *SupplyRepoImpl) ListMappings(ctx context.Context, connectionID uint64, 
 	return ms, total, err
 }
 
-// DeleteMapping 删除映射。
+// DeleteMapping 刪除映射。
 func (r *SupplyRepoImpl) DeleteMapping(ctx context.Context, id uint64) error {
 	err := data.Client(ctx, r.data).SupplyMapping.DeleteOneID(id).Exec(ctx)
 	if err != nil && ent.IsNotFound(err) {
@@ -337,7 +337,7 @@ func (r *SupplyRepoImpl) DeleteMapping(ctx context.Context, id uint64) error {
 	return err
 }
 
-// GetMapping 按上游键查映射（同步 upsert 判据）。
+// GetMapping 按上游鍵查映射（同步 upsert 判據）。
 func (r *SupplyRepoImpl) GetMapping(ctx context.Context, connectionID uint64, upstreamProduct, upstreamSku string) (*ent.SupplyMapping, error) {
 	m, err := data.Client(ctx, r.data).SupplyMapping.Query().
 		Where(
@@ -355,16 +355,16 @@ func (r *SupplyRepoImpl) GetMapping(ctx context.Context, connectionID uint64, up
 	return m, nil
 }
 
-// ── 节奏器状态（ S2）────────────────────────────────
+// ── 節奏器狀態（ S2）────────────────────────────────
 
-// UpdateRateState 仅写节奏器持久状态（rate_state JSON）。
+// UpdateRateState 僅寫節奏器持久狀態（rate_state JSON）。
 func (r *SupplyRepoImpl) UpdateRateState(ctx context.Context, id uint64, state map[string]any) error {
 	_, err := data.Client(ctx, r.data).SupplyConnection.UpdateOneID(id).
 		SetRateState(state).Save(ctx)
 	return err
 }
 
-// TripRateLimit 熔断：冷却截止 + 状态 + last_error。
+// TripRateLimit 熔斷：冷卻截止 + 狀態 + last_error。
 func (r *SupplyRepoImpl) TripRateLimit(ctx context.Context, id uint64, until time.Time, state map[string]any, lastErr string) error {
 	upd := data.Client(ctx, r.data).SupplyConnection.UpdateOneID(id).
 		SetRateLimitUntil(until).
@@ -376,7 +376,7 @@ func (r *SupplyRepoImpl) TripRateLimit(ctx context.Context, id uint64, until tim
 	return err
 }
 
-// ClearRateLimit 解除熔断（半开探测成功后；同时清 last_error）。
+// ClearRateLimit 解除熔斷（半開探測成功後；同時清 last_error）。
 func (r *SupplyRepoImpl) ClearRateLimit(ctx context.Context, id uint64) error {
 	_, err := data.Client(ctx, r.data).SupplyConnection.UpdateOneID(id).
 		ClearRateLimitUntil().
@@ -385,9 +385,9 @@ func (r *SupplyRepoImpl) ClearRateLimit(ctx context.Context, id uint64) error {
 	return err
 }
 
-// ── 同步任务 ──────────────────────────────────────────────
+// ── 同步任務 ──────────────────────────────────────────────
 
-// CreateSyncTask 创建同步任务（pending）。
+// CreateSyncTask 創建同步任務（pending）。
 func (r *SupplyRepoImpl) CreateSyncTask(ctx context.Context, connectionID uint64, mode, scope string, forceReprice bool) (*ent.SupplySyncTask, error) {
 	return data.Client(ctx, r.data).SupplySyncTask.Create().
 		SetConnectionID(connectionID).
@@ -398,7 +398,7 @@ func (r *SupplyRepoImpl) CreateSyncTask(ctx context.Context, connectionID uint64
 		Save(ctx)
 }
 
-// GetSyncTask 任务详情。
+// GetSyncTask 任務詳情。
 func (r *SupplyRepoImpl) GetSyncTask(ctx context.Context, id uint64) (*ent.SupplySyncTask, error) {
 	t, err := data.Client(ctx, r.data).SupplySyncTask.Get(ctx, id)
 	if err != nil {
@@ -410,7 +410,7 @@ func (r *SupplyRepoImpl) GetSyncTask(ctx context.Context, id uint64) (*ent.Suppl
 	return t, nil
 }
 
-// ListSyncTasks 任务列表。
+// ListSyncTasks 任務列表。
 func (r *SupplyRepoImpl) ListSyncTasks(ctx context.Context, connectionID uint64, page, pageSize int) ([]*ent.SupplySyncTask, int, error) {
 	q := data.Client(ctx, r.data).SupplySyncTask.Query().Order(ent.Desc(supplysynctask.FieldID))
 	if connectionID > 0 {
@@ -424,7 +424,7 @@ func (r *SupplyRepoImpl) ListSyncTasks(ctx context.Context, connectionID uint64,
 	return ts, total, err
 }
 
-// TaskProgress 同步进度快照（心跳/统计/取消检查的落库单元）。
+// TaskProgress 同步進度快照（心跳/統計/取消檢查的落庫單元）。
 type TaskProgress struct {
 	Stage         string
 	Page          int
@@ -437,7 +437,7 @@ type TaskProgress struct {
 	Deleted       int32
 }
 
-// TouchTask 心跳 + 进度（cancel_requested_at 已置则返回 true 表示应停止）。
+// TouchTask 心跳 + 進度（cancel_requested_at 已置則返回 true 表示應停止）。
 func (r *SupplyRepoImpl) TouchTask(ctx context.Context, id uint64, p TaskProgress) (cancelRequested bool, err error) {
 	task, err := r.GetSyncTask(ctx, id)
 	if err != nil {
@@ -466,7 +466,7 @@ func (r *SupplyRepoImpl) TouchTask(ctx context.Context, id uint64, p TaskProgres
 	return false, err
 }
 
-// SetTaskProcessing 任务开工（pending → processing，记 started_at）。
+// SetTaskProcessing 任務開工（pending → processing，記 started_at）。
 func (r *SupplyRepoImpl) SetTaskProcessing(ctx context.Context, id uint64, total int32) error {
 	_, err := data.Client(ctx, r.data).SupplySyncTask.UpdateOneID(id).
 		SetStatus(supplysynctask.StatusProcessing).
@@ -476,7 +476,7 @@ func (r *SupplyRepoImpl) SetTaskProcessing(ctx context.Context, id uint64, total
 	return err
 }
 
-// FinishTask 任务终态（done/failed/canceled + 统计 + finished_at）。
+// FinishTask 任務終態（done/failed/canceled + 統計 + finished_at）。
 func (r *SupplyRepoImpl) FinishTask(ctx context.Context, id uint64, status supplysynctask.Status, errorCode, errorContext string) error {
 	upd := data.Client(ctx, r.data).SupplySyncTask.UpdateOneID(id).
 		SetStatus(status).
@@ -491,7 +491,7 @@ func (r *SupplyRepoImpl) FinishTask(ctx context.Context, id uint64, status suppl
 	return err
 }
 
-// ResetTaskPending 重置任务为 pending（失败自动重试用；清心跳与取消标志）。
+// ResetTaskPending 重置任務為 pending（失敗自動重試用；清心跳與取消標誌）。
 func (r *SupplyRepoImpl) ResetTaskPending(ctx context.Context, id uint64) error {
 	_, err := data.Client(ctx, r.data).SupplySyncTask.UpdateOneID(id).
 		SetStatus(supplysynctask.StatusPending).
@@ -501,7 +501,7 @@ func (r *SupplyRepoImpl) ResetTaskPending(ctx context.Context, id uint64) error 
 	return err
 }
 
-// RequestCancel 请求取消（分批间检查标志）。
+// RequestCancel 請求取消（分批間檢查標誌）。
 func (r *SupplyRepoImpl) RequestCancel(ctx context.Context, id uint64) (*ent.SupplySyncTask, error) {
 	task, err := r.GetSyncTask(ctx, id)
 	if err != nil {
@@ -515,14 +515,14 @@ func (r *SupplyRepoImpl) RequestCancel(ctx context.Context, id uint64) (*ent.Sup
 		Save(ctx)
 }
 
-// LoadTaskProgress 读取任务当前统计（取消检查 + 进度读取）。
+// LoadTaskProgress 讀取任務當前統計（取消檢查 + 進度讀取）。
 func (r *SupplyRepoImpl) LoadTaskProgress(ctx context.Context, id uint64) (*ent.SupplySyncTask, error) {
 	return r.GetSyncTask(ctx, id)
 }
 
-// ── 调度（ S3）───────────────────────────────────────
+// ── 調度（ S3）───────────────────────────────────────
 
-// HasRunningTask 连接是否存在未完结同步任务（pending/processing；调度防重入）。
+// HasRunningTask 連接是否存在未完結同步任務（pending/processing；調度防重入）。
 func (r *SupplyRepoImpl) HasRunningTask(ctx context.Context, connectionID uint64) (bool, error) {
 	n, err := data.Client(ctx, r.data).SupplySyncTask.Query().
 		Where(
@@ -533,7 +533,7 @@ func (r *SupplyRepoImpl) HasRunningTask(ctx context.Context, connectionID uint64
 	return n > 0, err
 }
 
-// TouchScopeAnchor 写 scope 调度锚点列（派发定时任务时回写）。
+// TouchScopeAnchor 寫 scope 調度錨點列（派發定時任務時回寫）。
 func (r *SupplyRepoImpl) TouchScopeAnchor(ctx context.Context, id uint64, scope string) error {
 	now := time.Now().UTC()
 	upd := data.Client(ctx, r.data).SupplyConnection.UpdateOneID(id)
@@ -551,8 +551,8 @@ func (r *SupplyRepoImpl) TouchScopeAnchor(ctx context.Context, id uint64, scope 
 	return err
 }
 
-// ListStaleProcessing 心跳超时的 processing 任务（看门狗 reapStale；
-// 心跳为零的用 started_at 判定——刚开工尚未打第一次心跳的任务不会误伤）。
+// ListStaleProcessing 心跳超時的 processing 任務（看門狗 reapStale；
+// 心跳為零的用 started_at 判定——剛開工尚未打第一次心跳的任務不會誤傷）。
 func (r *SupplyRepoImpl) ListStaleProcessing(ctx context.Context, staleBefore time.Time) ([]*ent.SupplySyncTask, error) {
 	rows, err := data.Client(ctx, r.data).SupplySyncTask.Query().
 		Where(supplysynctask.StatusEQ(supplysynctask.StatusProcessing)).
@@ -573,7 +573,7 @@ func (r *SupplyRepoImpl) ListStaleProcessing(ctx context.Context, staleBefore ti
 	return out, nil
 }
 
-// parseRetryIntervals 解析 retry_intervals JSON 数组（秒）。
+// parseRetryIntervals 解析 retry_intervals JSON 數組（秒）。
 func parseRetryIntervals(s string) []int {
 	if s == "" {
 		return nil

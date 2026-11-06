@@ -1,16 +1,16 @@
 package inventory
 
-// 锁卡生命周期（P1 最高优先——防超卖双路径）：
+// 鎖卡生命週期（P1 最高優先——防超賣雙路徑）：
 //
-// MySQL/PG：事务内 SELECT ... WHERE status='available' ORDER BY id LIMIT n FOR UPDATE SKIP LOCKED
-// → 全部置 reserved + order_id + locked_at；数量不足整批回滚
-// SQLite： 单写者事务（BEGIN IMMEDIATE 语义由 database/sql 驱动自动处理）
+// MySQL/PG：事務內 SELECT ... WHERE status='available' ORDER BY id LIMIT n FOR UPDATE SKIP LOCKED
+// → 全部置 reserved + order_id + locked_at；數量不足整批迴滾
+// SQLite： 單寫者事務（BEGIN IMMEDIATE 語義由 database/sql 驅動自動處理）
 // → UPDATE cards SET status='reserved' WHERE id IN (...) AND status='available'
-// 校验 affected rows == n（CAS 语义，）
+// 校驗 affected rows == n（CAS 語義，）
 //
-// Release：reserved → available，**必须同时清 order_id**（1.x 踩坑：unlock 不清 order_id 导致旧订单发货错乱）
-// MarkUsed：UPDATE WHERE status='reserved' 校验 affected rows（防并发重发，友商纪律）
-// TTL 释放：周期任务扫 locked_at 超时（ order 超时取消时调用）
+// Release：reserved → available，**必須同時清 order_id**（1.x 踩坑：unlock 不清 order_id 導致舊訂單發貨錯亂）
+// MarkUsed：UPDATE WHERE status='reserved' 校驗 affected rows（防併發重發，友商紀律）
+// TTL 釋放：週期任務掃 locked_at 超時（ order 超時取消時調用）
 
 import (
 	"context"
@@ -26,7 +26,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/db"
 )
 
-// 错误。
+// 錯誤。
 var (
 	ErrInsufficient = fmt.Errorf("inventory.INSUFFICIENT_STOCK")
 	ErrNotFound     = fmt.Errorf("inventory.CARD_NOT_FOUND")
@@ -35,17 +35,17 @@ var (
 
 // ── Reserve ───────────────────────────────────────────────────
 
-// Reserve 事务内锁卡（防超卖）。必须在 data.Tx 内调用以共享事务。
+// Reserve 事務內鎖卡（防超賣）。必須在 data.Tx 內調用以共享事務。
 func (r *CardRepoImpl) Reserve(ctx context.Context, subsiteID uint64, items []port.ReserveItem) (*port.Reservation, error) {
 	client := data.Client(ctx, r.data)
 	supportsLock := r.data.Dialect.Capabilities().SupportsSkipLocked
-	var locked []port.ReservedCard // 锁到的卡（ 供货交付消费）
+	var locked []port.ReservedCard // 鎖到的卡（ 供貨交付消費）
 
 	for _, item := range items {
 		if item.Quantity <= 0 {
 			continue
 		}
-		// 1) 查可用卡（靓号精确匹配 or 按序取）
+		// 1) 查可用卡（靚號精確匹配 or 按序取）
 		query := client.Card.Query().
 			Where(
 				card.ProductID(item.ProductID),
@@ -56,7 +56,7 @@ func (r *CardRepoImpl) Reserve(ctx context.Context, subsiteID uint64, items []po
 			Limit(int(item.Quantity))
 
 		if item.NumberHash != "" {
-			// 靓号自选：精确匹配
+			// 靚號自選：精確匹配
 			query = client.Card.Query().
 				Where(
 					card.ProductID(item.ProductID),
@@ -74,27 +74,27 @@ func (r *CardRepoImpl) Reserve(ctx context.Context, subsiteID uint64, items []po
 			query = query.Where(card.SkuID(item.SkuID))
 		}
 
-		// 行锁（MySQL/PG；SQLite 单写者天然串行）
+		// 行鎖（MySQL/PG；SQLite 單寫者天然串行）
 		if supportsLock {
 			query = query.ForUpdate(entsql.WithLockAction(sql.SkipLocked))
 		}
 
 		rows, err := query.All(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("inventory: 查询可用卡失败: %w", err)
+			return nil, fmt.Errorf("inventory: 查詢可用卡失敗: %w", err)
 		}
 		want := int(item.Quantity)
 		if item.NumberHash != "" {
 			want = 1
 		}
 		if len(rows) < want {
-			return nil, ErrInsufficient // 数量不足整批回滚
+			return nil, ErrInsufficient // 數量不足整批迴滾
 		}
 		for _, row := range rows {
 			locked = append(locked, port.ReservedCard{CardID: row.ID, Locked: true})
 		}
 
-		// 2) 置 reserved + order_id + locked_at（CAS：affected rows 校验）
+		// 2) 置 reserved + order_id + locked_at（CAS：affected rows 校驗）
 		ids := make([]uint64, 0, len(rows))
 		for _, row := range rows {
 			ids = append(ids, row.ID)
@@ -108,14 +108,14 @@ func (r *CardRepoImpl) Reserve(ctx context.Context, subsiteID uint64, items []po
 			SetLockedAt(time.Now().UTC()).
 			Save(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("inventory: 锁卡失败: %w", err)
+			return nil, fmt.Errorf("inventory: 鎖卡失敗: %w", err)
 		}
 		if int(affected) != len(ids) {
-			return nil, ErrInsufficient // CAS 失败：并发竞争，回滚
+			return nil, ErrInsufficient // CAS 失敗：併發競爭，回滾
 		}
 	}
 
-	// 返回预留（caller 传入 order_id 后需调 BindOrder）
+	// 返回預留（caller 傳入 order_id 後需調 BindOrder）
 	return &port.Reservation{
 		ReservationID: fmt.Sprintf("batch-%d", time.Now().UnixNano()),
 		Cards:         locked,
@@ -123,7 +123,7 @@ func (r *CardRepoImpl) Reserve(ctx context.Context, subsiteID uint64, items []po
 	}, nil
 }
 
-// BindOrder 锁卡后绑定订单（Reserve 成功 → caller 持有 reservation → 调用绑定）。
+// BindOrder 鎖卡後綁定訂單（Reserve 成功 → caller 持有 reservation → 調用綁定）。
 func (r *CardRepoImpl) BindOrder(ctx context.Context, subsiteID, productID, orderID uint64, quantity int32) error {
 	client := data.Client(ctx, r.data)
 	_, err := client.Card.Update().
@@ -140,7 +140,7 @@ func (r *CardRepoImpl) BindOrder(ctx context.Context, subsiteID, productID, orde
 
 // ── Release ───────────────────────────────────────────────────
 
-// Release 释放预留（订单取消/超时；**必须清 order_id**——1.x 踩坑）。
+// Release 釋放預留（訂單取消/超時；**必須清 order_id**——1.x 踩坑）。
 func (r *CardRepoImpl) Release(ctx context.Context, orderID uint64) error {
 	client := data.Client(ctx, r.data)
 	_, err := client.Card.Update().
@@ -155,7 +155,7 @@ func (r *CardRepoImpl) Release(ctx context.Context, orderID uint64) error {
 	return err
 }
 
-// ReleaseExpired TTL 释放（周期任务：locked_at 超时的 reserved → available）。
+// ReleaseExpired TTL 釋放（週期任務：locked_at 超時的 reserved → available）。
 func (r *CardRepoImpl) ReleaseExpired(ctx context.Context, ttl time.Duration) (int, error) {
 	client := data.Client(ctx, r.data)
 	deadline := time.Now().Add(-ttl).UTC()
@@ -173,11 +173,11 @@ func (r *CardRepoImpl) ReleaseExpired(ctx context.Context, ttl time.Duration) (i
 
 // ── MarkUsed ──────────────────────────────────────────────────
 
-// MarkUsed 售出标记（校验 affected rows 防并发重发）。
+// MarkUsed 售出標記（校驗 affected rows 防併發重發）。
 func (r *CardRepoImpl) MarkUsed(ctx context.Context, cardIDs []uint64, orderID uint64) error {
 	client := data.Client(ctx, r.data)
-	// orderID>0：本地订单严格校验绑定（防并发重发）；
-	// orderID=0：供货交付（Reserve 未绑本地订单，order_id 为 NULL）
+	// orderID>0：本地訂單嚴格校驗綁定（防併發重發）；
+	// orderID=0：供貨交付（Reserve 未綁本地訂單，order_id 為 NULL）
 	upd := client.Card.Update().
 		Where(
 			card.IDIn(cardIDs...),
@@ -191,15 +191,15 @@ func (r *CardRepoImpl) MarkUsed(ctx context.Context, cardIDs []uint64, orderID u
 		SetUsedAt(time.Now().UTC()).
 		Save(ctx)
 	if err != nil {
-		return fmt.Errorf("inventory: 标记售出失败: %w", err)
+		return fmt.Errorf("inventory: 標記售出失敗: %w", err)
 	}
 	if int(affected) != len(cardIDs) {
-		return ErrNotReserved // 部分卡不在 reserved 状态（并发冲突）
+		return ErrNotReserved // 部分卡不在 reserved 狀態（併發衝突）
 	}
 	return nil
 }
 
-// ReleaseCards 释放指定锁卡（供货交付失败回滚；reserved → available）。
+// ReleaseCards 釋放指定鎖卡（供貨交付失敗回滾；reserved → available）。
 func (r *CardRepoImpl) ReleaseCards(ctx context.Context, cardIDs []uint64) error {
 	_, err := data.Client(ctx, r.data).Card.Update().
 		Where(
@@ -213,7 +213,7 @@ func (r *CardRepoImpl) ReleaseCards(ctx context.Context, cardIDs []uint64) error
 	return err
 }
 
-// MarkUsedAndDelete 即删模式（delivery_mode=delete：发后物理删除卡密行）。
+// MarkUsedAndDelete 即刪模式（delivery_mode=delete：發後物理刪除卡密行）。
 func (r *CardRepoImpl) MarkUsedAndDelete(ctx context.Context, cardIDs []uint64, orderID uint64) error {
 	if err := r.MarkUsed(ctx, cardIDs, orderID); err != nil {
 		return err
@@ -225,7 +225,7 @@ func (r *CardRepoImpl) MarkUsedAndDelete(ctx context.Context, cardIDs []uint64, 
 
 // ── Stock ─────────────────────────────────────────────────────
 
-// Stock 可用库存数（-1=无限，链接类）。
+// Stock 可用庫存數（-1=無限，鏈接類）。
 func (r *CardRepoImpl) Stock(ctx context.Context, productID, skuID uint64) (int64, error) {
 	client := data.Client(ctx, r.data)
 	p, e := client.Product.Get(ctx, productID)
@@ -257,7 +257,7 @@ func (r *CardRepoImpl) Stock(ctx context.Context, productID, skuID uint64) (int6
 	return int64(n), err
 }
 
-// ListByOrder 按订单查卡（交付/取货用）。
+// ListByOrder 按訂單查卡（交付/取貨用）。
 func (r *CardRepoImpl) ListByOrder(ctx context.Context, orderID uint64) ([]*ent.Card, error) {
 	return data.Client(ctx, r.data).Card.Query().
 		Where(card.OrderID(orderID)).
@@ -265,12 +265,12 @@ func (r *CardRepoImpl) ListByOrder(ctx context.Context, orderID uint64) ([]*ent.
 		All(ctx)
 }
 
-// ── 编译期接口断言 ────────────────────────────────────────────
+// ── 編譯期接口斷言 ────────────────────────────────────────────
 var _ port.Inventory = (*CardRepoImpl)(nil)
 var _ = db.SQLite // 保持 db 引用
 
-// Contents 交付卡密批量读取解密（ 供货交付出口）。
-// 明文仅内存态返回，调用方负责 TLS 传输与零日志。
+// Contents 交付卡密批量讀取解密（ 供貨交付出口）。
+// 明文僅內存態返回，調用方負責 TLS 傳輸與零日誌。
 func (r *CardRepoImpl) Contents(ctx context.Context, cardIDs []uint64, productID, subsiteID uint64) ([]string, error) {
 	rows, err := data.Client(ctx, r.data).Card.Query().
 		Where(card.IDIn(cardIDs...)).
@@ -282,7 +282,7 @@ func (r *CardRepoImpl) Contents(ctx context.Context, cardIDs []uint64, productID
 	for _, c := range rows {
 		plain, err := r.Cipher.Open(c.Content, c.ProductID, c.SubsiteID)
 		if err != nil {
-			return nil, fmt.Errorf("inventory: 卡密 %d 解密失败: %w", c.ID, err)
+			return nil, fmt.Errorf("inventory: 卡密 %d 解密失敗: %w", c.ID, err)
 		}
 		out = append(out, plain)
 	}

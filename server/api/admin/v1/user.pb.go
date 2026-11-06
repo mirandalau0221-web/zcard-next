@@ -25,12 +25,12 @@ const (
 
 type ListUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Keyword       string                 `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"` // 用户名/邮箱模糊匹配
+	Keyword       string                 `protobuf:"bytes,1,opt,name=keyword,proto3" json:"keyword,omitempty"` // 用户名/郵箱模糊匹配
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`   // active | banned（空 = 全部）
 	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	IsSupplier    bool                   `protobuf:"varint,5,opt,name=is_supplier,json=isSupplier,proto3" json:"is_supplier,omitempty"` // 仅看开通供货账户的用户（true 时生效）
-	LevelId       uint64                 `protobuf:"varint,6,opt,name=level_id,json=levelId,proto3" json:"level_id,omitempty"`          // 按会员等级筛选（非 0 时生效）
+	IsSupplier    bool                   `protobuf:"varint,5,opt,name=is_supplier,json=isSupplier,proto3" json:"is_supplier,omitempty"` // 僅看開通供貨賬户的用户（true 時生效）
+	LevelId       uint64                 `protobuf:"varint,6,opt,name=level_id,json=levelId,proto3" json:"level_id,omitempty"`          // 按會員等級篩選（非 0 時生效）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -259,7 +259,7 @@ type CreateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // ≥6 位
-	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`       // 可选
+	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`       // 可選
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -367,7 +367,7 @@ func (x *ResetUserPasswordRequest) GetNewPassword() string {
 	return ""
 }
 
-// UserItem 前台用户（敏感字段如密码哈希绝不外发）。
+// UserItem 前台用户（敏感字段如密碼哈希絕不外發）。
 type UserItem struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	ManualLevelId     uint64                 `protobuf:"varint,15,opt,name=manual_level_id,json=manualLevelId,proto3" json:"manual_level_id,omitempty"`
@@ -383,14 +383,14 @@ type UserItem struct {
 	Status            string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"` // active | banned | deleted
 	LastLoginAt       int64                  `protobuf:"varint,5,opt,name=last_login_at,json=lastLoginAt,proto3" json:"last_login_at,omitempty"`
 	CreatedAt         int64                  `protobuf:"varint,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	// 聚合展示（列表/详情同源）
-	LevelId        uint64 `protobuf:"varint,7,opt,name=level_id,json=levelId,proto3" json:"level_id,omitempty"` // 会员等级（0=无等级）
+	// 聚合展示（列表/詳情同源）
+	LevelId        uint64 `protobuf:"varint,7,opt,name=level_id,json=levelId,proto3" json:"level_id,omitempty"` // 會員等級（0=無等級）
 	LevelName      string `protobuf:"bytes,8,opt,name=level_name,json=levelName,proto3" json:"level_name,omitempty"`
-	BalanceCents   int64  `protobuf:"varint,9,opt,name=balance_cents,json=balanceCents,proto3" json:"balance_cents,omitempty"`       // 钱包可用余额（分）
-	Points         int32  `protobuf:"varint,10,opt,name=points,proto3" json:"points,omitempty"`                                      // 积分余额
-	OrderCount     int64  `protobuf:"varint,11,opt,name=order_count,json=orderCount,proto3" json:"order_count,omitempty"`            // 全部订单数
-	SpentCents     int64  `protobuf:"varint,12,opt,name=spent_cents,json=spentCents,proto3" json:"spent_cents,omitempty"`            // 累计消费（已支付订单总额，分）
-	IsSupplier     bool   `protobuf:"varint,13,opt,name=is_supplier,json=isSupplier,proto3" json:"is_supplier,omitempty"`            // 是否开通供货账户
+	BalanceCents   int64  `protobuf:"varint,9,opt,name=balance_cents,json=balanceCents,proto3" json:"balance_cents,omitempty"`       // 錢包可用餘額（分）
+	Points         int32  `protobuf:"varint,10,opt,name=points,proto3" json:"points,omitempty"`                                      // 積分餘額
+	OrderCount     int64  `protobuf:"varint,11,opt,name=order_count,json=orderCount,proto3" json:"order_count,omitempty"`            // 全部訂單數
+	SpentCents     int64  `protobuf:"varint,12,opt,name=spent_cents,json=spentCents,proto3" json:"spent_cents,omitempty"`            // 累計消費（已支付訂單總額，分）
+	IsSupplier     bool   `protobuf:"varint,13,opt,name=is_supplier,json=isSupplier,proto3" json:"is_supplier,omitempty"`            // 是否開通供貨賬户
 	SupplierStatus string `protobuf:"bytes,14,opt,name=supplier_status,json=supplierStatus,proto3" json:"supplier_status,omitempty"` // applying | approved | rejected
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -573,7 +573,7 @@ func (x *UserItem) GetSupplierStatus() string {
 	return ""
 }
 
-// UserCouponItem 用户持有优惠券。
+// UserCouponItem 用户持有優惠券。
 type UserCouponItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -642,10 +642,10 @@ func (x *UserCouponItem) GetExpiresAt() int64 {
 	return 0
 }
 
-// UserRecentOrder 最近订单（用户详情聚合，默认 10 条）。
+// UserRecentOrder 最近訂單（用户詳情聚合，默認 10 條）。
 type UserRecentOrder struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Items         []*AdminOrderItem      `protobuf:"bytes,5,rep,name=items,proto3" json:"items,omitempty"` // 商品名称、规格和数量摘要
+	Items         []*AdminOrderItem      `protobuf:"bytes,5,rep,name=items,proto3" json:"items,omitempty"` // 商品名稱、規格和數量摘要
 	OrderNo       string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
 	AmountCents   int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
 	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
@@ -719,14 +719,14 @@ func (x *UserRecentOrder) GetCreatedAt() int64 {
 	return 0
 }
 
-// UserDetail 用户详情（聚合视图）。
+// UserDetail 用户詳情（聚合視圖）。
 type UserDetail struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	User            *UserItem              `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	Coupons         []*UserCouponItem      `protobuf:"bytes,2,rep,name=coupons,proto3" json:"coupons,omitempty"`                                        // 持有优惠券（最多 50）
-	RecentOrders    []*UserRecentOrder     `protobuf:"bytes,3,rep,name=recent_orders,json=recentOrders,proto3" json:"recent_orders,omitempty"`          // 最近订单
-	InviterUsername string                 `protobuf:"bytes,4,opt,name=inviter_username,json=inviterUsername,proto3" json:"inviter_username,omitempty"` // 邀请人（无则空）
-	InviteesCount   int64                  `protobuf:"varint,5,opt,name=invitees_count,json=inviteesCount,proto3" json:"invitees_count,omitempty"`      // 直接下级数量
+	Coupons         []*UserCouponItem      `protobuf:"bytes,2,rep,name=coupons,proto3" json:"coupons,omitempty"`                                        // 持有優惠券（最多 50）
+	RecentOrders    []*UserRecentOrder     `protobuf:"bytes,3,rep,name=recent_orders,json=recentOrders,proto3" json:"recent_orders,omitempty"`          // 最近訂單
+	InviterUsername string                 `protobuf:"bytes,4,opt,name=inviter_username,json=inviterUsername,proto3" json:"inviter_username,omitempty"` // 邀請人（無則空）
+	InviteesCount   int64                  `protobuf:"varint,5,opt,name=invitees_count,json=inviteesCount,proto3" json:"invitees_count,omitempty"`      // 直接下級數量
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }

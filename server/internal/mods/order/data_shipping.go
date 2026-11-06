@@ -44,7 +44,7 @@ func (s *StoreOrderService) ShippingRegions(ctx context.Context, req *storefront
 	}
 	r, ok := shipping.Regions[req.Country]
 	if !ok {
-		return nil, kerrors.BadRequest("shipping.COUNTRY", "国家无效")
+		return nil, kerrors.BadRequest("shipping.COUNTRY", "國家無效")
 	}
 	b, _ := json.Marshal(r)
 	return &storefrontv1.ShippingRegionsReply{DataJson: string(b)}, nil
@@ -107,7 +107,7 @@ func (uc *OrderUsecase) ReplayOrder(ctx context.Context, in CreateOrderInput) (*
 		return nil, e
 	}
 	if prev.RequestHash != "" && prev.RequestHash != orderRequestHash(in) {
-		return nil, fmt.Errorf("order.FORM_INVALID: 同一请求标识不能用于不同订单内容")
+		return nil, fmt.Errorf("order.FORM_INVALID: 同一請求標識不能用於不同訂單內容")
 	}
 	return uc.replayOrderResult(prev, in)
 }
@@ -117,11 +117,11 @@ func (uc *OrderUsecase) replayOrderResult(prev *ent.Order, in CreateOrderInput) 
 	result := &CreateOrderResult{OrderNo: prev.OrderNo, TotalCents: prev.TotalAmount, ShippingCents: prev.ShippingAmount, ShippingCollect: len(shippingCollectProducts(prev)) > 0, ExpiresAt: prev.ExpiredAt}
 	if prev.OrderAccessTokenHash != "" {
 		if !orderaccess.SecureRequestKey(in.IdempotencyKey) || prev.RequestHash == "" || prev.RequestHash != orderRequestHash(in) || uc.AccessCipher == nil {
-			return nil, fmt.Errorf("order.FORM_INVALID: 无法恢复此订单授权，请通过邮箱查询订单")
+			return nil, fmt.Errorf("order.FORM_INVALID: 無法恢復此訂單授權，請通過郵箱查詢訂單")
 		}
 		token, err := uc.AccessCipher.OpenOrderAccess(prev.OrderAccessTokenSecret, prev.OrderNo, prev.SubsiteID)
 		if err != nil || !orderaccess.VerifyToken(prev.OrderAccessTokenHash, prev.SubsiteID, prev.OrderNo, token) {
-			return nil, fmt.Errorf("order.CREATE_FAILED: 订单授权暂时不可用，请通过邮箱查询订单")
+			return nil, fmt.Errorf("order.CREATE_FAILED: 訂單授權暫時不可用，請通過郵箱查詢訂單")
 		}
 		result.OrderAccessToken = token
 	}

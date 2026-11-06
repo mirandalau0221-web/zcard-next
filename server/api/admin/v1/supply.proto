@@ -8,32 +8,32 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminSupplyService 货源连接管理：上游连接 CRUD + Ping 探活、
-// 商品映射规则、同步任务（创建/列表/详情/取消）、连接健康。
-// 凭据纪律：credentials 仅创建时明文传入，任何响应都不回显密文
-// （列表/详情只给 credentials_set 布尔，铁律 11）。
+// AdminSupplyService 貨源連接管理：上游連接 CRUD + Ping 探活、
+// 商品映射規則、同步任務（創建/列表/詳情/取消）、連接健康。
+// 憑據紀律：credentials 僅創建時明文傳入，任何響應都不回顯密文
+// （列表/詳情只給 credentials_set 布爾，鐵律 11）。
 service AdminSupplyService {
-  // CreateConnection 创建上游连接（凭据 AES-GCM 加密入库；base_url SSRF 校验）。
+  // CreateConnection 創建上游連接（憑據 AES-GCM 加密入庫；base_url SSRF 校驗）。
   rpc CreateConnection(CreateConnectionRequest) returns (SupplyConnection) {
     option (google.api.http) = {
       post: "/api/v1/admin/supply/connections"
       body: "*"
     };
   }
-  // UpdateConnection 更新连接（credentials 留空 = 不更新凭据）。
+  // UpdateConnection 更新連接（credentials 留空 = 不更新憑據）。
   rpc UpdateConnection(UpdateConnectionRequest) returns (SupplyConnection) {
     option (google.api.http) = {
       put: "/api/v1/admin/supply/connections/{id}"
       body: "*"
     };
   }
-  // DeleteConnection 删除连接（存在映射时拒绝）。
+  // DeleteConnection 刪除連接（存在映射時拒絕）。
   rpc DeleteConnection(DeleteConnectionRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/api/v1/admin/supply/connections/{id}"
     };
   }
-  // ListConnections 连接列表（凭据零回显）。
+  // ListConnections 連接列表（憑據零回顯）。
   rpc ListConnections(ListConnectionsRequest) returns (ListConnectionsReply) {
     option (google.api.http) = { get: "/api/v1/admin/supply/connections" };
   }
@@ -44,39 +44,39 @@ service AdminSupplyService {
       body: "*"
     };
   }
-  // ListMappings 商品映射列表（按连接过滤）。
+  // ListMappings 商品映射列表（按連接過濾）。
   rpc ListMappings(ListMappingsRequest) returns (ListMappingsReply) {
     option (google.api.http) = { get: "/api/v1/admin/supply/mappings" };
   }
-  // UpsertMapping 创建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
+  // UpsertMapping 創建/更新映射（UNIQUE(connection_id, upstream_product, upstream_sku)）。
   rpc UpsertMapping(UpsertMappingRequest) returns (SupplyMapping) {
     option (google.api.http) = {
       post: "/api/v1/admin/supply/mappings"
       body: "*"
     };
   }
-  // DeleteMapping 删除映射。
+  // DeleteMapping 刪除映射。
   rpc DeleteMapping(DeleteMappingRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/api/v1/admin/supply/mappings/{id}"
     };
   }
-  // CreateSyncTask 创建同步任务（full=全量 / incremental=增量；low 队列执行）。
+  // CreateSyncTask 創建同步任務（full=全量 / incremental=增量；low 隊列執行）。
   rpc CreateSyncTask(CreateSyncTaskRequest) returns (SupplySyncTask) {
     option (google.api.http) = {
       post: "/api/v1/admin/supply/sync-tasks"
       body: "*"
     };
   }
-  // ListSyncTasks 同步任务列表。
+  // ListSyncTasks 同步任務列表。
   rpc ListSyncTasks(ListSyncTasksRequest) returns (ListSyncTasksReply) {
     option (google.api.http) = { get: "/api/v1/admin/supply/sync-tasks" };
   }
-  // GetSyncTask 任务详情（心跳/统计/错误上下文）。
+  // GetSyncTask 任務詳情（心跳/統計/錯誤上下文）。
   rpc GetSyncTask(GetSyncTaskRequest) returns (SupplySyncTask) {
     option (google.api.http) = { get: "/api/v1/admin/supply/sync-tasks/{id}" };
   }
-  // CancelSyncTask 请求取消（分批间检查标志）。
+  // CancelSyncTask 請求取消（分批間檢查標誌）。
   rpc CancelSyncTask(CancelSyncTaskRequest) returns (SupplySyncTask) {
     option (google.api.http) = {
       post: "/api/v1/admin/supply/sync-tasks/{id}/cancel"
@@ -89,12 +89,12 @@ service AdminSupplyService {
   rpc RetryImportTask(RetryImportTaskRequest) returns (SupplySyncTask) {
     option (google.api.http) = { post: "/api/v1/admin/supply/sync-tasks/{id}/retry" body: "*" };
   }
-  // ListHealth 连接健康列表（探活结果 + 最近错误 + 同步时间）。
-  // PreviewProducts 轻量目录预览；quote_code 按需查询一个商品的账号报价。
+  // ListHealth 連接健康列表（探活結果 + 最近錯誤 + 同步時間）。
+  // PreviewProducts 輕量目錄預覽；quote_code 按需查詢一個商品的賬號報價。
   rpc PreviewProducts(PreviewProductsRequest) returns (PreviewProductsReply) {
     option (google.api.http) = { get: "/api/v1/admin/supply/connections/{connection_id}/preview" };
   }
-  // ImportProducts 勾选导入（定价策略 + 类目映射 + 存为连接默认； D）。
+  // ImportProducts 勾選導入（定價策略 + 類目映射 + 存為連接默認； D）。
   rpc ImportProducts(ImportProductsRequest) returns (ImportProductsReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/supply/connections/{connection_id}/import"
@@ -106,18 +106,18 @@ service AdminSupplyService {
   }
 }
 
-// ---- 连接 ----
+// ---- 連接 ----
 
 message SupplyConnection {
   uint64 id = 1;
   string name = 2;
   string driver = 3; // zcard | dujiao_next | acg_faka
   string base_url = 4;
-  bool credentials_set = 5; // 凭据已配置（密文不回显）
+  bool credentials_set = 5; // 憑據已配置（密文不回顯）
   string status = 6; // active | disabled
   string callback_url = 7;
   int32 retry_max = 8;
-  string retry_intervals = 9; // JSON 数组 [30,60,300]
+  string retry_intervals = 9; // JSON 數組 [30,60,300]
   double exchange_rate = 10;
   double price_markup_percent = 11;
   string price_rounding_mode = 12; // none | ceil_int | ceil_tenth
@@ -126,7 +126,7 @@ message SupplyConnection {
   string settings = 15; // JSON
   int64 low_stock_scanned_at = 29;
   string low_stock_message = 30;
-  int64 price_markup_amount = 28; // 固定加价（分；与加价% 组合：×(1+%) 后再加）
+  int64 price_markup_amount = 28; // 固定加價（分；與加價% 組合：×(1+%) 後再加）
   int64 last_ping_at = 16;
   bool last_ping_ok = 17;
   int64 last_synced_at = 18;
@@ -134,19 +134,19 @@ message SupplyConnection {
   int64 balance_cache = 20;
   int64 created_at = 21;
   int64 updated_at = 22;
-  // S2/S3：调度锚点与限流状态（界面展示/倒计时）
+  // S2/S3：調度錨點與限流狀態（界面展示/倒計時）
   int64 last_collect_at = 23;
   int64 last_price_sync_at = 24;
   int64 last_status_sync_at = 25;
-  string rate_state = 26; // JSON（节奏器状态：当前间隔/封锁计数/冷却时长）
-  int64 rate_limit_until = 27; // 熔断冷却截止（秒；0=未熔断）
+  string rate_state = 26; // JSON（節奏器狀態：當前間隔/封鎖計數/冷卻時長）
+  int64 rate_limit_until = 27; // 熔斷冷卻截止（秒；0=未熔斷）
 }
 
 message CreateConnectionRequest {
   string name = 1 [(google.api.field_behavior) = REQUIRED];
   string driver = 2 [(google.api.field_behavior) = REQUIRED];
   string base_url = 3 [(google.api.field_behavior) = REQUIRED];
-  string credentials = 4 [(google.api.field_behavior) = REQUIRED]; // 驱动结构 JSON 明文（仅此接口）
+  string credentials = 4 [(google.api.field_behavior) = REQUIRED]; // 驅動結構 JSON 明文（僅此接口）
   string callback_url = 5;
   int32 retry_max = 6;
   string retry_intervals = 7;
@@ -156,7 +156,7 @@ message CreateConnectionRequest {
   bool auto_sync_price = 11;
   string stock_mode = 12;
   string settings = 13;
-  int64 price_markup_amount = 14; // 固定加价（分）
+  int64 price_markup_amount = 14; // 固定加價（分）
 }
 
 message UpdateConnectionRequest {
@@ -173,8 +173,8 @@ message UpdateConnectionRequest {
   optional bool auto_sync_price = 11;
   string stock_mode = 12;
   string status = 13;
-  string settings = 14; // JSON（定时计划/导入默认价；非空整体替换）
-  optional int64 price_markup_amount = 15; // 固定加价（分）
+  string settings = 14; // JSON（定時計劃/導入默認價；非空整體替換）
+  optional int64 price_markup_amount = 15; // 固定加價（分）
 }
 
 message DeleteConnectionRequest {
@@ -216,7 +216,7 @@ message SupplyMapping {
   uint64 local_product_id = 6;
   string upstream_sku = 7;
   uint64 local_sku_id = 8;
-  int32 up_stock = 9; // -1 = 无限
+  int32 up_stock = 9; // -1 = 無限
   string pricing_override = 10; // JSON
   int64 created_at = 11;
   int64 updated_at = 12;
@@ -250,13 +250,13 @@ message DeleteMappingRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// ---- 同步任务 ----
+// ---- 同步任務 ----
 
 message SupplySyncTask {
   uint64 id = 1;
   uint64 connection_id = 2;
   string mode = 3; // full | incremental
-  string scope = 4; // collect | price | status（空 = collect 兼容历史任务）
+  string scope = 4; // collect | price | status（空 = collect 兼容歷史任務）
   bool force_reprice = 5;
   string status = 6; // pending | processing | done | failed | canceled
   int64 total = 7;
@@ -285,19 +285,19 @@ message SupplySyncTask {
 
 message CreateSyncTaskRequest {
   uint64 connection_id = 1 [(google.api.field_behavior) = REQUIRED];
-  string mode = 2; // full | incremental（默认 full；驱动不支持增量时引擎自动回落全量）
-  string scope = 3; // collect=采集（默认，含删除对账）| price=仅刷价格 | status=仅刷上下架与库存
+  string mode = 2; // full | incremental（默認 full；驅動不支持增量時引擎自動回落全量）
+  string scope = 3; // collect=採集（默認，含刪除對賬）| price=僅刷價格 | status=僅刷上下架與庫存
   bool force_reprice = 4;
 }
 
 message PreviewProductsRequest {
   uint64 connection_id = 1 [(google.api.field_behavior) = REQUIRED];
-  string quote_code = 2; // 非空时仅返回该商品，并实时获取账号单件报价（含各规格）
-  bool async = 3; // 后台加载目录，短轮询读取状态
-  string snapshot_id = 4; // 已加载目录凭证，报价与导入均复用
+  string quote_code = 2; // 非空時僅返回該商品，並實時獲取賬號單件報價（含各規格）
+  bool async = 3; // 後台加載目錄，短輪詢讀取狀態
+  string snapshot_id = 4; // 已加載目錄憑證，報價與導入均複用
   int32 page = 6;
   int32 page_size = 7;
-  bool refresh = 5; // 明确重试或刷新；不覆盖其他窗口持有的快照
+  bool refresh = 5; // 明確重試或刷新；不覆蓋其他窗口持有的快照
 }
 
 message PreviewProduct {
@@ -306,19 +306,19 @@ message PreviewProduct {
   map<string,string> sms_product = 17;
   string code = 1;
   string name = 2;
-  int64 price_cents = 3; // 上游价（分）
+  int64 price_cents = 3; // 上游價（分）
   int64 factory_price_cents = 4;
   string category_code = 5;
   string category_name = 6;
   bool is_active = 7;
-  int32 stock = 8; // -1 = 无限/未知
-  bool already_imported = 9; // 已存在映射（勾选导入 = 更新）
-  string quote_status = 10; // pending | ready | failed；未确认时不能使用目录原价作为成本
-  int64 cost_price_cents = 11; // 本地币种成本，账号单件报价乘汇率，不含加价；未知=-1
+  int32 stock = 8; // -1 = 無限/未知
+  bool already_imported = 9; // 已存在映射（勾選導入 = 更新）
+  string quote_status = 10; // pending | ready | failed；未確認時不能使用目錄原價作為成本
+  int64 cost_price_cents = 11; // 本地幣種成本，賬號單件報價乘匯率，不含加價；未知=-1
   bool is_locked = 13;
   bool category_protected = 14;
   uint64 local_category_id = 15;
-  bool cost_is_minimum = 12; // 多规格商品显示最低规格成本
+  bool cost_is_minimum = 12; // 多規格商品顯示最低規格成本
 }
 
 message PreviewCategory {
@@ -345,34 +345,34 @@ message PreviewProductsReply {
 message ImportProductsRequest {
   uint64 connection_id = 1 [(google.api.field_behavior) = REQUIRED];
   repeated string codes = 2 [(google.api.field_behavior) = REQUIRED];
-  string pricing_mode = 3; // channel | percent | fixed | equal | pending（默认跟随渠道，兼容已保存导入策略）
-  double markup_percent = 4; // percent 模式加价 %（0 = 不加价）
-  int64 markup_amount_cents = 5; // fixed 模式加价金额（分）
-  bool save_default = 6; // 把本次策略存为连接默认（settings.import_pricing）
-  map<string, uint64> category_map = 7; // 缺省沿用；0 显式清除；正数指定本地分类
-  map<string, uint64> product_categories = 10; // 单品明确选择，仅限本次选中商品
+  string pricing_mode = 3; // channel | percent | fixed | equal | pending（默認跟隨渠道，兼容已保存導入策略）
+  double markup_percent = 4; // percent 模式加價 %（0 = 不加價）
+  int64 markup_amount_cents = 5; // fixed 模式加價金額（分）
+  bool save_default = 6; // 把本次策略存為連接默認（settings.import_pricing）
+  map<string, uint64> category_map = 7; // 缺省沿用；0 顯式清除；正數指定本地分類
+  map<string, uint64> product_categories = 10; // 單品明確選擇，僅限本次選中商品
   repeated ProductCategoryRule category_rules = 11;
   bool save_category_rules = 12;
-  bool selected_categories_only = 13; // 不修改整个上游分类的默认映射
-  string request_key = 9; // 同一次提交/网络重试使用同一键
+  bool selected_categories_only = 13; // 不修改整個上游分類的默認映射
+  string request_key = 9; // 同一次提交/網絡重試使用同一鍵
   string snapshot_id = 14;
-  repeated ImportCategoryDraft category_drafts = 8; // 仅在提交时创建，限所选商品涉及分类
+  repeated ImportCategoryDraft category_drafts = 8; // 僅在提交時創建，限所選商品涉及分類
 }
 
 message ImportCategoryDraft {
   string upstream_code = 1;
   string name = 2;
-  uint64 parent_id = 3; // 0 = 顶级分类
+  uint64 parent_id = 3; // 0 = 頂級分類
 }
 
 message ImportProductsReply {
-  SupplySyncTask task = 7; // 已受理后台任务，请查询任务接口获取结果
+  SupplySyncTask task = 7; // 已受理後台任務，請查詢任務接口獲取結果
   int32 imported = 1; // 新建
-  int32 updated = 2; // 更新（已导入重导）
+  int32 updated = 2; // 更新（已導入重導）
   int32 failed = 3;
   string error_context = 4;
   repeated string failed_codes = 5;
-  map<string, uint64> category_map = 6; // 本次已保存映射，失败重试时复用
+  map<string, uint64> category_map = 6; // 本次已保存映射，失敗重試時複用
 }
 
 message ListSyncTasksRequest {
@@ -443,7 +443,7 @@ message ListImportItemsReply {
 message RetryImportTaskRequest {
   uint64 id = 1;
   string scope = 2; // failed | stock | remaining
-  bool confirm_config = 3; // 已确认使用当前货源配置继续未完成部分
+  bool confirm_config = 3; // 已確認使用當前貨源配置繼續未完成部分
 }
 
 message ProductCategoryRule {

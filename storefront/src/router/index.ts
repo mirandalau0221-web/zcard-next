@@ -5,7 +5,7 @@ import { refreshCartSetting } from '@/cart';
 import { getToken } from '@/api/client';
 import Home from '@/views/Home.vue';
 
-// meta.auth：需登录页面（）——无 token 跳 /login 带回跳。
+// meta.auth：需登錄頁面（）——無 token 跳 /login 帶回跳。
 export const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: Home },
   { path: '/products', name: 'products', redirect: to => ({ path: '/', query: to.query, hash: to.hash || '#catalog' }) },
@@ -58,7 +58,7 @@ export function createAppRouter(): Router {
   return router;
 }
 
-/** 登录守卫 + 尾斜杠规范化（注册到任意 router 实例；vite-ssg 与独立入口共用） */
+/** 登錄守衞 + 尾斜槓規範化（註冊到任意 router 實例；vite-ssg 與獨立入口共用） */
 export function installRouterGuards(router: Router) {
   router.beforeEach(async (to, from) => {
     // Capture before the route changes or a shorter detail page clamps scrollY.
@@ -66,12 +66,12 @@ export function installRouterGuards(router: Router) {
       catalogPositions.set(from.fullPath, { left: window.scrollX, top: window.scrollY });
       if (catalogPositions.size > 50) catalogPositions.delete(catalogPositions.keys().next().value!);
     }
-    // 关闭时允许展示停用说明，无需先要求登录。
+    // 關閉時允許展示停用説明，無需先要求登錄。
     const cartUnavailable = to.name === 'cart' && !(await refreshCartSetting(true));
     if (to.meta.auth && !cartUnavailable && !getToken()) {
       return { path: '/login', query: { redirect: to.fullPath } };
     }
-    // URL 规范化：尾斜杠 replace 到无斜杠版本，避免同一内容双 URL 重复收录
+    // URL 規範化：尾斜槓 replace 到無斜槓版本，避免同一內容雙 URL 重複收錄
     if (to.path.length > 1 && to.path.endsWith('/')) {
       return { path: to.path.slice(0, -1), query: to.query, replace: true };
     }

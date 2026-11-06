@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminNotifyService 通知管理：模板 CRUD/测试发送、发送日志查询/重发。
+// AdminNotifyService 通知管理：模板 CRUD/測試發送、發送日誌查詢/重發。
 service AdminNotifyService {
   // TestEmail submits one message synchronously using saved SMTP settings.
   rpc TestEmail(TestEmailRequest) returns (google.protobuf.Empty) {
@@ -17,7 +17,7 @@ service AdminNotifyService {
   rpc TestTelegram(TestTelegramRequest) returns (TestTelegramReply) {
     option (google.api.http) = { post: "/api/v1/admin/notify/telegram/test" body: "*" };
   }
-  // UpsertTemplate 创建/更新模板（事件 × 通道 × 语言）。
+  // UpsertTemplate 創建/更新模板（事件 × 通道 × 語言）。
   rpc UpsertTemplate(UpsertNotifyTemplateRequest) returns (NotifyTemplate) {
     option (google.api.http) = {
       post: "/api/v1/admin/notify/templates"
@@ -28,43 +28,43 @@ service AdminNotifyService {
   rpc ListTemplates(google.protobuf.Empty) returns (ListNotifyTemplatesReply) {
     option (google.api.http) = { get: "/api/v1/admin/notify/templates" };
   }
-  // PreviewTemplate 模板预览（变量样例渲染；不发送）。
+  // PreviewTemplate 模板預覽（變量樣例渲染；不發送）。
   rpc PreviewTemplate(PreviewTemplateRequest) returns (PreviewTemplateReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/notify/templates/preview"
       body: "*"
     };
   }
-  // ListLogs 发送日志（按状态/事件筛选）。
+  // ListLogs 發送日誌（按狀態/事件篩選）。
   rpc ListLogs(ListNotifyLogsRequest) returns (ListNotifyLogsReply) {
     option (google.api.http) = { get: "/api/v1/admin/notify/logs" };
   }
-  // ResendLog 重发失败日志（原变量重投）。
+  // ResendLog 重發失敗日誌（原變量重投）。
   rpc ResendLog(ResendNotifyLogRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/notify/logs/{id}/resend"
       body: "*"
     };
   }
-  // EstimateBroadcast 覆盖人数预估。
+  // EstimateBroadcast 覆蓋人數預估。
   rpc EstimateBroadcast(EstimateBroadcastRequest) returns (EstimateBroadcastReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/notify/broadcasts/estimate"
       body: "*"
     };
   }
-  // CreateBroadcast 创建群发任务。
+  // CreateBroadcast 創建羣發任務。
   rpc CreateBroadcast(CreateBroadcastRequest) returns (Broadcast) {
     option (google.api.http) = {
       post: "/api/v1/admin/notify/broadcasts"
       body: "*"
     };
   }
-  // ListBroadcasts 群发任务列表。
+  // ListBroadcasts 羣發任務列表。
   rpc ListBroadcasts(ListBroadcastsRequest) returns (ListBroadcastsReply) {
     option (google.api.http) = { get: "/api/v1/admin/notify/broadcasts" };
   }
-  // CancelBroadcast 取消群发（仅 pending）。
+  // CancelBroadcast 取消羣發（僅 pending）。
   rpc CancelBroadcast(CancelBroadcastRequest) returns (Broadcast) {
     option (google.api.http) = {
       post: "/api/v1/admin/notify/broadcasts/{id}/cancel"
@@ -89,7 +89,7 @@ message NotifyTemplate {
   uint64 id = 1;
   string event_type = 2;
   string channel = 3; // email | inbox | sms | telegram
-  string locale = 4; // zh_CN 默认
+  string locale = 4; // zh_CN 默認
   string subject_tpl = 5;
   string body_tpl = 6;
   bool enabled = 7;
@@ -159,9 +159,9 @@ message ResendNotifyLogRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-// ── 群发任务─────────────────────────────────────────
+// ── 羣發任務─────────────────────────────────────────
 
-// EstimateBroadcast 覆盖人数预估（创建前预览）。
+// EstimateBroadcast 覆蓋人數預估（創建前預覽）。
 message EstimateBroadcastRequest {
   string target_type = 1 [(google.api.field_behavior) = REQUIRED];
   repeated uint64 target_ids = 2;
@@ -171,7 +171,7 @@ message EstimateBroadcastReply {
   int64 audience = 1;
 }
 
-// CreateBroadcast 创建群发（定时 scheduled_at；空 = 立即）。
+// CreateBroadcast 創建羣發（定時 scheduled_at；空 = 立即）。
 message CreateBroadcastRequest {
   string title = 1 [(google.api.field_behavior) = REQUIRED];
   string content = 2 [(google.api.field_behavior) = REQUIRED];

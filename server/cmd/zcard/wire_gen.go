@@ -44,7 +44,7 @@ import (
 
 // Injectors from wire.go:
 
-// wireApp init kratos application（update.Service 旁路返回——serve 层挂重启 hook）。
+// wireApp init kratos application（update.Service 旁路返回——serve 層掛重啓 hook）。
 func wireApp(serverConf *conf.Server, dataConf *conf.Data, securityConf *conf.Security, logger *slog.Logger) (*appDeps, func(), error) {
 	dataData, cleanup, err := data.NewData(dataConf)
 	if err != nil {
@@ -215,8 +215,8 @@ func wireApp(serverConf *conf.Server, dataConf *conf.Data, securityConf *conf.Se
 
 // wire.go:
 
-// appDeps wire 装配产物打包（wire 多具体返回值受限）。
+// appDeps wire 裝配產物打包（wire 多具體返回值受限）。
 type appDeps struct {
 	App    *kratos.App
-	Update *update.Service // serve 层挂更新重启 hook 用
+	Update *update.Service // serve 層掛更新重啓 hook 用
 }

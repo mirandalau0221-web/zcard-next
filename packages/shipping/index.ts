@@ -14,7 +14,7 @@ export const emptyAddress = (): ShippingAddress => ({
   phone: "",
   postal_code: "",
 });
-export function countryOptions(data: RegionData, allowed?: string[], locale = "zh-CN") {
+export function countryOptions(data: RegionData, allowed?: string[], locale = "zh-TW") {
   const names = new Intl.DisplayNames([locale], { type: "region" });
   return Object.keys(data)
     .filter((code) => !allowed || allowed.includes(code))
@@ -24,7 +24,7 @@ export function countryOptions(data: RegionData, allowed?: string[], locale = "z
     }))
     .sort((a, b) => a.label.localeCompare(b.label, locale));
 }
-export function regionOptions(data: RegionData, country: string, locale = "zh-CN") {
+export function regionOptions(data: RegionData, country: string, locale = "zh-TW") {
   const info = data[country] || {};
   const keys = (info.sub_keys || "").split("~").filter(Boolean);
   const english = locale.startsWith("en");
@@ -58,24 +58,24 @@ export function addressLines(address: Record<string, string | undefined>): strin
 export function validateAddress(address: Record<string, string | undefined>, data: RegionData): Record<string, string> {
   const errors: Record<string, string> = {};
   const requiredMessages: Record<string, string> = {
-    country: "请选择国家或地区。", name: "请填写收货人姓名。", phone: "请填写电话号码。", address: "请填写地址第一行。",
-    city: "请填写郊区或城市。", district: "请填写区或县。", region: "请选择州、省或地区。", postal_code: "请填写邮政编码。",
+    country: "請選擇國家或地區。", name: "請填寫收貨人姓名。", phone: "請填寫電話號碼。", address: "請填寫地址第一行。",
+    city: "請填寫郊區或城市。", district: "請填寫區或縣。", region: "請選擇州、省或地區。", postal_code: "請填寫郵政編碼。",
   };
   const info = data[address.country || ""];
   if (!info) errors.country = requiredMessages.country;
   const required = ["name", "phone", "address", ...addressFields(data, address.country || "").filter((field) => addressRequired(data, address.country || "", field))];
   for (const key of required) if (!address[key]?.trim()) errors[key] = requiredMessages[key];
   for (const [key, value] of Object.entries(address)) {
-    if (value && (Array.from(value.trim()).length > 300 || /[\u0000\r\n]/.test(value))) errors[key] = "此字段不能超过 300 个字符或包含换行和控制字符。";
+    if (value && (Array.from(value.trim()).length > 300 || /[\u0000\r\n]/.test(value))) errors[key] = "此字段不能超過 300 個字符或包含換行和控制字符。";
   }
   const phone = address.phone?.trim() || "";
   const digits = phone.replace(/\D/g, "").length;
-  if (phone && (digits < 6 || digits > 15 || !/^\+?[0-9 ()\-]{6,30}$/.test(phone))) errors.phone = "电话号码格式无效，请包含国际区号。";
+  if (phone && (digits < 6 || digits > 15 || !/^\+?[0-9 ()\-]{6,30}$/.test(phone))) errors.phone = "電話號碼格式無效，請包含國際區號。";
   const states = regionOptions(data, address.country || "");
-  if (address.region && states.length && !states.some((state) => state.value === address.region)) errors.region = "请选择属于该国家或地区的州、省或地区。";
+  if (address.region && states.length && !states.some((state) => state.value === address.region)) errors.region = "請選擇屬於該國家或地區的州、省或地區。";
   if (info?.zip && address.postal_code?.trim()) {
     try {
-      if (!new RegExp(`^(?:${info.zip})$`, "i").test(address.postal_code.trim())) errors.postal_code = "邮政编码与所选国家或地区的格式不符。";
+      if (!new RegExp(`^(?:${info.zip})$`, "i").test(address.postal_code.trim())) errors.postal_code = "郵政編碼與所選國家或地區的格式不符。";
     } catch { /* The server remains authoritative for metadata not supported by JS. */ }
   }
   return errors;
@@ -84,12 +84,12 @@ export function shippingStatus(value?: string) {
   return (
     (
       {
-        none: "无需配送",
+        none: "無需配送",
         pending_payment: "待付款",
-        pending: "待发货",
-        partial: "部分发货",
-        shipped: "已发货，待收货",
-        received: "已收货",
+        pending: "待發貨",
+        partial: "部分發貨",
+        shipped: "已發貨，待收貨",
+        received: "已收貨",
         canceled: "配送已取消",
       } as Record<string, string>
     )[value || "none"] || value

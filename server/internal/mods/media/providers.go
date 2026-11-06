@@ -2,11 +2,11 @@ package media
 
 // wire providers（）。
 //
-// 跨模块绑定（通道 A）：
-// - MediaRepo 实现 mediaport.Uploader（ticket 附件/管理上传共用安全路径）
-// - MediaRepo 实现 mediaport.Referencer（catalog/content/ticket 引用计数）
-// 引用注入方向：消费方在自己的 providers 里以依赖参数收 port.Referencer
-// （media 不 import 消费方——无环）。
+// 跨模塊綁定（通道 A）：
+// - MediaRepo 實現 mediaport.Uploader（ticket 附件/管理上傳共用安全路徑）
+// - MediaRepo 實現 mediaport.Referencer（catalog/content/ticket 引用計數）
+// 引用注入方向：消費方在自己的 providers 裏以依賴參數收 port.Referencer
+// （media 不 import 消費方——無環）。
 
 import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/media/port"

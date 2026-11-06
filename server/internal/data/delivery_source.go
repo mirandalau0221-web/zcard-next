@@ -118,7 +118,7 @@ func AdmitDeliverySource(ctx context.Context, d *Data, p *ent.Product, skuID uin
 	}
 	s, err := CurrentDeliverySource(ctx, c, p, skuID)
 	if err != nil || !SourceAdmissible(s) {
-		return 0, fmt.Errorf("该规格的复用内容未配置、已暂停或失效，请联系商家")
+		return 0, fmt.Errorf("該規格的複用內容未配置、已暫停或失效，請聯繫商家")
 	}
 	if s.MaxDeliveries > 0 {
 		n, e := SourceAllocations(ctx, c, s.ID, d.Dialect.Capabilities().SupportsSkipLocked)
@@ -126,7 +126,7 @@ func AdmitDeliverySource(ctx context.Context, d *Data, p *ent.Product, skuID uin
 			return 0, e
 		}
 		if int64(n) >= s.MaxDeliveries {
-			return 0, fmt.Errorf("该规格已达到可发放次数上限")
+			return 0, fmt.Errorf("該規格已達到可發放次數上限")
 		}
 	}
 	return s.ID, nil
@@ -187,7 +187,7 @@ func HasLocalDelivery(ctx context.Context, c *ent.Client, p *ent.Product) (bool,
 	return c.ProductSku.Query().Where(productsku.ProductID(p.ID), productsku.FulfillmentModeIn("local", "reuse")).Exist(ctx)
 }
 
-var ErrLocalDeliveryProtected = errors.New("商品已配置本地发货，已跳过上游维护")
+var ErrLocalDeliveryProtected = errors.New("商品已配置本地發貨，已跳過上游維護")
 
 // The local policy is operator-owned; upstream maintenance must not rebuild it.
 func GuardUpstreamDelivery(ctx context.Context, c *ent.Client, p *ent.Product) error {

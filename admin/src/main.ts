@@ -38,7 +38,7 @@ async function setupApp() {
   setupAppVersionNotification();
 
   setupVueRootValidator(app, {
-    lang: getLocale() === "zh-CN" ? "zh" : "en",
+    lang: getLocale() === "en-US" ? "en" : "zh",
   });
 
   app.mount("#app");

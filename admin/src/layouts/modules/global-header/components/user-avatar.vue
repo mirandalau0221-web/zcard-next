@@ -43,12 +43,12 @@ const options = computed(() => {
   const opts: DropdownOption[] = [
     {
       key: "security",
-      label: "账号安全",
+      label: "賬號安全",
       icon: SvgIconVNode({ icon: "ph:shield-check", fontSize: 18 }),
     },
     {
       key: "password",
-      label: "修改密码",
+      label: "修改密碼",
       icon: SvgIconVNode({ icon: "ph:key", fontSize: 18 }),
     },
     {
@@ -100,7 +100,7 @@ function handleDropdown(key: DropdownKey) {
   <NModal
     v-model:show="showSecurity"
     preset="card"
-    title="账号安全"
+    title="賬號安全"
     style="width: 620px; max-width: calc(100vw - 24px)"
     ><AccountSecurity
   /></NModal>

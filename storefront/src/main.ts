@@ -16,10 +16,10 @@ export const createApp = ViteSSG(
   ({ app, head, router, isClient }) => {
     setActiveHead(head);
     if (isClient) {
-      // 客户端用完整 router（含登录守卫/尾斜杠规范化）；SSR 用 vite-ssg 内置 router 渲染。
-      // 注意：默认 SEO 不在客户端全局 push（会与水合中的页面级 SEO 竞争覆盖）——
-      // 首页由 Home.vue 负责默认 SEO；页面级 SEO 由各页面组件负责。
-      // 守卫直接注册到 vite-ssg 的 router（不创建第二个 router——双 history 会互相干扰）
+      // 客户端用完整 router（含登錄守衞/尾斜槓規範化）；SSR 用 vite-ssg 內置 router 渲染。
+      // 注意：默認 SEO 不在客户端全局 push（會與水合中的頁面級 SEO 競爭覆蓋）——
+      // 首頁由 Home.vue 負責默認 SEO；頁面級 SEO 由各頁面組件負責。
+      // 守衞直接註冊到 vite-ssg 的 router（不創建第二個 router——雙 history 會互相干擾）
       installRouterGuards(router);
     } else {
       app.use(router);
@@ -46,7 +46,7 @@ export async function includedRoutes(paths: string[], _routes: unknown[]) {
     const posts = await postResp.json();
     (posts?.posts || []).forEach((p: { slug: string }) => out.push(`/posts/${p.slug}`));
   } catch (e) {
-    console.warn($t("[ssg] 静态化数据拉取失败（跳过动态页）"), e);
+    console.warn($t("[ssg] 靜態化數據拉取失敗（跳過動態頁）"), e);
   }
   return out;
 }

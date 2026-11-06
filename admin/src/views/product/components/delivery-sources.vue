@@ -41,14 +41,14 @@ const receipts = computed(() =>
 const busy = computed(() => ["submitting", "polling", "uncertain"].includes(current.value?.status));
 const names: Record<string, string> = {
   unconfigured: "未配置",
-  empty: "等待首次采购",
-  submitting: "首次采购中",
-  polling: "查询原采购结果",
-  ready: "可重复发放",
-  paused: "已暂停",
-  uncertain: "需要核实原采购",
-  failed: "需要处理",
-  expired: "已过期",
+  empty: "等待首次採購",
+  submitting: "首次採購中",
+  polling: "查詢原採購結果",
+  ready: "可重複發放",
+  paused: "已暫停",
+  uncertain: "需要核實原採購",
+  failed: "需要處理",
+  expired: "已過期",
 };
 function fill() {
   const s = current.value;
@@ -71,7 +71,7 @@ async function load() {
     const { data, error: e } = await fetchDeliverySources(productId);
     if(request!==loadRequest || productId!==props.productId || !props.show)return;
     if (e) {
-      error.value = "发货设置加载失败，请重试";
+      error.value = "發貨設置加載失敗，請重試";
       return;
     }
     reply.value = data;
@@ -104,7 +104,7 @@ watch(
         const pid = props.productId;
         const { data, error: e } = await fetchDeliverySources(pid);
         if (!e && props.show && pid === props.productId) {
-          if(dirty.value && Number(data.revision)!==Number(reply.value.revision)){error.value="设置已被更新，当前草稿已保留，请重新加载后核对";return;}
+          if(dirty.value && Number(data.revision)!==Number(reply.value.revision)){error.value="設置已被更新，當前草稿已保留，請重新加載後核對";return;}
           reply.value = data;
           if (!dirty.value) fill();
         }
@@ -117,10 +117,10 @@ onUnmounted(() => clearInterval(poll));
 function changeSku(value: number) {
   if (dirty.value) {
     window.$dialog?.warning({
-      title: "切换规格？",
-      content: "当前规格的未保存设置将丢弃。",
-      positiveText: "丢弃并切换",
-      negativeText: "继续编辑",
+      title: "切換規格？",
+      content: "當前規格的未保存設置將丟棄。",
+      positiveText: "丟棄並切換",
+      negativeText: "繼續編輯",
       onPositiveClick: () => {
         sku.value = value;
         fill();
@@ -135,10 +135,10 @@ function close() {
   if (saving.value) return;
   if (dirty.value) {
     window.$dialog?.warning({
-      title: "放弃未保存设置？",
-      content: "已经保存的发货设置仍会保留。",
-      positiveText: "放弃并关闭",
-      negativeText: "继续编辑",
+      title: "放棄未保存設置？",
+      content: "已經保存的發貨設置仍會保留。",
+      positiveText: "放棄並關閉",
+      negativeText: "繼續編輯",
       onPositiveClick: () => emit("update:show", false),
     });
   } else emit("update:show", false);
@@ -147,11 +147,11 @@ async function save(action = "configure") {
   if (props.readonly || saving.value) return;
   if (action === "configure" && form.mode === "reuse") {
     if (origin.value === "manual" && !form.content.trim()) {
-      error.value = "请填写发货内容";
+      error.value = "請填寫發貨內容";
       return;
     }
     if (origin.value === "history" && !form.procurement_id) {
-      error.value = "请选择一份历史采购内容";
+      error.value = "請選擇一份歷史採購內容";
       return;
     }
   }
@@ -172,7 +172,7 @@ async function save(action = "configure") {
       upstream_order_id: form.upstream_order_id,
     });
     if (e) {
-      error.value = (e as any)?.response?.data?.message || "保存失败，请检查设置；草稿已保留";
+      error.value = (e as any)?.response?.data?.message || "保存失敗，請檢查設置；草稿已保留";
       return;
     }
     reply.value = data;
@@ -180,7 +180,7 @@ async function save(action = "configure") {
     reply.value.receipts ||= [];
     fill();
     emit("saved");
-    window.$message?.success("发货设置已保存");
+    window.$message?.success("發貨設置已保存");
   } finally {
     saving.value = false;
   }
@@ -188,9 +188,9 @@ async function save(action = "configure") {
 function submit() {
   if (form.mode === "upstream" && current.value?.mode !== "upstream") {
     window.$dialog?.warning({
-      title: "切回每单上游采购？",
-      content: "后续新订单将逐单向上游采购并产生费用。已有订单继续按原方式处理。",
-      positiveText: "切回每单采购",
+      title: "切回每單上游採購？",
+      content: "後續新訂單將逐單向上游採購併產生費用。已有訂單繼續按原方式處理。",
+      positiveText: "切回每單採購",
       negativeText: "取消",
       onPositiveClick: () => save(),
     });
@@ -203,7 +203,7 @@ function submit() {
   <NModal
     :show="show"
     preset="card"
-    title="商品发货设置"
+    title="商品發貨設置"
     style="width: 740px; max-width: 96vw"
     :mask-closable="false"
     @update:show="close"
@@ -211,10 +211,10 @@ function submit() {
     <NSpin :show="loading">
       <div class="delivery-settings">
         <NAlert v-if="error" type="error"
-          >{{ error }} <NButton v-if="!dirty" text @click="load">重新加载</NButton></NAlert
+          >{{ error }} <NButton v-if="!dirty" text @click="load">重新加載</NButton></NAlert
         >
-        <NAlert v-if="readonly" type="warning">商品已锁定，可查看，解锁后才能修改发货设置。</NAlert>
-        <NFormItem label="商品规格"
+        <NAlert v-if="readonly" type="warning">商品已鎖定，可查看，解鎖後才能修改發貨設置。</NAlert>
+        <NFormItem label="商品規格"
           ><NSelect
             :value="sku" :disabled="saving||loading"
             :options="
@@ -225,50 +225,50 @@ function submit() {
         <NSpace v-if="current"
           ><NTag>{{ names[current.status] || current.status }}</NTag
           ><span v-if="current.id"
-            >内容版本 #{{ current.id }} · 已发放 {{ current.deliveries || 0 }} 次</span
+            >內容版本 #{{ current.id }} · 已發放 {{ current.deliveries || 0 }} 次</span
           ></NSpace
         >
         <NAlert v-if="current?.error" type="warning">{{ current.error }}</NAlert>
-        <NFormItem label="发货来源"
+        <NFormItem label="發貨來源"
           ><NSelect
             v-model:value="form.mode"
             :disabled="readonly || busy"
             :options="[
-              { label: '每单向上游采购', value: 'upstream' },
-              { label: '我的卡密：每条只卖一次', value: 'local' },
-              { label: '重复发货：复用同一份内容', value: 'reuse' },
+              { label: '每單向上游採購', value: 'upstream' },
+              { label: '我的卡密：每條只賣一次', value: 'local' },
+              { label: '重複發貨：複用同一份內容', value: 'reuse' },
             ]"
             @update:value="dirty = true"
         /></NFormItem>
         <NAlert v-if="form.mode === 'local'" type="info"
-          >请在「卡密库存」中为本规格导入卡密。缺货时停止接单，不会自动向上游采购；售价由你自行管理。</NAlert
+          >請在「卡密庫存」中為本規格導入卡密。缺貨時停止接單，不會自動向上游採購；售價由你自行管理。</NAlert
         >
         <template v-if="form.mode === 'reuse'">
           <NAlert type="info"
-            >每个规格独立保存内容，每单限购一份。内容准备好后直接本地发货；过期或停用不会自动重新采购。库存、售价不跟随上游同步。</NAlert
+            >每個規格獨立保存內容，每單限購一份。內容準備好後直接本地發貨；過期或停用不會自動重新採購。庫存、售價不跟隨上游同步。</NAlert
           >
-          <NFormItem label="内容来源"
+          <NFormItem label="內容來源"
             ><NSelect
               v-model:value="origin"
               :disabled="readonly || busy"
               :options="[
-                ...(current?.has_content ? [{ label: '保留当前内容', value: 'keep' }] : []),
-                { label: '选择历史采购内容', value: 'history' },
-                { label: '填写自己的账号 / 卡密', value: 'manual' },
-                { label: '首次有已付款订单时采购一次', value: 'first' },
+                ...(current?.has_content ? [{ label: '保留當前內容', value: 'keep' }] : []),
+                { label: '選擇歷史採購內容', value: 'history' },
+                { label: '填寫自己的賬號 / 卡密', value: 'manual' },
+                { label: '首次有已付款訂單時採購一次', value: 'first' },
               ]"
               @update:value="dirty = true"
           /></NFormItem>
-          <NFormItem v-if="origin === 'manual'" label="固定发货内容"
+          <NFormItem v-if="origin === 'manual'" label="固定發貨內容"
             ><NInput
               v-model:value="form.content"
               :disabled="readonly || busy"
               type="textarea"
               :rows="5"
-              placeholder="账号、密码及使用说明；内容加密保存，仅发给已付款买家"
+              placeholder="賬號、密碼及使用説明；內容加密保存，僅發給已付款買家"
               @update:value="dirty = true"
           /></NFormItem>
-          <NFormItem v-if="origin === 'history'" label="选择一份已购内容"
+          <NFormItem v-if="origin === 'history'" label="選擇一份已購內容"
             ><NSelect
               :value="form.procurement_id ? `${form.procurement_id}:${form.content_index}` : null"
               :disabled="readonly || busy"
@@ -278,14 +278,14 @@ function submit() {
                   value: `${r.procurement_id}:${r.content_index}`,
                 }))
               "
-              placeholder="仅显示同商品同规格的成功采购（最近100笔订单）"
+              placeholder="僅顯示同商品同規格的成功採購（最近100筆訂單）"
               @update:value="selectReceipt"
           /></NFormItem>
           <NAlert v-if="origin === 'first'" type="warning"
-            >首次采购只买 1
-            份，会产生上游费用；多位买家共享同一次采购结果。响应不明确时暂停核实，不会再次采购。</NAlert
+            >首次採購只買 1
+            份，會產生上游費用；多位買家共享同一次採購結果。響應不明確時暫停核實，不會再次採購。</NAlert
           >
-          <NFormItem label="内容有效期（留空表示不设期限）"
+          <NFormItem label="內容有效期（留空表示不設期限）"
             ><NDatePicker
               :value="form.expires_at ? form.expires_at * 1000 : null"
               :disabled="readonly || busy"
@@ -298,7 +298,7 @@ function submit() {
                 }
               "
           /></NFormItem>
-          <NFormItem label="最多发放次数（0 表示不限）"
+          <NFormItem label="最多發放次數（0 表示不限）"
             ><NInputNumber
               v-model:value="form.max_deliveries"
               :disabled="readonly || busy"
@@ -308,16 +308,16 @@ function submit() {
               @update:value="dirty = true"
           /></NFormItem>
           <template v-if="current?.status === 'uncertain'"
-            ><NFormItem label="原上游订单号"
+            ><NFormItem label="原上游訂單號"
               ><NInput
                 v-model:value="form.upstream_order_id"
                 :disabled="readonly"
-                placeholder="核对上游扣款后填写原订单号，只查原单，不重新购买" /></NFormItem
+                placeholder="核對上游扣款後填寫原訂單號，只查原單，不重新購買" /></NFormItem
             ><NButton
               :disabled="readonly || !form.upstream_order_id"
               :loading="saving"
               @click="save('reconcile')"
-              >核查原采购结果</NButton
+              >核查原採購結果</NButton
             ></template
           >
           <NSpace v-if="current?.has_content"
@@ -326,30 +326,30 @@ function submit() {
               :disabled="readonly"
               :loading="saving"
               @click="save('pause')"
-              >暂停复用，停止新销售</NButton
+              >暫停複用，停止新銷售</NButton
             ><NButton
               v-if="current.status === 'paused'"
               :disabled="readonly"
               :loading="saving"
               @click="save('resume')"
-              >恢复复用</NButton
+              >恢復複用</NButton
             ></NSpace
           >
         </template>
         <NAlert v-if="busy" type="warning"
-          >首次采购结果尚未确认，暂不能更换来源。可先在商品列表下架，停止新订单。</NAlert
+          >首次採購結果尚未確認，暫不能更換來源。可先在商品列表下架，停止新訂單。</NAlert
         >
       </div>
     </NSpin>
     <template #footer
       ><NSpace justify="end"
-        ><NButton @click="close">关闭</NButton
+        ><NButton @click="close">關閉</NButton
         ><NButton
           type="primary"
           :disabled="readonly || busy || loading"
           :loading="saving"
           @click="submit"
-          >保存发货设置</NButton
+          >保存發貨設置</NButton
         ></NSpace
       ></template
     >

@@ -22,7 +22,7 @@ type Post struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// Slug holds the value of the "slug" field.
 	Slug string `json:"slug,omitempty"`
@@ -32,7 +32,7 @@ type Post struct {
 	TitleJSON map[string]string `json:"title_json,omitempty"`
 	// SummaryJSON holds the value of the "summary_json" field.
 	SummaryJSON map[string]string `json:"summary_json,omitempty"`
-	// 多语言内容（JSON，sanitize 后）
+	// 多語言內容（JSON，sanitize 後）
 	ContentJSON string `json:"content_json,omitempty"`
 	// Thumbnail holds the value of the "thumbnail" field.
 	Thumbnail string `json:"thumbnail,omitempty"`

@@ -35,16 +35,16 @@ func (s *StoreSMSService) owned(ctx context.Context, no string) (*ent.SMSIntent,
 	}
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil || claims.Subject == 0 || claims.Realm != authn.RealmUser {
-		return nil, errors.Unauthorized("sms.LOGIN_REQUIRED", "请登录查看接码订单")
+		return nil, errors.Unauthorized("sms.LOGIN_REQUIRED", "請登錄查看接碼訂單")
 	}
 	c := data.Client(ctx, s.svc.repo.data)
 	o, e := c.Order.Query().Where(order.OrderNo(no), order.UserID(claims.Subject), order.SubsiteID(tenancy.FromContext(ctx).SubsiteID)).Only(ctx)
 	if e != nil {
-		return nil, errors.NotFound("sms.NOT_FOUND", "接码订单不存在")
+		return nil, errors.NotFound("sms.NOT_FOUND", "接碼訂單不存在")
 	}
 	row, e := c.SMSIntent.Query().Where(si.OrderID(o.ID), si.UserID(claims.Subject), si.SubsiteID(o.SubsiteID)).Only(ctx)
 	if e != nil {
-		return nil, errors.NotFound("sms.NOT_FOUND", "接码订单尚未付款或不存在")
+		return nil, errors.NotFound("sms.NOT_FOUND", "接碼訂單尚未付款或不存在")
 	}
 	return row, nil
 }
@@ -58,21 +58,21 @@ func (s *StoreSMSService) GetSMS(ctx context.Context, req *storefrontv1.SMSOrder
 func (s *StoreSMSService) reply(ctx context.Context, row *ent.SMSIntent) (*storefrontv1.SMSOrderReply, error) {
 	out := &storefrontv1.SMSOrderReply{State: row.State, Phase: row.Phase, RefundStatus: row.RetailRefundState, CanCancel: row.CanCancel, CanFinish: row.CanFinish, Active: row.Phase != "done" && row.Phase != "review"}
 	if row.Phase == "review" {
-		out.Message = "结果待核对，请凭订单号联系客服"
+		out.Message = "結果待核對，請憑訂單號聯繫客服"
 		out.CanCancel = false
 		out.CanFinish = false
 	}
 	if row.RetailRefundState == "pending" {
-		out.Message = "供货退款已确认，正在退还本次实际支付金额"
+		out.Message = "供貨退款已確認，正在退還本次實際支付金額"
 	}
 	if len(row.SnapshotCipher) > 0 {
 		plain, e := s.svc.cipher.Open(row.SnapshotCipher, row.OrderItemID, row.SubsiteID)
 		if e != nil {
-			return nil, errors.InternalServer("sms.READ_FAILED", "接码信息暂时无法读取")
+			return nil, errors.InternalServer("sms.READ_FAILED", "接碼信息暫時無法讀取")
 		}
 		var snap supplyport.SMSSnapshot
 		if json.Unmarshal([]byte(plain), &snap) != nil {
-			return nil, errors.InternalServer("sms.READ_FAILED", "接码信息暂时无法读取")
+			return nil, errors.InternalServer("sms.READ_FAILED", "接碼信息暫時無法讀取")
 		}
 		out.PhoneNumber = snap.PhoneNumber
 		out.OtpCode = snap.OTPCode
@@ -95,17 +95,17 @@ func (s *StoreSMSService) reply(ctx context.Context, row *ent.SMSIntent) (*store
 			out.CanFinish = false
 		}
 		if op.Status == "review" {
-			out.Message = "上一次操作结果待核对，请联系客服"
+			out.Message = "上一次操作結果待核對，請聯繫客服"
 		}
 		if op.Status == "rejected" {
-			out.Message = "上一次操作未获允许，可继续查看短信或按当前能力操作"
+			out.Message = "上一次操作未獲允許，可繼續查看短信或按當前能力操作"
 		}
 	}
 	if row.RetailRefundState == "pending" || row.RetailRefundState == "succeeded" {
 		out.OperationStatus, out.OperationAction = "", ""
 		out.Message = ""
 		if row.RetailRefundState == "pending" {
-			out.Message = "供货退款已确认，正在退还本次实际支付金额"
+			out.Message = "供貨退款已確認，正在退還本次實際支付金額"
 		}
 	}
 	if row.Phase == "done" || row.Phase == "refund" {
@@ -120,11 +120,11 @@ func (s *StoreSMSService) ActSMS(ctx context.Context, req *storefrontv1.SMSActio
 		return nil, e
 	}
 	if req.Action != "cancel" && req.Action != "finish" {
-		return nil, errors.BadRequest("sms.ACTION", "不支持的接码操作")
+		return nil, errors.BadRequest("sms.ACTION", "不支持的接碼操作")
 	}
 	// Browser-generated idempotency key is validated; it is never an arbitrary action URL.
 	if _, e := uuid.Parse(req.RequestId); e != nil {
-		return nil, errors.BadRequest("sms.REQUEST_ID", "请刷新后重试")
+		return nil, errors.BadRequest("sms.REQUEST_ID", "請刷新後重試")
 	}
 	operationID := "smsop_" + req.RequestId
 	e = data.Tx(ctx, s.svc.repo.data, func(ctx context.Context) error {
@@ -134,7 +134,7 @@ func (s *StoreSMSService) ActSMS(ctx context.Context, req *storefrontv1.SMSActio
 			return e
 		}
 		if n != 1 {
-			return errors.Conflict("sms.BUSY", "状态同步中，请稍后重试")
+			return errors.Conflict("sms.BUSY", "狀態同步中，請稍後重試")
 		}
 		current, e := c.SMSIntent.Get(ctx, row.ID)
 		if e != nil {
@@ -143,7 +143,7 @@ func (s *StoreSMSService) ActSMS(ctx context.Context, req *storefrontv1.SMSActio
 		previous, e := c.SMSOperation.Query().Where(so.OperationID(operationID)).Only(ctx)
 		if e == nil {
 			if previous.IntentID != row.ID || previous.Action != req.Action {
-				return errors.Conflict("sms.CONFLICT", "操作标识冲突")
+				return errors.Conflict("sms.CONFLICT", "操作標識衝突")
 			}
 			return nil
 		}
@@ -155,10 +155,10 @@ func (s *StoreSMSService) ActSMS(ctx context.Context, req *storefrontv1.SMSActio
 			return e
 		}
 		if pending {
-			return errors.Conflict("sms.PENDING", "已有操作待确认")
+			return errors.Conflict("sms.PENDING", "已有操作待確認")
 		}
 		if current.Phase != "query" || req.Action == "cancel" && !current.CanCancel || req.Action == "finish" && !current.CanFinish {
-			return errors.BadRequest("sms.UNAVAILABLE", "当前状态不允许该操作")
+			return errors.BadRequest("sms.UNAVAILABLE", "當前狀態不允許該操作")
 		}
 		return c.SMSOperation.Create().SetIntentID(row.ID).SetSubsiteID(row.SubsiteID).SetOperationID(operationID).SetAction(req.Action).Exec(ctx)
 	})
@@ -208,7 +208,7 @@ func (s *AdminProcurementService) ListSMS(ctx context.Context, req *adminv1.List
 }
 func (s *AdminProcurementService) RetrySMS(ctx context.Context, req *adminv1.RetrySMSRequest) (*emptypb.Empty, error) {
 	if len([]rune(req.Reason)) < 3 || len([]rune(req.Reason)) > 180 {
-		return nil, errors.BadRequest("sms.REASON", "请填写核对和重试原因（3–180 字）")
+		return nil, errors.BadRequest("sms.REASON", "請填寫核對和重試原因（3–180 字）")
 	}
 	e := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		c := data.Client(ctx, s.repo.data)
@@ -217,7 +217,7 @@ func (s *AdminProcurementService) RetrySMS(ctx context.Context, req *adminv1.Ret
 			return e
 		}
 		if r.Phase == "done" {
-			return errors.BadRequest("sms.DONE", "任务已经完成")
+			return errors.BadRequest("sms.DONE", "任務已經完成")
 		}
 		phase := "purchase"
 		if r.UpstreamOrderID != nil {
@@ -231,7 +231,7 @@ func (s *AdminProcurementService) RetrySMS(ctx context.Context, req *adminv1.Ret
 			return e
 		}
 		if n != 1 {
-			return errors.Conflict("sms.BUSY", "任务正在同步")
+			return errors.Conflict("sms.BUSY", "任務正在同步")
 		}
 		if e := c.SMSOperation.Update().Where(so.IntentID(r.ID), so.Status("review")).SetStatus("pending").SetAttempts(0).Exec(ctx); e != nil {
 			return e
@@ -240,7 +240,7 @@ func (s *AdminProcurementService) RetrySMS(ctx context.Context, req *adminv1.Ret
 		if claims := identity.ClaimsFromContext(ctx); claims != nil {
 			actor = claims.Subject
 		}
-		return c.OrderStatusEvent.Create().SetOrderID(r.OrderID).SetFromStatus("sms_review").SetToStatus("sms_retry").SetEvent("sms_retry").SetOperator("admin").SetOperatorID(actor).SetReason(fmt.Sprintf("恢复原接码意图：%s", req.Reason)).Exec(ctx)
+		return c.OrderStatusEvent.Create().SetOrderID(r.OrderID).SetFromStatus("sms_review").SetToStatus("sms_retry").SetEvent("sms_retry").SetOperator("admin").SetOperatorID(actor).SetReason(fmt.Sprintf("恢復原接碼意圖：%s", req.Reason)).Exec(ctx)
 	})
 	return &emptypb.Empty{}, e
 }

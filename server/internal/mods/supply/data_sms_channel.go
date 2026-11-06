@@ -45,28 +45,28 @@ func (s *StoreSMSChannelService) channel(ctx context.Context, id uint64, require
 	claims := identity.ClaimsFromContext(ctx)
 	member := claims != nil && claims.Realm == authn.RealmUser && claims.Subject != 0
 	if requireLogin && !member {
-		return nil, errors.Unauthorized("sms.LOGIN_REQUIRED", "请登录使用接码商品")
+		return nil, errors.Unauthorized("sms.LOGIN_REQUIRED", "請登錄使用接碼商品")
 	}
 	if tenancy.FromContext(ctx).SubsiteID != 0 {
-		return nil, errors.BadRequest("sms.MAIN_SITE_ONLY", "接码商品仅支持主站")
+		return nil, errors.BadRequest("sms.MAIN_SITE_ONLY", "接碼商品僅支持主站")
 	}
 	base, err := data.BaseCurrency(ctx, s.gw.repo.data)
 	if err != nil {
 		return nil, err
 	}
 	if base != "CNY" {
-		return nil, errors.BadRequest("sms.CURRENCY_UNSUPPORTED", "接码仅支持人民币基础币种")
+		return nil, errors.BadRequest("sms.CURRENCY_UNSUPPORTED", "接碼僅支持人民幣基礎幣種")
 	}
 	p, e := data.ProductForDelivery(ctx, data.Client(ctx, s.gw.repo.data), 0, id)
 	if e != nil || p.ProductKind != supplyport.SMSProductKind || p.DeliveryKind != supplyport.SMSDelivery || (p.Status != 1 && !(member && p.Status == 2)) || p.UpstreamSourceID == 0 {
-		return nil, errors.NotFound("sms.PRODUCT_UNAVAILABLE", "接码商品不可售")
+		return nil, errors.NotFound("sms.PRODUCT_UNAVAILABLE", "接碼商品不可售")
 	}
 	hidden, e := data.HiddenCategoryIDs(ctx, data.Client(ctx, s.gw.repo.data), 0)
 	if e != nil {
 		return nil, e
 	}
 	if data.CategoryHidden(hidden, p.CategoryID) {
-		return nil, errors.NotFound("sms.PRODUCT_UNAVAILABLE", "接码商品不可售")
+		return nil, errors.NotFound("sms.PRODUCT_UNAVAILABLE", "接碼商品不可售")
 	}
 	var user uint64
 	if member {
@@ -78,21 +78,21 @@ func (s *StoreSMSChannelService) channel(ctx context.Context, id uint64, require
 		return nil, e
 	}
 	if conn.Driver != "zcard" || string(conn.Status) != "active" || conn.ExchangeRate != 1 {
-		return nil, errors.BadRequest("sms.CONNECTION_UNAVAILABLE", "接码须使用启用的人民币 ZCard 货源")
+		return nil, errors.BadRequest("sms.CONNECTION_UNAVAILABLE", "接碼須使用啓用的人民幣 ZCard 貨源")
 	}
 	m, e := s.gw.repo.GetMapping(ctx, conn.ID, p.UpstreamProductCode, "")
 	if e != nil || m.LocalProductID != p.ID {
-		return nil, errors.BadRequest("sms.MAPPING_INVALID", "接码商品映射无效")
+		return nil, errors.BadRequest("sms.MAPPING_INVALID", "接碼商品映射無效")
 	}
 	rule, e := readProductRule(m.PricingOverride)
 	if e != nil {
 		return nil, e
 	}
 	if rule == nil || rule.Mode == PriceModePending {
-		return nil, errors.BadRequest("sms.PRICING_REQUIRED", "请先设置接码商品加价规则")
+		return nil, errors.BadRequest("sms.PRICING_REQUIRED", "請先設置接碼商品加價規則")
 	}
 	if _, fixed := m.PricingOverride["price"]; fixed {
-		return nil, errors.BadRequest("sms.PRICING_INVALID", "接码商品须按选项加价，不能设置统一固定售价")
+		return nil, errors.BadRequest("sms.PRICING_INVALID", "接碼商品須按選項加價，不能設置統一固定售價")
 	}
 	a, e := s.gw.adapterFor(ctx, conn.ID)
 	if e != nil {
@@ -104,15 +104,15 @@ func (s *StoreSMSChannelService) channel(ctx context.Context, id uint64, require
 	}
 	for _, cap := range []string{supplyport.SMSProductCatalog, supplyport.SMSProductPurchase, supplyport.SMSPolling} {
 		if !slices.Contains(ping.Capabilities, cap) {
-			return nil, errors.BadRequest("sms.UPGRADE_REQUIRED", "货源尚不支持渠道商品，请升级供货端")
+			return nil, errors.BadRequest("sms.UPGRADE_REQUIRED", "貨源尚不支持渠道商品，請升級供貨端")
 		}
 	}
 	if ping.Currency != "CNY" || ping.Balance < 0 {
-		return nil, errors.BadRequest("sms.ACCOUNT_UNAVAILABLE", "供货账户尚未就绪")
+		return nil, errors.BadRequest("sms.ACCOUNT_UNAVAILABLE", "供貨賬户尚未就緒")
 	}
 	client, ok := a.(supplyport.SMSChannelClient)
 	if !ok {
-		return nil, errors.BadRequest("sms.UNSUPPORTED", "货源不支持渠道商品")
+		return nil, errors.BadRequest("sms.UNSUPPORTED", "貨源不支持渠道商品")
 	}
 	return &retailChannel{p: p, conn: conn, mapping: m, client: client, revision: data.SMSRetailPricingRevision(conn, m), user: user, rule: *rule}, nil
 }
@@ -124,14 +124,14 @@ func channelFilter(country, platform, keyword string, page, size int32) (supplyp
 		size = 50
 	}
 	if page < 1 || page > 1000000 || size < 1 || size > 100 || len(country) > 64 || len(platform) > 64 || len([]rune(keyword)) > 100 {
-		return supplyport.SMSChannelFilter{}, errors.BadRequest("sms.INVALID_FILTER", "筛选或分页无效")
+		return supplyport.SMSChannelFilter{}, errors.BadRequest("sms.INVALID_FILTER", "篩選或分頁無效")
 	}
 	return supplyport.SMSChannelFilter{CountryID: country, PlatformID: platform, Keyword: strings.TrimSpace(keyword), Page: int(page), PageSize: int(size)}, nil
 }
 func (ch *retailChannel) price(cost int64) (int64, error) {
 	price := ch.rule.price(ch.conn, cost)
 	if !money.ValidCents(cost) || cost <= 0 || !money.ValidCents(price) || price < cost {
-		return 0, errors.BadRequest("sms.PRICE_INVALID", "接码售价须大于零且不低于供货价")
+		return 0, errors.BadRequest("sms.PRICE_INVALID", "接碼售價須大於零且不低於供貨價")
 	}
 	return price, nil
 }
@@ -146,7 +146,7 @@ func (s *StoreSMSChannelService) unchanged(ctx context.Context, ch *retailChanne
 		return e
 	}
 	if p.LockVersion != ch.p.LockVersion || p.Status < 1 || rev != ch.revision {
-		return errors.Conflict("sms.QUOTE_CHANGED", "商品或加价规则已变化，请刷新选价")
+		return errors.Conflict("sms.QUOTE_CHANGED", "商品或加價規則已變化，請刷新選價")
 	}
 	return nil
 }
@@ -203,10 +203,10 @@ func (s *StoreSMSChannelService) Offers(ctx context.Context, r *storefrontv1.SMS
 }
 func (s *StoreSMSChannelService) Quote(ctx context.Context, r *storefrontv1.SMSChannelQuoteRequest) (*storefrontv1.SMSChannelQuoteReply, error) {
 	if !data.SMSSalesEnabled() {
-		return nil, errors.BadRequest("sms.SALES_CLOSED", "接码新购已暂停")
+		return nil, errors.BadRequest("sms.SALES_CLOSED", "接碼新購已暫停")
 	}
 	if r.OfferId == "" || len(r.OfferId) > 256 {
-		return nil, errors.BadRequest("sms.INVALID_OFFER", "请选择报价选项")
+		return nil, errors.BadRequest("sms.INVALID_OFFER", "請選擇報價選項")
 	}
 	f, e := channelFilter(r.CountryId, r.PlatformId, "", r.Page, r.PageSize)
 	if e != nil {
@@ -226,7 +226,7 @@ func (s *StoreSMSChannelService) Quote(ctx context.Context, r *storefrontv1.SMSC
 	}
 	expiry := min(int64(quote.ExpiresAt), time.Now().Add(5*time.Minute).Unix())
 	if expiry <= time.Now().Unix()+5 {
-		return nil, errors.Conflict("sms.QUOTE_EXPIRED", "报价已过期，请重新选价")
+		return nil, errors.Conflict("sms.QUOTE_EXPIRED", "報價已過期，請重新選價")
 	}
 	var saved *ent.SMSRetailQuote
 	e = data.Tx(ctx, s.gw.repo.data, func(ctx context.Context) error {

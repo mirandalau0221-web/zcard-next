@@ -1,6 +1,6 @@
 package order
 
-// 订单 API（；storefront 下单 + admin 管理，薄 transport）。
+// 訂單 API（；storefront 下單 + admin 管理，薄 transport）。
 
 import (
 	"context"
@@ -41,22 +41,22 @@ import (
 
 // ── storefront ──
 
-// StoreOrderService 顾客下单服务。
+// StoreOrderService 顧客下單服務。
 type StoreOrderService struct {
 	storefrontv1.UnimplementedStoreOrderServiceServer
 	uc             *OrderUsecase
-	captcha        *captcha.Service // 图形验证码（captcha_order 场景）
+	captcha        *captcha.Service // 圖形驗證碼（captcha_order 場景）
 	recoverySender notifyport.Sender
 }
 
 func (s *StoreOrderService) SetRecoverySender(sender notifyport.Sender) { s.recoverySender = sender }
 
-// NewStoreOrderService 构造。
+// NewStoreOrderService 構造。
 func NewStoreOrderService(uc *OrderUsecase, cap *captcha.Service) *StoreOrderService {
 	return &StoreOrderService{uc: uc, captcha: cap}
 }
 
-// CreateOrder 下单。
+// CreateOrder 下單。
 func (s *StoreOrderService) CreateOrder(ctx context.Context, req *storefrontv1.CreateOrderRequest) (*storefrontv1.CreateOrderReply, error) {
 	return s.createOrder(ctx, req, false)
 }
@@ -65,18 +65,18 @@ func (s *StoreOrderService) QuoteOrder(ctx context.Context, req *storefrontv1.Cr
 }
 func (s *StoreOrderService) createOrder(ctx context.Context, req *storefrontv1.CreateOrderRequest, quote bool) (*storefrontv1.CreateOrderReply, error) {
 	if len(req.GetItems()) == 0 {
-		return nil, errors.BadRequest("order.EMPTY_ITEMS", "订单项不能为空")
+		return nil, errors.BadRequest("order.EMPTY_ITEMS", "訂單項不能為空")
 	}
 	items := make([]OrderItemInput, 0, len(req.GetItems()))
 	for _, it := range req.GetItems() {
 		if it.GetProductId() == 0 || it.GetQuantity() <= 0 {
-			return nil, errors.BadRequest("order.INVALID_ITEM", "商品 ID 与数量必填")
+			return nil, errors.BadRequest("order.INVALID_ITEM", "商品 ID 與數量必填")
 		}
 		items = append(items, OrderItemInput{
 			ProductID: it.GetProductId(), SkuID: it.GetSkuId(), Quantity: it.GetQuantity(), ControlAnswers: it.ControlAnswers,
 		})
 	}
-	// 登录态绑定买家（userAuthMiddleware 注入的 claims；0=游客单）
+	// 登錄態綁定買家（userAuthMiddleware 注入的 claims；0=遊客單）
 	var userID uint64
 	claims := identity.ClaimsFromContext(ctx)
 	if claims != nil {
@@ -90,7 +90,7 @@ func (s *StoreOrderService) createOrder(ctx context.Context, req *storefrontv1.C
 		CouponCode: req.GetCouponCode(), ControlAnswers: req.GetControlAnswers(),
 		UsePoints: req.GetUsePoints(),
 		RefCode:   req.GetRefCode(),
-		// ：Idempotency-Key 头（同 key 双击返回首单，）
+		// ：Idempotency-Key 頭（同 key 雙擊返回首單，）
 		IdempotencyKey: idempotencyKeyFromContext(ctx),
 	}
 	if replay, e := s.uc.ReplayOrder(ctx, input); e != nil {
@@ -112,8 +112,8 @@ func (s *StoreOrderService) createOrder(ctx context.Context, req *storefrontv1.C
 	}, nil
 }
 
-// GetOrder 查单（单号+密码）。
-// 取货三重门之一二（ 补全）：查询密码 或 登录态本人——登录态本人免密码。
+// GetOrder 查單（單號+密碼）。
+// 取貨三重門之一二（ 補全）：查詢密碼 或 登錄態本人——登錄態本人免密碼。
 func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetOrderRequest) (*storefrontv1.GetOrderReply, error) {
 	token := req.GetOrderAccessToken()
 	if token == "" {
@@ -129,7 +129,7 @@ func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetO
 		return nil, orderaccess.PublicError(orderaccess.Verify(ctx, s.uc.Gate, req.GetOrderNo(), "", req.GetQueryPassword(), orderClientIP(ctx)))
 	}
 	if err != nil {
-		return nil, errors.InternalServer("order.GET_FAILED", "查询失败")
+		return nil, errors.InternalServer("order.GET_FAILED", "查詢失敗")
 	}
 	if o.SubsiteID != tenancy.FromContext(ctx).SubsiteID {
 		if token != "" {
@@ -137,15 +137,15 @@ func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetO
 		}
 		return nil, orderaccess.PublicError(orderaccess.Verify(ctx, s.uc.Gate, req.GetOrderNo(), "", req.GetQueryPassword(), orderClientIP(ctx)))
 	}
-	// 登录态本人：免查询密码（密码错与单号不存在对外表现一致的纪律不破坏——
-	// 非本人登录态不泄露订单存在性，仍走密码校验路径）
+	// 登錄態本人：免查詢密碼（密碼錯與單號不存在對外表現一致的紀律不破壞——
+	// 非本人登錄態不泄露訂單存在性，仍走密碼校驗路徑）
 	claims := identity.ClaimsFromContext(ctx)
 	isOwner := claims != nil && o.UserID != 0 && claims.Subject == o.UserID
 	if !isOwner && !orderaccess.VerifyToken(o.OrderAccessTokenHash, o.SubsiteID, o.OrderNo, token) {
 		if (o.OrderAccessTokenHash != "" || token != "") && req.GetQueryPassword() == "" {
 			return nil, orderaccess.Required(ctx)
 		} else {
-			// 查询密码校验（三重门之一：设置则必须匹配；错误与单号不存在表现一致）
+			// 查詢密碼校驗（三重門之一：設置則必須匹配；錯誤與單號不存在表現一致）
 			if err := orderaccess.Verify(ctx, s.uc.Gate, o.OrderNo, o.QueryPasswordHash, req.GetQueryPassword(), orderClientIP(ctx)); err != nil {
 				return nil, orderaccess.PublicError(err)
 			}
@@ -171,14 +171,14 @@ func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetO
 	if err != nil {
 		return nil, err
 	}
-	// 子项
+	// 子項
 	items, err := data.Client(ctx, s.uc.Data).OrderItem.Query().Where(orderitem.OrderID(o.ID)).All(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("order.GET_FAILED", "读取订单商品失败")
+		return nil, errors.InternalServer("order.GET_FAILED", "讀取訂單商品失敗")
 	}
 	summaries, err := data.OrderProductSummaries(ctx, s.uc.Data, []*ent.Order{o})
 	if err != nil {
-		return nil, errors.InternalServer("order.GET_FAILED", "读取订单商品失败")
+		return nil, errors.InternalServer("order.GET_FAILED", "讀取訂單商品失敗")
 	}
 	names := map[uint64]string{}
 	for _, item := range summaries[o.ID] {
@@ -211,19 +211,19 @@ func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetO
 	return reply, nil
 }
 
-// ListMyOrders 我的订单（登录态； 补全）。
+// ListMyOrders 我的訂單（登錄態； 補全）。
 func (s *StoreOrderService) ListMyOrders(ctx context.Context, req *storefrontv1.ListMyOrdersRequest) (*storefrontv1.ListMyOrdersReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	rows, total, err := s.uc.ListUserOrders(ctx, claims.Subject, req.GetStatus(), int(req.GetPage()), int(req.GetPageSize()))
 	if err != nil {
-		return nil, errors.InternalServer("order.LIST_FAILED", "查询失败")
+		return nil, errors.InternalServer("order.LIST_FAILED", "查詢失敗")
 	}
 	summaries, err := data.OrderProductSummaries(ctx, s.uc.Data, rows)
 	if err != nil {
-		return nil, errors.InternalServer("order.LIST_FAILED", "读取订单商品失败")
+		return nil, errors.InternalServer("order.LIST_FAILED", "讀取訂單商品失敗")
 	}
 	reply := &storefrontv1.ListMyOrdersReply{Total: total}
 	for _, o := range rows {
@@ -266,19 +266,19 @@ func (s *StoreOrderService) ListMyOrders(ctx context.Context, req *storefrontv1.
 	return reply, nil
 }
 
-// ListGuestOrders 游客按下单联系方式查订单列表（邮箱/手机号）。
-// 安全口径：仅游客单（user_id 空）；精简信息（单号/状态/金额/时间——无卡密）；
-// 卡密仍需逐单查询密码（fetchDelivery 三重门）；查不到返回空列表（防枚举与
-// 查询不存在表现一致）；限最近 20 条。
+// ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號）。
+// 安全口徑：僅遊客單（user_id 空）；精簡信息（單號/狀態/金額/時間——無卡密）；
+// 卡密仍需逐單查詢密碼（fetchDelivery 三重門）；查不到返回空列表（防枚舉與
+// 查詢不存在表現一致）；限最近 20 條。
 func (s *StoreOrderService) ListGuestOrders(ctx context.Context, req *storefrontv1.ListGuestOrdersRequest) (*storefrontv1.ListGuestOrdersReply, error) {
 	contact := strings.TrimSpace(req.GetContact())
 	if contact == "" || len(contact) > 255 {
-		return nil, errors.BadRequest("order.CONTACT_INVALID", "请输入下单时留的邮箱或手机号")
+		return nil, errors.BadRequest("order.CONTACT_INVALID", "請輸入下單時留的郵箱或手機號")
 	}
 	rows, err := data.Client(ctx, s.uc.Data).Order.Query().
 		Where(
 			order.SubsiteID(tenancy.FromContext(ctx).SubsiteID),
-			// 游客单：user_id NULL 或 0（历史写入两种形态并存）
+			// 遊客單：user_id NULL 或 0（歷史寫入兩種形態並存）
 			order.Or(order.UserIDIsNil(), order.UserID(0)),
 			order.Or(order.Contact(contact), order.GuestContact(contact)),
 		).
@@ -286,7 +286,7 @@ func (s *StoreOrderService) ListGuestOrders(ctx context.Context, req *storefront
 		Limit(20).
 		All(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("order.LIST_FAILED", "查询失败")
+		return nil, errors.InternalServer("order.LIST_FAILED", "查詢失敗")
 	}
 	reply := &storefrontv1.ListGuestOrdersReply{}
 	for _, o := range rows {
@@ -299,21 +299,21 @@ func (s *StoreOrderService) ListGuestOrders(ctx context.Context, req *storefront
 	return reply, nil
 }
 
-// CancelMyOrder 取消本人待支付订单（ 补全；锁卡释放 + 返券）。
+// CancelMyOrder 取消本人待支付訂單（ 補全；鎖卡釋放 + 返券）。
 func (s *StoreOrderService) CancelMyOrder(ctx context.Context, req *storefrontv1.CancelMyOrderRequest) (*emptypb.Empty, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	o, err := s.uc.GetByOrderNo(ctx, req.GetOrderNo())
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("order.NOT_FOUND", "订单不存在")
+		return nil, errors.NotFound("order.NOT_FOUND", "訂單不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("order.GET_FAILED", "查询失败")
+		return nil, errors.InternalServer("order.GET_FAILED", "查詢失敗")
 	}
 	if o.UserID == 0 || o.UserID != claims.Subject {
-		return nil, errors.NotFound("order.NOT_FOUND", "订单不存在") // 非本人不泄露存在性
+		return nil, errors.NotFound("order.NOT_FOUND", "訂單不存在") // 非本人不泄露存在性
 	}
 	if err := s.uc.CancelOrder(ctx, req.GetOrderNo(), "用户取消", "user", claims.Subject); err != nil {
 		return nil, mapOrderErr(err)
@@ -321,7 +321,7 @@ func (s *StoreOrderService) CancelMyOrder(ctx context.Context, req *storefrontv1
 	return &emptypb.Empty{}, nil
 }
 
-// idempotencyKeyFromContext 读 Idempotency-Key 头（）。
+// idempotencyKeyFromContext 讀 Idempotency-Key 頭（）。
 func idempotencyKeyFromContext(ctx context.Context) string {
 	if tr, ok := transport.FromServerContext(ctx); ok {
 		return tr.RequestHeader().Get("Idempotency-Key")
@@ -331,19 +331,19 @@ func idempotencyKeyFromContext(ctx context.Context) string {
 
 // ── admin ──
 
-// AdminOrderService 订单管理服务。
+// AdminOrderService 訂單管理服務。
 type AdminOrderService struct {
 	adminv1.UnimplementedAdminOrderServiceServer
 	uc   *OrderUsecase
 	data *data.Data
 }
 
-// NewAdminOrderService 构造。
+// NewAdminOrderService 構造。
 func NewAdminOrderService(uc *OrderUsecase, d *data.Data) *AdminOrderService {
 	return &AdminOrderService{uc: uc, data: d}
 }
 
-// ListOrders 订单列表。
+// ListOrders 訂單列表。
 func (s *AdminOrderService) ListOrders(ctx context.Context, req *adminv1.ListOrdersRequest) (*adminv1.ListOrdersReply, error) {
 	tc := tenancy.FromContext(ctx)
 	limit := req.GetLimit()
@@ -352,7 +352,7 @@ func (s *AdminOrderService) ListOrders(ctx context.Context, req *adminv1.ListOrd
 	}
 	keyword := strings.TrimSpace(req.GetKeyword())
 	if utf8.RuneCountInString(keyword) > 150 {
-		return nil, errors.BadRequest("order.INVALID_KEYWORD", "搜索关键词不能超过 150 个字符")
+		return nil, errors.BadRequest("order.INVALID_KEYWORD", "搜索關鍵詞不能超過 150 個字符")
 	}
 	var filters []predicate.Order
 	if req.ShippingStatus != "" {
@@ -363,7 +363,7 @@ func (s *AdminOrderService) ListOrders(ctx context.Context, req *adminv1.ListOrd
 	}
 	if req.GetStartTime() != 0 || req.GetEndTime() != 0 {
 		if req.GetStartTime() <= 0 || req.GetEndTime() <= req.GetStartTime() || req.GetEndTime()-req.GetStartTime() > 366*86400 {
-			return nil, errors.BadRequest("order.INVALID_RANGE", "时间范围须在 1 至 366 天内")
+			return nil, errors.BadRequest("order.INVALID_RANGE", "時間範圍須在 1 至 366 天內")
 		}
 		start, end := time.Unix(req.GetStartTime(), 0).UTC(), time.Unix(req.GetEndTime(), 0).UTC()
 		switch req.GetTimeField() {
@@ -372,7 +372,7 @@ func (s *AdminOrderService) ListOrders(ctx context.Context, req *adminv1.ListOrd
 		case "paid":
 			filters = append(filters, order.PaidAtGTE(start), order.PaidAtLT(end))
 		default:
-			return nil, errors.BadRequest("order.INVALID_RANGE", "不支持的时间类型")
+			return nil, errors.BadRequest("order.INVALID_RANGE", "不支持的時間類型")
 		}
 	}
 	if req.GetChannelId() > 0 || req.GetChannelCode() != "" {
@@ -386,11 +386,11 @@ func (s *AdminOrderService) ListOrders(ctx context.Context, req *adminv1.ListOrd
 	}
 	rows, err := s.uc.ListOrders(ctx, tc.SubsiteID, req.GetStatus(), req.GetCursor(), limit, keyword, filters...)
 	if err != nil {
-		return nil, errors.InternalServer("order.LIST_FAILED", "读取订单失败")
+		return nil, errors.InternalServer("order.LIST_FAILED", "讀取訂單失敗")
 	}
 	summaries, err := data.OrderProductSummaries(ctx, s.uc.Data, rows)
 	if err != nil {
-		return nil, errors.InternalServer("order.LIST_FAILED", "读取订单商品失败")
+		return nil, errors.InternalServer("order.LIST_FAILED", "讀取訂單商品失敗")
 	}
 	reply := &adminv1.ListOrdersReply{}
 	for _, o := range rows {
@@ -406,14 +406,14 @@ func (s *AdminOrderService) ListOrders(ctx context.Context, req *adminv1.ListOrd
 	return reply, nil
 }
 
-// GetOrder 订单详情（含金额行+状态事件）。
+// GetOrder 訂單詳情（含金額行+狀態事件）。
 func (s *AdminOrderService) GetOrder(ctx context.Context, req *adminv1.GetAdminOrderRequest) (*adminv1.AdminOrder, error) {
 	o, err := s.uc.GetByOrderNo(ctx, req.GetOrderNo())
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("order.NOT_FOUND", "订单不存在")
+		return nil, errors.NotFound("order.NOT_FOUND", "訂單不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("order.GET_FAILED", "查询失败")
+		return nil, errors.InternalServer("order.GET_FAILED", "查詢失敗")
 	}
 	client := data.Client(ctx, s.data)
 	items, _ := client.OrderItem.Query().Where(orderitem.OrderID(o.ID)).All(ctx)
@@ -421,7 +421,7 @@ func (s *AdminOrderService) GetOrder(ctx context.Context, req *adminv1.GetAdminO
 		Order(ent.Asc(orderamountline.FieldSeq)).All(ctx)
 	events, _ := client.OrderStatusEvent.Query().Where(orderstatusevent.OrderID(o.ID)).
 		Order(ent.Asc(orderstatusevent.FieldCreatedAt), ent.Asc(orderstatusevent.FieldID)).All(ctx)
-	// 商品/上游联查（ 修复：订单详情展示自营/上游渠道/链接/成本——老项目同款信息区）
+	// 商品/上游聯查（ 修復：訂單詳情展示自營/上游渠道/鏈接/成本——老項目同款信息區）
 	products, connections := s.loadItemUpstream(ctx, items)
 	out := toAdminOrderPB(o, items, lines, events, products, connections)
 	out.ShipmentsJson, err = data.ShipmentsJSON(ctx, s.data, o.ID)
@@ -430,7 +430,7 @@ func (s *AdminOrderService) GetOrder(ctx context.Context, req *adminv1.GetAdminO
 	}
 	refunds, err := client.RefundOrder.Query().Where(refundorder.OrderID(o.ID), refundorder.StatusEQ(refundorder.StatusSucceeded)).All(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("order.REFUND_QUERY_FAILED", "读取退款金额失败")
+		return nil, errors.InternalServer("order.REFUND_QUERY_FAILED", "讀取退款金額失敗")
 	}
 	for _, r := range refunds {
 		out.RefundedCents += r.Amount
@@ -447,7 +447,7 @@ func (s *AdminOrderService) GetOrder(ctx context.Context, req *adminv1.GetAdminO
 	return out, nil
 }
 
-// loadItemUpstream 批量联查订单项的商品与上游货源连接（软外键——无 ent edge）。
+// loadItemUpstream 批量聯查訂單項的商品與上游貨源連接（軟外鍵——無 ent edge）。
 func (s *AdminOrderService) loadItemUpstream(ctx context.Context, items []*ent.OrderItem) (map[uint64]*ent.Product, map[uint64]*ent.SupplyConnection) {
 	products := map[uint64]*ent.Product{}
 	connIDs := map[uint64]bool{}
@@ -520,10 +520,10 @@ func toAdminOrderPB(o *ent.Order, items []*ent.OrderItem, lines []*ent.OrderAmou
 			Id: it.ID, FulfillmentType: string(it.FulfillmentType), FulfillmentStatus: it.FulfillmentStatus,
 			SkuName: it.SkuName, CostCents: it.Cost,
 		}
-		// 自营/上游信息（商品快照缺失时回落商品当前态——订单详情以商品为准）
+		// 自營/上游信息（商品快照缺失時回落商品當前態——訂單詳情以商品為準）
 		if pr := products[it.ProductID]; pr != nil {
 			pb.Name = pr.Name
-			pb.IsSelf = pr.UpstreamSourceID == 0 // 0=自营
+			pb.IsSelf = pr.UpstreamSourceID == 0 // 0=自營
 			if pr.UpstreamSourceID != 0 {
 				pb.UpstreamSourceId = pr.UpstreamSourceID
 				pb.UpstreamProductCode = pr.UpstreamProductCode
@@ -561,43 +561,43 @@ func mapOrderErr(err error) error {
 	case contains(msg, "FORM_INVALID"):
 		return errors.BadRequest("order.FORM_INVALID", strings.TrimPrefix(msg, "order.FORM_INVALID: "))
 	case stderrors.Is(err, couponport.ErrFlashReserved):
-		return errors.BadRequest("order.FLASH_RESERVED", "秒杀名额暂被待付款订单占用，请稍后重试")
+		return errors.BadRequest("order.FLASH_RESERVED", "秒殺名額暫被待付款訂單佔用，請稍後重試")
 	case stderrors.Is(err, couponport.ErrFlashSoldOut):
-		return errors.BadRequest("order.FLASH_SOLD_OUT", "秒杀已抢完")
+		return errors.BadRequest("order.FLASH_SOLD_OUT", "秒殺已搶完")
 	case stderrors.Is(err, couponport.ErrFlashUserLimit):
-		return errors.BadRequest("order.FLASH_USER_LIMIT", "已达到本次秒杀限购数量")
+		return errors.BadRequest("order.FLASH_USER_LIMIT", "已達到本次秒殺限購數量")
 	case contains(msg, "STOCK_UNAVAILABLE"):
-		return errors.BadRequest("order.STOCK_UNAVAILABLE", "暂时无法确认库存，请稍后重试")
+		return errors.BadRequest("order.STOCK_UNAVAILABLE", "暫時無法確認庫存，請稍後重試")
 	case contains(msg, "INSUFFICIENT"):
-		return errors.BadRequest("order.INSUFFICIENT_STOCK", "库存不足")
+		return errors.BadRequest("order.INSUFFICIENT_STOCK", "庫存不足")
 	case contains(msg, "PRODUCT_NOT"):
-		return errors.NotFound("order.PRODUCT_NOT_FOUND", "商品不存在或不可购买")
+		return errors.NotFound("order.PRODUCT_NOT_FOUND", "商品不存在或不可購買")
 	case contains(msg, "EMPTY"):
-		return errors.BadRequest("order.EMPTY_ITEMS", "订单项不能为空")
+		return errors.BadRequest("order.EMPTY_ITEMS", "訂單項不能為空")
 	case contains(msg, "COUPON"):
-		return errors.BadRequest("order.COUPON_INVALID", "优惠券无效或不可用")
+		return errors.BadRequest("order.COUPON_INVALID", "優惠券無效或不可用")
 	case contains(msg, "POINTS_LOGIN"):
-		return errors.Unauthorized("order.POINTS_LOGIN_REQUIRED", "积分兑换需登录")
+		return errors.Unauthorized("order.POINTS_LOGIN_REQUIRED", "積分兑換需登錄")
 	case contains(msg, "POINTS_MIXED"):
-		return errors.BadRequest("order.POINTS_MIXED_CART", "积分兑换订单须全部为积分商品")
+		return errors.BadRequest("order.POINTS_MIXED_CART", "積分兑換訂單須全部為積分商品")
 	case contains(msg, "POINTS"):
-		return errors.BadRequest("order.POINTS_INSUFFICIENT", "积分不足")
+		return errors.BadRequest("order.POINTS_INSUFFICIENT", "積分不足")
 	case contains(msg, "CANNOT_CANCEL"):
-		return errors.BadRequest("order.CANNOT_CANCEL", "订单当前状态不可取消")
+		return errors.BadRequest("order.CANNOT_CANCEL", "訂單當前狀態不可取消")
 	case contains(msg, "TRANSITION"):
-		return errors.BadRequest("order.TRANSITION_NOT_ALLOWED", "状态迁移不允许")
+		return errors.BadRequest("order.TRANSITION_NOT_ALLOWED", "狀態遷移不允許")
 	case contains(msg, "NOT_FOUND"):
-		return errors.NotFound("order.NOT_FOUND", "订单不存在")
+		return errors.NotFound("order.NOT_FOUND", "訂單不存在")
 	case contains(msg, "QUERY_PASSWORD_REQUIRED"):
-		return errors.BadRequest("order.QUERY_PASSWORD_REQUIRED", "请设置查询密码（至少 4 位，取货时使用）")
+		return errors.BadRequest("order.QUERY_PASSWORD_REQUIRED", "請設置查詢密碼（至少 4 位，取貨時使用）")
 	case contains(msg, "CONTACT_REQUIRED"), contains(msg, "CONTACT_INVALID"):
-		// 透出 usecase 校验文案（含联系方式模式说明）
+		// 透出 usecase 校驗文案（含聯繫方式模式説明）
 		if idx := strings.Index(msg, ": "); idx >= 0 && idx+2 < len(msg) {
 			return errors.BadRequest("order.CONTACT_INVALID", msg[idx+2:])
 		}
-		return errors.BadRequest("order.CONTACT_INVALID", "请填写有效的联系方式")
+		return errors.BadRequest("order.CONTACT_INVALID", "請填寫有效的聯繫方式")
 	default:
-		return errors.InternalServer("order.CREATE_FAILED", "下单失败")
+		return errors.InternalServer("order.CREATE_FAILED", "下單失敗")
 	}
 }
 

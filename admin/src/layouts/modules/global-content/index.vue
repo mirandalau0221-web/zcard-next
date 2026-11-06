@@ -46,8 +46,8 @@ function resetScroll() {
 <template>
   <RouterView v-slot="{ Component, route }">
     <div v-if="renderFailed" role="alert" class="p-16px">
-      <p>页面显示异常，请重试或切换其他菜单。</p>
-      <button type="button" class="mt-12px border rounded px-16px py-8px" @click="reloadContent">重新加载内容</button>
+      <p>頁面顯示異常，請重試或切換其他菜單。</p>
+      <button type="button" class="mt-12px border rounded px-16px py-8px" @click="reloadContent">重新加載內容</button>
     </div>
     <Transition
       v-else

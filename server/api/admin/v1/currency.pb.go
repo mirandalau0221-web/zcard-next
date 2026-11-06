@@ -67,7 +67,7 @@ func (x *CurrencyList) GetCurrencies() []*Currency {
 	return nil
 }
 
-// Currency 货币（rate 为 decimal 字符串）。
+// Currency 貨幣（rate 為 decimal 字符串）。
 type Currency struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`

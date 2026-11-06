@@ -1,5 +1,5 @@
-// Package schema 为 Ent schema 唯一真理源（《数据库架构设计.md》§0）。
-// 每个文件头部注释标注模块所有权（架构测试 §4.10-7 依据）。
+// Package schema 為 Ent schema 唯一真理源（《數據庫架構設計.md》§0）。
+// 每個文件頭部註釋標註模塊所有權（架構測試 §4.10-7 依據）。
 package schema
 
 import (
@@ -8,7 +8,7 @@ import (
 	"entgo.io/ent/schema/mixin"
 )
 
-// TimeMixin 通用时间字段（UTC 存储，展示时区由 settings 决定）。
+// TimeMixin 通用時間字段（UTC 存儲，展示時區由 settings 決定）。
 type TimeMixin struct {
 	mixin.Schema
 }
@@ -24,11 +24,11 @@ func (TimeMixin) Fields() []ent.Field {
 	}
 }
 
-// TenantMixin 租户列（Row 行级隔离，开源版唯一启用的隔离模式，ADR-D15）。
+// TenantMixin 租户列（Row 行級隔離，開源版唯一啓用的隔離模式，ADR-D15）。
 //
-// 三种隔离模式下统一保留该列（Schema/Database 模式恒为 0），Ent schema 定义不因模式而变。
-// M1 交付 Ent interceptor 读写自动注入（读拦截器追加 subsite_id IN (ctx)、写拦截器从父实体
-// 继承填充），业务代码不手写租户条件（铁律 14）。唯一索引必须含 subsite_id（§4.11.5）。
+// 三種隔離模式下統一保留該列（Schema/Database 模式恆為 0），Ent schema 定義不因模式而變。
+// M1 交付 Ent interceptor 讀寫自動注入（讀攔截器追加 subsite_id IN (ctx)、寫攔截器從父實體
+// 繼承填充），業務代碼不手寫租户條件（鐵律 14）。唯一索引必須含 subsite_id（§4.11.5）。
 type TenantMixin struct {
 	mixin.Schema
 }
@@ -37,17 +37,17 @@ func (TenantMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("subsite_id").
 			Default(0).
-			Comment("租户（0=主站；由 interceptor 自动注入，业务不手写）"),
+			Comment("租户（0=主站；由 interceptor 自動注入，業務不手寫）"),
 	}
 }
 
-// VersionMixin 乐观锁（并发行与行锁双保险，数据库架构 §3 通用字段约定）。
+// VersionMixin 樂觀鎖（併發行與行鎖雙保險，數據庫架構 §3 通用字段約定）。
 type VersionMixin struct {
 	mixin.Schema
 }
 
 func (VersionMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int32("version").Default(0).Comment("乐观锁版本号"),
+		field.Int32("version").Default(0).Comment("樂觀鎖版本號"),
 	}
 }

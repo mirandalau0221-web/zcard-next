@@ -8,32 +8,32 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminTicketService 客服工单工作台：urgent_paid 置顶持续高亮、
-// 认领/回复/内部备注/解决/关闭、筛选。
+// AdminTicketService 客服工單工作台：urgent_paid 置頂持續高亮、
+// 認領/回覆/內部備註/解決/關閉、篩選。
 service AdminTicketService {
-  // ListTickets 工作台列表（urgent_paid 置顶 → 高 → 中 → 低；状态/类型/订单筛选）。
+  // ListTickets 工作台列表（urgent_paid 置頂 → 高 → 中 → 低；狀態/類型/訂單篩選）。
   rpc ListTickets(ListTicketsRequest) returns (ListTicketsReply) {
     option (google.api.http) = { get: "/api/v1/admin/tickets" };
   }
-  // GetTicket 详情（含内部备注——客服侧全量）。
+  // GetTicket 詳情（含內部備註——客服側全量）。
   rpc GetTicket(GetTicketRequest) returns (GetTicketReply) {
     option (google.api.http) = { get: "/api/v1/admin/tickets/{ticket_no}" };
   }
-  // ReplyTicket 客服回复（可内部备注）。
+  // ReplyTicket 客服回覆（可內部備註）。
   rpc ReplyTicket(AdminReplyRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/tickets/{ticket_no}/reply"
       body: "*"
     };
   }
-  // ResolveTicket 解决。
+  // ResolveTicket 解決。
   rpc ResolveTicket(TicketNoRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/tickets/{ticket_no}/resolve"
       body: "*"
     };
   }
-  // CloseTicket 关闭。
+  // CloseTicket 關閉。
   rpc CloseTicket(TicketNoRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/tickets/{ticket_no}/close"
@@ -43,9 +43,9 @@ service AdminTicketService {
 }
 
 message ListTicketsRequest {
-  string status = 1; // open | processing | resolved | closed；空=未关闭（open+processing）
+  string status = 1; // open | processing | resolved | closed；空=未關閉（open+processing）
   string type = 2; // presale | aftersale
-  string order_no = 3; // 关联订单号（精确）
+  string order_no = 3; // 關聯訂單號（精確）
   int32 page = 4;
   int32 page_size = 5;
 }
@@ -89,13 +89,13 @@ message AdminTicketMessage {
 
 message GetTicketReply {
   AdminTicket ticket = 1;
-  repeated AdminTicketMessage messages = 2; // 含内部备注
+  repeated AdminTicketMessage messages = 2; // 含內部備註
 }
 
 message AdminReplyRequest {
   string ticket_no = 1 [(google.api.field_behavior) = REQUIRED];
   string content = 2 [(google.api.field_behavior) = REQUIRED];
-  bool is_internal = 3; // 内部备注（用户不可见）
+  bool is_internal = 3; // 內部備註（用户不可見）
 }
 
 message TicketNoRequest {

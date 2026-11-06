@@ -25,15 +25,15 @@ const OperationAdminUserManageServiceResetUserPassword = "/zcard.api.admin.v1.Ad
 const OperationAdminUserManageServiceSetUserStatus = "/zcard.api.admin.v1.AdminUserManageService/SetUserStatus"
 
 type AdminUserManageServiceHTTPServer interface {
-	// CreateUser CreateUser 后台新增用户（用户名/邮箱/初始密码；复用注册管线含推广码生成）。
+	// CreateUser CreateUser 後台新增用户（用户名/郵箱/初始密碼；複用註冊管線含推廣碼生成）。
 	CreateUser(context.Context, *CreateUserRequest) (*UserItem, error)
-	// GetUser GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+	// GetUser GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
 	GetUser(context.Context, *GetUserRequest) (*UserDetail, error)
-	// ListUsers ListUsers 用户列表（关键词/状态筛选，分页）。
+	// ListUsers ListUsers 用户列表（關鍵詞/狀態篩選，分頁）。
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
-	// ResetUserPassword ResetUserPassword 重置用户密码（超管专属）。
+	// ResetUserPassword ResetUserPassword 重置用户密碼（超管專屬）。
 	ResetUserPassword(context.Context, *ResetUserPasswordRequest) (*emptypb.Empty, error)
-	// SetUserStatus SetUserStatus 封禁/解封（status: active | banned；deleted 不可经此设置）。
+	// SetUserStatus SetUserStatus 封禁/解封（status: active | banned；deleted 不可經此設置）。
 	SetUserStatus(context.Context, *SetUserStatusRequest) (*UserItem, error)
 }
 
@@ -151,15 +151,15 @@ func _AdminUserManageService_SetUserStatus0_HTTP_Handler(srv AdminUserManageServ
 }
 
 type AdminUserManageServiceHTTPClient interface {
-	// CreateUser CreateUser 后台新增用户（用户名/邮箱/初始密码；复用注册管线含推广码生成）。
+	// CreateUser CreateUser 後台新增用户（用户名/郵箱/初始密碼；複用註冊管線含推廣碼生成）。
 	CreateUser(ctx context.Context, req *CreateUserRequest, opts ...http.CallOption) (rsp *UserItem, err error)
-	// GetUser GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+	// GetUser GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
 	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *UserDetail, err error)
-	// ListUsers ListUsers 用户列表（关键词/状态筛选，分页）。
+	// ListUsers ListUsers 用户列表（關鍵詞/狀態篩選，分頁）。
 	ListUsers(ctx context.Context, req *ListUsersRequest, opts ...http.CallOption) (rsp *ListUsersReply, err error)
-	// ResetUserPassword ResetUserPassword 重置用户密码（超管专属）。
+	// ResetUserPassword ResetUserPassword 重置用户密碼（超管專屬）。
 	ResetUserPassword(ctx context.Context, req *ResetUserPasswordRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// SetUserStatus SetUserStatus 封禁/解封（status: active | banned；deleted 不可经此设置）。
+	// SetUserStatus SetUserStatus 封禁/解封（status: active | banned；deleted 不可經此設置）。
 	SetUserStatus(ctx context.Context, req *SetUserStatusRequest, opts ...http.CallOption) (rsp *UserItem, err error)
 }
 
@@ -171,7 +171,7 @@ func NewAdminUserManageServiceHTTPClient(client *http.Client) AdminUserManageSer
 	return &AdminUserManageServiceHTTPClientImpl{client}
 }
 
-// CreateUser CreateUser 后台新增用户（用户名/邮箱/初始密码；复用注册管线含推广码生成）。
+// CreateUser CreateUser 後台新增用户（用户名/郵箱/初始密碼；複用註冊管線含推廣碼生成）。
 func (c *AdminUserManageServiceHTTPClientImpl) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...http.CallOption) (*UserItem, error) {
 	var out UserItem
 	pattern := "/api/v1/admin/users"
@@ -189,7 +189,7 @@ func (c *AdminUserManageServiceHTTPClientImpl) CreateUser(ctx context.Context, i
 	return &out, nil
 }
 
-// GetUser GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+// GetUser GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
 func (c *AdminUserManageServiceHTTPClientImpl) GetUser(ctx context.Context, in *GetUserRequest, opts ...http.CallOption) (*UserDetail, error) {
 	var out UserDetail
 	pattern := "/api/v1/admin/users/{id}"
@@ -206,7 +206,7 @@ func (c *AdminUserManageServiceHTTPClientImpl) GetUser(ctx context.Context, in *
 	return &out, nil
 }
 
-// ListUsers ListUsers 用户列表（关键词/状态筛选，分页）。
+// ListUsers ListUsers 用户列表（關鍵詞/狀態篩選，分頁）。
 func (c *AdminUserManageServiceHTTPClientImpl) ListUsers(ctx context.Context, in *ListUsersRequest, opts ...http.CallOption) (*ListUsersReply, error) {
 	var out ListUsersReply
 	pattern := "/api/v1/admin/users"
@@ -223,7 +223,7 @@ func (c *AdminUserManageServiceHTTPClientImpl) ListUsers(ctx context.Context, in
 	return &out, nil
 }
 
-// ResetUserPassword ResetUserPassword 重置用户密码（超管专属）。
+// ResetUserPassword ResetUserPassword 重置用户密碼（超管專屬）。
 func (c *AdminUserManageServiceHTTPClientImpl) ResetUserPassword(ctx context.Context, in *ResetUserPasswordRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/users/{id}/password"
@@ -241,7 +241,7 @@ func (c *AdminUserManageServiceHTTPClientImpl) ResetUserPassword(ctx context.Con
 	return &out, nil
 }
 
-// SetUserStatus SetUserStatus 封禁/解封（status: active | banned；deleted 不可经此设置）。
+// SetUserStatus SetUserStatus 封禁/解封（status: active | banned；deleted 不可經此設置）。
 func (c *AdminUserManageServiceHTTPClientImpl) SetUserStatus(ctx context.Context, in *SetUserStatusRequest, opts ...http.CallOption) (*UserItem, error) {
 	var out UserItem
 	pattern := "/api/v1/admin/users/{id}/status"

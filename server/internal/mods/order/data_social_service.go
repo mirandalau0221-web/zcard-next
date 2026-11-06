@@ -33,10 +33,10 @@ func socialUser(ctx context.Context) (uint64, error) {
 	}
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil || claims.Subject == 0 || claims.Realm != authn.RealmUser {
-		return 0, errors.Unauthorized("social.LOGIN_REQUIRED", "请登录购买服务")
+		return 0, errors.Unauthorized("social.LOGIN_REQUIRED", "請登錄購買服務")
 	}
 	if tenancy.FromContext(ctx).SubsiteID != 0 {
-		return 0, errors.BadRequest("social.MAIN_SITE_ONLY", "服务目前仅支持主站")
+		return 0, errors.BadRequest("social.MAIN_SITE_ONLY", "服務目前僅支持主站")
 	}
 	return claims.Subject, nil
 }
@@ -49,27 +49,27 @@ func (s *StoreSocialProductService) product(ctx context.Context, id uint64) (*en
 		return nil, nil, e
 	}
 	if currency != "CNY" {
-		return nil, nil, errors.BadRequest("social.CURRENCY_UNSUPPORTED", "服务购买仅支持人民币基础币种")
+		return nil, nil, errors.BadRequest("social.CURRENCY_UNSUPPORTED", "服務購買僅支持人民幣基礎幣種")
 	}
 	c := data.Client(ctx, s.uc.Data)
 	p, e := data.ProductForDelivery(ctx, c, 0, id)
 	if e != nil || p.DeliveryKind != supplyport.SocialDelivery || p.ProductKind != supplyport.SocialProductKind || p.Status != 1 || p.UpstreamSourceID == 0 {
-		return nil, nil, errors.NotFound("social.PRODUCT_UNAVAILABLE", "服务商品不可售")
+		return nil, nil, errors.NotFound("social.PRODUCT_UNAVAILABLE", "服務商品不可售")
 	}
 	hidden, e := data.HiddenCategoryIDs(ctx, c, 0)
 	if e != nil {
 		return nil, nil, e
 	}
 	if data.CategoryHidden(hidden, p.CategoryID) {
-		return nil, nil, errors.NotFound("social.PRODUCT_UNAVAILABLE", "服务商品不可售")
+		return nil, nil, errors.NotFound("social.PRODUCT_UNAVAILABLE", "服務商品不可售")
 	}
 	conn, e := c.SupplyConnection.Get(ctx, p.UpstreamSourceID)
 	if e != nil || string(conn.Status) != "active" || conn.Driver != "zcard" || conn.ExchangeRate != 1 {
-		return nil, nil, errors.BadRequest("social.CONNECTION_UNAVAILABLE", "服务货源暂不可购")
+		return nil, nil, errors.BadRequest("social.CONNECTION_UNAVAILABLE", "服務貨源暫不可購")
 	}
 	gw, ok := s.uc.StockGate.(supplyport.SocialClientGateway)
 	if !ok {
-		return nil, nil, errors.ServiceUnavailable("social.UNAVAILABLE", "服务暂不可用")
+		return nil, nil, errors.ServiceUnavailable("social.UNAVAILABLE", "服務暫不可用")
 	}
 	client, e := gw.OpenSocial(ctx, p.UpstreamSourceID)
 	return p, client, e
@@ -89,7 +89,7 @@ func (s *StoreSocialProductService) Schema(ctx context.Context, req *storefrontv
 	}
 	var obj map[string]any
 	if json.Unmarshal(b, &obj) != nil {
-		return nil, errors.InternalServer("social.INVALID_SCHEMA", "服务定义无法读取")
+		return nil, errors.InternalServer("social.INVALID_SCHEMA", "服務定義無法讀取")
 	}
 	return structpb.NewStruct(obj)
 }
@@ -103,7 +103,7 @@ func (s *StoreSocialProductService) Quote(ctx context.Context, req *storefrontv1
 		return nil, e
 	}
 	if s.uc.AccessCipher == nil {
-		return nil, errors.ServiceUnavailable("social.UNAVAILABLE", "服务暂不可用")
+		return nil, errors.ServiceUnavailable("social.UNAVAILABLE", "服務暫不可用")
 	}
 	c := data.Client(ctx, s.uc.Data)
 	conn, e := c.SupplyConnection.Get(ctx, p.UpstreamSourceID)
@@ -116,10 +116,10 @@ func (s *StoreSocialProductService) Quote(ctx context.Context, req *storefrontv1
 		return nil, e
 	}
 	if schema == nil || schema.Version != 1 || schema.Revision == "" || !schema.Purchasable {
-		return nil, errors.BadRequest("social.NOT_PURCHASABLE", "此服务暂不支持购买")
+		return nil, errors.BadRequest("social.NOT_PURCHASABLE", "此服務暫不支持購買")
 	}
 	if req.SchemaRevision != schema.Revision {
-		return nil, errors.Conflict("social.SCHEMA_CHANGED", "服务规则已更新，请刷新后填写")
+		return nil, errors.Conflict("social.SCHEMA_CHANGED", "服務規則已更新，請刷新後填寫")
 	}
 	params, quantity, e := supplyport.ValidateSocialParameters(*schema, supplyport.SocialParameters(req.Parameters))
 	if e != nil {
@@ -130,20 +130,20 @@ func (s *StoreSocialProductService) Quote(ctx context.Context, req *storefrontv1
 		return nil, e
 	}
 	if quote == nil || quote.QuoteID == "" || quote.ProductID != p.UpstreamProductCode || quote.SchemaRevision != schema.Revision || quote.Currency != "CNY" || quote.AmountCents <= 0 || !money.ValidCents(int64(quote.AmountCents)) || quote.ExpiresAt <= supplyport.Integer(time.Now().Unix()) || socialHash(quote.Parameters) != socialHash(params) {
-		return nil, errors.BadRequest("social.INVALID_QUOTE", "供货报价无效，请稍后重试")
+		return nil, errors.BadRequest("social.INVALID_QUOTE", "供貨報價無效，請稍後重試")
 	}
 	pricer, ok := s.uc.StockGate.(interface {
 		PriceSocialRetail(context.Context, uint64, uint64, int64) (int64, string, error)
 	})
 	if !ok {
-		return nil, errors.ServiceUnavailable("social.PRICING_UNAVAILABLE", "服务定价尚未配置")
+		return nil, errors.ServiceUnavailable("social.PRICING_UNAVAILABLE", "服務定價尚未配置")
 	}
 	amount, pricingRevision, e := pricer.PriceSocialRetail(ctx, p.UpstreamSourceID, p.ID, int64(quote.AmountCents))
 	if e != nil {
 		return nil, e
 	}
 	if amount < int64(quote.AmountCents) || !money.ValidCents(amount) {
-		return nil, errors.BadRequest("social.INVALID_PRICE", "服务总价无效")
+		return nil, errors.BadRequest("social.INVALID_PRICE", "服務總價無效")
 	}
 	raw, _ := json.Marshal(params)
 	sealed, e := s.uc.AccessCipher.Seal(string(raw), p.ID, p.SubsiteID)
@@ -174,7 +174,7 @@ func (s *StoreSocialProductService) Quote(ctx context.Context, req *storefrontv1
 			return e
 		}
 		if current.LockVersion != p.LockVersion || current.Status != 1 || current.UpstreamSourceID != conn.ID || current.UpstreamProductCode != p.UpstreamProductCode || identity != data.SocialConnectionIdentity(currentConn) || pricingRevision != data.SocialRetailPricingRevision(currentConn, m) {
-			return errors.Conflict("social.QUOTE_CHANGED", "服务或定价已变化，请重新报价")
+			return errors.Conflict("social.QUOTE_CHANGED", "服務或定價已變化，請重新報價")
 		}
 		return c.SocialQuote.Create().SetID(id).SetRole("retail").SetUserID(uid).SetSubsiteID(0).SetProductID(p.ID).SetConnectionID(conn.ID).SetConnectionIdentity(identity).SetProductRevision(p.LockVersion).SetSchemaRevision(schema.Revision).SetPricingRevision(pricingRevision).SetUpstreamProductID(p.UpstreamProductCode).SetParamsCipher(sealed).SetSchemaJSON(string(schemaJSON)).SetSupplyQuoteID(quote.QuoteID).SetCurrency("CNY").SetAmountCents(amount).SetCostCents(int64(quote.AmountCents)).SetExpiresAt(expires).Exec(ctx)
 	})
@@ -189,7 +189,7 @@ func (s *StoreSocialProductService) Buy(ctx context.Context, req *storefrontv1.S
 		return nil, e
 	}
 	if _, e := uuid.Parse(req.RequestId); e != nil {
-		return nil, errors.BadRequest("social.REQUEST_ID", "购买请求标识无效")
+		return nil, errors.BadRequest("social.REQUEST_ID", "購買請求標識無效")
 	}
 	result, e := s.uc.CreateOrder(ctx, CreateOrderInput{SocialQuoteID: req.QuoteId, UserID: uid, SubsiteID: 0, ClientIP: orderClientIP(ctx), IdempotencyKey: "social_" + req.RequestId, Items: []OrderItemInput{{ProductID: req.ProductId, Quantity: 1}}})
 	if e != nil {

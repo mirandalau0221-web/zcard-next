@@ -27,7 +27,7 @@ type VisitLog struct {
 	StatDate string `json:"stat_date,omitempty"`
 	// 0-23
 	StatHour int8 `json:"stat_hour,omitempty"`
-	// 路径或来源标识
+	// 路徑或來源標識
 	Path string `json:"path,omitempty"`
 	// Pv holds the value of the "pv" field.
 	Pv int64 `json:"pv,omitempty"`

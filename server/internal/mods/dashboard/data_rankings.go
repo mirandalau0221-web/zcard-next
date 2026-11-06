@@ -135,7 +135,7 @@ func (r *DashboardRepoImpl) GetTopProducts(ctx context.Context, window ...int) (
 			remaining -= amount
 			g := groups[it.ProductID]
 			if g == nil {
-				g = &TopProduct{ProductID: it.ProductID, Name: fmt.Sprintf("历史商品 #%d", it.ProductID)}
+				g = &TopProduct{ProductID: it.ProductID, Name: fmt.Sprintf("歷史商品 #%d", it.ProductID)}
 				groups[it.ProductID] = g
 			}
 			g.SoldQty += int64(it.Quantity)

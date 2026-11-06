@@ -1,7 +1,7 @@
 package wallet
 
-// 提现服务面（ ）：storefront 申请 + admin 审核/打款。
-// 金额服务端裁决（铁律 16）：白名单/最低额/手续费全部取 settings.withdraw。
+// 提現服務面（ ）：storefront 申請 + admin 審核/打款。
+// 金額服務端裁決（鐵律 16）：白名單/最低額/手續費全部取 settings.withdraw。
 
 import (
 	"context"
@@ -22,12 +22,12 @@ import (
 	"github.com/go-kratos/kratos/v3/errors"
 )
 
-// withdrawPolicy 提现配置（settings.withdraw 组；读取失败回退目录默认值）。
+// withdrawPolicy 提現配置（settings.withdraw 組；讀取失敗回退目錄默認值）。
 type withdrawPolicy struct {
 	Enabled   bool
 	MinAmount int64
 	FeeType   string // fixed | percent
-	FeeValue  int64  // fixed=分；percent=万分比
+	FeeValue  int64  // fixed=分；percent=萬分比
 	Methods   []withdrawMethod
 }
 
@@ -63,7 +63,7 @@ func (s *StoreWalletService) withdrawPolicy(ctx context.Context) withdrawPolicy 
 	return p
 }
 
-// feeOf 手续费（fixed=分；percent=万分比）。
+// feeOf 手續費（fixed=分；percent=萬分比）。
 func (p withdrawPolicy) feeOf(amount int64) int64 {
 	if p.FeeType == "percent" {
 		return amount * p.FeeValue / 10000
@@ -71,22 +71,22 @@ func (p withdrawPolicy) feeOf(amount int64) int64 {
 	return p.FeeValue
 }
 
-// CreateWithdrawal 提现申请（佣金提现）：档位校验 → 白名单收款方式 →
-// USDT 地址校验 → 佣金余额校验（available − 冻结 ≥ 金额）→ 落单（冻结口径=单本身）。
+// CreateWithdrawal 提現申請（佣金提現）：檔位校驗 → 白名單收款方式 →
+// USDT 地址校驗 → 佣金餘額校驗（available − 凍結 ≥ 金額）→ 落單（凍結口徑=單本身）。
 func (s *StoreWalletService) CreateWithdrawal(ctx context.Context, req *storefrontv1.CreateWithdrawalRequest) (*storefrontv1.CreateWithdrawalReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	policy := s.withdrawPolicy(ctx)
 	if !policy.Enabled {
-		return nil, errors.Forbidden("wallet.WITHDRAW_DISABLED", "提现功能未开放")
+		return nil, errors.Forbidden("wallet.WITHDRAW_DISABLED", "提現功能未開放")
 	}
 	amount := req.GetAmountCents()
 	if !money.ValidCents(amount) || amount < policy.MinAmount {
-		return nil, errors.BadRequest("wallet.INVALID_AMOUNT", "提现金额低于最低限额或超出上限")
+		return nil, errors.BadRequest("wallet.INVALID_AMOUNT", "提現金額低於最低限額或超出上限")
 	}
-	// 收款方式白名单（方法类型必须命中；账号服务端不设限但落快照）
+	// 收款方式白名單（方法類型必須命中；賬號服務端不設限但落快照）
 	var matched *withdrawMethod
 	for i := range policy.Methods {
 		if policy.Methods[i].Type == req.GetMethodType() {
@@ -95,17 +95,17 @@ func (s *StoreWalletService) CreateWithdrawal(ctx context.Context, req *storefro
 		}
 	}
 	if matched == nil || req.GetAccount() == "" {
-		return nil, errors.BadRequest("wallet.METHOD_INVALID", "收款方式不在白名单或账号为空")
+		return nil, errors.BadRequest("wallet.METHOD_INVALID", "收款方式不在白名單或賬號為空")
 	}
-	// USDT TRC20 地址格式校验
+	// USDT TRC20 地址格式校驗
 	if matched.Type == "usdt_trc20" && !usdtTrc20Re.MatchString(req.GetAccount()) {
-		return nil, errors.BadRequest("wallet.USDT_ADDRESS_INVALID", "USDT TRC20 地址格式不正确（T 开头 34 位）")
+		return nil, errors.BadRequest("wallet.USDT_ADDRESS_INVALID", "USDT TRC20 地址格式不正確（T 開頭 34 位）")
 	}
-	// 佣金余额校验（可提 = available − 冻结中提现单）
+	// 佣金餘額校驗（可提 = available − 凍結中提現單）
 	if s.commissions != nil {
 		stats, err := s.commissions.StatsByUser(ctx, claims.Subject)
 		if err != nil {
-			return nil, errors.InternalServer("wallet.WITHDRAW_FAILED", "佣金查询失败")
+			return nil, errors.InternalServer("wallet.WITHDRAW_FAILED", "佣金查詢失敗")
 		}
 		frozen, _ := s.commissions.FrozenWithdrawAmount(ctx, claims.Subject)
 		if stats.AvailableCents-frozen < amount {
@@ -116,7 +116,7 @@ func (s *StoreWalletService) CreateWithdrawal(ctx context.Context, req *storefro
 		"type": matched.Type, "name": matched.Name, "account": req.GetAccount(),
 	}
 	if qr := req.GetQrCodeUrl(); qr != "" {
-		method["qr_code_url"] = qr // 收款码图片 URL（微信/支付宝；admin 审核展示）
+		method["qr_code_url"] = qr // 收款碼圖片 URL（微信/支付寶；admin 審核展示）
 	}
 	fee := policy.feeOf(amount)
 	w, err := s.repo.CreateWithdrawal(ctx, claims.Subject, amount, fee, method)
@@ -129,16 +129,16 @@ func (s *StoreWalletService) CreateWithdrawal(ctx context.Context, req *storefro
 	}, nil
 }
 
-// ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+// ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 func (s *StoreWalletService) ListMyWithdrawals(ctx context.Context, req *storefrontv1.ListMyWithdrawalsRequest) (*storefrontv1.ListMyWithdrawalsReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "未登錄")
 	}
 	page, size := withdrawPage(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListWithdrawalsByUser(ctx, claims.Subject, page, size)
 	if err != nil {
-		return nil, errors.InternalServer("wallet.LIST_FAILED", "读取提现记录失败")
+		return nil, errors.InternalServer("wallet.LIST_FAILED", "讀取提現記錄失敗")
 	}
 	reply := &storefrontv1.ListMyWithdrawalsReply{Total: total}
 	for _, w := range rows {
@@ -172,26 +172,26 @@ func mapWithdrawErr(err error) error {
 	msg := err.Error()
 	switch {
 	case containsStr(msg, "INSUFFICIENT"):
-		return errors.BadRequest("wallet.INSUFFICIENT_BALANCE", "可用余额不足")
+		return errors.BadRequest("wallet.INSUFFICIENT_BALANCE", "可用餘額不足")
 	case containsStr(msg, "CONCURRENT"):
-		return errors.InternalServer("wallet.CONCURRENT_UPDATE", "并发冲突，请重试")
+		return errors.InternalServer("wallet.CONCURRENT_UPDATE", "併發衝突，請重試")
 	case containsStr(msg, "NOT_FOUND"):
-		return errors.NotFound("wallet.WITHDRAWAL_NOT_FOUND", "提现单不存在")
+		return errors.NotFound("wallet.WITHDRAWAL_NOT_FOUND", "提現單不存在")
 	case containsStr(msg, "NOT_PENDING"), containsStr(msg, "NOT_APPROVED"):
-		return errors.BadRequest("wallet.WITHDRAWAL_STATE", "提现单状态不允许该操作")
+		return errors.BadRequest("wallet.WITHDRAWAL_STATE", "提現單狀態不允許該操作")
 	default:
-		return errors.InternalServer("wallet.WITHDRAW_FAILED", "提现操作失败")
+		return errors.InternalServer("wallet.WITHDRAW_FAILED", "提現操作失敗")
 	}
 }
 
-// ── Admin 提现管理 ──────────────────────────────────────────
+// ── Admin 提現管理 ──────────────────────────────────────────
 
-// ListWithdrawals 提现单列表。
+// ListWithdrawals 提現單列表。
 func (s *AdminWalletService) ListWithdrawals(ctx context.Context, req *adminv1.ListWithdrawalsRequest) (*adminv1.ListWithdrawalsReply, error) {
 	page, size := withdrawPage(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListWithdrawals(ctx, req.GetStatus(), page, size)
 	if err != nil {
-		return nil, errors.InternalServer("wallet.LIST_FAILED", "读取提现单失败")
+		return nil, errors.InternalServer("wallet.LIST_FAILED", "讀取提現單失敗")
 	}
 	reply := &adminv1.ListWithdrawalsReply{Total: total}
 	for _, w := range rows {
@@ -201,10 +201,10 @@ func (s *AdminWalletService) ListWithdrawals(ctx context.Context, req *adminv1.L
 	return reply, nil
 }
 
-// ReviewWithdrawal 审核（通过/驳回；驳回解锁回余额）。
+// ReviewWithdrawal 審核（通過/駁回；駁回解鎖回餘額）。
 func (s *AdminWalletService) ReviewWithdrawal(ctx context.Context, req *adminv1.ReviewWithdrawalRequest) (*adminv1.WithdrawalItem, error) {
 	if !req.GetApprove() && req.GetReason() == "" {
-		return nil, errors.BadRequest("wallet.REASON_REQUIRED", "驳回原因必填")
+		return nil, errors.BadRequest("wallet.REASON_REQUIRED", "駁回原因必填")
 	}
 	w, err := s.repo.ReviewWithdrawal(ctx, req.GetId(), req.GetApprove(), req.GetReason(), adminWalletUID(ctx))
 	if err != nil {
@@ -213,7 +213,7 @@ func (s *AdminWalletService) ReviewWithdrawal(ctx context.Context, req *adminv1.
 	return toWithdrawalPB(w), nil
 }
 
-// PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣减 + 流水）。
+// PayWithdrawal 打款（人工打款模式：approved→paid + locked 扣減 + 流水）。
 func (s *AdminWalletService) PayWithdrawal(ctx context.Context, req *adminv1.PayWithdrawalRequest) (*adminv1.WithdrawalItem, error) {
 	w, err := s.repo.PayWithdrawal(ctx, req.GetId(), req.GetReceipt())
 	if err != nil {
@@ -244,7 +244,7 @@ func withdrawPage(page, pageSize int32) (int, int) {
 	return p, ps
 }
 
-// toWithdrawalPB 转 admin 协议（method 快照拆出 type/name/account/qr）。
+// toWithdrawalPB 轉 admin 協議（method 快照拆出 type/name/account/qr）。
 func toWithdrawalPB(w *ent.Withdrawal) *adminv1.WithdrawalItem {
 	out := &adminv1.WithdrawalItem{
 		Id: w.ID, UserId: w.UserID, AmountCents: w.Amount, FeeCents: w.Fee,
@@ -271,7 +271,7 @@ func toWithdrawalPB(w *ent.Withdrawal) *adminv1.WithdrawalItem {
 	return out
 }
 
-// enrichUsernames 批量富化用户名（列表一次查询防 N+1）。
+// enrichUsernames 批量富化用户名（列表一次查詢防 N+1）。
 func (s *AdminWalletService) enrichUsernames(ctx context.Context, items []*adminv1.WithdrawalItem) {
 	if len(items) == 0 {
 		return
@@ -301,11 +301,11 @@ func (s *AdminWalletService) enrichUsernames(ctx context.Context, items []*admin
 var _ = withdrawal.StatusPending
 var _ = fmt.Sprintf
 
-// CommissionSource 佣金读取端口（提现校验；affiliate.CommissionRepo 实现，通道 A）。
+// CommissionSource 佣金讀取端口（提現校驗；affiliate.CommissionRepo 實現，通道 A）。
 type CommissionSource interface {
 	StatsByUser(ctx context.Context, userID uint64) (*affiliateport.CommissionStats, error)
 	FrozenWithdrawAmount(ctx context.Context, userID uint64) (int64, error)
 }
 
-// usdtTrc20Re TRC20 地址（T 开头 34 位 base58，剔除 0OIl）。
+// usdtTrc20Re TRC20 地址（T 開頭 34 位 base58，剔除 0OIl）。
 var usdtTrc20Re = regexp.MustCompile(`^T[1-9A-HJ-NP-Za-km-z]{33}$`)

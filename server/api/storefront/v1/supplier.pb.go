@@ -25,12 +25,12 @@ const (
 
 type SubmitSupplierApplicationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// 下游面板协议：zcard | dujiao_next | acg_faka
+	// 下游面板協議：zcard | dujiao_next | acg_faka
 	Protocol      string `protobuf:"bytes,1,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	DisplayName   string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"` // 站点/店铺名（≤100）
-	Contact       string `protobuf:"bytes,3,opt,name=contact,proto3" json:"contact,omitempty"`                            // 联系方式（QQ/邮箱/手机）
-	ApplyReason   string `protobuf:"bytes,4,opt,name=apply_reason,json=applyReason,proto3" json:"apply_reason,omitempty"` // 申请理由（≤500）
-	NotifyUrl     string `protobuf:"bytes,5,opt,name=notify_url,json=notifyUrl,proto3" json:"notify_url,omitempty"`       // 交付回调地址（可选；HTTPS 强制）
+	DisplayName   string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"` // 站點/店鋪名（≤100）
+	Contact       string `protobuf:"bytes,3,opt,name=contact,proto3" json:"contact,omitempty"`                            // 聯繫方式（QQ/郵箱/手機）
+	ApplyReason   string `protobuf:"bytes,4,opt,name=apply_reason,json=applyReason,proto3" json:"apply_reason,omitempty"` // 申請理由（≤500）
+	NotifyUrl     string `protobuf:"bytes,5,opt,name=notify_url,json=notifyUrl,proto3" json:"notify_url,omitempty"`       // 交付回調地址（可選；HTTPS 強制）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -108,12 +108,12 @@ type SupplierAccountReply struct {
 	DisplayName   string                 `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	Contact       string                 `protobuf:"bytes,5,opt,name=contact,proto3" json:"contact,omitempty"`
 	ApplyReason   string                 `protobuf:"bytes,6,opt,name=apply_reason,json=applyReason,proto3" json:"apply_reason,omitempty"`
-	ReviewNote    string                 `protobuf:"bytes,7,opt,name=review_note,json=reviewNote,proto3" json:"review_note,omitempty"` // 审核意见/驳回理由
-	ApiKey        string                 `protobuf:"bytes,8,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`             // app_id（明文常驻）
+	ReviewNote    string                 `protobuf:"bytes,7,opt,name=review_note,json=reviewNote,proto3" json:"review_note,omitempty"` // 審核意見/駁回理由
+	ApiKey        string                 `protobuf:"bytes,8,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`             // app_id（明文常駐）
 	ReviewedAt    int64                  `protobuf:"varint,9,opt,name=reviewed_at,json=reviewedAt,proto3" json:"reviewed_at,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	BalanceCache  int64                  `protobuf:"varint,11,opt,name=balance_cache,json=balanceCache,proto3" json:"balance_cache,omitempty"` // 供货余额（分）
-	IpWhitelist   []string               `protobuf:"bytes,12,rep,name=ip_whitelist,json=ipWhitelist,proto3" json:"ip_whitelist,omitempty"`     // IP 白名单（空=所有 IP 放行；精确 IP 或 CIDR）
+	BalanceCache  int64                  `protobuf:"varint,11,opt,name=balance_cache,json=balanceCache,proto3" json:"balance_cache,omitempty"` // 供貨餘額（分）
+	IpWhitelist   []string               `protobuf:"bytes,12,rep,name=ip_whitelist,json=ipWhitelist,proto3" json:"ip_whitelist,omitempty"`     // IP 白名單（空=所有 IP 放行；精確 IP 或 CIDR）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -410,10 +410,10 @@ func (x *CancelSupplierApplicationRequest) GetId() uint64 {
 
 type CreateSupplierRechargeRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
-	Id          uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                      // 对接账户（须 approved 且归属本人）
-	AmountCents int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"` // 意向金额（分；服务端按档位裁决）
+	Id          uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                      // 對接賬户（須 approved 且歸屬本人）
+	AmountCents int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"` // 意向金額（分；服務端按檔位裁決）
 	Channel     string                 `protobuf:"bytes,3,opt,name=channel,proto3" json:"channel,omitempty"`                             // 支付渠道 code
-	// 方式标识（多方式渠道必填：易支付 alipay/wxpay、USDT 选链；单方式渠道留空）
+	// 方式標識（多方式渠道必填：易支付 alipay/wxpay、USDT 選鏈；單方式渠道留空）
 	Method        *string `protobuf:"bytes,4,opt,name=method,proto3,oneof" json:"method,omitempty"`
 	QuoteKey      string  `protobuf:"bytes,5,opt,name=quote_key,json=quoteKey,proto3" json:"quote_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -488,7 +488,7 @@ func (x *CreateSupplierRechargeRequest) GetQuoteKey() string {
 type SetSupplierIPWhitelistRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Ips           []string               `protobuf:"bytes,2,rep,name=ips,proto3" json:"ips,omitempty"` // 精确 IP 或 CIDR 网段（如 1.2.3.4、10.0.0.0/24）；空 = 不限
+	Ips           []string               `protobuf:"bytes,2,rep,name=ips,proto3" json:"ips,omitempty"` // 精確 IP 或 CIDR 網段（如 1.2.3.4、10.0.0.0/24）；空 = 不限
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -541,8 +541,8 @@ type CreateSupplierRechargeReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RechargeId    uint64                 `protobuf:"varint,1,opt,name=recharge_id,json=rechargeId,proto3" json:"recharge_id,omitempty"`
 	PaymentId     uint64                 `protobuf:"varint,2,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`
-	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`       // redirect | qrcode | params（与 CreateRechargeReply 同构）
-	Payload       string                 `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"` // 支付跳转 URL / 二维码内容 / 参数 JSON
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`       // redirect | qrcode | params（與 CreateRechargeReply 同構）
+	Payload       string                 `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"` // 支付跳轉 URL / 二維碼內容 / 參數 JSON
 	Quote         *PaymentQuote          `protobuf:"bytes,5,opt,name=quote,proto3" json:"quote,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -619,7 +619,7 @@ type SupplierCredentialsReply struct {
 	Protocol      string                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 	ApiKey        string                 `protobuf:"bytes,4,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`          // app_id（明文）
-	ApiSecret     string                 `protobuf:"bytes,5,opt,name=api_secret,json=apiSecret,proto3" json:"api_secret,omitempty"` // app_key（明文；重置后旧值立即失效）
+	ApiSecret     string                 `protobuf:"bytes,5,opt,name=api_secret,json=apiSecret,proto3" json:"api_secret,omitempty"` // app_key（明文；重置後舊值立即失效）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

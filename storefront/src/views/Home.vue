@@ -1,9 +1,9 @@
 <template>
   <div class="home">
-    <!-- Hero 轮播（公告设置 image/carousel 优先；回落横幅；无图回退渐变品牌区） -->
+    <!-- Hero 輪播（公告設置 image/carousel 優先；回落橫幅；無圖回退漸變品牌區） -->
     <div v-if="!heroReady" class="hero-placeholder" :role="heroError ? 'alert' : 'status'">
-      <span>{{ heroError ? $t('店铺展示内容暂时无法加载') : $t('正在加载店铺内容…') }}</span>
-      <button v-if="heroError" class="feed-retry" @click="loadDecorations">{{ $t('重试') }}</button>
+      <span>{{ heroError ? $t('店鋪展示內容暫時無法加載') : $t('正在加載店鋪內容…') }}</span>
+      <button v-if="heroError" class="feed-retry" @click="loadDecorations">{{ $t('重試') }}</button>
     </div>
     <div v-else-if="heroItems.length" class="hero-slider" @mouseenter="stopHero" @mouseleave="startHero">
       <div class="hero-track" :style="{ transform: `translateX(-${heroIndex * 100}%)` }">
@@ -25,24 +25,24 @@
     <div v-else class="hero-banner">
       <div>
         <h1 :class="{ 'brand-name-placeholder': !brandReady }" :aria-busy="!brandReady">{{ siteName }}</h1>
-        <p>{{ $t('在线下单 · 正品保障 · 售后无忧') }}</p>
+        <p>{{ $t('在線下單 · 正品保障 · 售後無憂') }}</p>
         <div class="hero-points">
           <span>{{ $t('📦 按商品交付') }}</span>
           <span>{{ $t('🛡️ 正品保障') }}</span>
-          <span>{{ $t('💬 在线客服') }}</span>
+          <span>{{ $t('💬 在線客服') }}</span>
         </div>
       </div>
       <span class="hero-icon">🎁</span>
     </div>
 
-    <!-- 公告条（设置文本优先；回落最新公告文章；点击弹公告弹窗，与导航📢同源） -->
+    <!-- 公告條（設置文本優先；回落最新公告文章；點擊彈公告彈窗，與導航📢同源） -->
     <div v-if="noticeBarText" class="notice-bar" @click="openNoticeModal()">
       <span class="tag">{{ $t('公告') }}</span>
       <span class="notice-title">{{ noticeBarText }}</span>
       <span v-if="latestNotice && !announcementText" class="muted">{{ formatDate(latestNotice.published_at) }}</span>
     </div>
 
-    <!-- 左右布局：PC 左侧多级分类树 + 右侧内容；移动端横向胶囊兜底 -->
+    <!-- 左右佈局：PC 左側多級分類樹 + 右側內容；移動端橫向膠囊兜底 -->
     <div id="catalog" class="home-layout">
       <CategoryTree
         v-if="navStyle !== 'grid'"
@@ -62,17 +62,17 @@
           <button class="btn btn-primary" type="submit">{{ $t('搜索') }}</button>
         </form>
 
-        <!-- 分类导航：grid=顶部胶囊全断点；list 时 PC 左树，移动端「全部分类」折叠树（含全部层级，替代胶囊） -->
+        <!-- 分類導航：grid=頂部膠囊全斷點；list 時 PC 左樹，移動端「全部分類」摺疊樹（含全部層級，替代膠囊） -->
         <div v-if="navStyle === 'grid' && (categories.length || showRecommendedFilter)" class="card cat-chips">
           <button class="mobile-cat-head" type="button" :aria-expanded="chipsExpanded" @click="chipsExpanded = !chipsExpanded">
-            <span class="mcb-bar"></span><span class="mcb-title">{{ $t('全部分类') }}</span>
-            <span class="mcb-count">{{ categories.length }} {{ $t('类') }}</span>
-            <span class="mcb-toggle-label">{{ chipsExpanded ? $t('折叠') : $t('展开') }}</span>
+            <span class="mcb-bar"></span><span class="mcb-title">{{ $t('全部分類') }}</span>
+            <span class="mcb-count">{{ categories.length }} {{ $t('類') }}</span>
+            <span class="mcb-toggle-label">{{ chipsExpanded ? $t('摺疊') : $t('展開') }}</span>
             <span class="mcb-arrow" :class="{ open: chipsExpanded }"></span>
           </button>
           <div class="cat-chips-row" :class="{ expanded: chipsExpanded }">
             <button class="chip" :class="{ active: !activeCategory }" @click="pickCategory(0)"><ThemeIcon name="grid" class="chip-icon" />{{ $t('全部') }}</button>
-            <button v-if="showRecommendedFilter" class="chip" :class="{ active: activeCategory === -1 }" @click="pickCategory(-1)">{{ $t('推荐商品') }}</button>
+            <button v-if="showRecommendedFilter" class="chip" :class="{ active: activeCategory === -1 }" @click="pickCategory(-1)">{{ $t('推薦商品') }}</button>
             <button v-for="c in categories.filter((x) => !x.parent_id)" :key="c.id" class="chip" :class="{ active: activeCategory === c.id }" @click="pickCategory(c.id)">
               <CategoryIcon :icon="c.icon" class="chip-icon" />{{ c.name }}
             </button>
@@ -82,74 +82,74 @@
           <CategoryTree variant="panel" :categories="categories" :loading="categoriesLoading" :error="!!categoriesError" @retry="loadCategories" :show-recommended="showRecommendedFilter" :model-value="activeCategory" @update:model-value="pickCategory" />
         </div>
 
-        <div v-if="navStyle === 'grid' && categoriesError" class="error" role="alert">{{ $t('分类加载失败') }} <button class="feed-retry" :disabled="categoriesLoading" @click="loadCategories">{{ $t('重试') }}</button></div>
+        <div v-if="navStyle === 'grid' && categoriesError" class="error" role="alert">{{ $t('分類加載失敗') }} <button class="feed-retry" :disabled="categoriesLoading" @click="loadCategories">{{ $t('重試') }}</button></div>
 
         <section v-if="showRecommendations && (recommendedProducts.length || recommendationsLoading || recommendationsError)" class="home-recommendations" aria-labelledby="home-recommendations-title" :aria-busy="recommendationsLoading">
           <div class="recommendations-heading">
-            <h2 id="home-recommendations-title">{{ $t('推荐商品') }}</h2>
+            <h2 id="home-recommendations-title">{{ $t('推薦商品') }}</h2>
             <router-link v-if="hasRecommended" class="recommendations-more" :to="{ path: '/', query: { recommend_only: '1' }, hash: '#catalog' }">{{ $t('查看全部') }}</router-link>
           </div>
           <div v-if="recommendationsError" class="error" role="alert">
-            {{ $t('推荐商品加载失败') }} <button class="feed-retry" :disabled="recommendationsLoading" @click="refreshRecommendations">{{ $t('重试') }}</button>
+            {{ $t('推薦商品加載失敗') }} <button class="feed-retry" :disabled="recommendationsLoading" @click="refreshRecommendations">{{ $t('重試') }}</button>
           </div>
-          <div v-if="recommendationsLoading && !recommendedProducts.length" class="feed-status" role="status">{{ $t('正在加载商品…') }}</div>
+          <div v-if="recommendationsLoading && !recommendedProducts.length" class="feed-status" role="status">{{ $t('正在加載商品…') }}</div>
           <div v-if="recommendedProducts.length" class="product-grid" :class="{ 'catalog-big': bigGrid }" :style="gridStyle">
             <ProductCard v-for="p in recommendedProducts" :key="p.id" :p="p" mode="grid" :show-sales="showSales" :show-stock="showStock" />
           </div>
         </section>
 
-        <div v-if="error" role="alert" class="error" style="margin-bottom: 12px;">{{ uiText(error) }} <button :disabled="loading" class="feed-retry" @click="load(products.length > 0)">{{ $t('重新加载') }}</button></div>
+        <div v-if="error" role="alert" class="error" style="margin-bottom: 12px;">{{ uiText(error) }} <button :disabled="loading" class="feed-retry" @click="load(products.length > 0)">{{ $t('重新加載') }}</button></div>
 
         <CatalogToolbar :title="sectionTitle" :sort="!showSales && sort === 'sales' ? 'default' : sort" :show-sales="showSales" :view="viewMode" :loading="loading" @sort="changeSort" @view="changeView" />
 
-        <!-- 商品列表（网格/列表双视图） -->
+        <!-- 商品列表（網格/列表雙視圖） -->
         <div ref="catalogItems" :class="[viewMode === 'grid' ? 'product-grid' : 'product-list', { 'catalog-big': viewMode === 'grid' && bigGrid }]"
           :style="viewMode === 'grid' ? gridStyle : undefined">
           <template v-for="(p, index) in products" :key="p.id">
             <ProductCard :p="p" :mode="viewMode" :show-sales="showSales" :show-stock="showStock" />
             <BannerStrip v-if="index + 1 === middleBannerIndex" :banners="middleBanners" catalog
-              :label="$t('商品列表中部横幅')" @open="openBanner" />
+              :label="$t('商品列表中部橫幅')" @open="openBanner" />
           </template>
         </div>
         <div v-if="products.length === 0 && !loading && !error" class="empty-state">
           <div class="empty-icon">📦</div>
-          <div class="muted">{{ $t('暂无商品') }}</div>
+          <div class="muted">{{ $t('暫無商品') }}</div>
         </div>
 
-        <!-- 分页器（首页/页码/末页 + 每页条数） -->
-        <div v-if="loading && !products.length" class="feed-status" role="status">{{ $t('正在加载商品…') }}</div>
+        <!-- 分頁器（首頁/頁碼/末頁 + 每頁條數） -->
+        <div v-if="loading && !products.length" class="feed-status" role="status">{{ $t('正在加載商品…') }}</div>
         <div v-if="mobileCatalog && products.length" ref="loadMoreTarget" class="feed-status" :class="{ 'is-complete': !hasMore && !loading }" :aria-busy="loading || loadingMore">
-          <span v-if="loadingMore" role="status">{{ $t('正在加载更多商品…') }}</span>
-          <button v-else-if="error" class="feed-retry" @click="load(true)">{{ $t('刷新失败，点击重试') }}</button>
-          <button v-else-if="loadMoreError" class="feed-retry" @click="loadMore()">{{ $t('加载失败，点击重试') }}</button>
-          <button v-else-if="hasMore" class="feed-more" :disabled="loading" @click="loadMore()">{{ $t('继续下滑加载更多 · 已加载') }} {{ products.length }} {{ $t('件') }}</button>
-          <span v-else role="status">{{ $t('已显示全部') }} {{ products.length }} {{ $t('件商品') }}</span>
+          <span v-if="loadingMore" role="status">{{ $t('正在加載更多商品…') }}</span>
+          <button v-else-if="error" class="feed-retry" @click="load(true)">{{ $t('刷新失敗，點擊重試') }}</button>
+          <button v-else-if="loadMoreError" class="feed-retry" @click="loadMore()">{{ $t('加載失敗，點擊重試') }}</button>
+          <button v-else-if="hasMore" class="feed-more" :disabled="loading" @click="loadMore()">{{ $t('繼續下滑加載更多 · 已加載') }} {{ products.length }} {{ $t('件') }}</button>
+          <span v-else role="status">{{ $t('已顯示全部') }} {{ products.length }} {{ $t('件商品') }}</span>
         </div>
         <div v-if="!mobileCatalog && total > defaultPageSize" class="pager">
           <span class="pager-total muted">{{ $t('共') }} {{ total }} {{ $t('件') }}</span>
           <div class="pager-btns">
-            <button class="pager-btn pager-jump" :disabled="page <= 1" :title="$t('首页')" @click="goPage(1)">«</button>
-            <button class="pager-btn" :disabled="page <= 1" @click="goPage(page - 1)">{{ $t('上一页') }}</button>
-            <!-- 手机端页码砖收起后的当前位置指示（桌面隐藏） -->
+            <button class="pager-btn pager-jump" :disabled="page <= 1" :title="$t('首頁')" @click="goPage(1)">«</button>
+            <button class="pager-btn" :disabled="page <= 1" @click="goPage(page - 1)">{{ $t('上一頁') }}</button>
+            <!-- 手機端頁碼磚收起後的當前位置指示（桌面隱藏） -->
             <span class="pager-now">{{ page }} / {{ totalPage }}</span>
             <template v-for="p in pageList" :key="p">
               <span v-if="p === 0" class="pager-ellipsis">…</span>
               <button v-else class="pager-btn num" :class="{ active: p === page }" @click="goPage(p)">{{ p }}</button>
             </template>
-            <button class="pager-btn" :disabled="page >= totalPage" @click="goPage(page + 1)">{{ $t('下一页') }}</button>
-            <button class="pager-btn pager-jump" :disabled="page >= totalPage" :title="$t('末页')" @click="goPage(totalPage)">»</button>
+            <button class="pager-btn" :disabled="page >= totalPage" @click="goPage(page + 1)">{{ $t('下一頁') }}</button>
+            <button class="pager-btn pager-jump" :disabled="page >= totalPage" :title="$t('末頁')" @click="goPage(totalPage)">»</button>
           </div>
           <div class="pager-size">
-            <span class="muted">{{ $t('每页') }}</span>
+            <span class="muted">{{ $t('每頁') }}</span>
             <select v-model.number="pageSize" class="pager-select" @change="changePageSize">
               <option v-for="s in pageSizeOptions" :key="s" :value="s">{{ s }}</option>
             </select>
-            <span class="muted">{{ $t('条') }}</span>
+            <span class="muted">{{ $t('條') }}</span>
           </div>
         </div>
       </div>
     </div>
-    <BannerStrip class="home-bottom-banners" :banners="bottomBanners" :label="$t('首页底部横幅')" @open="openBanner" />
+    <BannerStrip class="home-bottom-banners" :banners="bottomBanners" :label="$t('首頁底部橫幅')" @open="openBanner" />
   </div>
 </template>
 
@@ -183,7 +183,7 @@ let appliedDefaultView = '';
 let initialized = false;
 const loading = ref(true);
 const error = ref('');
-// 公告弹窗开启动词由 App.vue 提供（与导航📢公告同一弹窗；缺失时回退文章列表页）
+// 公告彈窗開啓動詞由 App.vue 提供（與導航📢公告同一彈窗；缺失時回退文章列表頁）
 const openNoticeModal: () => void = inject('openNotice', () => {
   window.location.href = '/posts?type=notice';
 });
@@ -196,7 +196,7 @@ const categoriesLoading = ref(true);
 const categoriesError = ref('');
 const heroReady = ref(false);
 const heroError = ref(false);
-const hasRecommended = ref(false); // 推荐分类仅在存在可见推荐商品时显示
+const hasRecommended = ref(false); // 推薦分類僅在存在可見推薦商品時顯示
 const recommendedProducts = ref<Product[]>([]);
 const recommendationsLoading = ref(true);
 const recommendationsError = ref(false);
@@ -220,22 +220,22 @@ const loadMoreTarget = ref<HTMLElement | null>(null);
 const catalogActive = ref(true);
 const hasMore = computed(() => !feedEnded.value && loadedPage.value * feedPageSize.value < total.value);
 const announcement = ref<AnnouncementConfig>({ type: 'text', text: '', images: [] });
-// 每页选项跟随后台 template.per_page（默认 20 → 20/40/60），前台不再写死档位
+// 每頁選項跟隨後台 template.per_page（默認 20 → 20/40/60），前台不再寫死檔位
 const pageSizeOptions = computed(() => [defaultPageSize.value, defaultPageSize.value * 2, defaultPageSize.value * 3]);
 
 const { siteName, brandReady } = useBranding();
 
-// ── 模板设置（后台 系统设置 → 模板；与商品列表页同源消费，保证全站一致）──
-const navStyle = ref('list'); // template.category_nav_style：list=左侧树 | grid=顶部胶囊
-const bigGrid = ref(false); // template.default_view=big：大图卡片（更宽的列）
-const perRow = ref(0); // template.per_row：每行商品数（2-8 固定列数；0=按容器宽度自适应）
+// ── 模板設置（後台 系統設置 → 模板；與商品列表頁同源消費，保證全站一致）──
+const navStyle = ref('list'); // template.category_nav_style：list=左側樹 | grid=頂部膠囊
+const bigGrid = ref(false); // template.default_view=big：大圖卡片（更寬的列）
+const perRow = ref(0); // template.per_row：每行商品數（2-8 固定列數；0=按容器寬度自適應）
 const gridMinPx = computed(() => (bigGrid.value ? 300 : 200));
 const gridStyle = computed(() =>
   !bigGrid.value && perRow.value
     ? { gridTemplateColumns: `repeat(${perRow.value}, 1fr)` }
     : { gridTemplateColumns: `repeat(auto-fill, minmax(${gridMinPx.value}px, 1fr))` },
 );
-// 以实际渲染列数对齐完整商品行，避免横幅前留出半行空白。
+// 以實際渲染列數對齊完整商品行，避免橫幅前留出半行空白。
 const catalogItems = ref<HTMLElement | null>(null);
 const catalogColumns = ref(1);
 watch([catalogItems, gridStyle, viewMode], ([element], _previous, onCleanup) => {
@@ -254,24 +254,24 @@ const middleBannerIndex = computed(() => {
   if (!count || !middleBanners.value.length) return 0;
   const columns = viewMode.value === 'grid' ? catalogColumns.value : 1;
   const lastBreak = Math.floor((count - 1) / columns) * columns;
-  // 只有一行时放在该行之后，既不挤开商品，也不制造空白行。
+  // 只有一行時放在該行之後，既不擠開商品，也不製造空白行。
   if (!lastBreak) return count;
   return Math.min(lastBreak, Math.max(columns, Math.round(count / 2 / columns) * columns));
 });
 
 const { showSales, applySalesConfig, normalizeSalesSort } = useSalesVisibility();
-const showStock = ref(false); // template.show_stock：卡片「库存」显示开关
-const topBannerEnabled = ref(true); // promo.top_banner_enabled：顶部横幅（首页 Hero 轮播）开关
-const chipsExpanded = ref(false); // 移动端 grid 胶囊：单行横滑 → 展开多行
+const showStock = ref(false); // template.show_stock：卡片「庫存」顯示開關
+const topBannerEnabled = ref(true); // promo.top_banner_enabled：頂部橫幅（首頁 Hero 輪播）開關
+const chipsExpanded = ref(false); // 移動端 grid 膠囊：單行橫滑 → 展開多行
 
 const categoryTitle = computed(() =>
-  activeCategory.value === -1 ? $t("推荐商品") : activeCategory.value
+  activeCategory.value === -1 ? $t("推薦商品") : activeCategory.value
     ? categories.value.find((c) => c.id === activeCategory.value)?.name || $t("全部商品")
     : $t("全部商品"),
 );
-const sectionTitle = computed(() => searchTerm.value ? $t("{0} · 搜索结果", [categoryTitle.value]) : categoryTitle.value);
+const sectionTitle = computed(() => searchTerm.value ? $t("{0} · 搜索結果", [categoryTitle.value]) : categoryTitle.value);
 const totalPage = computed(() => Math.max(1, Math.ceil(total.value / pageSize.value)));
-// 页码列表：当前页 ±2 + 首末页；越界段用 0 占位渲染省略号
+// 頁碼列表：當前頁 ±2 + 首末頁；越界段用 0 佔位渲染省略號
 const pageList = computed(() => {
   const cur = page.value, last = totalPage.value;
   const set = new Set<number>([1, last, cur - 2, cur - 1, cur, cur + 1, cur + 2]);
@@ -279,7 +279,7 @@ const pageList = computed(() => {
   const out: number[] = [];
   let prev = 0;
   for (const p of nums) {
-    if (prev && p - prev > 1) out.push(0); // 省略号
+    if (prev && p - prev > 1) out.push(0); // 省略號
     out.push(p);
     prev = p;
   }
@@ -293,12 +293,12 @@ function goPage(p: number) {
 }
 
 function changePageSize() {
-  // 即使当前已在第一页，也必须按新的每页条数重新请求。
+  // 即使當前已在第一頁，也必須按新的每頁條數重新請求。
   page.value = 1;
   void navigateCatalog();
 }
 
-// Hero 轮播：公告设置 image/carousel 优先；顶部横幅开启时用生效横幅；点击行为跟随来源
+// Hero 輪播：公告設置 image/carousel 優先；頂部橫幅開啓時用生效橫幅；點擊行為跟隨來源
 const heroItems = computed(() => {
   const items: { key: string; img: string; title: string; onClick?: () => void }[] = [];
   const ann = announcement.value;
@@ -309,11 +309,11 @@ const heroItems = computed(() => {
   }
   return items;
 });
-// 公告条：设置文本优先，回落最新公告文章标题
+// 公告條：設置文本優先，回落最新公告文章標題
 const announcementText = computed(() => (announcement.value.type === 'text' ? announcement.value.text : ''));
 const noticeBarText = computed(() => (announcementText.value ? (announcement.value.summary ?? announcementText.value) : latestNotice.value?.title) || '');
 
-// 点击公告轮播 → 打开全局公告弹窗（App.vue 监听）
+// 點擊公告輪播 → 打開全局公告彈窗（App.vue 監聽）
 function openAnnouncement() {
   window.dispatchEvent(new CustomEvent('zcard-open-notice'));
 }
@@ -333,12 +333,12 @@ function stopHero() {
 }
 
 function bannerImg(b: Banner): string {
-  // SSR 构建期无 window：PC 图（移动端图由客户端水合后按视口切换）
+  // SSR 構建期無 window：PC 圖（移動端圖由客户端水合後按視口切換）
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
   return (isMobile && b.mobile_image) ? b.mobile_image : b.image;
 }
 
-// Banner 点击：product → 详情；category → 分类列表；post → 文章详情；notice → 公告弹窗；url → 外链
+// Banner 點擊：product → 詳情；category → 分類列表；post → 文章詳情；notice → 公告彈窗；url → 外鏈
 function openBanner(b: Banner) {
   if (b.link_type === 'product' && b.link_value) {
     router.push(`/product/${b.link_value}`);
@@ -460,7 +460,7 @@ async function load(preserveFeed = false) {
   const sequence = ++loadSequence;
   const mobile = mobileCatalog.value;
   const size = mobile ? defaultPageSize.value : pageSize.value;
-  // 返回详情页时刷新已加载的所有批次，替换前保留原列表高度和位置。
+  // 返回詳情頁時刷新已加載的所有批次，替換前保留原列表高度和位置。
   const pages = mobile && preserveFeed && feedPageSize.value === size ? loadedPage.value : 1;
   loading.value = true;
   loadingMore.value = false;
@@ -512,7 +512,7 @@ async function loadMore() {
     if (sequence === loadSequence) loadingMore.value = false;
   }
 }
-// 只保留一个观察器；请求失败后停止自动重试，由用户点击重试继续。
+// 只保留一個觀察器；請求失敗後停止自動重試，由用户點擊重試繼續。
 watch([loadMoreTarget, mobileCatalog, hasMore, loading, loadingMore, loadMoreError, error, catalogActive], ([target], _old, onCleanup) => {
   if (!target || !mobileCatalog.value || !hasMore.value || loading.value || loadingMore.value || loadMoreError.value || error.value || !catalogActive.value || typeof IntersectionObserver === 'undefined') return;
   const observer = new IntersectionObserver(entries => {
@@ -556,7 +556,7 @@ onActivated(async () => {
   startHero();
   if (needsRefresh) {
     needsRefresh = false;
-    // 保留浏览状态，同时重新获取价格、库存和首页标题。
+    // 保留瀏覽狀態，同時重新獲取價格、庫存和首頁標題。
     const sequence = loadSequence;
     await loadTemplateSettings();
     if (sequence !== loadSequence || !catalogActive.value || route.path !== '/') return;
@@ -639,10 +639,10 @@ async function loadTemplateSettings() {
       if (raw === undefined) return undefined;
       try { return JSON.parse(raw); } catch { return raw; }
     };
-    // 分类导航样式：grid=顶部胶囊（隐藏左侧树）
+    // 分類導航樣式：grid=頂部膠囊（隱藏左側樹）
     const ns = val('template.category_nav_style');
     if (ns === 'grid' || ns === 'list') navStyle.value = ns;
-    // 商品默认视图：list=列表行 | grid=网格 | big=大图（网格加宽）
+    // 商品默認視圖：list=列表行 | grid=網格 | big=大圖（網格加寬）
     const dv = val('template.default_view');
     const nextView = ['list', 'big'].includes(dv) ? dv : 'grid';
     if (nextView !== appliedDefaultView) {
@@ -650,12 +650,12 @@ async function loadTemplateSettings() {
       viewMode.value = nextView === 'list' ? 'list' : 'grid';
       appliedDefaultView = nextView;
     }
-    // 库存显示沿用原有开关。
+    // 庫存顯示沿用原有開關。
     showStock.value = val('template.show_stock') !== false;
-    // 每行商品数（2-8）：显式固定列数，替代 auto-fill 的"装几个算几个"
+    // 每行商品數（2-8）：顯式固定列數，替代 auto-fill 的"裝幾個算幾個"
     const pr = val('template.per_row');
     if (typeof pr === 'number' && pr >= 2 && pr <= 8) perRow.value = Math.floor(pr);
-    // 每页商品数（防滥用夹在 6~60；与 /products 页同源消费）
+    // 每頁商品數（防濫用夾在 6~60；與 /products 頁同源消費）
     const pp = Number(val('template.per_page'));
 
     if (Number.isInteger(pp) && pp >= 6 && pp <= 60 && pp !== defaultPageSize.value) {
@@ -666,9 +666,9 @@ async function loadTemplateSettings() {
     }
     const sb = val('template.sort_by');
     if (['default', 'newest', 'sales', 'price_asc', 'price_desc'].includes(sb)) defaultSort.value = normalizeSalesSort(sb);
-    // 顶部横幅开关：关闭时 Hero 回退品牌渐变区（公告图片轮播不受影响）
+    // 頂部橫幅開關：關閉時 Hero 回退品牌漸變區（公告圖片輪播不受影響）
     topBannerEnabled.value = val('promo.top_banner_enabled') !== false;
-  } catch { /* 配置拉取失败保持默认 */ }
+  } catch { /* 配置拉取失敗保持默認 */ }
 }
 
 </script>
@@ -691,14 +691,14 @@ async function loadTemplateSettings() {
   .home .home-bottom-banners { margin: 0; }
 }
 
-/* 左右布局：PC 左侧分类树 + 右侧内容 */
+/* 左右佈局：PC 左側分類樹 + 右側內容 */
 .home-layout { scroll-margin-top: 100px; display: flex; gap: 16px; align-items: flex-start; }
 .home-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 .mobile-only { display: flex; }
 @media (min-width: 768px) {
   .mobile-only { display: none; }
 }
-/* 分类胶囊（category_nav_style=grid 顶部导航 / list 移动端兜底）——饱满大尺寸 */
+/* 分類膠囊（category_nav_style=grid 頂部導航 / list 移動端兜底）——飽滿大尺寸 */
 .cat-chips { padding: 0; overflow: hidden; }
 .cat-chips-row.expanded { flex-wrap: wrap; overflow-x: visible; }
 .cat-chips-row .chip { flex-shrink: 0; }
@@ -712,8 +712,8 @@ async function loadTemplateSettings() {
 .chip-icon { margin-right: 5px; }
 .chip-icon-img { width: 16px; height: 16px; object-fit: contain; border-radius: 3px; }
 
-/* ── 移动端「全部分类」折叠面板（PC 左树的移动端等价物；含全部层级） ── */
-/* mobile-only 会给容器 display:flex，这里必须转纵向，防止头/体横排挤压树体 */
+/* ── 移動端「全部分類」摺疊面板（PC 左樹的移動端等價物；含全部層級） ── */
+/* mobile-only 會給容器 display:flex，這裏必須轉縱向，防止頭/體橫排擠壓樹體 */
 .mobile-cat { padding: 0; overflow: hidden; flex-direction: column; }
 .mobile-cat-head {
   width: 100%; display: flex; align-items: center; gap: 8px;
@@ -795,7 +795,7 @@ async function loadTemplateSettings() {
 .search-bar .input { flex: 1; border: none; outline: none; padding: 8px 12px; font-size: 14px; }
 .search-bar .input:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--zc-primary) 20%, transparent); border-radius: 8px; }
 
-/* ── 商品区 ── */
+/* ── 商品區 ── */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -827,7 +827,7 @@ async function loadTemplateSettings() {
 .pager-btn.active { background: var(--zc-primary); border-color: var(--zc-primary); color: #fff; font-weight: 600; }
 .pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .pager-ellipsis { color: #9ca3af; padding: 0 2px; }
-/* 手机端当前位置指示（桌面隐藏，页码砖即位置） */
+/* 手機端當前位置指示（桌面隱藏，頁碼磚即位置） */
 .pager-now { display: none; align-items: center; justify-content: center; min-width: 56px; height: 34px; font-size: 14px; font-weight: 600; color: #374151; font-variant-numeric: tabular-nums; }
 .pager-size { display: flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
 .pager-select {
@@ -836,26 +836,26 @@ async function loadTemplateSettings() {
 }
 .pager-total { font-size: 13px; }
 
-/* ── 移动端（≤768px）：轮播限高、分类胶囊单行横滑、商品双列 ── */
+/* ── 移動端（≤768px）：輪播限高、分類膠囊單行橫滑、商品雙列 ── */
 @media (max-width: 768px) {
   .home { gap: 12px; }
   .home-layout { scroll-margin-top: 100px; gap: 12px; }
-  /* 轮播高度按视口收窄（桌面 clamp 240-360px 在手机上过高） */
+  /* 輪播高度按視口收窄（桌面 clamp 240-360px 在手機上過高） */
   .hero-slide img { height: clamp(110px, 30vw, 170px); }
   .hero-title { padding: 22px 14px 10px; font-size: 15px; }
-  /* 回退品牌横幅（无图时）移动端收紧：省首屏空间——隐藏大图标、压行距 */
+  /* 回退品牌橫幅（無圖時）移動端收緊：省首屏空間——隱藏大圖標、壓行距 */
   .hero-banner { padding: 14px 16px; }
   .hero-banner h1 { font-size: 18px; margin-bottom: 4px; }
   .hero-banner p { margin-bottom: 8px; font-size: 12px; }
   .hero-points { font-size: 12px; gap: 10px; flex-wrap: wrap; }
   .hero-icon { display: none; }
-  /* 分类展开后自动换行，长分类名不撑出屏幕。 */
+  /* 分類展開後自動換行，長分類名不撐出屏幕。 */
   .cat-chips-row { gap: 8px; padding: 10px 12px; }
   .chip { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
-  /* 商品网格：双列瀑布（auto-fill minmax(200px) 在手机只能出 1 列） */
+  /* 商品網格：雙列瀑布（auto-fill minmax(200px) 在手機只能出 1 列） */
   .product-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
-  /* 分页器：手机紧凑单行（上一页 · 当前/总页 · 下一页）——页码砖/省略号/首末跳转收起，
-     flex 不折行保证一行放得下；「每页 N 条」独占一行居中。淡灰文字压深一档保可读 */
+  /* 分頁器：手機緊湊單行（上一頁 · 當前/總頁 · 下一頁）——頁碼磚/省略號/首末跳轉收起，
+     flex 不折行保證一行放得下；「每頁 N 條」獨佔一行居中。淡灰文字壓深一檔保可讀 */
   .pager { gap: 10px; }
   .pager-btns { flex-wrap: nowrap; justify-content: center; }
   .pager-jump, .pager-ellipsis { display: none; }

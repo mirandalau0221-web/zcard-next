@@ -90,7 +90,7 @@ func (s *AffiliateService) reconcilePhysical(ctx context.Context, o *ent.Order) 
 				return err
 			}
 			if n != 1 {
-				return fmt.Errorf("佣金已变化，请重试退款扣回")
+				return fmt.Errorf("佣金已變化，請重試退款扣回")
 			}
 			if row.Status != affiliatecommission.StatusPendingConfirm {
 				debit += take
@@ -98,7 +98,7 @@ func (s *AffiliateService) reconcilePhysical(ctx context.Context, o *ent.Order) 
 			remaining -= take
 		}
 		if remaining != 0 {
-			return fmt.Errorf("订单佣金分摊余额异常")
+			return fmt.Errorf("訂單佣金分攤餘額異常")
 		}
 		if debit > 0 {
 			e = s.wallet.DebitInTx(ctx, walletport.Entry{UserID: referrer, Direction: "out", Type: "commission_reversal", Amount: centsOf(debit), Reference: fmt.Sprintf("physical_commission:%d:%d:%d", o.ID, tier, target), Remark: "商品退款佣金扣回"})
@@ -153,13 +153,13 @@ func (s *AffiliateService) confirmOne(ctx context.Context, id uint64) error {
 			return e
 		}
 		if n != 1 {
-			return fmt.Errorf("佣金状态已变化")
+			return fmt.Errorf("佣金狀態已變化")
 		}
 		if row.Amount > 0 {
-			return s.wallet.CreditInTx(ctx, walletport.Entry{UserID: row.ReferrerID, Direction: "in", Type: "commission", Amount: centsOf(row.Amount), Reference: refKey(id), Remark: "佣金到期确认"})
+			return s.wallet.CreditInTx(ctx, walletport.Entry{UserID: row.ReferrerID, Direction: "in", Type: "commission", Amount: centsOf(row.Amount), Reference: refKey(id), Remark: "佣金到期確認"})
 		}
 		if row.Amount < 0 {
-			return s.wallet.DebitInTx(ctx, walletport.Entry{UserID: row.ReferrerID, Direction: "out", Type: "commission_debt", Amount: centsOf(-row.Amount), Reference: debtRefKey(id), Remark: "佣金负债抵扣"})
+			return s.wallet.DebitInTx(ctx, walletport.Entry{UserID: row.ReferrerID, Direction: "out", Type: "commission_debt", Amount: centsOf(-row.Amount), Reference: debtRefKey(id), Remark: "佣金負債抵扣"})
 		}
 		return nil
 	})

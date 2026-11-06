@@ -1,18 +1,18 @@
 package procurement
 
-// /：采购提交与到手即加密。
+// /：採購提交與到手即加密。
 //
-// 流程（订阅 order.paid → 逐 upstream 项）：
-// 1. 幂等建单（order_item_id 唯一）pending
-// 2. fail-open 库存校验（stock_mode=real 且缓存不足时实时查；失败放行）
-// 3. Gateway.Submit（幂等键 = 采购单 dedupe_key，随请求发送）
+// 流程（訂閲 order.paid → 逐 upstream 項）：
+// 1. 冪等建單（order_item_id 唯一）pending
+// 2. fail-open 庫存校驗（stock_mode=real 且緩存不足時實時查；失敗放行）
+// 3. Gateway.Submit（冪等鍵 = 採購單 dedupe_key，隨請求發送）
 // - delivered → 卡密到手即加密（CardCipher.Seal）→ 落 procurement_items
-// → 交付出口与 MarkFulfilled 同事务提交 → 发布 fulfilled
-// - pending → MarkSubmitted（记 upstream_order_id + 退避调度）
-// - 永久错误 → MarkRejected → 失败策略分流（auto_refund / manual）
-// - 可重试 → BumpRetry（退避后由轮询/巡检再试）
+// → 交付出口與 MarkFulfilled 同事務提交 → 發佈 fulfilled
+// - pending → MarkSubmitted（記 upstream_order_id + 退避調度）
+// - 永久錯誤 → MarkRejected → 失敗策略分流（auto_refund / manual）
+// - 可重試 → BumpRetry（退避後由輪詢/巡檢再試）
 //
-// 铁律 11（采购侧）：上游卡密内存态 → 立即 Seal → 密文落库；全程零明文落盘零日志。
+// 鐵律 11（採購側）：上游卡密內存態 → 立即 Seal → 密文落庫；全程零明文落盤零日誌。
 
 import (
 	"context"
@@ -32,7 +32,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/queue"
 )
 
-// orderPaidPayload order.paid 事件载荷（与 order 模块发布结构对齐）。
+// orderPaidPayload order.paid 事件載荷（與 order 模塊發佈結構對齊）。
 type orderPaidPayload struct {
 	OrderNo   string `json:"order_no"`
 	OrderID   uint64 `json:"order_id"`
@@ -46,7 +46,7 @@ type orderPaidPayload struct {
 	} `json:"items"`
 }
 
-// ProcureService 采购服务（ 提交 / 三通道 / 失败策略）。
+// ProcureService 採購服務（ 提交 / 三通道 / 失敗策略）。
 type ProcureService struct {
 	repo   *ProcureRepo
 	gw     supplyport.UpstreamGateway
@@ -59,7 +59,7 @@ type ProcureService struct {
 	log    *slog.Logger
 }
 
-// NewProcureService 构造。
+// NewProcureService 構造。
 func NewProcureService(
 	repo *ProcureRepo,
 	gw supplyport.UpstreamGateway,
@@ -74,11 +74,11 @@ func NewProcureService(
 	return &ProcureService{repo: repo, gw: gw, reader: reader, cipher: cipher, attach: attach, refund: refund, outbox: outbox, enq: enq, log: log}
 }
 
-// OnOrderPaid 订阅 order.paid（Dispatcher 注册；幂等由 processed_events 兜底）。
+// OnOrderPaid 訂閲 order.paid（Dispatcher 註冊；冪等由 processed_events 兜底）。
 func (s *ProcureService) OnOrderPaid(ctx context.Context, env events.Envelope) error {
 	var payload orderPaidPayload
 	if err := json.Unmarshal(env.Payload, &payload); err != nil {
-		return fmt.Errorf("procurement: 解析 order.paid 载荷失败: %w", err)
+		return fmt.Errorf("procurement: 解析 order.paid 載荷失敗: %w", err)
 	}
 	for _, it := range payload.Items {
 		if it.FulfillmentType == "reuse" {
@@ -89,13 +89,13 @@ func (s *ProcureService) OnOrderPaid(ctx context.Context, env events.Envelope) e
 			continue
 		}
 		if it.FulfillmentType != "upstream" {
-			continue // 本地卡密项由 fulfillment 模块履约
+			continue // 本地卡密項由 fulfillment 模塊履約
 		}
 		if err := s.processItem(ctx, payload, it.OrderItemID, it.ProductID, it.SkuID, it.Quantity); err != nil {
 			if errors.Is(err, ErrOrderNotPurchasable) {
 				continue
 			}
-			// 单条失败不阻断其余（错误留痕，重试由轮询/人工兜底）
+			// 單條失敗不阻斷其餘（錯誤留痕，重試由輪詢/人工兜底）
 			s.log.Error("procurement.process_item_failed",
 				"order_no", payload.OrderNo, "order_item_id", it.OrderItemID, "err", err)
 			if e := s.repo.recordMissing(ctx, it.OrderItemID); e != nil {
@@ -106,16 +106,16 @@ func (s *ProcureService) OnOrderPaid(ctx context.Context, env events.Envelope) e
 	return nil
 }
 
-// processItem 单上游项采购编排（幂等：已存在采购单直接跳过）。
+// processItem 單上游項採購編排（冪等：已存在採購單直接跳過）。
 func (s *ProcureService) processItem(ctx context.Context, payload orderPaidPayload, orderItemID, productID, skuID uint64, quantity int32) error {
 	it, e := data.Client(ctx, s.repo.data).OrderItem.Get(ctx, orderItemID)
 	if e != nil {
 		return e
 	}
 	if it.DeliveryKind != "card" {
-		return fmt.Errorf("接码订单不能使用卡密采购")
+		return fmt.Errorf("接碼訂單不能使用卡密採購")
 	}
-	// 幂等：该订单项已建采购单（重复投递 / 手动重试）
+	// 冪等：該訂單項已建採購單（重複投遞 / 手動重試）
 	if _, err := s.repo.GetByOrderItem(ctx, orderItemID); err == nil {
 		return nil
 	} else if !errors.Is(err, ErrNotFound) {
@@ -125,14 +125,14 @@ func (s *ProcureService) processItem(ctx context.Context, payload orderPaidPaylo
 	// 商品上游映射（upstream_source_id + product_code 判定）
 	p, err := s.reader.Get(ctx, payload.SubsiteID, productID)
 	if err != nil {
-		return fmt.Errorf("procurement: 商品不可读: %w", err)
+		return fmt.Errorf("procurement: 商品不可讀: %w", err)
 	}
 	if p.UpstreamSourceID == 0 || p.UpstreamProductCode == "" {
 		s.log.Warn("procurement.skip_non_upstream", "order_item_id", orderItemID, "product_id", productID)
-		return fmt.Errorf("procurement: 上游商品映射缺失，需要人工核实")
+		return fmt.Errorf("procurement: 上游商品映射缺失，需要人工核實")
 	}
 
-	// 建单并持久化随机请求号；失败策略取渠道级配置，默认自动退款。
+	// 建單並持久化隨機請求號；失敗策略取渠道級配置，默認自動退款。
 	failStrategy := "auto_refund"
 	if s.gw != nil {
 		if fs := s.gw.FailStrategyOf(ctx, p.UpstreamSourceID); fs != "" {
@@ -142,7 +142,7 @@ func (s *ProcureService) processItem(ctx context.Context, payload orderPaidPaylo
 	po, err := s.repo.claimPurchase(ctx, orderItemID, p.UpstreamSourceID, p.UpstreamProductCode, quantity, failStrategy, payload.OrderNo)
 	if err != nil {
 		if errors.Is(err, ErrDuplicatePurchase) {
-			return nil // 并发已建
+			return nil // 併發已建
 		}
 		return err
 	}
@@ -150,7 +150,7 @@ func (s *ProcureService) processItem(ctx context.Context, payload orderPaidPaylo
 	traceID := fmt.Sprintf("po-%d-%s", po.ID, payload.OrderNo)
 	_ = s.repo.EnsureTraceID(ctx, po.ID, traceID)
 
-	// 规格选择：客户所选本地 SKU 的上游标识（acg=race|k=v 编码 / dujiao=sku_id）
+	// 規格選擇：客户所選本地 SKU 的上游標識（acg=race|k=v 編碼 / dujiao=sku_id）
 	upstreamSKU := ""
 	if skuID > 0 {
 		upstreamSKU = s.reader.SkuUpstreamCode(ctx, payload.SubsiteID, skuID)
@@ -182,8 +182,8 @@ func (s *ProcureService) processItem(ctx context.Context, payload orderPaidPaylo
 	case "delivered":
 		return s.finalizeDelivered(ctx, po.ID, payload.OrderID, orderItemID, productID, payload.SubsiteID, res.Cards, res.Amount)
 	case "pending", "submitted", "paid", "accepted", "processing":
-		// dujiao 等上游：钱包受理即 paid（异步交付）——轮询/回调推进
-		// 受理：记 upstream_order_id + 退避（默认间隔表首档 30s）
+		// dujiao 等上游：錢包受理即 paid（異步交付）——輪詢/回調推進
+		// 受理：記 upstream_order_id + 退避（默認間隔表首檔 30s）
 		next := time.Now().UTC().Add(30 * time.Second)
 		if err := s.repo.MarkSubmitted(ctx, po.ID, res.UpstreamOrderID, next); err != nil {
 			return err
@@ -191,18 +191,18 @@ func (s *ProcureService) processItem(ctx context.Context, payload orderPaidPaylo
 		s.log.Info("procurement.submitted", "id", po.ID, "upstream_order_id", res.UpstreamOrderID)
 		return s.schedulePoll(ctx, po.ID, 30*time.Second)
 	default:
-		return fmt.Errorf("procurement: 未知上游状态 %q", res.Status)
+		return fmt.Errorf("procurement: 未知上游狀態 %q", res.Status)
 	}
 }
 
-// finalizeDelivered 同步拿货成功：到手即加密 → 落库 → 交付出口 → 事件。
+// finalizeDelivered 同步拿貨成功：到手即加密 → 落庫 → 交付出口 → 事件。
 func (s *ProcureService) finalizeDelivered(ctx context.Context, poID, orderID, orderItemID, productID, subsiteID uint64, cards []string, amount int64) error {
 	// Persist the encrypted receipt before attempting local delivery. Never buy again to recover it.
 	sealed := make([][]byte, 0, len(cards))
 	for _, plain := range cards {
 		ct, err := s.cipher.Seal(plain, productID, subsiteID)
 		if err != nil {
-			return fmt.Errorf("procurement: 卡密加密失败: %w", err)
+			return fmt.Errorf("procurement: 卡密加密失敗: %w", err)
 		}
 		sealed = append(sealed, ct)
 	}
@@ -219,12 +219,12 @@ func (s *ProcureService) finalizeDelivered(ctx context.Context, poID, orderID, o
 	return err
 }
 
-// handleSubmitError 提交失败分流：永久错误 → rejected → 失败策略；其余 → 退避重试。
+// handleSubmitError 提交失敗分流：永久錯誤 → rejected → 失敗策略；其餘 → 退避重試。
 func (s *ProcureService) handleSubmitError(ctx context.Context, poID uint64, err error) error {
-	// 防重键冲突（acg request_no 重复即报错）：上游可能已受理首请求（响应丢失
-	// 场景），重试永远撞墙、自动退款可能造成上游已成交却退客户款 → 立即转人工核对
+	// 防重鍵衝突（acg request_no 重複即報錯）：上游可能已受理首請求（響應丟失
+	// 場景），重試永遠撞牆、自動退款可能造成上游已成交卻退客户款 → 立即轉人工核對
 	if errors.Is(err, supplyport.ErrUpstreamDuplicate) {
-		reason := "采购请求编号被上游判定重复，无法确认本单是否成交；请核实原上游订单后处理，系统不会重新采购"
+		reason := "採購請求編號被上游判定重複，無法確認本單是否成交；請核實原上游訂單後處理，系統不會重新採購"
 		if merr := s.repo.MarkManual(ctx, poID, reason); merr != nil {
 			return merr
 		}
@@ -235,17 +235,17 @@ func (s *ProcureService) handleSubmitError(ctx context.Context, poID uint64, err
 		return nil
 	}
 	if errors.Is(err, supplyport.ErrUpstreamBalance) {
-		if e := s.repo.MarkManual(ctx, poID, "上游账户余额不足，等待管理员补卡或核实后退款"); e != nil {
+		if e := s.repo.MarkManual(ctx, poID, "上游賬户餘額不足，等待管理員補卡或核實後退款"); e != nil {
 			return e
 		}
-		s.publish(ctx, events.ProcurementFailed, poID, map[string]any{"procurement_id": poID, "reason": "上游账户余额不足", "strategy": "manual_balance"})
+		s.publish(ctx, events.ProcurementFailed, poID, map[string]any{"procurement_id": poID, "reason": "上游賬户餘額不足", "strategy": "manual_balance"})
 		return nil
 	}
 	permanent := errors.Is(err, supplyport.ErrUpstreamDeleted) ||
 		errors.Is(err, supplyport.ErrUpstreamUnavailable) ||
 		errors.Is(err, supplyport.ErrUpstreamBalance) ||
-		// 上游明确无库存：永久拒绝（否则空 upstream_order_id 进轮询死循环到 24h
-		// 才转人工；即刻走失败策略让付款顾客马上退款，符合 fail-open 补偿语义）
+		// 上游明確無庫存：永久拒絕（否則空 upstream_order_id 進輪詢死循環到 24h
+		// 才轉人工；即刻走失敗策略讓付款顧客馬上退款，符合 fail-open 補償語義）
 		errors.Is(err, supplyport.ErrUpstreamNoStock)
 	if permanent {
 		reason := err.Error()
@@ -255,7 +255,7 @@ func (s *ProcureService) handleSubmitError(ctx context.Context, poID uint64, err
 		s.log.Warn("procurement.rejected", "id", poID, "reason", reason)
 		return s.applyFailStrategy(ctx, poID, reason)
 	}
-	// 可重试（网络/上游抖动）：退避后移交轮询
+	// 可重試（網絡/上游抖動）：退避後移交輪詢
 	s.log.Warn("procurement.submit_retryable", "id", poID, "err", err)
 	if err := s.repo.BumpRetry(ctx, poID, time.Now().UTC().Add(30*time.Second), err.Error()); err != nil {
 		return err
@@ -263,7 +263,7 @@ func (s *ProcureService) handleSubmitError(ctx context.Context, poID uint64, err
 	return s.schedulePoll(ctx, poID, 30*time.Second)
 }
 
-// applyFailStrategy 失败策略：auto_refund → 退款编排；manual → 人工终态 + 事件。
+// applyFailStrategy 失敗策略：auto_refund → 退款編排；manual → 人工終態 + 事件。
 func (s *ProcureService) applyFailStrategy(ctx context.Context, poID uint64, reason string) error {
 	po, err := s.repo.Get(ctx, poID)
 	if err != nil {
@@ -278,18 +278,18 @@ func (s *ProcureService) applyFailStrategy(ctx context.Context, poID uint64, rea
 		})
 		return nil
 	}
-	// auto_refund：创建本地退款单（channel=upstream）→ 驱动订单退款流转
+	// auto_refund：創建本地退款單（channel=upstream）→ 驅動訂單退款流轉
 	if err := s.repo.MarkRefunding(ctx, poID); err != nil {
 		return err
 	}
 	if s.refund != nil {
-		// 金额 0 = 按订单实付全额退款（payment 内部核算）
+		// 金額 0 = 按訂單實付全額退款（payment 內部核算）
 		orderID, oerr := s.repo.OrderIDOf(ctx, poID)
 		if oerr != nil {
 			s.log.Error("procurement.order_resolve_failed", "po_id", poID, "err", oerr)
-		} else if err := s.refund.RefundOrder(ctx, orderID, 0, "上游采购失败自动退款: "+reason); err != nil {
+		} else if err := s.refund.RefundOrder(ctx, orderID, 0, "上游採購失敗自動退款: "+reason); err != nil {
 			s.log.Error("procurement.auto_refund_failed", "po_id", poID, "order_id", orderID, "err", err)
-			_ = s.repo.MarkManual(ctx, poID, "自动退款失败转人工: "+err.Error())
+			_ = s.repo.MarkManual(ctx, poID, "自動退款失敗轉人工: "+err.Error())
 			s.publish(ctx, events.ProcurementFailed, poID, map[string]any{
 				"procurement_id": poID, "reason": reason, "strategy": "auto_refund_failed_manual",
 			})
@@ -302,11 +302,11 @@ func (s *ProcureService) applyFailStrategy(ctx context.Context, poID uint64, rea
 	return nil
 }
 
-// schedulePoll 退避调度：入队轮询任务（critical 队列；降级模式进程内执行）。
+// schedulePoll 退避調度：入隊輪詢任務（critical 隊列；降級模式進程內執行）。
 func (s *ProcureService) schedulePoll(ctx context.Context, poID uint64, delay time.Duration) error {
 	payload, _ := json.Marshal(map[string]uint64{"procurement_id": poID})
 	if s.enq == nil || !s.enq.Enabled() {
-		// 降级：直接异步轮询
+		// 降級：直接異步輪詢
 		go func() {
 			time.Sleep(delay)
 			runCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Minute)
@@ -325,7 +325,7 @@ func (s *ProcureService) schedulePoll(ctx context.Context, poID uint64, delay ti
 	})
 }
 
-// publish 发布采购事件（procurement.fulfilled / procurement.failed）。
+// publish 發佈採購事件（procurement.fulfilled / procurement.failed）。
 func (s *ProcureService) publish(ctx context.Context, typ string, poID uint64, payload map[string]any) {
 	if s.outbox == nil {
 		return

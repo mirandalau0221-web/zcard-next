@@ -28,11 +28,11 @@ type RegisterRequest struct {
 	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	InviteCode    string                 `protobuf:"bytes,4,opt,name=invite_code,json=inviteCode,proto3" json:"invite_code,omitempty"`    // 推广码（8 位随机或旧数字 ID；可空）
-	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty"`                                  // 注册验证码（register_method=email/phone 时必填）
-	Phone         string                 `protobuf:"bytes,6,opt,name=phone,proto3" json:"phone,omitempty"`                                // 手机号（register_method=phone 时必填）
-	CaptchaId     string                 `protobuf:"bytes,7,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 图形验证码 ID（captcha_register 开启时必填）
-	CaptchaCode   string                 `protobuf:"bytes,8,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 图形验证码（4 位数字）
+	InviteCode    string                 `protobuf:"bytes,4,opt,name=invite_code,json=inviteCode,proto3" json:"invite_code,omitempty"`    // 推廣碼（8 位隨機或舊數字 ID；可空）
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty"`                                  // 註冊驗證碼（register_method=email/phone 時必填）
+	Phone         string                 `protobuf:"bytes,6,opt,name=phone,proto3" json:"phone,omitempty"`                                // 手機號（register_method=phone 時必填）
+	CaptchaId     string                 `protobuf:"bytes,7,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 圖形驗證碼 ID（captcha_register 開啓時必填）
+	CaptchaCode   string                 `protobuf:"bytes,8,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 圖形驗證碼（4 位數字）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -125,10 +125,10 @@ func (x *RegisterRequest) GetCaptchaCode() string {
 
 type SendRegisterCodeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Target        string                 `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`                              // 邮箱或手机号
-	Channel       string                 `protobuf:"bytes,2,opt,name=channel,proto3" json:"channel,omitempty"`                            // email | phone（空则按 target 格式自动判定）
-	CaptchaId     string                 `protobuf:"bytes,3,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 图形验证码 ID（captcha_register 开启时必填）
-	CaptchaCode   string                 `protobuf:"bytes,4,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 图形验证码
+	Target        string                 `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`                              // 郵箱或手機號
+	Channel       string                 `protobuf:"bytes,2,opt,name=channel,proto3" json:"channel,omitempty"`                            // email | phone（空則按 target 格式自動判定）
+	CaptchaId     string                 `protobuf:"bytes,3,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 圖形驗證碼 ID（captcha_register 開啓時必填）
+	CaptchaCode   string                 `protobuf:"bytes,4,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 圖形驗證碼
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -230,9 +230,9 @@ func (*SendRegisterCodeReply) Descriptor() ([]byte, []int) {
 type RegisterReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"` // 注册即登录
+	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"` // 註冊即登錄
 	ExpiresAt     int64                  `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	PromoCode     string                 `protobuf:"bytes,4,opt,name=promo_code,json=promoCode,proto3" json:"promo_code,omitempty"` // 自己的推广码（注册成功即拥有）
+	PromoCode     string                 `protobuf:"bytes,4,opt,name=promo_code,json=promoCode,proto3" json:"promo_code,omitempty"` // 自己的推廣碼（註冊成功即擁有）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -297,10 +297,10 @@ func (x *RegisterReply) GetPromoCode() string {
 
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"` // 用户名/邮箱/手机号混输
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"` // 用户名/郵箱/手機號混輸
 	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	CaptchaId     string                 `protobuf:"bytes,3,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 图形验证码 ID（captcha_login 开启时必填）
-	CaptchaCode   string                 `protobuf:"bytes,4,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 图形验证码
+	CaptchaId     string                 `protobuf:"bytes,3,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 圖形驗證碼 ID（captcha_login 開啓時必填）
+	CaptchaCode   string                 `protobuf:"bytes,4,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 圖形驗證碼
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -431,7 +431,7 @@ type MeReply struct {
 	CreatedAt         int64                  `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	IsReseller        bool                   `protobuf:"varint,5,opt,name=is_reseller,json=isReseller,proto3" json:"is_reseller,omitempty"` // 分站主身份（approved）
 	ResellerProfileId uint64                 `protobuf:"varint,6,opt,name=reseller_profile_id,json=resellerProfileId,proto3" json:"reseller_profile_id,omitempty"`
-	PromoCode         string                 `protobuf:"bytes,7,opt,name=promo_code,json=promoCode,proto3" json:"promo_code,omitempty"` // 推广码（懒生成）
+	PromoCode         string                 `protobuf:"bytes,7,opt,name=promo_code,json=promoCode,proto3" json:"promo_code,omitempty"` // 推廣碼（懶生成）
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -518,8 +518,8 @@ func (x *MeReply) GetPromoCode() string {
 type ForgotPasswordRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	CaptchaId     string                 `protobuf:"bytes,2,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 图形验证码 ID（captcha_reset 开启时必填）
-	CaptchaCode   string                 `protobuf:"bytes,3,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 图形验证码
+	CaptchaId     string                 `protobuf:"bytes,2,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 圖形驗證碼 ID（captcha_reset 開啓時必填）
+	CaptchaCode   string                 `protobuf:"bytes,3,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"` // 圖形驗證碼
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -614,7 +614,7 @@ func (*ForgotPasswordReply) Descriptor() ([]byte, []int) {
 type ResetPasswordRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`                                  // 邮件验证码
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`                                  // 郵件驗證碼
 	NewPassword   string                 `protobuf:"bytes,3,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"` // >= 6 位
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -673,7 +673,7 @@ func (x *ResetPasswordRequest) GetNewPassword() string {
 
 type ResetPasswordReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"` // 重置即登录
+	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"` // 重置即登錄
 	ExpiresAt     int64                  `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -777,7 +777,7 @@ func (x *ChangePasswordRequest) GetNewPassword() string {
 
 type ChangePasswordReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` // 改密后吊销全部 session；新 token 保当前会话
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` // 改密後吊銷全部 session；新 token 保當前會話
 	ExpiresAt     int64                  `protobuf:"varint,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -829,7 +829,7 @@ func (x *ChangePasswordReply) GetExpiresAt() int64 {
 
 type UpdateProfileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"` // 新邮箱（空=不改；唯一性校验）
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"` // 新郵箱（空=不改；唯一性校驗）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

@@ -1,6 +1,6 @@
 package audit
 
-// 管理面 API（）：三类日志查询、黑名单管理。
+// 管理面 API（）：三類日誌查詢、黑名單管理。
 
 import (
 	"context"
@@ -13,20 +13,20 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminAuditService 管理面审计服务。
+// AdminAuditService 管理面審計服務。
 type AdminAuditService struct {
 	adminv1.UnimplementedAdminAuditServiceServer
 	repo   *AuditRepo
-	admins identityport.AdminReader // 操作者/主体名称富化（nil = 跳过）
-	users  identityport.UserReader  // 安全审计 user 主体名称富化（nil = 跳过）
+	admins identityport.AdminReader // 操作者/主體名稱富化（nil = 跳過）
+	users  identityport.UserReader  // 安全審計 user 主體名稱富化（nil = 跳過）
 }
 
-// NewAdminAuditService 构造。
+// NewAdminAuditService 構造。
 func NewAdminAuditService(repo *AuditRepo, admins identityport.AdminReader, users identityport.UserReader) *AdminAuditService {
 	return &AdminAuditService{repo: repo, admins: admins, users: users}
 }
 
-// enrichAdminNames 员工 ID → 账号名（去重批量 PK get；失败项省略——前端回落 #ID）。
+// enrichAdminNames 員工 ID → 賬號名（去重批量 PK get；失敗項省略——前端回落 #ID）。
 func (s *AdminAuditService) enrichAdminNames(ctx context.Context, ids ...uint64) map[uint64]string {
 	out := make(map[uint64]string, len(ids))
 	if s.admins == nil {
@@ -46,7 +46,7 @@ func (s *AdminAuditService) enrichAdminNames(ctx context.Context, ids ...uint64)
 	return out
 }
 
-// enrichUserNames 前台用户 ID → 账号名（同上）。
+// enrichUserNames 前台用户 ID → 賬號名（同上）。
 func (s *AdminAuditService) enrichUserNames(ctx context.Context, ids ...uint64) map[uint64]string {
 	out := make(map[uint64]string, len(ids))
 	if s.users == nil {
@@ -66,7 +66,7 @@ func (s *AdminAuditService) enrichUserNames(ctx context.Context, ids ...uint64) 
 	return out
 }
 
-// ListOpLogs 操作审计。
+// ListOpLogs 操作審計。
 func (s *AdminAuditService) ListOpLogs(ctx context.Context, req *adminv1.ListOpLogsRequest) (*adminv1.ListOpLogsReply, error) {
 	page, size := auditPageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListOpLogs(ctx, req.GetOperatorId(), page, size)
@@ -103,7 +103,7 @@ func (s *AdminAuditService) ListOpLogs(ctx context.Context, req *adminv1.ListOpL
 	return reply, nil
 }
 
-// ListSecurityLogs 安全审计。
+// ListSecurityLogs 安全審計。
 func (s *AdminAuditService) ListSecurityLogs(ctx context.Context, req *adminv1.ListSecurityLogsRequest) (*adminv1.ListSecurityLogsReply, error) {
 	page, size := auditPageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListSecurityLogs(ctx, req.GetAction(), page, size)
@@ -143,12 +143,12 @@ func (s *AdminAuditService) ListSecurityLogs(ctx context.Context, req *adminv1.L
 	return reply, nil
 }
 
-// ListVisitStats 访问统计。
+// ListVisitStats 訪問統計。
 func (s *AdminAuditService) ListVisitStats(ctx context.Context, req *adminv1.ListVisitStatsRequest) (*adminv1.ListVisitStatsReply, error) {
 	page, size := auditPageParams(req.GetPage(), req.GetPageSize())
 	date := req.GetStatDate()
 	if date == "" {
-		date = latestDate() // 最新日期（简化：当天）
+		date = latestDate() // 最新日期（簡化：當天）
 	}
 	rows, total, err := s.repo.ListVisitStats(ctx, date, page, size)
 	if err != nil {
@@ -164,12 +164,12 @@ func (s *AdminAuditService) ListVisitStats(ctx context.Context, req *adminv1.Lis
 	return reply, nil
 }
 
-// GetBlacklist 黑名单。
+// GetBlacklist 黑名單。
 func (s *AdminAuditService) GetBlacklist(ctx context.Context, _ *emptypb.Empty) (*adminv1.GetBlacklistReply, error) {
 	return &adminv1.GetBlacklistReply{Entries: s.repo.BlacklistRaw()}, nil
 }
 
-// SetBlacklist 设置黑名单。
+// SetBlacklist 設置黑名單。
 func (s *AdminAuditService) SetBlacklist(ctx context.Context, req *adminv1.SetBlacklistRequest) (*emptypb.Empty, error) {
 	entries := strings.Split(req.GetEntries(), ",")
 	cleaned := make([]string, 0, len(entries))

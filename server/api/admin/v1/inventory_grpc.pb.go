@@ -40,31 +40,31 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminInventoryService 卡密库存管理：导入/导出/列表/操作。
+// AdminInventoryService 卡密庫存管理：導入/導出/列表/操作。
 type AdminInventoryServiceClient interface {
 	GetTargets(ctx context.Context, in *InventoryTargetsRequest, opts ...grpc.CallOption) (*InventoryTargetsReply, error)
 	AssignPreview(ctx context.Context, in *AssignPreviewRequest, opts ...grpc.CallOption) (*AssignPreviewReply, error)
 	AssignCards(ctx context.Context, in *AssignCardsRequest, opts ...grpc.CallOption) (*AssignCardsReply, error)
 	PreviewCancelImport(ctx context.Context, in *CancelImportRequest, opts ...grpc.CallOption) (*CancelImportPreviewReply, error)
-	// ImportPreview 上传预览（去重统计 + 样本预览）。
+	// ImportPreview 上傳預覽（去重統計 + 樣本預覽）。
 	ImportPreview(ctx context.Context, in *ImportPreviewRequest, opts ...grpc.CallOption) (*ImportPreviewReply, error)
-	// ImportConfirm 确认导入（分片写入 + 批次追踪）。
+	// ImportConfirm 確認導入（分片寫入 + 批次追蹤）。
 	ImportConfirm(ctx context.Context, in *ImportConfirmRequest, opts ...grpc.CallOption) (*ImportBatch, error)
-	// ListImports 导入批次列表。
+	// ListImports 導入批次列表。
 	ListImports(ctx context.Context, in *ListImportsRequest, opts ...grpc.CallOption) (*ListImportsReply, error)
-	// CancelImport 撤销批次（删除本批 available 卡）。
+	// CancelImport 撤銷批次（刪除本批 available 卡）。
 	CancelImport(ctx context.Context, in *CancelImportRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListCards 卡密列表（掩码默认；card:view_content 权限才可见完整内容）。
+	// ListCards 卡密列表（掩碼默認；card:view_content 權限才可見完整內容）。
 	ListCards(ctx context.Context, in *ListCardsRequest, opts ...grpc.CallOption) (*ListCardsReply, error)
-	// ExportCards 导出卡密（card:export 权限 + 审计 + 限流 + CsvSafe）。
+	// ExportCards 導出卡密（card:export 權限 + 審計 + 限流 + CsvSafe）。
 	ExportCards(ctx context.Context, in *ExportCardsRequest, opts ...grpc.CallOption) (*ExportCardsReply, error)
-	// ToggleCard 禁用/启用单张卡。
+	// ToggleCard 禁用/啓用單張卡。
 	ToggleCard(ctx context.Context, in *ToggleCardRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ViewCardContent 查看完整卡密（card:view_content 权限 + 安全审计）。
+	// ViewCardContent 查看完整卡密（card:view_content 權限 + 安全審計）。
 	ViewCardContent(ctx context.Context, in *ViewCardContentRequest, opts ...grpc.CallOption) (*ViewCardContentReply, error)
-	// UpdateCardContent 编辑未使用的单张卡密（独立敏感权限；版本冲突时不覆盖）。
+	// UpdateCardContent 編輯未使用的單張卡密（獨立敏感權限；版本衝突時不覆蓋）。
 	UpdateCardContent(ctx context.Context, in *UpdateCardContentRequest, opts ...grpc.CallOption) (*UpdateCardContentReply, error)
-	// ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限）。
+	// ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限）。
 	ListPremiumCards(ctx context.Context, in *ListPremiumCardsRequest, opts ...grpc.CallOption) (*ListPremiumCardsReply, error)
 }
 
@@ -220,31 +220,31 @@ func (c *adminInventoryServiceClient) ListPremiumCards(ctx context.Context, in *
 // All implementations must embed UnimplementedAdminInventoryServiceServer
 // for forward compatibility.
 //
-// AdminInventoryService 卡密库存管理：导入/导出/列表/操作。
+// AdminInventoryService 卡密庫存管理：導入/導出/列表/操作。
 type AdminInventoryServiceServer interface {
 	GetTargets(context.Context, *InventoryTargetsRequest) (*InventoryTargetsReply, error)
 	AssignPreview(context.Context, *AssignPreviewRequest) (*AssignPreviewReply, error)
 	AssignCards(context.Context, *AssignCardsRequest) (*AssignCardsReply, error)
 	PreviewCancelImport(context.Context, *CancelImportRequest) (*CancelImportPreviewReply, error)
-	// ImportPreview 上传预览（去重统计 + 样本预览）。
+	// ImportPreview 上傳預覽（去重統計 + 樣本預覽）。
 	ImportPreview(context.Context, *ImportPreviewRequest) (*ImportPreviewReply, error)
-	// ImportConfirm 确认导入（分片写入 + 批次追踪）。
+	// ImportConfirm 確認導入（分片寫入 + 批次追蹤）。
 	ImportConfirm(context.Context, *ImportConfirmRequest) (*ImportBatch, error)
-	// ListImports 导入批次列表。
+	// ListImports 導入批次列表。
 	ListImports(context.Context, *ListImportsRequest) (*ListImportsReply, error)
-	// CancelImport 撤销批次（删除本批 available 卡）。
+	// CancelImport 撤銷批次（刪除本批 available 卡）。
 	CancelImport(context.Context, *CancelImportRequest) (*emptypb.Empty, error)
-	// ListCards 卡密列表（掩码默认；card:view_content 权限才可见完整内容）。
+	// ListCards 卡密列表（掩碼默認；card:view_content 權限才可見完整內容）。
 	ListCards(context.Context, *ListCardsRequest) (*ListCardsReply, error)
-	// ExportCards 导出卡密（card:export 权限 + 审计 + 限流 + CsvSafe）。
+	// ExportCards 導出卡密（card:export 權限 + 審計 + 限流 + CsvSafe）。
 	ExportCards(context.Context, *ExportCardsRequest) (*ExportCardsReply, error)
-	// ToggleCard 禁用/启用单张卡。
+	// ToggleCard 禁用/啓用單張卡。
 	ToggleCard(context.Context, *ToggleCardRequest) (*emptypb.Empty, error)
-	// ViewCardContent 查看完整卡密（card:view_content 权限 + 安全审计）。
+	// ViewCardContent 查看完整卡密（card:view_content 權限 + 安全審計）。
 	ViewCardContent(context.Context, *ViewCardContentRequest) (*ViewCardContentReply, error)
-	// UpdateCardContent 编辑未使用的单张卡密（独立敏感权限；版本冲突时不覆盖）。
+	// UpdateCardContent 編輯未使用的單張卡密（獨立敏感權限；版本衝突時不覆蓋）。
 	UpdateCardContent(context.Context, *UpdateCardContentRequest) (*UpdateCardContentReply, error)
-	// ListPremiumCards 靓号列表（number_hash 命中 + 可用卡；card:premium 权限）。
+	// ListPremiumCards 靚號列表（number_hash 命中 + 可用卡；card:premium 權限）。
 	ListPremiumCards(context.Context, *ListPremiumCardsRequest) (*ListPremiumCardsReply, error)
 	mustEmbedUnimplementedAdminInventoryServiceServer()
 }

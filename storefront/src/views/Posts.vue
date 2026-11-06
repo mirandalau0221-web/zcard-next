@@ -7,8 +7,8 @@
         <button :class="['btn', type === 'blog' ? '' : 'secondary']" @click="switchType('blog')">{{ $t('博客') }}</button>
       </div>
     </div>
-    <!-- 栏目筛选：横向滚动胶囊（选中高亮） -->
-    <div v-if="categories.length" ref="categoryNav" class="cat-nav" :aria-label="$t('文章栏目')" style="margin-bottom: 16px;">
+    <!-- 欄目篩選：橫向滾動膠囊（選中高亮） -->
+    <div v-if="categories.length" ref="categoryNav" class="cat-nav" :aria-label="$t('文章欄目')" style="margin-bottom: 16px;">
       <button :class="['cat-chip', { active: !categoryId }]" @click="pickCategory(0)">{{ $t('全部') }}</button>
       <button
         v-for="c in categories"
@@ -27,11 +27,11 @@
         <div class="muted post-date">{{ formatDate(p.published_at) }}</div>
       </router-link>
     </div>
-    <div v-if="posts.length === 0 && !loading" class="card post-empty" role="status">{{ $t('暂无内容') }}</div>
+    <div v-if="posts.length === 0 && !loading" class="card post-empty" role="status">{{ $t('暫無內容') }}</div>
     <div v-if="total > pageSize" style="display: flex; gap: 8px; justify-content: center; margin-top: 16px;">
-      <button class="btn secondary" :disabled="page <= 1" @click="load(page - 1)">{{ $t('上一页') }}</button>
+      <button class="btn secondary" :disabled="page <= 1" @click="load(page - 1)">{{ $t('上一頁') }}</button>
       <span class="muted" style="align-self: center;">{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-      <button class="btn secondary" :disabled="page * pageSize >= total" @click="load(page + 1)">{{ $t('下一页') }}</button>
+      <button class="btn secondary" :disabled="page * pageSize >= total" @click="load(page + 1)">{{ $t('下一頁') }}</button>
     </div>
   </div>
 </template>
@@ -86,7 +86,7 @@ function syncQuery(t: string, id: number) {
   router.replace({ query: q });
 }
 
-// 仅移动栏目条，让选中项留在可见范围，避免 scrollIntoView 带动整页。
+// 僅移動欄目條，讓選中項留在可見範圍，避免 scrollIntoView 帶動整頁。
 async function revealCategory() {
   await nextTick();
   const nav = categoryNav.value;
@@ -125,7 +125,7 @@ async function load(p = 1) {
   page.value = p;
 }
 
-// 文章列表数据预取（setup 顶层：SSG 静态化 + 输出 SEO head）
+// 文章列表數據預取（setup 頂層：SSG 靜態化 + 輸出 SEO head）
 {
   const { data } = await listPostCategories();
   categories.value = data?.categories || [];
@@ -133,8 +133,8 @@ async function load(p = 1) {
   await applyListSeo();
 }
 
-/** 文章列表页 SEO：canonical 恒为 /posts（公告/博客筛选是同一列表变体，
- 与静态壳 canonical 一致） */
+/** 文章列表頁 SEO：canonical 恆為 /posts（公告/博客篩選是同一列表變體，
+ 與靜態殼 canonical 一致） */
 async function applyListSeo() {
   const site = await fetchSiteSeo();
   const origin = typeof window !== "undefined" ? window.location.origin : site.url;
@@ -158,7 +158,7 @@ async function applyListSeo() {
 .post-item { color:#1f2937; text-decoration:none; min-width:0; cursor: pointer; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .post-title { min-width:0; overflow-wrap:anywhere; line-height:1.6; flex: 1; font-weight: 600; font-size: 15px; }
 
-/* 栏目胶囊：横向滚动，选中蓝底白字（与首页分类导航同款交互） */
+/* 欄目膠囊：橫向滾動，選中藍底白字（與首頁分類導航同款交互） */
 .cat-nav {
   display: flex; gap: 8px; align-items: center; overflow-x: auto;
   background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 10px 14px;

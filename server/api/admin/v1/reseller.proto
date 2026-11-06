@@ -8,64 +8,64 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminResellerService 分站管理(主站面核心）：申请审核/列表/定价/账本/余额。
-// 域名验证与分站后台完整面随 storefront 用户登录体系接续（核心引擎已就绪）。
+// AdminResellerService 分站管理(主站面核心）：申請審核/列表/定價/賬本/餘額。
+// 域名驗證與分站後台完整面隨 storefront 用户登錄體系接續（核心引擎已就緒）。
 service AdminResellerService {
   // MySites 分站主：名下域名列表。
   rpc MySites(MySitesRequest) returns (MySitesReply) {
     option (google.api.http) = { get: "/api/v1/admin/reseller/my/sites" };
   }
-  // AddSite 分站主：登记域名（生成验证 token）。
+  // AddSite 分站主：登記域名（生成驗證 token）。
   rpc AddSite(AddSiteRequest) returns (ResellerSiteItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/reseller/my/sites"
       body: "*"
     };
   }
-  // VerifySite 分站主：触发域名验证（DNS TXT / HTTP well-known 双方案）。
+  // VerifySite 分站主：觸發域名驗證（DNS TXT / HTTP well-known 雙方案）。
   rpc VerifySite(VerifySiteRequest) returns (VerifySiteReply) {
     option (google.api.http) = {
       post: "/api/v1/admin/reseller/my/sites/{site_id}/verify"
       body: "*"
     };
   }
-  // SetWhitelabel 分站主：白标设置（站名/LOGO/favicon）。
+  // SetWhitelabel 分站主：白標設置（站名/LOGO/favicon）。
   rpc SetWhitelabel(SetWhitelabelRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/reseller/my/sites/{site_id}/whitelabel"
       body: "*"
     };
   }
-  // CreateProduct 分站主：自营商品上架（subsite_id = 本人分站；等级权限位自助上架）。
+  // CreateProduct 分站主：自營商品上架（subsite_id = 本人分站；等級權限位自助上架）。
   rpc CreateProduct(CreateResellerProductRequest) returns (ResellerProduct) {
     option (google.api.http) = {
       post: "/api/v1/admin/reseller/products"
       body: "*"
     };
   }
-  // ReviewApply 审核申请（通过设加价率区间与冻结天数）。
+  // ReviewApply 審核申請（通過設加價率區間與凍結天數）。
   rpc ReviewApply(ReviewApplyRequest) returns (ResellerProfile) {
     option (google.api.http) = {
       post: "/api/v1/admin/reseller/apply/{id}/review"
       body: "*"
     };
   }
-  // ListProfiles 申请/分站列表。
+  // ListProfiles 申請/分站列表。
   rpc ListProfiles(ListProfilesRequest) returns (ListProfilesReply) {
     option (google.api.http) = { get: "/api/v1/admin/reseller/profiles" };
   }
-  // UpsertPricing 分站定价规则（SKU>商品>默认）。
+  // UpsertPricing 分站定價規則（SKU>商品>默認）。
   rpc UpsertPricing(UpsertPricingRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/admin/reseller/pricing"
       body: "*"
     };
   }
-  // Ledger 分站账本流水。
+  // Ledger 分站賬本流水。
   rpc Ledger(LedgerRequest) returns (LedgerReply) {
     option (google.api.http) = { get: "/api/v1/admin/reseller/ledger" };
   }
-  // Balance 分站余额（缓存 + 重算对账）。
+  // Balance 分站餘額（緩存 + 重算對賬）。
   rpc Balance(BalanceRequest) returns (BalanceReply) {
     option (google.api.http) = { get: "/api/v1/admin/reseller/balance" };
   }
@@ -89,7 +89,7 @@ message ReviewApplyRequest {
   uint64 id = 1 [(google.api.field_behavior) = REQUIRED];
   bool approve = 2;
   string reason = 3;
-  double default_markup_percent = 4; // 审核通过时设定
+  double default_markup_percent = 4; // 審核通過時設定
   double max_markup_percent = 5;
   int32 confirm_days = 6;
 }
@@ -112,7 +112,7 @@ message UpsertPricingRequest {
   uint64 product_id = 2 [(google.api.field_behavior) = REQUIRED];
   uint64 sku_id = 3;
   string mode = 4 [(google.api.field_behavior) = REQUIRED]; // inherit | markup_percent | fixed_markup | fixed_price
-  int64 value = 5 [(google.api.field_behavior) = REQUIRED]; // markup=万分比；fixed=分
+  int64 value = 5 [(google.api.field_behavior) = REQUIRED]; // markup=萬分比；fixed=分
 }
 
 message LedgerRequest {
@@ -145,15 +145,15 @@ message BalanceRequest {
 }
 
 message BalanceReply {
-  int64 available = 1; // 缓存（含冻结正数）
+  int64 available = 1; // 緩存（含凍結正數）
   int64 locked = 2;
   int64 negative = 3;
-  int64 recomputed_available = 4; // 流水重算（对账口径）
+  int64 recomputed_available = 4; // 流水重算（對賬口徑）
   int64 recomputed_locked = 5;
   int64 recomputed_negative = 6;
 }
 
-// ── 分站主自服务面（reseller: 权限域，数据按 subsite_id 隔离）──
+// ── 分站主自服務面（reseller: 權限域，數據按 subsite_id 隔離）──
 
 // MySites 我名下域名（分站主）。
 message MySitesRequest {}
@@ -163,7 +163,7 @@ message ResellerSiteItem {
   uint64 profile_id = 2;
   string domain = 3;
   string verification_status = 4; // pending | verified | failed
-  string verification_token = 5; // 用于 DNS TXT/HTTP 文件内容
+  string verification_token = 5; // 用於 DNS TXT/HTTP 文件內容
   bool is_primary = 6;
   string site_name = 7;
   string logo = 8;
@@ -195,7 +195,7 @@ message SetWhitelabelRequest {
   string favicon = 4;
 }
 
-// CreateResellerProductRequest 分站自营商品上架入参（名称必填；价格/成本分）。
+// CreateResellerProductRequest 分站自營商品上架入參（名稱必填；價格/成本分）。
 message CreateResellerProductRequest {
   string name = 1 [(google.api.field_behavior) = REQUIRED];
   int64 price_cents = 2;
@@ -205,12 +205,12 @@ message CreateResellerProductRequest {
   uint64 category_id = 6;
   string stock_type = 7; // card | url | code
   string delivery_mode = 8; // status | delete
-  int32 status = 9; // 1=上架 0=下架 2=隐藏
+  int32 status = 9; // 1=上架 0=下架 2=隱藏
   int32 sort = 10;
   bool stock_visible = 11;
 }
 
-// ResellerProduct 分站自营商品（上架结果回执）。
+// ResellerProduct 分站自營商品（上架結果回執）。
 message ResellerProduct {
   uint64 id = 1;
   uint64 subsite_id = 2;

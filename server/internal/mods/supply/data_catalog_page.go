@@ -28,14 +28,14 @@ func (s *AdminSupplyService) previewCatalogPage(ctx context.Context, req *adminv
 		return s.PreviewProducts(ctx, copy)
 	}
 	if string(conn.Status) != "active" {
-		return nil, fmt.Errorf("货源已停用")
+		return nil, fmt.Errorf("貨源已停用")
 	}
 	size := int(req.PageSize)
 	if size == 0 {
 		size = 50
 	}
 	if size < 1 || size > 100 || req.Page < 1 {
-		return nil, fmt.Errorf("分页范围无效")
+		return nil, fmt.Errorf("分頁範圍無效")
 	}
 	list, err := a.ListProducts(adapter.WithCatalogRead(ctx), int(req.Page), size, true)
 	if err != nil {
@@ -57,19 +57,19 @@ func (s *AdminSupplyService) previewCatalogPage(ctx context.Context, req *adminv
 	}
 	for _, p := range list.Items {
 		if p.ID == "" {
-			return nil, fmt.Errorf("上游商品 ID 为空")
+			return nil, fmt.Errorf("上游商品 ID 為空")
 		}
 		if _, ok := byCode[p.ID]; ok {
-			return nil, fmt.Errorf("上游页内商品重复")
+			return nil, fmt.Errorf("上游頁內商品重複")
 		}
 		byCode[p.ID] = p
 		g := groups[p.CategoryID]
 		if g == nil {
 			name := paths[p.CategoryID]
 			if name == "" {
-				name = "未分类"
+				name = "未分類"
 				if p.CategoryID != "" && p.CategoryID != "0" {
-					return nil, fmt.Errorf("上游商品分类缺失：%s", p.CategoryID)
+					return nil, fmt.Errorf("上游商品分類缺失：%s", p.CategoryID)
 				}
 			}
 			g = &adminv1.PreviewCategory{Code: p.CategoryID, Name: name, Path: name, ParentCode: parents[p.CategoryID]}
@@ -87,7 +87,7 @@ func (s *AdminSupplyService) previewCatalogPage(ctx context.Context, req *adminv
 		return nil, err
 	}
 	if previewIdentity(current) != previewIdentity(conn) {
-		return nil, fmt.Errorf("货源已变化，请重新加载")
+		return nil, fmt.Errorf("貨源已變化，請重新加載")
 	}
 	raw, err := json.Marshal(catalogPayload{Categories: cats, Products: byCode, Tree: tree, Page: int(req.Page), PageSize: list.PageSize, Total: list.Total, HasMore: list.HasMore, Capability: "sms_activation.v1"})
 	if err != nil {
@@ -103,10 +103,10 @@ func categoryPaths(tree []adapter.Category) (map[string]string, error) {
 	nodes := map[string]adapter.Category{}
 	for _, c := range tree {
 		if c.ID == "" {
-			return nil, fmt.Errorf("上游分类 ID 为空")
+			return nil, fmt.Errorf("上游分類 ID 為空")
 		}
 		if _, ok := nodes[c.ID]; ok {
-			return nil, fmt.Errorf("上游分类 ID 重复")
+			return nil, fmt.Errorf("上游分類 ID 重複")
 		}
 		nodes[c.ID] = c
 	}
@@ -121,11 +121,11 @@ func categoryPaths(tree []adapter.Category) (map[string]string, error) {
 			return p, nil
 		}
 		if visiting[id] || depth > 100 {
-			return "", fmt.Errorf("上游分类父级循环或层级过深")
+			return "", fmt.Errorf("上游分類父級循環或層級過深")
 		}
 		c, ok := nodes[id]
 		if !ok {
-			return "", fmt.Errorf("上游分类父级缺失：%s", id)
+			return "", fmt.Errorf("上游分類父級缺失：%s", id)
 		}
 		visiting[id] = true
 		p, err := walk(c.ParentID, depth+1)
@@ -154,7 +154,7 @@ func ensurePageCategory(ctx context.Context, c *ent.Client, tenant uint64, id st
 	}
 	node, ok := tree[id]
 	if !ok {
-		return 0, fmt.Errorf("上游分类缺失")
+		return 0, fmt.Errorf("上游分類缺失")
 	}
 	parent, err := ensurePageCategory(ctx, c, tenant, node.ParentID, tree, mapped, "")
 	if err != nil {
@@ -175,7 +175,7 @@ func ensurePageCategory(ctx context.Context, c *ent.Client, tenant uint64, id st
 		return 0, err
 	}
 	if len(rows) > 1 {
-		return 0, fmt.Errorf("同一路径存在多个同名分类，请手动选择")
+		return 0, fmt.Errorf("同一路徑存在多個同名分類，請手動選擇")
 	}
 	var local uint64
 	if len(rows) == 1 {

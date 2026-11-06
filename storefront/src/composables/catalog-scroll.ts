@@ -1,7 +1,7 @@
 import { nextTick, onActivated, onDeactivated } from 'vue';
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 
-/** 与缓存的目录实例一起保留位置，等 Suspense/KeepAlive 恢复内容后再滚动。 */
+/** 與緩存的目錄實例一起保留位置，等 Suspense/KeepAlive 恢復內容後再滾動。 */
 export function useCatalogScroll() {
   let position = { left: 0, top: 0 };
   let active = false;

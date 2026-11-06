@@ -18,7 +18,7 @@ func paymentForDevice(ctx context.Context, driver string, info *port.RedirectInf
 		return info, nil
 	}
 	if !info.Deadline.IsZero() && !time.Now().Before(info.Deadline) {
-		return nil, fmt.Errorf("xunhupay: 支付二维码已过期，请更换支付方式或重新下单；已付款请等待到账通知")
+		return nil, fmt.Errorf("xunhupay: 支付二維碼已過期，請更換支付方式或重新下單；已付款請等待到賬通知")
 	}
 	if req, ok := khttp.RequestFromServerContext(ctx); ok {
 		ua := strings.ToLower(req.UserAgent())
@@ -27,7 +27,7 @@ func paymentForDevice(ctx context.Context, driver string, info *port.RedirectInf
 				MobileURL string `json:"mobile_url"`
 			}
 			if err := json.Unmarshal(info.Payload, &payload); err != nil || payload.MobileURL == "" {
-				return nil, fmt.Errorf("xunhupay: 缺少手机支付地址")
+				return nil, fmt.Errorf("xunhupay: 缺少手機支付地址")
 			}
 			result := *info
 			result.Type = "redirect"

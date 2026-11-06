@@ -29,13 +29,13 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreNotificationService 站内信铃铛：未读数/列表/已读。
+// StoreNotificationService 站內信鈴鐺：未讀數/列表/已讀。
 type StoreNotificationServiceClient interface {
-	// UnreadCount 未读数。
+	// UnreadCount 未讀數。
 	UnreadCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UnreadCountReply, error)
-	// ListNotifications 站内信列表。
+	// ListNotifications 站內信列表。
 	ListNotifications(ctx context.Context, in *ListNotificationsRequest, opts ...grpc.CallOption) (*ListNotificationsReply, error)
-	// MarkRead 标记已读（id=0 全部）。
+	// MarkRead 標記已讀（id=0 全部）。
 	MarkRead(ctx context.Context, in *MarkReadRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -81,13 +81,13 @@ func (c *storeNotificationServiceClient) MarkRead(ctx context.Context, in *MarkR
 // All implementations must embed UnimplementedStoreNotificationServiceServer
 // for forward compatibility.
 //
-// StoreNotificationService 站内信铃铛：未读数/列表/已读。
+// StoreNotificationService 站內信鈴鐺：未讀數/列表/已讀。
 type StoreNotificationServiceServer interface {
-	// UnreadCount 未读数。
+	// UnreadCount 未讀數。
 	UnreadCount(context.Context, *emptypb.Empty) (*UnreadCountReply, error)
-	// ListNotifications 站内信列表。
+	// ListNotifications 站內信列表。
 	ListNotifications(context.Context, *ListNotificationsRequest) (*ListNotificationsReply, error)
-	// MarkRead 标记已读（id=0 全部）。
+	// MarkRead 標記已讀（id=0 全部）。
 	MarkRead(context.Context, *MarkReadRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedStoreNotificationServiceServer()
 }

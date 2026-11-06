@@ -1,7 +1,7 @@
 package audit
 
-// T5 访问统计明细：page_views（PV/UV 逐请求明细）+ user_sessions（在线心跳）。
-// 埋点原则：统计性质数据，写入失败一律忽略、绝不阻断业务请求。
+// T5 訪問統計明細：page_views（PV/UV 逐請求明細）+ user_sessions（在線心跳）。
+// 埋點原則：統計性質數據，寫入失敗一律忽略、絕不阻斷業務請求。
 
 import (
 	"context"
@@ -15,18 +15,18 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/businessday"
 )
 
-// TrackRepo 访问埋点/统计仓储。
+// TrackRepo 訪問埋點/統計倉儲。
 type TrackRepo struct {
 	data *data.Data
 }
 
-// NewTrackRepo 构造。
+// NewTrackRepo 構造。
 func NewTrackRepo(d *data.Data) *TrackRepo {
 	return &TrackRepo{data: d}
 }
 
-// RecordVisit 记一次访问：PV 明细一行 + 登录用户在线心跳 upsert。
-// 失败忽略（埋点不阻断请求）。
+// RecordVisit 記一次訪問：PV 明細一行 + 登錄用户在線心跳 upsert。
+// 失敗忽略（埋點不阻斷請求）。
 func (r *TrackRepo) RecordVisit(ctx context.Context, subsite uint64, path string, userID uint64, ip string) {
 	now := time.Now().UTC()
 	client := data.Client(ctx, r.data)
@@ -40,7 +40,7 @@ func (r *TrackRepo) RecordVisit(ctx context.Context, subsite uint64, path string
 	if err != nil || userID == 0 {
 		return
 	}
-	// 在线心跳 upsert（唯一键 subsite_id + user_id；created_at 不可变保留）
+	// 在線心跳 upsert（唯一鍵 subsite_id + user_id；created_at 不可變保留）
 	_ = client.UserSession.Create().
 		SetSubsiteID(subsite).
 		SetUserID(userID).
@@ -51,7 +51,7 @@ func (r *TrackRepo) RecordVisit(ctx context.Context, subsite uint64, path string
 		Exec(ctx)
 }
 
-// CountOnlineUsers 在线用户数（last_active_at ≥ since 且分站隔离）。
+// CountOnlineUsers 在線用户數（last_active_at ≥ since 且分站隔離）。
 func (r *TrackRepo) CountOnlineUsers(ctx context.Context, subsite uint64, since time.Time) (int64, error) {
 	n, err := data.Client(ctx, r.data).UserSession.Query().
 		Where(usersession.LastActiveAtGTE(since), usersession.SubsiteID(subsite)).
@@ -59,7 +59,7 @@ func (r *TrackRepo) CountOnlineUsers(ctx context.Context, subsite uint64, since 
 	return int64(n), err
 }
 
-// TrafficByDay 近 N 天 PV/UV（PV=行数，UV=按 ip 去重；缺日补零由调用方补齐）。
+// TrafficByDay 近 N 天 PV/UV（PV=行數，UV=按 ip 去重；缺日補零由調用方補齊）。
 func (r *TrackRepo) TrafficByDay(ctx context.Context, subsite uint64, days int) ([]auditport.TrafficDay, error) {
 	if days < 1 {
 		days = 7
@@ -95,7 +95,7 @@ func (r *TrackRepo) TrafficByDay(ctx context.Context, subsite uint64, days int) 
 	return out, nil
 }
 
-// CleanupVisitData 清理过期数据（cron）：明细保留 90 天，心跳保留 24 小时。
+// CleanupVisitData 清理過期數據（cron）：明細保留 90 天，心跳保留 24 小時。
 func (r *TrackRepo) CleanupVisitData(ctx context.Context) error {
 	client := data.Client(ctx, r.data)
 	dayCut := time.Now().UTC().AddDate(0, 0, -90).Format("20060102")

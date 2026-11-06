@@ -25,7 +25,7 @@ type Notification struct {
 	Content string `json:"content,omitempty"`
 	// ReadAt holds the value of the "read_at" field.
 	ReadAt time.Time `json:"read_at,omitempty"`
-	// 来源（order/ticket/broadcast）
+	// 來源（order/ticket/broadcast）
 	SourceType string `json:"source_type,omitempty"`
 	// SourceID holds the value of the "source_id" field.
 	SourceID uint64 `json:"source_id,omitempty"`

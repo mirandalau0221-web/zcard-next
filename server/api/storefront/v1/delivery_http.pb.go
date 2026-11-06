@@ -21,9 +21,9 @@ const OperationStoreDeliveryServiceFetchDelivery = "/zcard.api.storefront.v1.Sto
 const OperationStoreDeliveryServiceMaskedDeliveries = "/zcard.api.storefront.v1.StoreDeliveryService/MaskedDeliveries"
 
 type StoreDeliveryServiceHTTPServer interface {
-	// FetchDelivery FetchDelivery 取货（一次性明文；默认 1 次后掩码；Cache-Control: no-store）。
+	// FetchDelivery FetchDelivery 取貨（一次性明文；默認 1 次後掩碼；Cache-Control: no-store）。
 	FetchDelivery(context.Context, *FetchDeliveryRequest) (*FetchDeliveryReply, error)
-	// MaskedDeliveries MaskedDeliveries 我的订单掩码列表。
+	// MaskedDeliveries MaskedDeliveries 我的訂單掩碼列表。
 	MaskedDeliveries(context.Context, *MaskedDeliveriesRequest) (*MaskedDeliveriesReply, error)
 }
 
@@ -72,9 +72,9 @@ func _StoreDeliveryService_MaskedDeliveries0_HTTP_Handler(srv StoreDeliveryServi
 }
 
 type StoreDeliveryServiceHTTPClient interface {
-	// FetchDelivery FetchDelivery 取货（一次性明文；默认 1 次后掩码；Cache-Control: no-store）。
+	// FetchDelivery FetchDelivery 取貨（一次性明文；默認 1 次後掩碼；Cache-Control: no-store）。
 	FetchDelivery(ctx context.Context, req *FetchDeliveryRequest, opts ...http.CallOption) (rsp *FetchDeliveryReply, err error)
-	// MaskedDeliveries MaskedDeliveries 我的订单掩码列表。
+	// MaskedDeliveries MaskedDeliveries 我的訂單掩碼列表。
 	MaskedDeliveries(ctx context.Context, req *MaskedDeliveriesRequest, opts ...http.CallOption) (rsp *MaskedDeliveriesReply, err error)
 }
 
@@ -86,7 +86,7 @@ func NewStoreDeliveryServiceHTTPClient(client *http.Client) StoreDeliveryService
 	return &StoreDeliveryServiceHTTPClientImpl{client}
 }
 
-// FetchDelivery FetchDelivery 取货（一次性明文；默认 1 次后掩码；Cache-Control: no-store）。
+// FetchDelivery FetchDelivery 取貨（一次性明文；默認 1 次後掩碼；Cache-Control: no-store）。
 func (c *StoreDeliveryServiceHTTPClientImpl) FetchDelivery(ctx context.Context, in *FetchDeliveryRequest, opts ...http.CallOption) (*FetchDeliveryReply, error) {
 	var out FetchDeliveryReply
 	pattern := "/api/v1/storefront/delivery/fetch"
@@ -104,7 +104,7 @@ func (c *StoreDeliveryServiceHTTPClientImpl) FetchDelivery(ctx context.Context, 
 	return &out, nil
 }
 
-// MaskedDeliveries MaskedDeliveries 我的订单掩码列表。
+// MaskedDeliveries MaskedDeliveries 我的訂單掩碼列表。
 func (c *StoreDeliveryServiceHTTPClientImpl) MaskedDeliveries(ctx context.Context, in *MaskedDeliveriesRequest, opts ...http.CallOption) (*MaskedDeliveriesReply, error) {
 	var out MaskedDeliveriesReply
 	pattern := "/api/v1/storefront/delivery"

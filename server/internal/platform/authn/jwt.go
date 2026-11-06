@@ -1,8 +1,8 @@
-// Package authn 双 realm JWT（规划 §7.3）。
+// Package authn 雙 realm JWT（規劃 §7.3）。
 //
-// admin 与 user 独立密钥与声明（防提权串用）：admin 令牌在 user 接口无效，反之亦然。
-// access 2h；refresh 14d 轮换（sessions 表，M3）。本包为纯 JWT 原语（golang-jwt/v5），
-// 不 import Kratos transport（架构测试规则 3：platform 纯净）。
+// admin 與 user 獨立密鑰與聲明（防提權串用）：admin 令牌在 user 接口無效，反之亦然。
+// access 2h；refresh 14d 輪換（sessions 表，M3）。本包為純 JWT 原語（golang-jwt/v5），
+// 不 import Kratos transport（架構測試規則 3：platform 純淨）。
 package authn
 
 import (
@@ -13,40 +13,40 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Realm 令牌领域。
+// Realm 令牌領域。
 type Realm string
 
-// 双 realm。
+// 雙 realm。
 const (
 	RealmAdmin Realm = "admin"
 	RealmUser  Realm = "user"
 )
 
-// Claims 自定义声明。
+// Claims 自定義聲明。
 type Claims struct {
 	AuthVersion int    `json:"auth_version"`
 	Subject     uint64 `json:"sub"`            // admin_users.id / users.id
-	Username    string `json:"username"`       // 登录名快照
+	Username    string `json:"username"`       // 登錄名快照
 	RoleID      uint64 `json:"role,omitempty"` // admin realm：角色 ID
-	Realm       Realm  `json:"realm"`          // admin | user（校验时必须匹配）
+	Realm       Realm  `json:"realm"`          // admin | user（校驗時必須匹配）
 	TokenType   string `json:"typ"`            // access | refresh
 	jwt.RegisteredClaims
 }
 
-// ErrInvalidToken 令牌无效/过期/领域不匹配（对外统一 401，不区分原因防探测）。
-var ErrInvalidToken = errors.New("authn: 令牌无效")
+// ErrInvalidToken 令牌無效/過期/領域不匹配（對外統一 401，不區分原因防探測）。
+var ErrInvalidToken = errors.New("authn: 令牌無效")
 
-// Signer 签发器（每 realm 一把密钥，从 conf.Security 装配）。
+// Signer 簽發器（每 realm 一把密鑰，從 conf.Security 裝配）。
 type Signer struct {
 	adminKey []byte
 	userKey  []byte
 	ttl      time.Duration
 }
 
-// NewSigner 构造。密钥长度 >= 32 字节。
+// NewSigner 構造。密鑰長度 >= 32 字節。
 func NewSigner(adminKey, userKey []byte, accessTTL time.Duration) (*Signer, error) {
 	if len(adminKey) < 32 || len(userKey) < 32 {
-		return nil, fmt.Errorf("authn: JWT 密钥长度不足（需 >= 32 字节，admin=%d user=%d）", len(adminKey), len(userKey))
+		return nil, fmt.Errorf("authn: JWT 密鑰長度不足（需 >= 32 字節，admin=%d user=%d）", len(adminKey), len(userKey))
 	}
 	if accessTTL <= 0 {
 		accessTTL = 2 * time.Hour
@@ -54,10 +54,10 @@ func NewSigner(adminKey, userKey []byte, accessTTL time.Duration) (*Signer, erro
 	return &Signer{adminKey: adminKey, userKey: userKey, ttl: accessTTL}, nil
 }
 
-// AccessTTL 访问令牌有效期。
+// AccessTTL 訪問令牌有效期。
 func (s *Signer) AccessTTL() time.Duration { return s.ttl }
 
-// Issue 签发 access 令牌。
+// Issue 簽發 access 令牌。
 func (s *Signer) Issue(realm Realm, subject uint64, username string, roleID uint64, version ...int) (token string, expiresAt time.Time, err error) {
 	v := 0
 	if len(version) > 0 {
@@ -98,7 +98,7 @@ func (s *Signer) IssueUntil(realm Realm, subject uint64, username string, roleID
 	return token, expiresAt, err
 }
 
-// Verify 校验令牌并返回声明；realm 必须与期望一致（双 realm 防串用）。
+// Verify 校驗令牌並返回聲明；realm 必須與期望一致（雙 realm 防串用）。
 func (s *Signer) Verify(realm Realm, tokenString string) (*Claims, error) {
 	key := s.adminKey
 	if realm == RealmUser {
@@ -107,7 +107,7 @@ func (s *Signer) Verify(realm Realm, tokenString string) (*Claims, error) {
 	claims := &Claims{}
 	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("authn: 非预期签名算法 %v", t.Header["alg"])
+			return nil, fmt.Errorf("authn: 非預期簽名算法 %v", t.Header["alg"])
 		}
 		return key, nil
 	})

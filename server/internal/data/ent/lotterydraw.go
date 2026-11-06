@@ -22,7 +22,7 @@ type LotteryDraw struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ActivityID holds the value of the "activity_id" field.
 	ActivityID uint64 `json:"activity_id,omitempty"`
@@ -54,7 +54,7 @@ type LotteryDraw struct {
 	Revision int32 `json:"revision,omitempty"`
 	// RuleSnapshot holds the value of the "rule_snapshot" field.
 	RuleSnapshot map[string]interface{} `json:"rule_snapshot,omitempty"`
-	// 抽奖专用密文，AAD 绑定中奖编号和站点
+	// 抽獎專用密文，AAD 綁定中獎編號和站點
 	Content []byte `json:"content,omitempty"`
 	// DeliveredAt holds the value of the "delivered_at" field.
 	DeliveredAt time.Time `json:"delivered_at,omitempty"`

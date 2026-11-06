@@ -1,10 +1,10 @@
 package fulfillment
 
-// 自动交付管线 + 取货三重门 + 人工发货（ 最后一个 M1a 模块）。
+// 自動交付管線 + 取貨三重門 + 人工發貨（ 最後一個 M1a 模塊）。
 //
-// 核心安全设计（ 无明文快照）：
-// 交付记录 = card_id 引用 + 一次性 delivery_token_hash——不存明文。
-// 取货时现场解密返回，绝不落库明文（区别于 1.x card_content / 友商 Payload text）。
+// 核心安全設計（ 無明文快照）：
+// 交付記錄 = card_id 引用 + 一次性 delivery_token_hash——不存明文。
+// 取貨時現場解密返回，絕不落庫明文（區別於 1.x card_content / 友商 Payload text）。
 
 import (
 	"context"
@@ -33,16 +33,16 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/orderaccess"
 )
 
-// DeliveryRepoImpl 交付仓储。
+// DeliveryRepoImpl 交付倉儲。
 type DeliveryRepoImpl struct {
 	data    *data.Data
 	cipher  *inventory.CardCipher
 	inv     inventory.CardRepo
-	gate    auditport.RiskGate // 取货失败锁定（nil = 未装配跳过）
-	auditor auditport.Auditor  // 取货安全审计（nil = 未装配跳过）
+	gate    auditport.RiskGate // 取貨失敗鎖定（nil = 未裝配跳過）
+	auditor auditport.Auditor  // 取貨安全審計（nil = 未裝配跳過）
 }
 
-// actorTypeOf 订单归属（游客 user_id=0 → guest）。
+// actorTypeOf 訂單歸屬（遊客 user_id=0 → guest）。
 func actorTypeOf(o *ent.Order) string {
 	if o.UserID == 0 {
 		return "guest"
@@ -50,15 +50,15 @@ func actorTypeOf(o *ent.Order) string {
 	return "user"
 }
 
-// NewDeliveryRepoImpl 构造。
+// NewDeliveryRepoImpl 構造。
 func NewDeliveryRepoImpl(d *data.Data, cipher *inventory.CardCipher, gate auditport.RiskGate, auditor auditport.Auditor) *DeliveryRepoImpl {
 	return &DeliveryRepoImpl{data: d, cipher: cipher, gate: gate, auditor: auditor}
 }
 
-// ── 自动交付管线 ─────────────────────────────────────────
+// ── 自動交付管線 ─────────────────────────────────────────
 
-// FulfillOrder 自动交付（order.paid 事件触发）：
-// 1) 取订单 reserved 卡密 → 2) MarkUsed/即删 → 3) 写交付记录（card_id + 令牌）
+// FulfillOrder 自動交付（order.paid 事件觸發）：
+// 1) 取訂單 reserved 卡密 → 2) MarkUsed/即刪 → 3) 寫交付記錄（card_id + 令牌）
 func (r *DeliveryRepoImpl) FulfillOrder(ctx context.Context, orderNo string) error {
 	return data.Tx(ctx, r.data, func(ctx context.Context) error { return r.fulfillOrder(ctx, orderNo) })
 }
@@ -66,7 +66,7 @@ func (r *DeliveryRepoImpl) FulfillOrder(ctx context.Context, orderNo string) err
 func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) error {
 	client := data.Client(ctx, r.data)
 
-	// 查订单
+	// 查訂單
 	o, err := client.Order.Query().Where(order.OrderNo(orderNo)).Only(ctx)
 	if ent.IsNotFound(err) {
 		return fmt.Errorf("fulfillment.ORDER_NOT_FOUND")
@@ -95,7 +95,7 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 		return err
 	}
 
-	// 取订单子项（获取 product_id 用于解密 AAD）
+	// 取訂單子項（獲取 product_id 用於解密 AAD）
 	items, err := client.OrderItem.Query().
 		Where(orderitem.OrderID(o.ID)).All(ctx)
 	if err != nil {
@@ -108,7 +108,7 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 
 	deliveredAt := time.Now().UTC()
 
-	// 商品发货模式映射（products.delivery_mode：status=标记 / delete=即删）
+	// 商品發貨模式映射（products.delivery_mode：status=標記 / delete=即刪）
 	modeByProduct := map[uint64]string{}
 	for _, it := range items {
 		if _, ok := modeByProduct[it.ProductID]; ok {
@@ -125,7 +125,7 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 		return orderdelivery.DeliveredModeStatus
 	}
 
-	// 逐卡：MarkUsed + 交付记录（即删模式交付后物理删除卡密行）
+	// 逐卡：MarkUsed + 交付記錄（即刪模式交付後物理刪除卡密行）
 	var deleteCardIDs []uint64
 	for _, c := range cards {
 		var itemID uint64
@@ -146,7 +146,7 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 		if itemID == 0 {
 			return fmt.Errorf("fulfillment.CARD_ITEM_MISMATCH")
 		}
-		// MarkUsed（affected rows 校验防并发重发）
+		// MarkUsed（affected rows 校驗防併發重發）
 		affected, err := client.Card.Update().
 			Where(card.ID(c.ID), card.StatusEQ(card.StatusReserved), card.OrderID(o.ID)).
 			SetStatus(card.StatusUsed).
@@ -156,10 +156,10 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 			return fmt.Errorf("fulfillment.MARK_USED_FAILED: %w", err)
 		}
 		if affected == 0 {
-			continue // 已处理（并发幂等）
+			continue // 已處理（併發冪等）
 		}
 
-		// 交付记录（card_id 引用 + 一次性令牌哈希——不存明文）
+		// 交付記錄（card_id 引用 + 一次性令牌哈希——不存明文）
 		token := randomToken()
 		tokenHash := hashToken(token)
 		mode := modeOf(c.ProductID)
@@ -177,7 +177,7 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 			return fmt.Errorf("fulfillment.DELIVERY_CREATE_FAILED: %w", err)
 		}
 		if mode == orderdelivery.DeliveredModeDelete {
-			deleteCardIDs = append(deleteCardIDs, c.ID) // 即删：交付后物理删除（取货占位兜底见 FetchDelivery）
+			deleteCardIDs = append(deleteCardIDs, c.ID) // 即刪：交付後物理刪除（取貨佔位兜底見 FetchDelivery）
 		}
 	}
 	if len(deleteCardIDs) > 0 {
@@ -186,8 +186,8 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 		}
 	}
 
-	// 直发商品（url/code）：同一链接/兑换码反复发货——写直发交付记录
-	// （CardID=0，取货时从商品 direct_content 现场解密）。每订单项一条。
+	// 直髮商品（url/code）：同一鏈接/兑換碼反覆發貨——寫直髮交付記錄
+	// （CardID=0，取貨時從商品 direct_content 現場解密）。每訂單項一條。
 	for _, it := range items {
 		if it.GoodsType == "physical" || it.CanceledQuantity >= it.Quantity {
 			continue
@@ -200,7 +200,7 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 		}
 		p, err := client.Product.Get(ctx, it.ProductID)
 		if err != nil || p.StockType == product.StockTypeCard || p.UpstreamSourceID > 0 || it.FulfillmentType == orderitem.FulfillmentTypeManual {
-			continue // 卡密类走上方逐卡；上游项由 procurement 回填
+			continue // 卡密類走上方逐卡；上游項由 procurement 回填
 		}
 		exists, err := client.OrderDelivery.Query().Where(orderdelivery.OrderID(o.ID), orderdelivery.ItemID(it.ID)).Exist(ctx)
 		if err != nil {
@@ -228,9 +228,9 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 	return r.updateDeliveryProgress(ctx, o, "system", 0, "")
 }
 
-// ── 取货三重门 ─────────────────────────────────────────
+// ── 取貨三重門 ─────────────────────────────────────────
 
-// FetchResult 取货结果。
+// FetchResult 取貨結果。
 type FetchResult struct {
 	OrderNo  string
 	Status   string
@@ -238,19 +238,19 @@ type FetchResult struct {
 	FetchCnt int32
 }
 
-// FetchItem 取货项。
+// FetchItem 取貨項。
 type FetchItem struct {
 	ItemID, DeliveryID         uint64
 	Kind, ProductName, SkuName string
 	DeliveredAt                int64
 	CardID                     uint64
-	Content                    string // 明文（首次）或掩码
+	Content                    string // 明文（首次）或掩碼
 	Masked                     bool
 }
 
-// FetchDelivery 取货（三重门：单号+密码+限流；凭正确密码始终返回明文——
-// 2026-09-03 修订，原「首次明文、后续掩码」致支付页自动取货消耗首次后客户
-// 再查只见尾 4 位掩码，客诉率高）。
+// FetchDelivery 取貨（三重門：單號+密碼+限流；憑正確密碼始終返回明文——
+// 2026-09-03 修訂，原「首次明文、後續掩碼」致支付頁自動取貨消耗首次後客户
+// 再查只見尾 4 位掩碼，客訴率高）。
 func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPassword, clientIP string, accessToken ...string) (*FetchResult, error) {
 	client := data.Client(ctx, r.data)
 	var token string
@@ -258,7 +258,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 		token = accessToken[0]
 	}
 
-	// 门 1+2：单号 + 查询密码（错误响应一致——防枚举）
+	// 門 1+2：單號 + 查詢密碼（錯誤響應一致——防枚舉）
 	o, err := client.Order.Query().Where(order.OrderNo(orderNo)).Only(ctx)
 	if ent.IsNotFound(err) {
 		if token != "" {
@@ -291,7 +291,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 		return &FetchResult{OrderNo: o.OrderNo, Status: string(o.Status)}, nil
 	}
 
-	// 取交付记录
+	// 取交付記錄
 	deliveries, err := client.OrderDelivery.Query().
 		Where(orderdelivery.OrderID(o.ID)).
 		Order(ent.Asc(orderdelivery.FieldID)).
@@ -305,7 +305,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 		Status:   string(o.Status),
 		FetchCnt: 0,
 	}
-	// 取货审计（：谁/何时/IP/订单——不含明文卡密）
+	// 取貨審計（：誰/何時/IP/訂單——不含明文卡密）
 	if r.auditor != nil {
 		r.auditor.Security(ctx, auditport.SecurityEntry{
 			ActorType: actorTypeOf(o), ActorID: o.UserID,
@@ -320,17 +320,17 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 			continue
 		}
 
-		// 直发交付（url/code 商品）：内容在商品 direct_content（CardID=0 无卡）
+		// 直髮交付（url/code 商品）：內容在商品 direct_content（CardID=0 無卡）
 		if d.DeliveredMode == orderdelivery.DeliveredModeDirect {
 			oi, e := client.OrderItem.Get(ctx, d.ItemID)
 			if e == nil && oi.FulfillmentType == orderitem.FulfillmentTypeReuse {
 				src, e := client.ProductDeliverySource.Get(ctx, oi.DeliverySourceID)
 				if e != nil || src.ProductID != oi.ProductID || src.SkuID != oi.SkuID || src.SubsiteID != o.SubsiteID {
-					return nil, fmt.Errorf("历史交付来源不可读取")
+					return nil, fmt.Errorf("歷史交付來源不可讀取")
 				}
 				plain, e := r.cipher.Open(src.Content, oi.ProductID, o.SubsiteID)
 				if e != nil {
-					return nil, fmt.Errorf("历史交付内容不可解密")
+					return nil, fmt.Errorf("歷史交付內容不可解密")
 				}
 				result.Items = append(result.Items, FetchItem{Content: string(plain), Masked: false})
 				continue
@@ -343,31 +343,31 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 			}
 			p, perr := client.Product.Get(ctx, productID)
 			if perr != nil || len(p.DirectContent) == 0 {
-				result.Items = append(result.Items, FetchItem{CardID: 0, Content: "****（直发内容未配置）", Masked: true})
+				result.Items = append(result.Items, FetchItem{CardID: 0, Content: "****（直髮內容未配置）", Masked: true})
 				continue
 			}
 			plain, derr := r.cipher.Open(p.DirectContent, p.ID, p.SubsiteID)
 			if derr != nil {
-				result.Items = append(result.Items, FetchItem{CardID: 0, Content: "****（解密失败）", Masked: true})
+				result.Items = append(result.Items, FetchItem{CardID: 0, Content: "****（解密失敗）", Masked: true})
 				continue
 			}
-			// 明文规则（2026-09-03 修订）：单号+查询密码取货始终明文——密码即门。
-			// 曾「首次明文、后续掩码」：支付成功页的自动取货即消耗首次，客户
-			// 再查只见尾 4 位，客诉率高（发卡平台通行做法均为凭密码可反复查看）。
+			// 明文規則（2026-09-03 修訂）：單號+查詢密碼取貨始終明文——密碼即門。
+			// 曾「首次明文、後續掩碼」：支付成功頁的自動取貨即消耗首次，客户
+			// 再查只見尾 4 位，客訴率高（髮卡平台通行做法均為憑密碼可反覆查看）。
 			result.Items = append(result.Items, FetchItem{CardID: 0, Content: string(plain), Masked: false})
 			continue
 		}
 
 		if tracking, ok := d.Logistics["tracking_no"].(string); ok && tracking != "" {
-			result.Items = append(result.Items, FetchItem{Content: "物流单号：" + tracking})
+			result.Items = append(result.Items, FetchItem{Content: "物流單號：" + tracking})
 			continue
 		}
 		// 取卡密
 		c, err := client.Card.Get(ctx, d.CardID)
 		if ent.IsNotFound(err) {
-			// 即删模式：卡密已物理删除——返回占位
+			// 即刪模式：卡密已物理刪除——返回佔位
 			result.Items = append(result.Items, FetchItem{
-				CardID: d.CardID, Content: "****（已删除）", Masked: true,
+				CardID: d.CardID, Content: "****（已刪除）", Masked: true,
 			})
 			continue
 		}
@@ -375,11 +375,11 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 			return nil, err
 		}
 
-		// 现场解密（不落库明文）；凭密码取货始终明文（同直发分支注释）
+		// 現場解密（不落庫明文）；憑密碼取貨始終明文（同直髮分支註釋）
 		plain, err := r.cipher.Open(c.Content, c.ProductID, c.SubsiteID)
 		if err != nil {
 			result.Items = append(result.Items, FetchItem{
-				CardID: c.ID, Content: "****（解密失败）", Masked: true,
+				CardID: c.ID, Content: "****（解密失敗）", Masked: true,
 			})
 			continue
 		}
@@ -406,7 +406,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 			it.SkuName = oi.SkuName
 		}
 	}
-	// 取货计数 + IP：每次取货均记（审计）；首次取货推进订单 → completed
+	// 取貨計數 + IP：每次取貨均記（審計）；首次取貨推進訂單 → completed
 	for _, d := range deliveries {
 		_, _ = client.OrderDelivery.UpdateOne(d).
 			SetFetchCount(d.FetchCount + 1).
@@ -440,7 +440,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 	return result, nil
 }
 
-// ProductNames 批量商品名（待发货面板展示用；缺失商品返回空串由调用方回落 #id）。
+// ProductNames 批量商品名（待發貨面板展示用；缺失商品返回空串由調用方回落 #id）。
 func (r *DeliveryRepoImpl) ProductNames(ctx context.Context, ids []uint64) (map[uint64]string, error) {
 	out := make(map[uint64]string, len(ids))
 	if len(ids) == 0 {
@@ -456,7 +456,7 @@ func (r *DeliveryRepoImpl) ProductNames(ctx context.Context, ids []uint64) (map[
 	return out, nil
 }
 
-// ListPending 按订单分页，包含待寄出的实体商品和待人工处理的交付项。
+// ListPending 按訂單分頁，包含待寄出的實體商品和待人工處理的交付項。
 func (r *DeliveryRepoImpl) ListPending(ctx context.Context, page, size int) ([]*ent.Order, bool, error) {
 	c := data.Client(ctx, r.data)
 	pos, err := c.ProcurementOrder.Query().Where(procurementorder.StatusIn(procurementorder.StatusManual, procurementorder.StatusRejected, procurementorder.StatusRefunding)).All(ctx)
@@ -487,7 +487,7 @@ func (r *DeliveryRepoImpl) ListPending(ctx context.Context, page, size int) ([]*
 	return rows, hasMore, nil
 }
 
-// ListDeliveries 交付记录列表。
+// ListDeliveries 交付記錄列表。
 func (r *DeliveryRepoImpl) ListDeliveries(ctx context.Context, orderNo string, page, size int, orderItemID ...uint64) ([]*ent.OrderDelivery, int64, error) {
 	client := data.Client(ctx, r.data)
 	q := client.OrderDelivery.Query().Order(ent.Desc(orderdelivery.FieldDeliveredAt), ent.Desc(orderdelivery.FieldID))
@@ -517,7 +517,7 @@ func (r *DeliveryRepoImpl) ListDeliveries(ctx context.Context, orderNo string, p
 func randomToken() string {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
-		panic("fulfillment: 随机数生成失败")
+		panic("fulfillment: 隨機數生成失敗")
 	}
 	return hex.EncodeToString(b)
 }
@@ -527,14 +527,14 @@ func hashToken(t string) string {
 	return hex.EncodeToString(h[:])
 }
 
-// ── （）上游采购交付出口 ─────────────────────────────
+// ── （）上游採購交付出口 ─────────────────────────────
 
 // AttachUpstreamDelivery 上游卡密交付（ 交付出口）：
-// 入参已是密文（procurement 侧 CardCipher.Seal 后透传），本层只负责：
-// 1. 写 cards（status=used，order_id 绑定——前台取货按 order 关联，与本地卡密同链路）
-// 2. 写 order_deliveries（card_id 引用 + 一次性令牌 + 掩码，无明文快照）
+// 入參已是密文（procurement 側 CardCipher.Seal 後透傳），本層只負責：
+// 1. 寫 cards（status=used，order_id 綁定——前台取貨按 order 關聯，與本地卡密同鏈路）
+// 2. 寫 order_deliveries（card_id 引用 + 一次性令牌 + 掩碼，無明文快照）
 //
-// 幂等：同 order_item 已交付直接返回（procurement 侧也以采购单状态机兜底）。
+// 冪等：同 order_item 已交付直接返回（procurement 側也以採購單狀態機兜底）。
 func (r *DeliveryRepoImpl) AttachUpstreamDelivery(ctx context.Context, orderID, itemID, productID uint64, items []port.UpstreamDeliveryItem) error {
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		return r.attachUpstreamDelivery(ctx, orderID, itemID, productID, items)
@@ -565,7 +565,7 @@ func (r *DeliveryRepoImpl) attachUpstreamDelivery(ctx context.Context, orderID, 
 			return true, nil
 		}
 		if counts[oi.ID] > 0 {
-			return false, fmt.Errorf("商品已部分交付，请转人工补发剩余数量")
+			return false, fmt.Errorf("商品已部分交付，請轉人工補發剩餘數量")
 		}
 		return false, nil
 	}
@@ -583,19 +583,19 @@ func (r *DeliveryRepoImpl) attachUpstreamDelivery(ctx context.Context, orderID, 
 		return err
 	}
 	if oi.CanceledQuantity > 0 || oi.FulfillmentStatus == "refunded" {
-		return fmt.Errorf("商品已取消，不能交付上游内容")
+		return fmt.Errorf("商品已取消，不能交付上游內容")
 	}
 	processing, err := client.RefundOrder.Query().Where(refundorder.OrderID(o.ID), refundorder.StatusEQ(refundorder.StatusProcessing)).Exist(ctx)
 	if err != nil {
 		return err
 	}
 	if processing {
-		return fmt.Errorf("退款处理中，请先核实退款结果")
+		return fmt.Errorf("退款處理中，請先核實退款結果")
 	}
 
 	deliveredAt := time.Now().UTC()
 	for _, it := range items {
-		// 上游卡密以「已用卡」形态入库（不进入可售库存池；防超卖语义不受影响）
+		// 上游卡密以「已用卡」形態入庫（不進入可售庫存池；防超賣語義不受影響）
 		c, err := client.Card.Create().
 			SetProductID(productID).
 			SetSubsiteID(o.SubsiteID).
@@ -616,7 +616,7 @@ func (r *DeliveryRepoImpl) attachUpstreamDelivery(ctx context.Context, orderID, 
 			SetCardID(c.ID).
 			SetDeliveryTokenHash(hashToken(token)).
 			SetDeliveredMode(orderdelivery.DeliveredModeStatus).
-			SetDeliveredBy(0). // auto（上游采购交付）
+			SetDeliveredBy(0). // auto（上游採購交付）
 			SetFetchCount(0).
 			SetDeliveredAt(deliveredAt).
 			Save(ctx)

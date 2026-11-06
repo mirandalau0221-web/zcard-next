@@ -34,24 +34,24 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreUserService 用户中心(前置）：注册/登录（user realm JWT）/我的信息。
-// 注册可带邀请码（ref=<user_id>）——三级分销归因链写入（环状拒绝）。
+// StoreUserService 用户中心(前置）：註冊/登錄（user realm JWT）/我的信息。
+// 註冊可帶邀請碼（ref=<user_id>）——三級分銷歸因鏈寫入（環狀拒絕）。
 type StoreUserServiceClient interface {
-	// Register 注册（username+password；invite_code 可选=上级 user_id）。
+	// Register 註冊（username+password；invite_code 可選=上級 user_id）。
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
-	// SendRegisterCode 发送注册验证码（通道：email|phone——按 security.register_method 校验）。
+	// SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
 	SendRegisterCode(ctx context.Context, in *SendRegisterCodeRequest, opts ...grpc.CallOption) (*SendRegisterCodeReply, error)
-	// Login 登录（返回 user realm JWT；username 混输：用户名/邮箱/手机号）。
+	// Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
-	// Me 我的信息（需登录）。
+	// Me 我的信息（需登錄）。
 	Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MeReply, error)
-	// ForgotPassword 发送找回密码验证码（：邮箱不存在同样成功——防枚举）。
+	// ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordReply, error)
-	// ResetPassword 验码重置密码（重置即登录——返回新 token；吊销全部 session）。
+	// ResetPassword 驗碼重置密碼（重置即登錄——返回新 token；吊銷全部 session）。
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordReply, error)
-	// ChangePassword 登录态改密（旧密码校验；吊销全部 session、响应携带新 token 保当前会话）。
+	// ChangePassword 登錄態改密（舊密碼校驗；吊銷全部 session、響應攜帶新 token 保當前會話）。
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordReply, error)
-	// UpdateProfile 修改资料（邮箱；唯一性校验）。
+	// UpdateProfile 修改資料（郵箱；唯一性校驗）。
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*MeReply, error)
 }
 
@@ -147,24 +147,24 @@ func (c *storeUserServiceClient) UpdateProfile(ctx context.Context, in *UpdatePr
 // All implementations must embed UnimplementedStoreUserServiceServer
 // for forward compatibility.
 //
-// StoreUserService 用户中心(前置）：注册/登录（user realm JWT）/我的信息。
-// 注册可带邀请码（ref=<user_id>）——三级分销归因链写入（环状拒绝）。
+// StoreUserService 用户中心(前置）：註冊/登錄（user realm JWT）/我的信息。
+// 註冊可帶邀請碼（ref=<user_id>）——三級分銷歸因鏈寫入（環狀拒絕）。
 type StoreUserServiceServer interface {
-	// Register 注册（username+password；invite_code 可选=上级 user_id）。
+	// Register 註冊（username+password；invite_code 可選=上級 user_id）。
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
-	// SendRegisterCode 发送注册验证码（通道：email|phone——按 security.register_method 校验）。
+	// SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
 	SendRegisterCode(context.Context, *SendRegisterCodeRequest) (*SendRegisterCodeReply, error)
-	// Login 登录（返回 user realm JWT；username 混输：用户名/邮箱/手机号）。
+	// Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
-	// Me 我的信息（需登录）。
+	// Me 我的信息（需登錄）。
 	Me(context.Context, *emptypb.Empty) (*MeReply, error)
-	// ForgotPassword 发送找回密码验证码（：邮箱不存在同样成功——防枚举）。
+	// ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordReply, error)
-	// ResetPassword 验码重置密码（重置即登录——返回新 token；吊销全部 session）。
+	// ResetPassword 驗碼重置密碼（重置即登錄——返回新 token；吊銷全部 session）。
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordReply, error)
-	// ChangePassword 登录态改密（旧密码校验；吊销全部 session、响应携带新 token 保当前会话）。
+	// ChangePassword 登錄態改密（舊密碼校驗；吊銷全部 session、響應攜帶新 token 保當前會話）。
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordReply, error)
-	// UpdateProfile 修改资料（邮箱；唯一性校验）。
+	// UpdateProfile 修改資料（郵箱；唯一性校驗）。
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*MeReply, error)
 	mustEmbedUnimplementedStoreUserServiceServer()
 }

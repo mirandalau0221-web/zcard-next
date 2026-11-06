@@ -1,12 +1,12 @@
 package migratev1
 
-// P4 交易域迁移：orders 五表合成（orders/order_items/order_amount_lines/
-// order_status_events）→ payments（聚合支付取首单+raw 保真）→ recharge_orders →
+// P4 交易域遷移：orders 五表合成（orders/order_items/order_amount_lines/
+// order_status_events）→ payments（聚合支付取首單+raw 保真）→ recharge_orders →
 // coupons → order_deliveries → cards.order_id 回填。
-// 映射规格《数据迁移工具开发计划》§5.5 与附录 A；对外单号 order_no 原样保留。
+// 映射規格《數據遷移工具開發計劃》§5.5 與附錄 A；對外單號 order_no 原樣保留。
 //
-// 金额不变量：total_amount = SUM(order_amount_lines.amount)（base_price 正、
-// coupon_discount 负、subsite_markup 正，按需合成）。
+// 金額不變量：total_amount = SUM(order_amount_lines.amount)（base_price 正、
+// coupon_discount 負、subsite_markup 正，按需合成）。
 
 import (
 	"context"
@@ -25,15 +25,15 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/rechargeorder"
 )
 
-// MigrateTrade P4 阶段。
+// MigrateTrade P4 階段。
 func (m *Migrator) MigrateTrade(ctx context.Context) error {
 	steps := []func(context.Context) error{
 		m.migrateOrders,
-		m.migrateRecharges, // 先于 payments（payments.recharge_order_id 引用）
+		m.migrateRecharges, // 先於 payments（payments.recharge_order_id 引用）
 		m.migratePayments,
 		m.migrateCoupons,
 		m.migrateOrderDeliveries,
-		m.backfillCardOrderIDs, // 最后：订单落库后回填 P3 置 0 的 cards.order_id
+		m.backfillCardOrderIDs, // 最後：訂單落庫後回填 P3 置 0 的 cards.order_id
 	}
 	for _, step := range steps {
 		if err := step(ctx); err != nil {
@@ -43,7 +43,7 @@ func (m *Migrator) MigrateTrade(ctx context.Context) error {
 	return nil
 }
 
-// mapOrderStatus 1.x (status, delivery_status) → 2.0 状态（附录 A）。
+// mapOrderStatus 1.x (status, delivery_status) → 2.0 狀態（附錄 A）。
 func mapOrderStatus(status, deliveryStatus string) string {
 	switch status {
 	case "paid":
@@ -107,7 +107,7 @@ func (m *Migrator) migrateOrders(ctx context.Context) error {
 		func(int64) error {
 			siteID, siteOK := m.subsiteFor(ctx, nullInt(merchant))
 			if !siteOK {
-				m.st.Record("orders", "skip") // 分站订单：P6 补
+				m.st.Record("orders", "skip") // 分站訂單：P6 補
 				return nil
 			}
 			if _, ok := m.IDs.Get(ctx, "orders", uint64(id)); ok {
@@ -124,7 +124,7 @@ func (m *Migrator) migrateOrders(ctx context.Context) error {
 			}
 			st := mapOrderStatus(status, deliveryStatus)
 
-			// extra：v1 快照保真 + query_password 提升为列
+			// extra：v1 快照保真 + query_password 提升為列
 			extraOut := map[string]any{}
 			if e := nullStr(extra); e != "" && json.Valid([]byte(e)) {
 				_ = json.Unmarshal([]byte(e), &extraOut)
@@ -172,7 +172,7 @@ func (m *Migrator) migrateOrders(ctx context.Context) error {
 				}
 			}
 			if queryHash != "" {
-				b.SetQueryPasswordHash(queryHash) // bcrypt 直迁（$2y$ 兼容已由 golden vector 钉死）
+				b.SetQueryPasswordHash(queryHash) // bcrypt 直遷（$2y$ 兼容已由 golden vector 釘死）
 			}
 			if bc := nullStr(baseCur); bc != "" {
 				b.SetBaseCurrency(bc)
@@ -207,14 +207,14 @@ func (m *Migrator) migrateOrders(ctx context.Context) error {
 				return err
 			} else if ok {
 				b.SetClosedAt(t)
-				b.SetExpiredAt(t) // 1.x 无独立 expired 概念，closed 即终态锚点
+				b.SetExpiredAt(t) // 1.x 無獨立 expired 概念，closed 即終態錨點
 			}
 			o, err := b.Save(ctx)
 			if err != nil {
 				return err
 			}
 
-			// order_items：以 1.x order_items 为准（单商品模型恒 1 行）
+			// order_items：以 1.x order_items 為準（單商品模型恆 1 行）
 			qty := nullInt(quantity)
 			if qty <= 0 {
 				qty = 1
@@ -237,22 +237,22 @@ func (m *Migrator) migrateOrders(ctx context.Context) error {
 				SetFulfillmentStatus(fulfillStatus).
 				Save(ctx)
 			if err != nil {
-				return fmt.Errorf("order_items 合成失败: %w", err)
+				return fmt.Errorf("order_items 合成失敗: %w", err)
 			}
 			if !pidOK {
-				m.RW.AddError("orders", uint64(id), "商品未迁移（分站？），item.product_id=0")
+				m.RW.AddError("orders", uint64(id), "商品未遷移（分站？），item.product_id=0")
 			}
 
-			// amount_lines（恒等式 total = SUM(lines)）：
-			// base_price = amount + discount - subsiteMarkup；coupon_discount 为负；
-			// subsite_markup 仅分站单合成（1.x subsite_profit 是利润：分站售价=基础价+利润，
-			// 拆 base=amount-profit / markup=+profit；主站单利润只进 orders.subsite_profit 列）
+			// amount_lines（恆等式 total = SUM(lines)）：
+			// base_price = amount + discount - subsiteMarkup；coupon_discount 為負；
+			// subsite_markup 僅分站單合成（1.x subsite_profit 是利潤：分站售價=基礎價+利潤，
+			// 拆 base=amount-profit / markup=+profit；主站單利潤只進 orders.subsite_profit 列）
 			subsiteMarkup := int64(0)
 			if (siteID > 0 || nullInt(subsiteID) > 0) && subsiteProfit > 0 {
 				subsiteMarkup = subsiteProfit
 			} else if subsiteProfit > 0 {
 				m.RW.AddError("orders", uint64(id),
-					fmt.Sprintf("主站订单带 subsite_profit=%d（仅记入 orders 列，不参与金额行）", subsiteProfit))
+					fmt.Sprintf("主站訂單帶 subsite_profit=%d（僅記入 orders 列，不參與金額行）", subsiteProfit))
 			}
 			lines := []*ent.OrderAmountLineCreate{
 				m.Client.OrderAmountLine.Create().
@@ -279,10 +279,10 @@ func (m *Migrator) migrateOrders(ctx context.Context) error {
 					SetSeq(3))
 			}
 			if _, err := m.Client.OrderAmountLine.CreateBulk(lines...).Save(ctx); err != nil {
-				return fmt.Errorf("amount_lines 合成失败: %w", err)
+				return fmt.Errorf("amount_lines 合成失敗: %w", err)
 			}
 
-			// status_events：created/paid/closed 三个锚点（operator=system）
+			// status_events：created/paid/closed 三個錨點（operator=system）
 			events := []*ent.OrderStatusEventCreate{
 				m.Client.OrderStatusEvent.Create().
 					SetOrderID(o.ID).
@@ -311,7 +311,7 @@ func (m *Migrator) migrateOrders(ctx context.Context) error {
 					SetCreatedAt(t))
 			}
 			if _, err := m.Client.OrderStatusEvent.CreateBulk(events...).Save(ctx); err != nil {
-				return fmt.Errorf("status_events 回填失败: %w", err)
+				return fmt.Errorf("status_events 回填失敗: %w", err)
 			}
 
 			if _, err := m.IDs.Put(ctx, m.Client, "orders", uint64(id), o.ID); err != nil {
@@ -341,8 +341,8 @@ func pidOrZero(id uint64, ok bool) uint64 {
 	return id
 }
 
-// migratePayments 1.x payments → payments。聚合支付（order_ids JSON 数组）：
-// order_id 取首单，完整数组保 raw（已确认决策）。
+// migratePayments 1.x payments → payments。聚合支付（order_ids JSON 數組）：
+// order_id 取首單，完整數組保 raw（已確認決策）。
 func (m *Migrator) migratePayments(ctx context.Context) error {
 	var (
 		id                           int64
@@ -382,7 +382,7 @@ func (m *Migrator) migratePayments(ctx context.Context) error {
 			if no := nullStr(channelOrderNoNull); no != "" {
 				b.SetChannelOrderNo(no)
 			}
-			// 聚合支付：首单关联 + raw 保真
+			// 聚合支付：首單關聯 + raw 保真
 			if oid := nullInt(orderID); oid > 0 {
 				if newO, ok := m.IDs.Get(ctx, "orders", uint64(oid)); ok {
 					b.SetOrderID(newO)
@@ -393,7 +393,7 @@ func (m *Migrator) migratePayments(ctx context.Context) error {
 					if newO, ok := m.IDs.Get(ctx, "orders", uint64(ids[0])); ok {
 						b.SetOrderID(newO)
 						m.RW.AddError("payments", uint64(id),
-							fmt.Sprintf("聚合支付关联 %d 单，已取首单（完整清单见 raw）", len(ids)))
+							fmt.Sprintf("聚合支付關聯 %d 單，已取首單（完整清單見 raw）", len(ids)))
 					}
 				}
 			}
@@ -405,8 +405,8 @@ func (m *Migrator) migratePayments(ctx context.Context) error {
 			if cc := nullStr(chargedCur); cc != "" {
 				b.SetChargedCurrency(cc)
 			}
-			// 1.x charged_amount 是实收币种最小单位 → 2.0 charged_units；
-			// charged_amount（基础货币实收分）取应收近似，差异由对账报告暴露
+			// 1.x charged_amount 是實收幣種最小單位 → 2.0 charged_units；
+			// charged_amount（基礎貨幣實收分）取應收近似，差異由對賬報告暴露
 			if ca := nullInt(chargedAmount); ca != 0 {
 				b.SetChargedUnits(ca).
 					SetChargedAmount(amount)
@@ -438,7 +438,7 @@ func (m *Migrator) migratePayments(ctx context.Context) error {
 	)
 }
 
-// migrateRecharges 1.x recharges → recharge_orders（1.x 单号无 2.0 列，进报告）。
+// migrateRecharges 1.x recharges → recharge_orders（1.x 單號無 2.0 列，進報告）。
 func (m *Migrator) migrateRecharges(ctx context.Context) error {
 	var (
 		id, userID, amount int64
@@ -483,7 +483,7 @@ func (m *Migrator) migrateRecharges(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			m.RW.AddError("recharges", uint64(id), "1.x 单号 "+rechargeNo+" 无 2.0 列（充值单新体系）")
+			m.RW.AddError("recharges", uint64(id), "1.x 單號 "+rechargeNo+" 無 2.0 列（充值單新體系）")
 			if _, err := m.IDs.Put(ctx, m.Client, "recharges", uint64(id), r.ID); err != nil {
 				return err
 			}
@@ -493,7 +493,7 @@ func (m *Migrator) migrateRecharges(ctx context.Context) error {
 	)
 }
 
-// migrateCoupons 1.x coupons → coupons（percent ×100 万分比；门槛进 scope meta）。
+// migrateCoupons 1.x coupons → coupons（percent ×100 萬分比；門檻進 scope meta）。
 func (m *Migrator) migrateCoupons(ctx context.Context) error {
 	var (
 		id, minAmount                int64
@@ -527,7 +527,7 @@ func (m *Migrator) migrateCoupons(ctx context.Context) error {
 			}
 			v := value
 			if ctype == "percent" {
-				v = value * 100 // 百分比整数 → 万分比
+				v = value * 100 // 百分比整數 → 萬分比
 			}
 			scope := map[string]any{}
 			if pid := nullInt(productID); pid > 0 {
@@ -541,7 +541,7 @@ func (m *Migrator) migrateCoupons(ctx context.Context) error {
 				}
 			}
 			if minAmount > 0 {
-				scope["min_amount"] = minAmount // 2.0 无独立门槛列，scope 保真
+				scope["min_amount"] = minAmount // 2.0 無獨立門檻列，scope 保真
 			}
 			name := nullStr(note)
 			if name == "" {
@@ -596,7 +596,7 @@ func (m *Migrator) migrateCoupons(ctx context.Context) error {
 }
 
 // migrateOrderDeliveries 1.x order_deliveries → 2.0 order_deliveries。
-// card_id 定位：P3 回填映射（v1id_maps order_deliveries）或源库 (product, order) 反查。
+// card_id 定位：P3 回填映射（v1id_maps order_deliveries）或源庫 (product, order) 反查。
 func (m *Migrator) migrateOrderDeliveries(ctx context.Context) error {
 	var (
 		id                 int64
@@ -616,10 +616,10 @@ func (m *Migrator) migrateOrderDeliveries(ctx context.Context) error {
 			}
 			newO, ok := m.IDs.Get(ctx, "orders", uint64(nullInt(orderID)))
 			if !ok {
-				m.st.Record("order_deliveries", "skip") // 分站订单：P6
+				m.st.Record("order_deliveries", "skip") // 分站訂單：P6
 				return nil
 			}
-			// card_id：优先 P3 回填映射；否则源库按 (product, order) 反查 1.x 卡
+			// card_id：優先 P3 回填映射；否則源庫按 (product, order) 反查 1.x 卡
 			var newCardID uint64
 			if cid, ok := m.IDs.Get(ctx, "order_deliveries", uint64(id)); ok {
 				newCardID = cid
@@ -637,20 +637,20 @@ func (m *Migrator) migrateOrderDeliveries(ctx context.Context) error {
 				}
 			}
 			if newCardID == 0 {
-				m.RW.AddError("order_deliveries", uint64(id), "无法定位 card_id（卡未迁或分站），该交付记录跳过")
+				m.RW.AddError("order_deliveries", uint64(id), "無法定位 card_id（卡未遷或分站），該交付記錄跳過")
 				return nil
 			}
-			// item：该订单首 item（1.x 单商品模型）
+			// item：該訂單首 item（1.x 單商品模型）
 			item, err := m.Client.OrderItem.Query().Where(orderitem.OrderIDEQ(newO)).First(ctx)
 			if err != nil {
-				return fmt.Errorf("订单 %d 无 item: %w", newO, err)
+				return fmt.Errorf("訂單 %d 無 item: %w", newO, err)
 			}
 			d, err := m.Client.OrderDelivery.Create().
 				SetOrderID(newO).
 				SetItemID(item.ID).
 				SetCardID(newCardID).
 				SetDeliveredMode(orderdelivery.DeliveredMode(deliveredMode)).
-				SetDeliveryTokenHash(""). // 1.x 无取货令牌（历史单走订单查询密码取货）
+				SetDeliveryTokenHash(""). // 1.x 無取貨令牌（歷史單走訂單查詢密碼取貨）
 				SetFetchCount(1).
 				Save(ctx)
 			if err != nil {
@@ -706,7 +706,7 @@ func (m *Migrator) backfillCardOrderIDs(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		if cardRow.OrderID != 0 { // 幂等
+		if cardRow.OrderID != 0 { // 冪等
 			t.SkippedExists++
 			continue
 		}

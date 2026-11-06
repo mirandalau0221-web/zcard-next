@@ -60,13 +60,13 @@ func MovePhysicalStock(ctx context.Context, d *Data, site, pid, sku, oid uint64,
 		return e
 	}
 	if n != 1 {
-		return fmt.Errorf("order.INSUFFICIENT_STOCK: 实物库存不足或规格不存在")
+		return fmt.Errorf("order.INSUFFICIENT_STOCK: 實物庫存不足或規格不存在")
 	}
 	return c.PhysicalStockMovement.Create().SetSubsiteID(site).SetProductID(pid).SetSkuID(sku).SetOrderID(oid).SetDelta(delta).SetReference(ref).SetReason(reason).Exec(ctx)
 }
 func AdjustPhysicalStock(ctx context.Context, d *Data, p *ent.Product, sku uint64, target int64) error {
 	if target < 0 || target > 100000000 {
-		return fmt.Errorf("实物可售库存必须在0至一亿之间")
+		return fmt.Errorf("實物可售庫存必須在0至一億之間")
 	}
 	old := p.PhysicalStock
 	if sku == 0 && target != old {
@@ -75,7 +75,7 @@ func AdjustPhysicalStock(ctx context.Context, d *Data, p *ent.Product, sku uint6
 			return e
 		}
 		if hasSKU {
-			return fmt.Errorf("多规格实体商品请在规格中调整库存，不能修改商品级库存")
+			return fmt.Errorf("多規格實體商品請在規格中調整庫存，不能修改商品級庫存")
 		}
 	}
 	if sku != 0 {
@@ -85,7 +85,7 @@ func AdjustPhysicalStock(ctx context.Context, d *Data, p *ent.Product, sku uint6
 		}
 		old = s.PhysicalStock
 	}
-	return MovePhysicalStock(ctx, d, p.SubsiteID, p.ID, sku, 0, target-old, fmt.Sprintf("adjust:%d:%d:%d", p.ID, sku, p.LockVersion), "管理员调整可售库存")
+	return MovePhysicalStock(ctx, d, p.SubsiteID, p.ID, sku, 0, target-old, fmt.Sprintf("adjust:%d:%d:%d", p.ID, sku, p.LockVersion), "管理員調整可售庫存")
 }
 func ReleasePhysicalStock(ctx context.Context, d *Data, oid uint64, reason string) error {
 	rows, e := Client(ctx, d).OrderItem.Query().Where(orderitem.OrderID(oid), orderitem.GoodsType("physical")).All(ctx)

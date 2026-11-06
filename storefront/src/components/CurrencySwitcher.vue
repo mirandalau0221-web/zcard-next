@@ -1,7 +1,7 @@
 <template>
-  <!-- 顶部货币切换器（多币种才显示；展示层换算——结算仍以站点基准货币） -->
+  <!-- 頂部貨幣切換器（多幣種才顯示；展示層換算——結算仍以站點基準貨幣） -->
   <div v-if="options.length > 1" ref="rootEl" class="currency-switch">
-    <button class="cs-btn" type="button" :title="$t('切换展示货币（结算以基准货币）')" @click="open = !open">
+    <button class="cs-btn" type="button" :title="$t('切換展示貨幣（結算以基準貨幣）')" @click="open = !open">
       <span class="cs-symbol">{{ current.symbol }}</span>
       <span class="cs-code">{{ current.code }}</span>
       <span class="cs-caret">▾</span>

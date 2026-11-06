@@ -1,15 +1,15 @@
 package supply
 
-// 定时调度器（ S3）：cron 每分钟扫描 active 连接，按 settings.schedule 派发
-// collect/price/status 三类同步任务。
+// 定時調度器（ S3）：cron 每分鐘掃描 active 連接，按 settings.schedule 派發
+// collect/price/status 三類同步任務。
 //
-// - 到期判定：enabled && interval>0 && 当前时间在窗口内 && 距锚点 ≥ 间隔
-// - 熔断冷却中的渠道跳过（rate_limit_until 列；节奏器半开探测由出站路径负责）
-// - 防重入：同连接存在 pending/processing 任务时本轮跳过（任务状态机兜底）
-// - 锚点在派发时即回写（宁可晚一轮也绝不密集双发；任务失败下轮重试）
-// - 看门狗：心跳超 10 分钟的 processing 任务置 failed（防僵死饿死调度）
+// - 到期判定：enabled && interval>0 && 當前時間在窗口內 && 距錨點 ≥ 間隔
+// - 熔斷冷卻中的渠道跳過（rate_limit_until 列；節奏器半開探測由出站路徑負責）
+// - 防重入：同連接存在 pending/processing 任務時本輪跳過（任務狀態機兜底）
+// - 錨點在派發時即回寫（寧可晚一輪也絕不密集雙發；任務失敗下輪重試）
+// - 看門狗：心跳超 10 分鐘的 processing 任務置 failed（防僵死餓死調度）
 //
-// settings.schedule 结构（界面可编辑，对齐 1.x SupplyScheduleService）：
+// settings.schedule 結構（界面可編輯，對齊 1.x SupplyScheduleService）：
 //
 //	{
 // "enabled": true, "request_delay": 1, "stock_concurrency": 3,
@@ -19,7 +19,7 @@ package supply
 // "status": {"enabled":true,"interval":60,"windows":[]}
 //	}
 //
-// windows 元素 {"start":"09:00","end":"18:00"}；空 = 全天；start>end 视为跨午夜。
+// windows 元素 {"start":"09:00","end":"18:00"}；空 = 全天；start>end 視為跨午夜。
 
 import (
 	"context"
@@ -33,48 +33,48 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/supplysynctask"
 )
 
-// 调度参数。
+// 調度參數。
 const (
-	schedStaleAfter = 10 * time.Minute // 看门狗：心跳超时阈值
+	schedStaleAfter = 10 * time.Minute // 看門狗：心跳超時閾值
 )
 
-// scope 默认间隔（分钟；对齐 1.x DEFAULT_INTERVALS——scope 键存在但缺 interval 时用）。
+// scope 默認間隔（分鐘；對齊 1.x DEFAULT_INTERVALS——scope 鍵存在但缺 interval 時用）。
 var scopeDefaultInterval = map[string]int{
 	ScopeCollect: 360,
 	ScopePrice:   30,
 	ScopeStatus:  60,
 }
 
-// timeWindow 执行时间窗（HH:MM；start>end 跨午夜）。
+// timeWindow 執行時間窗（HH:MM；start>end 跨午夜）。
 type timeWindow struct{ Start, End string }
 
-// scopePlan 单 scope 计划。
+// scopePlan 單 scope 計劃。
 type scopePlan struct {
 	Enabled  bool
-	Interval int    // 分钟
-	Mode     string // collect 专用：full | incremental
+	Interval int    // 分鐘
+	Mode     string // collect 專用：full | incremental
 	Windows  []timeWindow
 }
 
-// scheduleConfig schedule 整体配置。
+// scheduleConfig schedule 整體配置。
 type scheduleConfig struct {
 	Enabled bool
 	Scopes  map[string]scopePlan
 }
 
-// Scheduler 定时调度器（cron 入口 Scan / ReapStaleTasks）。
+// Scheduler 定時調度器（cron 入口 Scan / ReapStaleTasks）。
 type Scheduler struct {
 	repo *SupplyRepoImpl
 	sync *SyncService
 	log  *slog.Logger
 }
 
-// NewScheduler 构造。
+// NewScheduler 構造。
 func NewScheduler(repo *SupplyRepoImpl, sync *SyncService, log *slog.Logger) *Scheduler {
 	return &Scheduler{repo: repo, sync: sync, log: log}
 }
 
-// Scan 每分钟扫描派发（cron；单轮耗时受连接数约束，失败仅日志不 panic）。
+// Scan 每分鐘掃描派發（cron；單輪耗時受連接數約束，失敗僅日誌不 panic）。
 func (s *Scheduler) Scan(ctx context.Context) {
 	conns, err := s.repo.ListActiveConnections(ctx)
 	if err != nil {
@@ -93,7 +93,7 @@ func (s *Scheduler) Scan(ctx context.Context) {
 		if !cfg.Enabled && !hasAuto {
 			continue
 		}
-		// 熔断冷却中：本轮跳过（到期后半开探测成功后自然恢复）
+		// 熔斷冷卻中：本輪跳過（到期後半開探測成功後自然恢復）
 		if !conn.RateLimitUntil.IsZero() && time.Now().UTC().Before(conn.RateLimitUntil) {
 			continue
 		}
@@ -101,7 +101,7 @@ func (s *Scheduler) Scan(ctx context.Context) {
 			s.log.Warn("scheduler.has_running_failed", "connection_id", conn.ID, "err", err)
 			continue
 		} else if has {
-			continue // 防重入：上轮任务未完结
+			continue // 防重入：上輪任務未完結
 		}
 		if hasAuto && s.dispatchIfDue(ctx, conn, scopePlan{Enabled: true, Interval: 5, Mode: "full"}, ScopeListing) {
 			continue
@@ -111,13 +111,13 @@ func (s *Scheduler) Scan(ctx context.Context) {
 		}
 		for _, scope := range []string{ScopeCollect, ScopePrice, ScopeStatus} {
 			if s.dispatchIfDue(ctx, conn, cfg.Scopes[scope], scope) {
-				break // 每连接每轮至多派发一个（错峰；下轮继续）
+				break // 每連接每輪至多派發一個（錯峯；下輪繼續）
 			}
 		}
 	}
 }
 
-// dispatchIfDue 到期则派发；返回是否已派发。
+// dispatchIfDue 到期則派發；返回是否已派發。
 func (s *Scheduler) dispatchIfDue(ctx context.Context, conn *ent.SupplyConnection, plan scopePlan, scope string) bool {
 	if !plan.Enabled || plan.Interval <= 0 {
 		return false
@@ -131,7 +131,7 @@ func (s *Scheduler) dispatchIfDue(ctx context.Context, conn *ent.SupplyConnectio
 	}
 	mode := plan.Mode
 	if mode == "" {
-		mode = "incremental" // 首跑锚点为零 → 引擎自动全量
+		mode = "incremental" // 首跑錨點為零 → 引擎自動全量
 	}
 	task, err := s.repo.CreateSyncTask(ctx, conn.ID, mode, scope, false)
 	if err != nil {
@@ -148,7 +148,7 @@ func (s *Scheduler) dispatchIfDue(ctx context.Context, conn *ent.SupplyConnectio
 	return true
 }
 
-// ReapStaleTasks 看门狗：心跳超时 的 processing 任务置 failed（防僵死）。
+// ReapStaleTasks 看門狗：心跳超時 的 processing 任務置 failed（防僵死）。
 func (s *Scheduler) ReapStaleTasks(ctx context.Context) {
 	rows, err := s.repo.ListStaleProcessing(ctx, time.Now().UTC().Add(-schedStaleAfter))
 	if err != nil {
@@ -159,7 +159,7 @@ func (s *Scheduler) ReapStaleTasks(ctx context.Context) {
 		if t.Scope == ScopeImport {
 			continue
 		} // durable item checkpoints resume through ResumeTasks
-		reason := "任务心跳超时（>" + schedStaleAfter.String() + "），看门狗回收——可手动重跑"
+		reason := "任務心跳超時（>" + schedStaleAfter.String() + "），看門狗回收——可手動重跑"
 		if err := s.repo.FinishTask(ctx, t.ID, supplysynctask.StatusFailed, "STALE_HEARTBEAT", reason); err != nil {
 			s.log.Warn("scheduler.reap_failed", "task_id", t.ID, "err", err)
 			continue
@@ -168,7 +168,7 @@ func (s *Scheduler) ReapStaleTasks(ctx context.Context) {
 	}
 }
 
-// scopeAnchor scope → 调度锚点列（collect 兼容旧列 last_synced_at）。
+// scopeAnchor scope → 調度錨點列（collect 兼容舊列 last_synced_at）。
 func scopeAnchor(conn *ent.SupplyConnection, scope string) time.Time {
 	switch scope {
 	case ScopeCollect:
@@ -184,7 +184,7 @@ func scopeAnchor(conn *ent.SupplyConnection, scope string) time.Time {
 	return time.Time{}
 }
 
-// loadScheduleConfig 解析 settings.schedule（结构不存在 = 定时调度关闭）。
+// loadScheduleConfig 解析 settings.schedule（結構不存在 = 定時調度關閉）。
 func loadScheduleConfig(conn *ent.SupplyConnection) scheduleConfig {
 	sched, _ := conn.Settings["schedule"].(map[string]any)
 	cfg := scheduleConfig{Scopes: map[string]scopePlan{}}
@@ -195,14 +195,14 @@ func loadScheduleConfig(conn *ent.SupplyConnection) scheduleConfig {
 	for _, scope := range []string{ScopeCollect, ScopePrice, ScopeStatus} {
 		raw, ok := sched[scope].(map[string]any)
 		if !ok {
-			continue // scope 未配置 = 不启用（显式为准）
+			continue // scope 未配置 = 不啓用（顯式為準）
 		}
 		cfg.Scopes[scope] = parseScopePlan(raw, scope)
 	}
 	return cfg
 }
 
-// parseScopePlan 单 scope 配置归一化（interval 缺省用 scope 默认间隔）。
+// parseScopePlan 單 scope 配置歸一化（interval 缺省用 scope 默認間隔）。
 func parseScopePlan(raw map[string]any, scope string) scopePlan {
 	plan := scopePlan{Mode: "incremental"}
 	plan.Enabled, _ = raw["enabled"].(bool)
@@ -238,7 +238,7 @@ func parseScopePlan(raw map[string]any, scope string) scopePlan {
 	return plan
 }
 
-// inWindows 当前时间是否落在任一窗口内（空 = 全天；start>end 跨午夜）。
+// inWindows 當前時間是否落在任一窗口內（空 = 全天；start>end 跨午夜）。
 func inWindows(windows []timeWindow, now time.Time) bool {
 	if len(windows) == 0 {
 		return true
@@ -264,7 +264,7 @@ func inWindows(windows []timeWindow, now time.Time) bool {
 	return false
 }
 
-// parseHHMM "HH:MM" → 当日分钟数。
+// parseHHMM "HH:MM" → 當日分鐘數。
 func parseHHMM(s string) (int, bool) {
 	parts := strings.Split(s, ":")
 	if len(parts) != 2 {

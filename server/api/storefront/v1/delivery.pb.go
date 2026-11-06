@@ -151,7 +151,7 @@ func (x *FetchDeliveryReply) GetFetchCount() int32 {
 	return 0
 }
 
-// DeliveryItem 交付项（明文只在首次取货返回；之后掩码）。
+// DeliveryItem 交付項（明文只在首次取貨返回；之後掩碼）。
 type DeliveryItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DeliveryId    uint64                 `protobuf:"varint,4,opt,name=delivery_id,json=deliveryId,proto3" json:"delivery_id,omitempty"`

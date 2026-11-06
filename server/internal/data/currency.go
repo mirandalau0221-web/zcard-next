@@ -31,7 +31,7 @@ func BaseCurrency(ctx context.Context, d *Data) (string, error) {
 func parseBaseCurrency(value json.RawMessage) (string, error) {
 	var code string
 	if json.Unmarshal(value, &code) != nil || !currencyCodePattern.MatchString(code) {
-		return "", fmt.Errorf("settings.INVALID_BASE_CURRENCY: 基础货币配置无效")
+		return "", fmt.Errorf("settings.INVALID_BASE_CURRENCY: 基礎貨幣配置無效")
 	}
 	return code, nil
 }

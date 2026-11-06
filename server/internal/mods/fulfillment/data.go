@@ -1,3 +1,3 @@
 package fulfillment
 
-// 交付仓储声明（实现见 data_fulfill.go / data_service.go）。
+// 交付倉儲聲明（實現見 data_fulfill.go / data_service.go）。

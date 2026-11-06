@@ -6,9 +6,9 @@ export function displayPrecision(value: unknown): number {
 
 function decimalParts(value: string): { numerator: bigint; denominator: bigint } {
   const match = /^([+-]?)(\d+)(?:\.(\d+))?(?:e([+-]?\d+))?$/i.exec(value.trim());
-  if (!match || value.length > 100) throw new RangeError('金额格式不正确');
+  if (!match || value.length > 100) throw new RangeError('金額格式不正確');
   const exponent = Number(match[4] || 0) - (match[3]?.length || 0);
-  if (!Number.isInteger(exponent) || Math.abs(exponent) > 30) throw new RangeError('金额超出范围');
+  if (!Number.isInteger(exponent) || Math.abs(exponent) > 30) throw new RangeError('金額超出範圍');
   let numerator = BigInt(match[2] + (match[3] || '')) * (match[1] === '-' ? -1n : 1n);
   let denominator = 1n;
   if (exponent >= 0) numerator *= 10n ** BigInt(exponent);
@@ -19,9 +19,9 @@ function decimalParts(value: string): { numerator: bigint; denominator: bigint }
 export function toCents(value: number | string): number {
   const { numerator, denominator } = decimalParts(String(value));
   const scaled = numerator * 100n;
-  if (scaled % denominator !== 0n) throw new RangeError('金额最多精确到分（小数点后两位）');
+  if (scaled % denominator !== 0n) throw new RangeError('金額最多精確到分（小數點後兩位）');
   const cents = Number(scaled / denominator);
-  if (!Number.isSafeInteger(cents)) throw new RangeError('金额超出范围');
+  if (!Number.isSafeInteger(cents)) throw new RangeError('金額超出範圍');
   return cents;
 }
 

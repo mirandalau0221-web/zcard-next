@@ -67,22 +67,22 @@ func (x *ChannelList) GetChannels() []*Channel {
 	return nil
 }
 
-// Channel 渠道（config 为 AES-GCM 加密凭据，列表返回 ****）。
+// Channel 渠道（config 為 AES-GCM 加密憑據，列表返回 ****）。
 type Channel struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Id                   uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name                 string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Code                 string                 `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
 	Driver               string                 `protobuf:"bytes,4,opt,name=driver,proto3" json:"driver,omitempty"`
-	ConfigJson           string                 `protobuf:"bytes,5,opt,name=config_json,json=configJson,proto3" json:"config_json,omitempty"` // 脱敏后
+	ConfigJson           string                 `protobuf:"bytes,5,opt,name=config_json,json=configJson,proto3" json:"config_json,omitempty"` // 脱敏後
 	Fee                  int64                  `protobuf:"varint,6,opt,name=fee,proto3" json:"fee,omitempty"`
 	FeeType              string                 `protobuf:"bytes,7,opt,name=fee_type,json=feeType,proto3" json:"fee_type,omitempty"`
 	Enabled              bool                   `protobuf:"varint,8,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	Sort                 int32                  `protobuf:"varint,9,opt,name=sort,proto3" json:"sort,omitempty"`
-	ConfiguredFields     []string               `protobuf:"bytes,10,rep,name=configured_fields,json=configuredFields,proto3" json:"configured_fields,omitempty"` // 已配置字段名（仅名不显值——脱敏）
-	CallbackUrl          string                 `protobuf:"bytes,11,opt,name=callback_url,json=callbackUrl,proto3" json:"callback_url,omitempty"`                // 回调地址（站点 URL 拼接；未配置站点时为相对路径）
-	Icon                 string                 `protobuf:"bytes,12,opt,name=icon,proto3" json:"icon,omitempty"`                                                 // 渠道自定义图标（素材库 URL，空=回落内置徽标）
-	MethodsJson          string                 `protobuf:"bytes,13,opt,name=methods_json,json=methodsJson,proto3" json:"methods_json,omitempty"`                // 支付方式列表 JSON [{code,name,icon,enabled,params}]（空=单方式渠道）
+	ConfiguredFields     []string               `protobuf:"bytes,10,rep,name=configured_fields,json=configuredFields,proto3" json:"configured_fields,omitempty"` // 已配置字段名（僅名不顯值——脱敏）
+	CallbackUrl          string                 `protobuf:"bytes,11,opt,name=callback_url,json=callbackUrl,proto3" json:"callback_url,omitempty"`                // 回調地址（站點 URL 拼接；未配置站點時為相對路徑）
+	Icon                 string                 `protobuf:"bytes,12,opt,name=icon,proto3" json:"icon,omitempty"`                                                 // 渠道自定義圖標（素材庫 URL，空=回落內置徽標）
+	MethodsJson          string                 `protobuf:"bytes,13,opt,name=methods_json,json=methodsJson,proto3" json:"methods_json,omitempty"`                // 支付方式列表 JSON [{code,name,icon,enabled,params}]（空=單方式渠道）
 	AllowPurchase        *bool                  `protobuf:"varint,14,opt,name=allow_purchase,json=allowPurchase,proto3,oneof" json:"allow_purchase,omitempty"`
 	AllowMemberRecharge  *bool                  `protobuf:"varint,15,opt,name=allow_member_recharge,json=allowMemberRecharge,proto3,oneof" json:"allow_member_recharge,omitempty"`
 	AllowSupplyRecharge  *bool                  `protobuf:"varint,16,opt,name=allow_supply_recharge,json=allowSupplyRecharge,proto3,oneof" json:"allow_supply_recharge,omitempty"`
@@ -264,7 +264,7 @@ func (x *Channel) GetRecommendDescription() string {
 	return ""
 }
 
-// DriverList 驱动元数据列表。
+// DriverList 驅動元數據列表。
 type DriverList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Drivers       []*Driver              `protobuf:"bytes,1,rep,name=drivers,proto3" json:"drivers,omitempty"`
@@ -309,13 +309,13 @@ func (x *DriverList) GetDrivers() []*Driver {
 	return nil
 }
 
-// Driver 渠道驱动元数据（ListDrivers）。
+// Driver 渠道驅動元數據（ListDrivers）。
 type Driver struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`               // 驱动码（= adapter Type）
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`               // 显示名
-	Icon          string                 `protobuf:"bytes,3,opt,name=icon,proto3" json:"icon,omitempty"`               // 品牌图标标识（前端图标库映射）
-	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"` // 说明（适用场景/收款币种）
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`               // 驅動碼（= adapter Type）
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`               // 顯示名
+	Icon          string                 `protobuf:"bytes,3,opt,name=icon,proto3" json:"icon,omitempty"`               // 品牌圖標標識（前端圖標庫映射）
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"` // 説明（適用場景/收款幣種）
 	Fields        []*ConfigField         `protobuf:"bytes,5,rep,name=fields,proto3" json:"fields,omitempty"`           // 配置字段 schema
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -386,7 +386,7 @@ func (x *Driver) GetFields() []*ConfigField {
 	return nil
 }
 
-// ConfigField 配置字段 schema（前端按 type 动态渲染表单）。
+// ConfigField 配置字段 schema（前端按 type 動態渲染表單）。
 type ConfigField struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
@@ -394,10 +394,10 @@ type ConfigField struct {
 	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"` // text | password | textarea | select | number | switch
 	Required      bool                   `protobuf:"varint,4,opt,name=required,proto3" json:"required,omitempty"`
 	Placeholder   string                 `protobuf:"bytes,5,opt,name=placeholder,proto3" json:"placeholder,omitempty"`
-	Help          string                 `protobuf:"bytes,6,opt,name=help,proto3" json:"help,omitempty"`            // 字段帮助文案
-	Sensitive     bool                   `protobuf:"varint,7,opt,name=sensitive,proto3" json:"sensitive,omitempty"` // 敏感字段：编辑时留空=保持原值，不回显
-	Dynamic       bool                   `protobuf:"varint,8,opt,name=dynamic,proto3" json:"dynamic,omitempty"`     // 选项动态加载（FieldOptions；失败回落 options）
-	Multiple      bool                   `protobuf:"varint,9,opt,name=multiple,proto3" json:"multiple,omitempty"`   // 多选（保存为数组；epusdt token/network——占位订单模式）
+	Help          string                 `protobuf:"bytes,6,opt,name=help,proto3" json:"help,omitempty"`            // 字段幫助文案
+	Sensitive     bool                   `protobuf:"varint,7,opt,name=sensitive,proto3" json:"sensitive,omitempty"` // 敏感字段：編輯時留空=保持原值，不回顯
+	Dynamic       bool                   `protobuf:"varint,8,opt,name=dynamic,proto3" json:"dynamic,omitempty"`     // 選項動態加載（FieldOptions；失敗回落 options）
+	Multiple      bool                   `protobuf:"varint,9,opt,name=multiple,proto3" json:"multiple,omitempty"`   // 多選（保存為數組；epusdt token/network——佔位訂單模式）
 	Options       []*Option              `protobuf:"bytes,10,rep,name=options,proto3" json:"options,omitempty"`
 	Default       string                 `protobuf:"bytes,11,opt,name=default,proto3" json:"default,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -565,9 +565,9 @@ func (x *Option) GetValue() string {
 
 type FieldOptionsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`                               // 驱动码
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`                               // 驅動碼
 	Field         string                 `protobuf:"bytes,2,opt,name=field,proto3" json:"field,omitempty"`                             // 字段 key（network/token）
-	ConfigJson    string                 `protobuf:"bytes,3,opt,name=config_json,json=configJson,proto3" json:"config_json,omitempty"` // 部分配置（仅非敏感字段，如 api_url）
+	ConfigJson    string                 `protobuf:"bytes,3,opt,name=config_json,json=configJson,proto3" json:"config_json,omitempty"` // 部分配置（僅非敏感字段，如 api_url）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -626,7 +626,7 @@ func (x *FieldOptionsRequest) GetConfigJson() string {
 type FieldOptionsReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Options       []*Option              `protobuf:"bytes,1,rep,name=options,proto3" json:"options,omitempty"`
-	Fallback      bool                   `protobuf:"varint,2,opt,name=fallback,proto3" json:"fallback,omitempty"` // true=上游不可达回落静态矩阵（前端提示）
+	Fallback      bool                   `protobuf:"varint,2,opt,name=fallback,proto3" json:"fallback,omitempty"` // true=上游不可達回落靜態矩陣（前端提示）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -680,13 +680,13 @@ type CreateChannelRequest struct {
 	Name                 string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Code                 string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
 	Driver               string                 `protobuf:"bytes,3,opt,name=driver,proto3" json:"driver,omitempty"`
-	ConfigJson           string                 `protobuf:"bytes,4,opt,name=config_json,json=configJson,proto3" json:"config_json,omitempty"` // 凭据 JSON 明文（入库前加密）
+	ConfigJson           string                 `protobuf:"bytes,4,opt,name=config_json,json=configJson,proto3" json:"config_json,omitempty"` // 憑據 JSON 明文（入庫前加密）
 	Fee                  int64                  `protobuf:"varint,5,opt,name=fee,proto3" json:"fee,omitempty"`
 	FeeType              string                 `protobuf:"bytes,6,opt,name=fee_type,json=feeType,proto3" json:"fee_type,omitempty"`
 	Enabled              bool                   `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	Sort                 int32                  `protobuf:"varint,8,opt,name=sort,proto3" json:"sort,omitempty"`
 	Icon                 string                 `protobuf:"bytes,9,opt,name=icon,proto3" json:"icon,omitempty"`
-	MethodsJson          string                 `protobuf:"bytes,10,opt,name=methods_json,json=methodsJson,proto3" json:"methods_json,omitempty"` // 支付方式列表 JSON（聚合网关按方式收银）
+	MethodsJson          string                 `protobuf:"bytes,10,opt,name=methods_json,json=methodsJson,proto3" json:"methods_json,omitempty"` // 支付方式列表 JSON（聚合網關按方式收銀）
 	AllowPurchase        *bool                  `protobuf:"varint,11,opt,name=allow_purchase,json=allowPurchase,proto3,oneof" json:"allow_purchase,omitempty"`
 	AllowMemberRecharge  *bool                  `protobuf:"varint,12,opt,name=allow_member_recharge,json=allowMemberRecharge,proto3,oneof" json:"allow_member_recharge,omitempty"`
 	AllowSupplyRecharge  *bool                  `protobuf:"varint,13,opt,name=allow_supply_recharge,json=allowSupplyRecharge,proto3,oneof" json:"allow_supply_recharge,omitempty"`
@@ -1271,7 +1271,7 @@ func (x *CapturePaymentRequest) GetId() uint64 {
 	return 0
 }
 
-// Payment 支付单。
+// Payment 支付單。
 type Payment struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1648,7 +1648,7 @@ func (x *ListRefundsReply) GetRefunds() []*RefundOrder {
 	return nil
 }
 
-// RefundOrder 退款单。
+// RefundOrder 退款單。
 type RefundOrder struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	Id                  uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`

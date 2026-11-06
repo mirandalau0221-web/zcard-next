@@ -11,11 +11,11 @@ import (
 )
 
 // ProviderSet supply providers。
-// 跨模块绑定（通道 A，装配集中在 bootstrap）：
+// 跨模塊綁定（通道 A，裝配集中在 bootstrap）：
 // - SyncService.writer ← catalogport.UpstreamProductWriter（catalog.ProductRepoImpl）
 // - SyncService.outbox ← events.Writer（data.OutboxWriter）
-// - Gateway ← supplyport.UpstreamGateway（ procurement 消费）
-// - Gateway ← orderport.UpstreamStockGate（ order 下单前库存预检消费）
+// - Gateway ← supplyport.UpstreamGateway（ procurement 消費）
+// - Gateway ← orderport.UpstreamStockGate（ order 下單前庫存預檢消費）
 var ProviderSet = wire.NewSet(
 	NewSupplyRepoImpl,
 	NewSyncService,
@@ -25,8 +25,8 @@ var ProviderSet = wire.NewSet(
 	NewGateway,
 	NewStoreSMSChannelService,
 	wire.Bind(new(port.UpstreamGateway), new(*Gateway)),
-	// ：对账上游数据源端口（dashboard 消费，通道 A）
+	// ：對賬上游數據源端口（dashboard 消費，通道 A）
 	wire.Bind(new(dashboardport.UpstreamOrderSource), new(*Gateway)),
-	// 下单前上游库存预检闸门（order 消费，通道 A）
+	// 下單前上游庫存預檢閘門（order 消費，通道 A）
 	wire.Bind(new(orderport.UpstreamStockGate), new(*Gateway)),
 )

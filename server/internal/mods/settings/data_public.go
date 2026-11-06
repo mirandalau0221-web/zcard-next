@@ -1,7 +1,7 @@
 package settings
 
-// 前台公开配置服务 + 多币种读取（）。
-// 白名单输出（SECRET 键物理隔离）；admin 货币 CRUD 在 service.go（AdminCurrencyService）。
+// 前台公開配置服務 + 多幣種讀取（）。
+// 白名單輸出（SECRET 鍵物理隔離）；admin 貨幣 CRUD 在 service.go（AdminCurrencyService）。
 
 import (
 	"context"
@@ -20,24 +20,24 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// StorefrontConfigService 前台配置服务（实现 storefrontv1）。
+// StorefrontConfigService 前台配置服務（實現 storefrontv1）。
 type StorefrontConfigService struct {
 	storefrontv1.UnimplementedStorefrontConfigServiceServer
 	repo Repo
 }
 
-// NewStorefrontConfigService 构造。
+// NewStorefrontConfigService 構造。
 func NewStorefrontConfigService(repo Repo) *StorefrontConfigService {
 	return &StorefrontConfigService{repo: repo}
 }
 
-// GetPublicConfig 白名单输出：DB 值优先，无值回落目录默认值；仅 PUBLIC_KEYS 键；
-// SECRET 键双保险（即使误入 PublicKeys 也不下发）。
+// GetPublicConfig 白名單輸出：DB 值優先，無值回落目錄默認值；僅 PUBLIC_KEYS 鍵；
+// SECRET 鍵雙保險（即使誤入 PublicKeys 也不下發）。
 func (s *StorefrontConfigService) GetPublicConfig(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.PublicConfig, error) {
 	// One snapshot avoids issuing a query for each public key on every page load.
 	rows, err := s.repo.List(ctx, "")
 	if err != nil {
-		return nil, errors.InternalServer("settings.CONFIG_UNAVAILABLE", "店铺配置暂时无法读取，请稍后重试")
+		return nil, errors.InternalServer("settings.CONFIG_UNAVAILABLE", "店鋪配置暫時無法讀取，請稍後重試")
 	}
 	stored := make(map[string]json.RawMessage, len(rows))
 	for _, row := range rows {
@@ -107,11 +107,11 @@ func (s *StorefrontConfigService) GetPublicConfig(ctx context.Context, _ *emptyp
 	return reply, nil
 }
 
-// ListCurrencies 启用货币（rate 为 decimal 字符串，前端 decimal 换算杜绝浮点）。
+// ListCurrencies 啓用貨幣（rate 為 decimal 字符串，前端 decimal 換算杜絕浮點）。
 func (s *StorefrontConfigService) ListCurrencies(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.Currencies, error) {
 	rows, err := s.repo.Currencies(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("settings.CURRENCY_LIST_FAILED", "读取货币失败")
+		return nil, errors.InternalServer("settings.CURRENCY_LIST_FAILED", "讀取貨幣失敗")
 	}
 	out := &storefrontv1.Currencies{}
 	for _, c := range rows {
@@ -126,7 +126,7 @@ func (s *StorefrontConfigService) ListCurrencies(ctx context.Context, _ *emptypb
 	return out, nil
 }
 
-// CurrencyView 货币视图。
+// CurrencyView 貨幣視圖。
 type CurrencyView struct {
 	Code      string
 	Symbol    string
@@ -135,7 +135,7 @@ type CurrencyView struct {
 	Rate      decimal.Decimal
 }
 
-// Currencies 启用货币视图列表。
+// Currencies 啓用貨幣視圖列表。
 func (r *RepoImpl) Currencies(ctx context.Context) ([]CurrencyView, error) {
 	rows, err := data.Client(ctx, r.data).Currency.Query().
 		Where(currency.Enabled(true)).
@@ -154,11 +154,11 @@ func (r *RepoImpl) Currencies(ctx context.Context) ([]CurrencyView, error) {
 	return out, nil
 }
 
-// CurrencyByCode 按 code 取（ exchange 的取数端；port.CurrencyReader）。
+// CurrencyByCode 按 code 取（ exchange 的取數端；port.CurrencyReader）。
 func (r *RepoImpl) CurrencyByCode(ctx context.Context, code string) (string, int32, error) {
 	row, err := data.Client(ctx, r.data).Currency.Query().Where(currency.Code(code), currency.Enabled(true)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return "", 2, errors.NotFound("settings.CURRENCY_NOT_FOUND", "货币不存在")
+		return "", 2, errors.NotFound("settings.CURRENCY_NOT_FOUND", "貨幣不存在")
 	}
 	if err != nil {
 		return "", 2, err

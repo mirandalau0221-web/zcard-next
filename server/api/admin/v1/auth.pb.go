@@ -139,11 +139,11 @@ func (x *ResetTOTPRequest) GetReason() string {
 type LoginRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Challenge string                 `protobuf:"bytes,6,opt,name=challenge,proto3" json:"challenge,omitempty"`
-	Username  string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"` // 第一阶段必填，挑战验证阶段不重复提交
-	Password  string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // 第一阶段必填，由登录用例按阶段验证
-	// TOTP 六位动态码（员工开启二步验证时必填）
+	Username  string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"` // 第一階段必填，挑戰驗證階段不重複提交
+	Password  string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // 第一階段必填，由登錄用例按階段驗證
+	// TOTP 六位動態碼（員工開啓二步驗證時必填）
 	TotpCode string `protobuf:"bytes,3,opt,name=totp_code,json=totpCode,proto3" json:"totp_code,omitempty"`
-	// 图形验证码 ID/验证码（captcha_admin_login 开启时必填）
+	// 圖形驗證碼 ID/驗證碼（captcha_admin_login 開啓時必填）
 	CaptchaId     string `protobuf:"bytes,4,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`
 	CaptchaCode   string `protobuf:"bytes,5,opt,name=captcha_code,json=captchaCode,proto3" json:"captcha_code,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -224,10 +224,10 @@ func (x *LoginRequest) GetCaptchaCode() string {
 
 type CaptchaImageReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CaptchaId     string                 `protobuf:"bytes,1,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 验证码 ID（提交时回传）
-	ImageBase64   string                 `protobuf:"bytes,2,opt,name=image_base64,json=imageBase64,proto3" json:"image_base64,omitempty"` // base64 PNG 图片（data:image/png;base64, 前缀）
-	Length        uint32                 `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"`                             // 本次验证码位数（4–8）
-	Charset       string                 `protobuf:"bytes,4,opt,name=charset,proto3" json:"charset,omitempty"`                            // 本次字符类型：digit / letter / mixed（字母不区分大小写）
+	CaptchaId     string                 `protobuf:"bytes,1,opt,name=captcha_id,json=captchaId,proto3" json:"captcha_id,omitempty"`       // 驗證碼 ID（提交時回傳）
+	ImageBase64   string                 `protobuf:"bytes,2,opt,name=image_base64,json=imageBase64,proto3" json:"image_base64,omitempty"` // base64 PNG 圖片（data:image/png;base64, 前綴）
+	Length        uint32                 `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"`                             // 本次驗證碼位數（4–8）
+	Charset       string                 `protobuf:"bytes,4,opt,name=charset,proto3" json:"charset,omitempty"`                            // 本次字符類型：digit / letter / mixed（字母不區分大小寫）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -292,7 +292,7 @@ func (x *CaptchaImageReply) GetCharset() string {
 
 type CaptchaConfigReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"` // security.captcha_admin_login 开关
+	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"` // security.captcha_admin_login 開關
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -424,8 +424,8 @@ func (x *RefreshTokenRequest) GetRefreshToken() string {
 
 type EnableTOTPReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Secret        string                 `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`                           // base32 密钥（手输用）
-	OtpauthUrl    string                 `protobuf:"bytes,2,opt,name=otpauth_url,json=otpauthUrl,proto3" json:"otpauth_url,omitempty"` // otpauth:// 二维码内容
+	Secret        string                 `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`                           // base32 密鑰（手輸用）
+	OtpauthUrl    string                 `protobuf:"bytes,2,opt,name=otpauth_url,json=otpauthUrl,proto3" json:"otpauth_url,omitempty"` // otpauth:// 二維碼內容
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -478,7 +478,7 @@ type ConfirmTOTPRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Password       string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	RecoveryTicket string                 `protobuf:"bytes,3,opt,name=recovery_ticket,json=recoveryTicket,proto3" json:"recovery_ticket,omitempty"`
-	Code           string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // 首次生成绑定密钥时为空；确认/解绑时由用例验证
+	Code           string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // 首次生成綁定密鑰時為空；確認/解綁時由用例驗證
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -539,14 +539,14 @@ type LoginReply struct {
 	RequiresTotp   bool                   `protobuf:"varint,6,opt,name=requires_totp,json=requiresTotp,proto3" json:"requires_totp,omitempty"`
 	Challenge      string                 `protobuf:"bytes,7,opt,name=challenge,proto3" json:"challenge,omitempty"`
 	RecoveryTicket string                 `protobuf:"bytes,8,opt,name=recovery_ticket,json=recoveryTicket,proto3" json:"recovery_ticket,omitempty"`
-	// admin realm 访问令牌（2h）
+	// admin realm 訪問令牌（2h）
 	AccessToken string `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	// 令牌类型，固定 Bearer
+	// 令牌類型，固定 Bearer
 	TokenType string `protobuf:"bytes,2,opt,name=token_type,json=tokenType,proto3" json:"token_type,omitempty"`
-	// 过期时间（unix 秒）
+	// 過期時間（unix 秒）
 	ExpiresAt int64         `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	Admin     *AdminProfile `protobuf:"bytes,4,opt,name=admin,proto3" json:"admin,omitempty"`
-	// refresh 令牌（14d，一次性轮换）
+	// refresh 令牌（14d，一次性輪換）
 	RefreshToken  string `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -641,7 +641,7 @@ func (x *LoginReply) GetRefreshToken() string {
 type GetProfileReply struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Admin *AdminProfile          `protobuf:"bytes,1,opt,name=admin,proto3" json:"admin,omitempty"`
-	// 权限点清单（如 order:list / card:view_content），前端据此生成菜单与按钮
+	// 權限點清單（如 order:list / card:view_content），前端據此生成菜單與按鈕
 	Permissions   []string `protobuf:"bytes,2,rep,name=permissions,proto3" json:"permissions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

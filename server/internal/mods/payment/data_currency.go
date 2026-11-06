@@ -19,7 +19,7 @@ func (r *PaymentRepoImpl) validateOrderCurrency(ctx context.Context, o *ent.Orde
 		return err
 	}
 	if orderBaseCurrency(o) != base {
-		return fmt.Errorf("payment.CURRENCY_MISMATCH: 订单币种与基础货币不一致，需要迁移")
+		return fmt.Errorf("payment.CURRENCY_MISMATCH: 訂單幣種與基礎貨幣不一致，需要遷移")
 	}
 	return nil
 }

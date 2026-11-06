@@ -28,7 +28,7 @@ const locationFields = computed(() => addressFields(regions.value, address.count
 const fieldErrors = ref<Record<string, string>>({});
 const touched = new Set<string>();
 let attempted = false;
-const fieldNames = { city: "郊区或城市", district: "区 / 县", region: "州 / 省 / 地区", postal_code: "邮政编码" };
+const fieldNames = { city: "郊區或城市", district: "區 / 縣", region: "州 / 省 / 地區", postal_code: "郵政編碼" };
 const fieldAutocomplete = { city: "address-level2", district: "address-level3", region: "address-level1", postal_code: "postal-code" };
 function checkField(field: string) {
   touched.add(field);
@@ -80,10 +80,10 @@ async function open(
       try {
         regions.value = JSON.parse(r.data?.data_json || "{}");
       } catch {
-        error.value = $t("地址数据加载失败，请关闭后重试");
+        error.value = $t("地址數據加載失敗，請關閉後重試");
       }
   }
-  if (!allowed.value.length) error.value = $t("所选商品没有共同的可配送国家，请分开下单");
+  if (!allowed.value.length) error.value = $t("所選商品沒有共同的可配送國家，請分開下單");
   return result;
 }
 function close(result: CreateOrderReply | null = null) {
@@ -148,7 +148,7 @@ async function submit() {
     retryKey.value = "";
     close(r.data);
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : $t("提交失败，请重试");
+    error.value = cause instanceof Error ? cause.message : $t("提交失敗，請重試");
   } finally {
     busy.value = false;
   }
@@ -166,42 +166,42 @@ defineExpose({ open });
   >
     <form novalidate @submit.prevent="submit">
       <div class="shipping-head">
-        <h2 id="shipping-title">{{ $t('填写收货地址') }}</h2>
-        <button type="button" class="btn secondary" :disabled="busy" @click="close()">{{ $t('关闭') }}</button>
+        <h2 id="shipping-title">{{ $t('填寫收貨地址') }}</h2>
+        <button type="button" class="btn secondary" :disabled="busy" @click="close()">{{ $t('關閉') }}</button>
       </div>
-      <p class="muted">{{ $t('实体商品将寄送至以下地址。确认金额后再创建订单。') }}</p>
+      <p class="muted">{{ $t('實體商品將寄送至以下地址。確認金額後再創建訂單。') }}</p>
       <fieldset :disabled="busy" class="shipping-fields shipping-recipient">
-        <legend>{{ $t('收货人') }}</legend>
-        <label for="shipping-name">{{ $t('收货人姓名') }}
+        <legend>{{ $t('收貨人') }}</legend>
+        <label for="shipping-name">{{ $t('收貨人姓名') }}
           <input id="shipping-name" v-model="address.name" required maxlength="100" class="input" autocomplete="shipping name" :aria-invalid="!!fieldErrors.name" :aria-describedby="fieldErrors.name ? 'shipping-name-error' : undefined" @blur="checkField('name')" />
           <span v-if="fieldErrors.name" id="shipping-name-error" class="field-error">{{ $t(fieldErrors.name) }}</span>
         </label>
-        <label for="shipping-phone">{{ $t('电话号码') }}
+        <label for="shipping-phone">{{ $t('電話號碼') }}
           <input id="shipping-phone" v-model="address.phone" type="tel" required maxlength="30" class="input" autocomplete="shipping tel" :placeholder="$t('如 +61 412 345 678')" :aria-invalid="!!fieldErrors.phone" :aria-describedby="fieldErrors.phone ? 'shipping-phone-error' : undefined" @blur="checkField('phone')" />
           <span v-if="fieldErrors.phone" id="shipping-phone-error" class="field-error">{{ $t(fieldErrors.phone) }}</span>
         </label>
       </fieldset>
       <fieldset :disabled="busy" class="shipping-fields shipping-address">
         <legend>{{ $t('配送地址') }}</legend>
-        <label for="shipping-country">{{ $t('国家或地区') }}
+        <label for="shipping-country">{{ $t('國家或地區') }}
           <select id="shipping-country" v-model="address.country" required class="input" autocomplete="shipping country" :aria-invalid="!!fieldErrors.country" :aria-describedby="fieldErrors.country ? 'shipping-country-error' : undefined" @change="changeCountry" @blur="checkField('country')">
-            <option value="" disabled>{{ $t('请选择') }}</option>
+            <option value="" disabled>{{ $t('請選擇') }}</option>
             <option v-for="c in countries" :key="c.value" :value="c.value">{{ c.label }}</option>
           </select>
           <span v-if="fieldErrors.country" id="shipping-country-error" class="field-error">{{ $t(fieldErrors.country) }}</span>
         </label>
         <label for="shipping-address">{{ $t('地址第一行') }}
-          <input id="shipping-address" v-model="address.address" required maxlength="300" class="input" autocomplete="shipping address-line1" :placeholder="$t('街道名称和门牌号')" :aria-invalid="!!fieldErrors.address" :aria-describedby="fieldErrors.address ? 'shipping-address-error' : undefined" @blur="checkField('address')" />
+          <input id="shipping-address" v-model="address.address" required maxlength="300" class="input" autocomplete="shipping address-line1" :placeholder="$t('街道名稱和門牌號')" :aria-invalid="!!fieldErrors.address" :aria-describedby="fieldErrors.address ? 'shipping-address-error' : undefined" @blur="checkField('address')" />
           <span v-if="fieldErrors.address" id="shipping-address-error" class="field-error">{{ $t(fieldErrors.address) }}</span>
         </label>
-        <label for="shipping-address_line2">{{ $t('地址第二行（选填）') }}
-          <input id="shipping-address_line2" v-model="address.address_line2" maxlength="300" class="input" autocomplete="shipping address-line2" :placeholder="$t('公寓、套房、单元号等（选填）')" :aria-invalid="!!fieldErrors.address_line2" :aria-describedby="fieldErrors.address_line2 ? 'shipping-address_line2-error' : undefined" @blur="checkField('address_line2')" />
+        <label for="shipping-address_line2">{{ $t('地址第二行（選填）') }}
+          <input id="shipping-address_line2" v-model="address.address_line2" maxlength="300" class="input" autocomplete="shipping address-line2" :placeholder="$t('公寓、套房、單元號等（選填）')" :aria-invalid="!!fieldErrors.address_line2" :aria-describedby="fieldErrors.address_line2 ? 'shipping-address_line2-error' : undefined" @blur="checkField('address_line2')" />
           <span v-if="fieldErrors.address_line2" id="shipping-address_line2-error" class="field-error">{{ $t(fieldErrors.address_line2) }}</span>
         </label>
         <label v-for="field in locationFields" :key="field" :for="`shipping-${field}`">
-          {{ $t(fieldNames[field]) }}{{ addressRequired(regions, address.country, field) ? '' : $t('（选填）') }}
+          {{ $t(fieldNames[field]) }}{{ addressRequired(regions, address.country, field) ? '' : $t('（選填）') }}
           <select v-if="field === 'region' && states.length" :id="`shipping-${field}`" v-model="address.region" :required="addressRequired(regions, address.country, field)" class="input" :autocomplete="`shipping ${fieldAutocomplete[field]}`" :aria-invalid="!!fieldErrors[field]" :aria-describedby="fieldErrors[field] ? `shipping-${field}-error` : undefined" @blur="checkField(field)">
-            <option value="" :disabled="addressRequired(regions, address.country, field)">{{ $t('请选择地区') }}</option>
+            <option value="" :disabled="addressRequired(regions, address.country, field)">{{ $t('請選擇地區') }}</option>
             <option v-for="state in states" :key="state.value" :value="state.value">{{ state.label }}</option>
           </select>
           <input v-else :id="`shipping-${field}`" v-model="address[field]" :required="addressRequired(regions, address.country, field)" :maxlength="field === 'postal_code' ? 30 : 100" class="input" :autocomplete="`shipping ${fieldAutocomplete[field]}`" :aria-invalid="!!fieldErrors[field]" :aria-describedby="fieldErrors[field] ? `shipping-${field}-error` : undefined" @blur="checkField(field)" />
@@ -211,13 +211,13 @@ defineExpose({ open });
       <p v-if="error" role="alert" class="error">{{ uiText(error) }}</p>
       <div v-if="quote" class="shipping-quote" aria-live="polite">
         <span
-          >{{ $t('优惠后商品金额') }} {{
+          >{{ $t('優惠後商品金額') }} {{
             formatMoney(Number(quote.total_cents || 0) - Number(quote.shipping_cents || 0))
           }}</span
-        ><span>{{ $t(quote.shipping_collect ? '在线支付运费' : '运费') }} {{ formatMoney(quote.shipping_cents || 0) }}</span
-        ><strong>{{ $t('合计') }} {{ formatMoney(quote.total_cents || 0) }}</strong
-        ><span v-if="quote.shipping_collect">{{ $t('到付商品的运费由快递在收货时收取。') }}</span>
-        <small class="muted">{{ $t('支付渠道手续费将在支付前单独显示。') }}</small>
+        ><span>{{ $t(quote.shipping_collect ? '在線支付運費' : '運費') }} {{ formatMoney(quote.shipping_cents || 0) }}</span
+        ><strong>{{ $t('合計') }} {{ formatMoney(quote.total_cents || 0) }}</strong
+        ><span v-if="quote.shipping_collect">{{ $t('到付商品的運費由快遞在收貨時收取。') }}</span>
+        <small class="muted">{{ $t('支付渠道手續費將在支付前單獨顯示。') }}</small>
       </div>
       <button
         v-if="quote"
@@ -225,9 +225,9 @@ defineExpose({ open });
         class="btn secondary"
         :disabled="busy"
         @click="quote = undefined"
-      > {{ $t('重新核算金额') }} </button>
+      > {{ $t('重新核算金額') }} </button>
       <button class="btn btn-primary shipping-submit" :disabled="busy || !countries.length">
-        {{ busy ? $t('正在处理…') : quote ? $t('确认地址及金额，创建订单') : $t('核算商品金额及运费') }}
+        {{ busy ? $t('正在處理…') : quote ? $t('確認地址及金額，創建訂單') : $t('核算商品金額及運費') }}
       </button>
     </form>
   </dialog>

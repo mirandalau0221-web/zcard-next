@@ -102,7 +102,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
    *
    * @param userName User name
    * @param password Password
-   * @param [captcha] 图形验证码（captcha_admin_login 开启时必填）
+   * @param [captcha] 圖形驗證碼（captcha_admin_login 開啓時必填）
    * @param [redirect=true] Whether to redirect after login. Default is `true`
    */
   async function login(
@@ -181,15 +181,15 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
       const admin = (data as any)?.admin || data;
       userInfo.userId = String(admin?.id || admin?.user_id || "");
       userInfo.userName = admin?.username || admin?.userName || "";
-      // 真实权限点（后端 GetProfile 下发）：buttons 供 hasAuth/v-auth 按钮级控制；
-      // roles 仅映射超管（R_super 驱动 isStaticSuper 全量放行），非超管为空走权限码过滤。
-      // 兼容回退：旧后端无 permissions 字段（undefined≠空数组）→ 按 R_super 全量放行
-      // （后端中间件每请求仍独立鉴权，此处仅菜单/按钮表现层回退，不构成越权）
+      // 真實權限點（後端 GetProfile 下發）：buttons 供 hasAuth/v-auth 按鈕級控制；
+      // roles 僅映射超管（R_super 驅動 isStaticSuper 全量放行），非超管為空走權限碼過濾。
+      // 兼容回退：舊後端無 permissions 字段（undefined≠空數組）→ 按 R_super 全量放行
+      // （後端中間件每請求仍獨立鑑權，此處僅菜單/按鈕表現層回退，不構成越權）
       const rawPerms = (data as any)?.permissions;
       const perms: string[] = Array.isArray(rawPerms) ? rawPerms : ["*"];
       userInfo.buttons = perms;
       userInfo.roles = perms.includes("*") ? ["R_super"] : [];
-      // 登录页跳过的货币初始化在此补载（符号/小数位从后台拉取）
+      // 登錄頁跳過的貨幣初始化在此補載（符號/小數位從後台拉取）
       import("@/utils/money").then((m) => m.initCurrency(true)).catch(() => {});
       return true;
     }
@@ -197,14 +197,14 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     return false;
   }
 
-  /** Logout（先请求后端吊销 refresh 会话，再清本地——只清本地会留下 14 天有效会话） */
+  /** Logout（先請求後端吊銷 refresh 會話，再清本地——只清本地會留下 14 天有效會話） */
   async function logout() {
     const rToken = localStg.get("refreshToken");
     if (rToken) {
       try {
         await fetchLogout(rToken);
       } catch {
-        // 吊销失败也继续登出（token 可能已过期）
+        // 吊銷失敗也繼續登出（token 可能已過期）
       }
     }
     await resetStore();

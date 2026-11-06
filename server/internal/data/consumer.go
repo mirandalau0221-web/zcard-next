@@ -1,8 +1,8 @@
 package data
 
-// 事件/任务消费分发器（ / 消费侧）：
-// asynq worker 与 SyncQueue 共用同一入口；消费幂等经 processed_events(event_id, consumer)。
-// 注册空目录（事件消费方 随交易闭环接入）；进程内处理器供单机模式直连分发。
+// 事件/任務消費分發器（ / 消費側）：
+// asynq worker 與 SyncQueue 共用同一入口；消費冪等經 processed_events(event_id, consumer)。
+// 註冊空目錄（事件消費方 隨交易閉環接入）；進程內處理器供單機模式直連分發。
 
 import (
 	"context"
@@ -19,30 +19,30 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/queue"
 )
 
-// HandlerReg 处理器注册项。
+// HandlerReg 處理器註冊項。
 type HandlerReg struct {
-	Consumer string // 消费者标识（processed_events 幂等键组成；建议 "模块.处理器"）
-	Type     string // 订阅的事件类型（如 events.OrderPaid）
+	Consumer string // 消費者標識（processed_events 冪等鍵組成；建議 "模塊.處理器"）
+	Type     string // 訂閲的事件類型（如 events.OrderPaid）
 	Fn       events.Handler
 	// Transactional is for database-only handlers whose repositories join the context transaction.
 	Transactional bool
 }
 
-// Dispatcher 消费分发器：任务载荷 = events.Envelope JSON。
+// Dispatcher 消費分發器：任務載荷 = events.Envelope JSON。
 type Dispatcher struct {
 	data *Data
 	log  *slog.Logger
 
 	mu       sync.RWMutex
-	handlers map[string][]HandlerReg // 事件类型 → 订阅者
+	handlers map[string][]HandlerReg // 事件類型 → 訂閲者
 }
 
-// NewDispatcher 构造。
+// NewDispatcher 構造。
 func NewDispatcher(d *Data, log *slog.Logger) *Dispatcher {
 	return &Dispatcher{data: d, log: log, handlers: map[string][]HandlerReg{}}
 }
 
-// Register 注册订阅（幂等：同 Consumer+Type 重复注册覆盖）。
+// Register 註冊訂閲（冪等：同 Consumer+Type 重複註冊覆蓋）。
 func (dp *Dispatcher) Register(regs ...HandlerReg) {
 	dp.mu.Lock()
 	defer dp.mu.Unlock()
@@ -64,12 +64,12 @@ func (dp *Dispatcher) Register(regs ...HandlerReg) {
 	}
 }
 
-// HandleTask 队列任务入口（task type 形如 "event:order.paid"）。
+// HandleTask 隊列任務入口（task type 形如 "event:order.paid"）。
 func (dp *Dispatcher) HandleTask(ctx context.Context, task queue.Task) error {
 	typ := strings.TrimPrefix(task.Type, "event:")
 	var env events.Envelope
 	if err := json.Unmarshal(task.Payload, &env); err != nil {
-		return fmt.Errorf("consumer: 解析事件载荷失败（type=%s）: %w", task.Type, err)
+		return fmt.Errorf("consumer: 解析事件載荷失敗（type=%s）: %w", task.Type, err)
 	}
 	if env.Type == "" {
 		env.Type = typ
@@ -77,7 +77,7 @@ func (dp *Dispatcher) HandleTask(ctx context.Context, task queue.Task) error {
 	return dp.Dispatch(ctx, env)
 }
 
-// Dispatch 分发到全部订阅者（逐个幂等；单订阅者失败不阻断其余，返回聚合错误）。
+// Dispatch 分發到全部訂閲者（逐個冪等；單訂閲者失敗不阻斷其餘，返回聚合錯誤）。
 func (dp *Dispatcher) Dispatch(ctx context.Context, env events.Envelope) error {
 	dp.mu.RLock()
 	subs := append([]HandlerReg(nil), dp.handlers[env.Type]...)
@@ -94,7 +94,7 @@ func (dp *Dispatcher) Dispatch(ctx context.Context, env events.Envelope) error {
 	return nil
 }
 
-// runOnce 单订阅者执行：processed_events 唯一索引幂等（已处理直接返回 nil）。
+// runOnce 單訂閲者執行：processed_events 唯一索引冪等（已處理直接返回 nil）。
 func (dp *Dispatcher) runOnce(ctx context.Context, env events.Envelope, sub HandlerReg) error {
 	if sub.Transactional {
 		return dp.runTransactional(ctx, env, sub)
@@ -105,13 +105,13 @@ func (dp *Dispatcher) runOnce(ctx context.Context, env events.Envelope, sub Hand
 		SetConsumer(sub.Consumer).
 		Save(ctx)
 	if ent.IsConstraintError(err) {
-		return nil // 已消费：幂等 ACK
+		return nil // 已消費：冪等 ACK
 	}
 	if err != nil {
 		return err
 	}
 	if err := sub.Fn(ctx, env); err != nil {
-		return err // 处理失败：processed_events 已写入—— 引入补偿删除或改「先执行后记录」策略前，以日志告警
+		return err // 處理失敗：processed_events 已寫入—— 引入補償刪除或改「先執行後記錄」策略前，以日誌告警
 	}
 	if dp.log != nil {
 		dp.log.Debug("consumer.dispatched", "type", env.Type, "consumer", sub.Consumer, "event_id", env.EventID)

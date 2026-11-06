@@ -1,6 +1,6 @@
 package schema
 
-// 所有权：mods/inventory（M1；表结构 M0 落地——铁律 11：卡密永不落明文）
+// 所有權：mods/inventory（M1；表結構 M0 落地——鐵律 11：卡密永不落明文）
 
 import (
 	"entgo.io/ent"
@@ -9,13 +9,13 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// Card 卡密/链接/兑换码（最高频、最可能破千万的表，《数据库架构设计.md》§4.2）。
+// Card 卡密/鏈接/兑換碼（最高頻、最可能破千萬的表，《數據庫架構設計.md》§4.2）。
 //
-// 安全要点（铁律 11/§5.20.2）：
-//   - content 强制 AES-256-GCM（随机 nonce + AAD 绑定 product_id/tenant），无关闭开关；
+// 安全要點（鐵律 11/§5.20.2）：
+//   - content 強制 AES-256-GCM（隨機 nonce + AAD 綁定 product_id/tenant），無關閉開關；
 //   - content_hash = HMAC-SHA256(cardKey, plain) keyed hash，防低熵卡彩虹表反推；
-//   - 售出后按 delivery_mode 走「标记/即删」，即删模式物理删除（不留密文残骸）；
-//   - 乐观锁 version 与「FOR UPDATE 锁卡 + affected rows 校验」双保险（SQLite 走 BEGIN IMMEDIATE + CAS）。
+//   - 售出後按 delivery_mode 走「標記/即刪」，即刪模式物理刪除（不留密文殘骸）；
+//   - 樂觀鎖 version 與「FOR UPDATE 鎖卡 + affected rows 校驗」雙保險（SQLite 走 BEGIN IMMEDIATE + CAS）。
 type Card struct {
 	ent.Schema
 }
@@ -27,31 +27,31 @@ func (Card) Mixin() []ent.Mixin {
 func (Card) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
-		field.Uint64("product_id").Comment("所属商品（硬外键 → products）"),
-		field.Bytes("content").Comment("AES-256-GCM 密文（AAD 绑定 product_id/subsite_id）"),
-		field.String("content_hash").MaxLen(64).Comment("keyed hash = HMAC-SHA256(cardKey, plain)，商品内去重"),
-		field.String("number_hash").MaxLen(64).Optional().Comment("靓号/卡号归一化 hash（靓号自选检索）"),
+		field.Uint64("product_id").Comment("所屬商品（硬外鍵 → products）"),
+		field.Bytes("content").Comment("AES-256-GCM 密文（AAD 綁定 product_id/subsite_id）"),
+		field.String("content_hash").MaxLen(64).Comment("keyed hash = HMAC-SHA256(cardKey, plain)，商品內去重"),
+		field.String("number_hash").MaxLen(64).Optional().Comment("靚號/卡號歸一化 hash（靚號自選檢索）"),
 		field.Enum("status").Values("available", "reserved", "used", "disabled").Default("available"),
-		// 软外键：锁定/售出订单反查（有意不加 FK，防 cards↔orders 环）
-		field.Uint64("order_id").Optional().Comment("锁定/售出订单（软外键，仅索引）"),
-		field.Uint64("sku_id").Optional().Comment("所属 SKU（可空=商品级）"),
-		field.Uint64("import_id").Optional().Comment("导入批次"),
-		field.String("card_type").MaxLen(20).Optional().Comment("卡密类型（月卡/周卡，对应 SKU）"),
+		// 軟外鍵：鎖定/售出訂單反查（有意不加 FK，防 cards↔orders 環）
+		field.Uint64("order_id").Optional().Comment("鎖定/售出訂單（軟外鍵，僅索引）"),
+		field.Uint64("sku_id").Optional().Comment("所屬 SKU（可空=商品級）"),
+		field.Uint64("import_id").Optional().Comment("導入批次"),
+		field.String("card_type").MaxLen(20).Optional().Comment("卡密類型（月卡/周卡，對應 SKU）"),
 		field.String("note").MaxLen(255).Optional(),
-		field.Uint64("owner_id").Default(0).Comment("所属会员（0=系统；会员预选/锁定靓号）"),
-		field.Int64("draft_premium").Default(0).Comment("预选加价（分）"),
-		field.Int64("draft_cost").Default(0).Comment("预选成本（分）"),
-		field.Int64("price").Optional().Comment("靓号自选价（分，NULL=商品价）"),
-		field.Time("locked_at").SchemaType(mysqlTime).Optional().Comment("锁定时间（TTL 释放）"),
-		field.Time("used_at").SchemaType(mysqlTime).Optional().Comment("售出时间"),
+		field.Uint64("owner_id").Default(0).Comment("所屬會員（0=系統；會員預選/鎖定靚號）"),
+		field.Int64("draft_premium").Default(0).Comment("預選加價（分）"),
+		field.Int64("draft_cost").Default(0).Comment("預選成本（分）"),
+		field.Int64("price").Optional().Comment("靚號自選價（分，NULL=商品價）"),
+		field.Time("locked_at").SchemaType(mysqlTime).Optional().Comment("鎖定時間（TTL 釋放）"),
+		field.Time("used_at").SchemaType(mysqlTime).Optional().Comment("售出時間"),
 	}
 }
 
 func (Card) Indexes() []ent.Index {
 	return []ent.Index{
-		// 唯一索引必须含 subsite_id（§4.11.5），避免分站间误判重复
+		// 唯一索引必須含 subsite_id（§4.11.5），避免分站間誤判重複
 		index.Fields("subsite_id", "product_id", "content_hash").Unique(),
-		// 发货热路径：SELECT ... WHERE product_id=? AND status='available' FOR UPDATE
+		// 發貨熱路徑：SELECT ... WHERE product_id=? AND status='available' FOR UPDATE
 		index.Fields("product_id", "status"),
 		index.Fields("subsite_id", "status"),
 		index.Fields("order_id"),
@@ -61,7 +61,7 @@ func (Card) Indexes() []ent.Index {
 
 func (Card) Edges() []ent.Edge {
 	return []ent.Edge{
-		// 硬外键 → products（核心聚合内，数据库架构 §6 关系规则 1）
+		// 硬外鍵 → products（核心聚合內，數據庫架構 §6 關係規則 1）
 		edge.From("product", Product.Type).
 			Ref("cards").
 			Field("product_id").

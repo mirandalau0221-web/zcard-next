@@ -18,7 +18,7 @@ func (s *AdminSettingsService) ListTemplates(_ context.Context, _ *emptypb.Empty
 	return &adminv1.TemplateList{Templates: items}, nil
 }
 func scanTemplates() ([]*adminv1.TemplateItem, error) {
-	out := []*adminv1.TemplateItem{{Key: "classic", Name: "Classic", Desc: "内置响应式主题（PC / 手机自适应）", Author: "ZCard Team", Version: "1.0.0"}}
+	out := []*adminv1.TemplateItem{{Key: "classic", Name: "Classic", Desc: "內置響應式主題（PC / 手機自適應）", Author: "ZCard Team", Version: "1.0.0"}}
 	themes, err := theme.List()
 	if err != nil {
 		return nil, err
@@ -44,16 +44,16 @@ func templateKeyExists(key string) bool {
 }
 func (s *AdminSettingsService) InstallTemplate(ctx context.Context, req *adminv1.InstallTemplateRequest) (*adminv1.TemplateItem, error) {
 	if len(req.GetDataBase64()) > base64.StdEncoding.EncodedLen(theme.MaxZipBytes) {
-		return nil, errors.BadRequest("settings.TEMPLATE_TOO_LARGE", "主题包超过 20MB 上限")
+		return nil, errors.BadRequest("settings.TEMPLATE_TOO_LARGE", "主題包超過 20MB 上限")
 	}
 	raw, err := base64.StdEncoding.DecodeString(req.GetDataBase64())
 	if err != nil {
-		return nil, errors.BadRequest("settings.TEMPLATE_BAD_ENCODING", "主题文件编码非法")
+		return nil, errors.BadRequest("settings.TEMPLATE_BAD_ENCODING", "主題文件編碼非法")
 	}
 	themeChanges.Lock()
 	defer themeChanges.Unlock()
 	if err := s.freezeLegacyTheme(ctx); err != nil {
-		return nil, errors.InternalServer("settings.TEMPLATE_PIN_FAILED", "保留当前主题版本失败，未安装新主题，请重试")
+		return nil, errors.InternalServer("settings.TEMPLATE_PIN_FAILED", "保留當前主題版本失敗，未安裝新主題，請重試")
 	}
 	t, err := theme.Install(raw)
 	if err != nil {

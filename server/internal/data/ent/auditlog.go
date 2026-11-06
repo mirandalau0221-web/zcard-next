@@ -28,9 +28,9 @@ type AuditLog struct {
 	Action string `json:"action,omitempty"`
 	// Route holds the value of the "route" field.
 	Route string `json:"route,omitempty"`
-	// 变更前快照
+	// 變更前快照
 	Before map[string]interface{} `json:"before,omitempty"`
-	// 变更后快照
+	// 變更後快照
 	After map[string]interface{} `json:"after,omitempty"`
 	// IP holds the value of the "ip" field.
 	IP string `json:"ip,omitempty"`

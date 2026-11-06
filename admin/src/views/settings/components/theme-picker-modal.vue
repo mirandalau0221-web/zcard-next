@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * 主题选择弹窗（WP 主题式交互）：卡片网格展示已安装主题——
- * 封面图/主题名/版本号/作者/描述；选中态高亮 + ✓ 角标；
- * 右上角支持本地上传 zip 安装（服务端解压校验后原子落盘）。
+ * 主題選擇彈窗（WP 主題式交互）：卡片網格展示已安裝主題——
+ * 封面圖/主題名/版本號/作者/描述；選中態高亮 + ✓ 角標；
+ * 右上角支持本地上傳 zip 安裝（服務端解壓校驗後原子落盤）。
  */
 import ThemeSettingsModal from "./theme-settings-modal.vue";
 import { ref, watch } from "vue";
@@ -14,7 +14,7 @@ defineOptions({ name: "ThemePickerModal" });
 
 const props = defineProps<{
   show: boolean;
-  /** 当前已选主题 key（弹窗打开时高亮） */
+  /** 當前已選主題 key（彈窗打開時高亮） */
   current?: string;
 }>();
 const emit = defineEmits<{
@@ -55,14 +55,14 @@ watch(
 function onFileChange(e: Event) {
   const input = e.target as HTMLInputElement;
   const file = input.files?.[0];
-  input.value = ""; // 允许重复选择同一文件
+  input.value = ""; // 允許重複選擇同一文件
   if (!file) return;
   if (!file.name.toLowerCase().endsWith(".zip")) {
-    window.$message?.warning("请选择 zip 格式的主题包");
+    window.$message?.warning("請選擇 zip 格式的主題包");
     return;
   }
   if (file.size > 20 * 1024 * 1024) {
-    window.$message?.warning("主题包超过 20MB 上限");
+    window.$message?.warning("主題包超過 20MB 上限");
     return;
   }
   installing.value = true;
@@ -72,7 +72,7 @@ function onFileChange(e: Event) {
       const base64 = String(reader.result).split(",")[1] || "";
       const { error } = await installTemplate(base64);
       if (!error) {
-        window.$message?.success("主题安装成功，选择后点击「切换为默认」才会生效");
+        window.$message?.success("主題安裝成功，選擇後點擊「切換為默認」才會生效");
         emit("installed");
         await load();
       }
@@ -80,7 +80,7 @@ function onFileChange(e: Event) {
       installing.value = false;
     }
   };
-  reader.onerror = () => { installing.value = false; window.$message?.error("读取主题包失败，请重新选择文件"); };
+  reader.onerror = () => { installing.value = false; window.$message?.error("讀取主題包失敗，請重新選擇文件"); };
   reader.onabort = () => { installing.value = false; };
   reader.readAsDataURL(file);
 }
@@ -96,7 +96,7 @@ async function confirm() {
     if (error) return;
     emit("select", key);
     emit("update:show", false);
-    window.$message?.success("默认主题已切换，刷新商城首页即可查看");
+    window.$message?.success("默認主題已切換，刷新商城首頁即可查看");
   } finally {
     activating.value = false;
   }
@@ -107,7 +107,7 @@ async function confirm() {
   <NModal
     :show="show"
     preset="card"
-    title="商城主题"
+    title="商城主題"
     :closable="!installing && !activating"
     :mask-closable="!installing && !activating"
     :close-on-esc="!installing && !activating"
@@ -123,12 +123,12 @@ async function confirm() {
         @change="onFileChange"
       />
       <NButton size="small" secondary type="primary" :loading="installing" :disabled="activating || installing" @click="fileInput?.click()">
-        安装主题（zip）
+        安裝主題（zip）
       </NButton>
     </template>
 
     <NAlert type="info" :bordered="false" class="mb-16px">
-      一个主题同时适配 PC 和手机。ZIP 上限 20MB，需包含 theme.json、编译后的 index.html 和静态资源；Vue 源码包不能直接安装。上传仅安装并显示在列表中；卡片显示最新安装版本，新主题或同名升级都需点击「切换为默认」才会生效。
+      一個主題同時適配 PC 和手機。ZIP 上限 20MB，需包含 theme.json、編譯後的 index.html 和靜態資源；Vue 源碼包不能直接安裝。上傳僅安裝並顯示在列表中；卡片顯示最新安裝版本，新主題或同名升級都需點擊「切換為默認」才會生效。
     </NAlert>
     <NSpin :show="loading">
       <div v-if="templates.length" class="grid grid-cols-2 gap-14px sm:grid-cols-3">
@@ -155,7 +155,7 @@ async function confirm() {
             <div v-else class="flex h-full w-full items-center justify-center text-14px text-gray-500">
               {{ tp.name }}
             </div>
-            <!-- 选中角标 -->
+            <!-- 選中角標 -->
             <div
               v-if="selected === tp.key"
               class="absolute right-8px top-8px flex h-20px w-20px items-center justify-center rounded-full bg-primary text-12px text-white shadow"
@@ -163,7 +163,7 @@ async function confirm() {
               ✓
             </div>
           </div>
-          <!-- 信息区 -->
+          <!-- 信息區 -->
           <div class="px-10px py-8px">
             <div class="flex items-center justify-between gap-6px">
               <span class="truncate text-13px font-medium">{{ tp.name }}</span>
@@ -171,17 +171,17 @@ async function confirm() {
             </div>
             <div v-if="tp.author" class="mt-4px truncate text-12px text-gray-400">作者：{{ tp.author }}</div>
             <div v-if="tp.desc" class="mt-2px truncate text-12px text-gray-400">{{ tp.desc }}</div>
-            <NButton class="mt-10px" size="small" block secondary @click.stop="optionsKey = tp.key; optionsShow = true">主题自定义与预览</NButton>
+            <NButton class="mt-10px" size="small" block secondary @click.stop="optionsKey = tp.key; optionsShow = true">主題自定義與預覽</NButton>
           </div>
         </div>
       </div>
-      <div v-else class="py-40px text-center text-13px text-gray-400">暂无可用主题，可点击右上角「安装主题」上传 zip 安装</div>
+      <div v-else class="py-40px text-center text-13px text-gray-400">暫無可用主題，可點擊右上角「安裝主題」上傳 zip 安裝</div>
     </NSpin>
 
     <template #footer>
       <div class="flex justify-end gap-8px">
-        <NButton :disabled="installing || activating" @click="emit('update:show', false)">关闭</NButton>
-        <NButton type="primary" :disabled="!selected || installing || loading" :loading="activating" @click="confirm">切换为默认</NButton>
+        <NButton :disabled="installing || activating" @click="emit('update:show', false)">關閉</NButton>
+        <NButton type="primary" :disabled="!selected || installing || loading" :loading="activating" @click="confirm">切換為默認</NButton>
       </div>
     </template>
     <ThemeSettingsModal v-model:show="optionsShow" :theme-key="optionsKey" @published="emit('installed')" />

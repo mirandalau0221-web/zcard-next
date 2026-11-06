@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 内容管理：文章/公告（文章管理）+ 首页横幅两个子页（content:read / write）。
+// 內容管理：文章/公告（文章管理）+ 首頁橫幅兩個子頁（content:read / write）。
 import { NTabs, NTabPane, NCard } from "naive-ui";
 import { checkAuth } from "@/directives";
 import ArticleManagement from "./components/article-management.vue";
@@ -10,12 +10,12 @@ defineOptions({ name: "ContentManagement", route: "content" });
 
 <template>
   <div class="min-h-500px">
-    <NCard title="内容管理">
+    <NCard title="內容管理">
       <NTabs type="line">
         <NTabPane v-if="checkAuth('content:read')" name="articles" tab="文章管理">
           <ArticleManagement />
         </NTabPane>
-        <NTabPane v-if="checkAuth('content:read')" name="banners" tab="首页横幅">
+        <NTabPane v-if="checkAuth('content:read')" name="banners" tab="首頁橫幅">
           <BannerManagement />
         </NTabPane>
       </NTabs>

@@ -1,13 +1,13 @@
 package migratev1
 
-// verify-only：对已迁移数据做事后校验（不迁移、不写业务表），产出独立报告。
-// 校验项（《数据迁移工具开发计划》§6）：
-//  1. 金额恒等式：orders.total_amount == SUM(order_amount_lines.amount)（2.0 内部）
-//  2. 钱包三方对账：末条流水 balance_after vs wallet_accounts.available（差异清单）
-//  3. 分站余额对账：reseller_ledger 合计 vs reseller_balance_accounts.available
-//  4. 卡密抽样：源端解密明文 vs 目标端解密明文逐字节相等 + HMAC 一致
-//  5. 行数三方核对：源行数 / v1id_maps 映射数 / 目标行数（差异列出供人工判读）
-//  6. 引用完整性：已迁订单的 user_id=0 但源库有值的清单（映射缺失）
+// verify-only：對已遷移數據做事後校驗（不遷移、不寫業務表），產出獨立報告。
+// 校驗項（《數據遷移工具開發計劃》§6）：
+//  1. 金額恆等式：orders.total_amount == SUM(order_amount_lines.amount)（2.0 內部）
+//  2. 錢包三方對賬：末條流水 balance_after vs wallet_accounts.available（差異清單）
+//  3. 分站餘額對賬：reseller_ledger 合計 vs reseller_balance_accounts.available
+//  4. 卡密抽樣：源端解密明文 vs 目標端解密明文逐字節相等 + HMAC 一致
+//  5. 行數三方核對：源行數 / v1id_maps 映射數 / 目標行數（差異列出供人工判讀）
+//  6. 引用完整性：已遷訂單的 user_id=0 但源庫有值的清單（映射缺失）
 
 import (
 	"context"
@@ -22,14 +22,14 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/inventory"
 )
 
-// VerifyResult 校验报告。
+// VerifyResult 校驗報告。
 type VerifyResult struct {
 	Passed  bool
 	Checks  []Check
 	Summary map[string]string
 }
 
-// RunVerify 执行事后校验。
+// RunVerify 執行事後校驗。
 func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, error) {
 	if sample <= 0 {
 		sample = 100
@@ -42,7 +42,7 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 		res.Checks = append(res.Checks, Check{Name: name, Status: StatusOK, Message: msg})
 	}
 
-	// 1. 金额恒等式（2.0 内部，逐单核对取汇总）
+	// 1. 金額恆等式（2.0 內部，逐單核對取彙總）
 	type row struct {
 		OrderID uint64
 		Total   int64
@@ -66,7 +66,7 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 		}
 	}
 	if len(broken) > 0 {
-		fail("金额恒等式", fmt.Sprintf("%d/%d 单 total≠SUM(lines)，首批：order_id=%d total=%d sum=%d",
+		fail("金額恆等式", fmt.Sprintf("%d/%d 單 total≠SUM(lines)，首批：order_id=%d total=%d sum=%d",
 			len(broken), len(os), broken[0].OrderID, broken[0].Total, broken[0].Sum))
 		for i, b := range broken {
 			m.RW.AddError("verify_amount", b.OrderID, fmt.Sprintf("total=%d lines_sum=%d", b.Total, b.Sum))
@@ -75,21 +75,21 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 			}
 		}
 	} else {
-		pass("金额恒等式", fmt.Sprintf("全部 %d 单 total == SUM(lines)", len(os)))
+		pass("金額恆等式", fmt.Sprintf("全部 %d 單 total == SUM(lines)", len(os)))
 	}
 
-	// 2. 钱包三方对账（复用 P5 逻辑的只读版）
+	// 2. 錢包三方對賬（複用 P5 邏輯的只讀版）
 	if err := m.ReconcileWallets(ctx); err != nil {
 		return nil, err
 	}
 	rc := m.st.table("wallet_reconcile")
 	if rc.SkippedExists > 0 {
-		fail("钱包对账", fmt.Sprintf("%d 个账户流水与快照不一致（差异清单见 errors.jsonl）", rc.SkippedExists))
+		fail("錢包對賬", fmt.Sprintf("%d 個賬户流水與快照不一致（差異清單見 errors.jsonl）", rc.SkippedExists))
 	} else {
-		pass("钱包对账", fmt.Sprintf("全部 %d 个账户流水与快照一致", rc.Migrated))
+		pass("錢包對賬", fmt.Sprintf("全部 %d 個賬户流水與快照一致", rc.Migrated))
 	}
 
-	// 3. 分站余额对账
+	// 3. 分站餘額對賬
 	profiles, err := m.Client.ResellerProfile.Query().All(ctx)
 	if err != nil {
 		return nil, err
@@ -119,28 +119,28 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 		if acc != nil && acc.Available != int64(sum) {
 			subDiff++
 			m.RW.AddError("verify_reseller", p.ID,
-				fmt.Sprintf("ledger 合计 %d ≠ 账户快照 %d", sum, acc.Available))
+				fmt.Sprintf("ledger 合計 %d ≠ 賬户快照 %d", sum, acc.Available))
 		}
 	}
 	if subDiff > 0 {
-		fail("分站余额对账", fmt.Sprintf("%d 个分站账实不一致", subDiff))
+		fail("分站餘額對賬", fmt.Sprintf("%d 個分站賬實不一致", subDiff))
 	} else {
-		pass("分站余额对账", fmt.Sprintf("全部 %d 个分站一致（含零流水分站）", len(profiles)))
+		pass("分站餘額對賬", fmt.Sprintf("全部 %d 個分站一致（含零流水分站）", len(profiles)))
 	}
 
-	// 4. 卡密抽样：源解密 vs 目标解密逐字节相等
+	// 4. 卡密抽樣：源解密 vs 目標解密逐字節相等
 	if err := m.verifyCardSamples(ctx, sample, fail, pass); err != nil {
 		return nil, err
 	}
 
-	// 5. 行数三方核对（源 / idmap / 目标）
+	// 5. 行數三方核對（源 / idmap / 目標）
 	for _, t := range []struct{ src, dst string }{
 		{"users", "users"}, {"products", "products"}, {"orders", "orders"}, {"cards", "cards"},
 	} {
 		var srcN int64
 		if err := m.Src.DB.QueryRowContext(ctx,
 			fmt.Sprintf("SELECT COUNT(*) FROM `%s`", t.src)).Scan(&srcN); err != nil {
-			continue // 源表缺失（可选域）
+			continue // 源表缺失（可選域）
 		}
 		mapN, err := m.Client.V1IDMap.Query().
 			Where(v1idmap.TableName(t.src)).Count(ctx)
@@ -169,18 +169,18 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 		if err != nil {
 			return nil, err
 		}
-		res.Summary[t.src] = fmt.Sprintf("源 %d / 映射 %d / 目标 %d", srcN, mapN, dstN)
+		res.Summary[t.src] = fmt.Sprintf("源 %d / 映射 %d / 目標 %d", srcN, mapN, dstN)
 		if int64(mapN) != dstN {
-			fail("行数核对:"+t.src, fmt.Sprintf("映射 %d ≠ 目标 %d（差异可能来自回填行或分站未迁——人工判读）", mapN, dstN))
+			fail("行數核對:"+t.src, fmt.Sprintf("映射 %d ≠ 目標 %d（差異可能來自回填行或分站未遷——人工判讀）", mapN, dstN))
 		} else if int64(mapN) < srcN && srcN > 0 {
 			res.Checks = append(res.Checks, Check{
-				Name: "行数核对:" + t.src, Status: StatusWarn,
-				Message: fmt.Sprintf("映射 %d < 源 %d（分站/跳过/软删——主站先行模式下属预期）", mapN, srcN),
+				Name: "行數核對:" + t.src, Status: StatusWarn,
+				Message: fmt.Sprintf("映射 %d < 源 %d（分站/跳過/軟刪——主站先行模式下屬預期）", mapN, srcN),
 			})
 		}
 	}
 
-	// 6. 引用完整性：已迁订单 user_id=0 但源库有值
+	// 6. 引用完整性：已遷訂單 user_id=0 但源庫有值
 	var orderIDs []uint64
 	srcOrders, err := m.Src.DB.QueryContext(ctx,
 		"SELECT `id`, `user_id` FROM `orders` WHERE `user_id` > 0")
@@ -204,9 +204,9 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 		srcOrders.Close()
 	}
 	if len(orderIDs) > 0 {
-		fail("引用完整性", fmt.Sprintf("%d 笔已迁订单丢失 user 关联（映射缺失）", len(orderIDs)))
+		fail("引用完整性", fmt.Sprintf("%d 筆已遷訂單丟失 user 關聯（映射缺失）", len(orderIDs)))
 	} else {
-		pass("引用完整性", "已迁订单的用户关联完整")
+		pass("引用完整性", "已遷訂單的用户關聯完整")
 	}
 
 	res.Passed = true
@@ -218,24 +218,24 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 	return res, nil
 }
 
-// verifyCardSamples 卡密抽样比对：源明文（1.x 解密/直通）vs 目标明文（2.0 卡密钥匙解密）。
+// verifyCardSamples 卡密抽樣比對：源明文（1.x 解密/直通）vs 目標明文（2.0 卡密鑰匙解密）。
 func (m *Migrator) verifyCardSamples(ctx context.Context, sample int,
 	fail func(name, msg string), pass func(name, msg string)) error {
 
 	var srcTotal int64
 	if err := m.Src.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM `cards`").Scan(&srcTotal); err != nil {
-		pass("卡密抽样", "源库无 cards 表，跳过")
+		pass("卡密抽樣", "源庫無 cards 表，跳過")
 		return nil
 	}
 	if srcTotal == 0 {
-		pass("卡密抽样", "源库卡密为空")
+		pass("卡密抽樣", "源庫卡密為空")
 		return nil
 	}
 	n := int64(sample)
 	if srcTotal < n {
 		n = srcTotal
 	}
-	// 随机偏移抽样（id 均匀性近似）
+	// 隨機偏移抽樣（id 均勻性近似）
 	mismatch := 0
 	checked := 0
 	for i := int64(0); i < n; i++ {
@@ -255,7 +255,7 @@ func (m *Migrator) verifyCardSamples(ctx context.Context, sample int,
 		}
 		newID, ok := m.IDs.Get(ctx, "cards", uint64(oldID))
 		if !ok {
-			continue // 未迁（分站/跳过）
+			continue // 未遷（分站/跳過）
 		}
 		c, err := m.Client.Card.Get(ctx, newID)
 		if err != nil {
@@ -264,27 +264,27 @@ func (m *Migrator) verifyCardSamples(ctx context.Context, sample int,
 		srcPlain, _, err := openV1Card(content, m.CardKey)
 		if err != nil {
 			mismatch++
-			m.RW.AddError("verify_cards", uint64(oldID), "源端解密失败: "+err.Error())
+			m.RW.AddError("verify_cards", uint64(oldID), "源端解密失敗: "+err.Error())
 			continue
 		}
 		dstPlain, err := m.verifyOpen(c.Content, c.ProductID, c.SubsiteID)
 		if err != nil || dstPlain != srcPlain {
 			mismatch++
-			m.RW.AddError("verify_cards", uint64(oldID), "明文不一致或解密失败")
+			m.RW.AddError("verify_cards", uint64(oldID), "明文不一致或解密失敗")
 			continue
 		}
 		checked++
 		_ = contentHash
 	}
 	if mismatch > 0 {
-		fail("卡密抽样", fmt.Sprintf("抽样 %d 条中 %d 条不一致（致命——密钥或数据损坏）", checked+mismatch, mismatch))
+		fail("卡密抽樣", fmt.Sprintf("抽樣 %d 條中 %d 條不一致（致命——密鑰或數據損壞）", checked+mismatch, mismatch))
 	} else {
-		pass("卡密抽样", fmt.Sprintf("抽样 %d 条全部一致（含 AAD 绑定校验）", checked))
+		pass("卡密抽樣", fmt.Sprintf("抽樣 %d 條全部一致（含 AAD 綁定校驗）", checked))
 	}
 	return nil
 }
 
-// verifyOpen 目标端卡密解密（verify 专用，绑定行自身 product/subsite 的 AAD）。
+// verifyOpen 目標端卡密解密（verify 專用，綁定行自身 product/subsite 的 AAD）。
 func (m *Migrator) verifyOpen(content []byte, productID, subsiteID uint64) (string, error) {
 	c, err := inventory.NewCardCipher(m.NewCardKey)
 	if err != nil {
@@ -293,22 +293,22 @@ func (m *Migrator) verifyOpen(content []byte, productID, subsiteID uint64) (stri
 	return c.Open(content, productID, subsiteID)
 }
 
-// WriteVerify 报告输出。
+// WriteVerify 報告輸出。
 func (w *ReportWriter) WriteVerify(v *VerifyResult, meta PreflightMeta) error {
 	if err := w.WriteJSON("verify.json", map[string]any{"meta": meta, "result": v}); err != nil {
 		return err
 	}
 	var md string
-	title := "❌ 未通过"
+	title := "❌ 未通過"
 	if v.Passed {
-		title = "✅ 通过"
+		title = "✅ 通過"
 	}
-	md = fmt.Sprintf("\n## 迁移后校验（%s）\n\n| 状态 | 检查项 | 说明 |\n|---|---|---|\n", title)
+	md = fmt.Sprintf("\n## 遷移後校驗（%s）\n\n| 狀態 | 檢查項 | 説明 |\n|---|---|---|\n", title)
 	for _, c := range v.Checks {
 		md += fmt.Sprintf("| %s | %s | %s |\n", c.Status, c.Name, c.Message)
 	}
 	if len(v.Summary) > 0 {
-		md += "\n### 行数三方核对\n\n| 表 | 数字 |\n|---|---|\n"
+		md += "\n### 行數三方核對\n\n| 表 | 數字 |\n|---|---|\n"
 		for _, k := range []string{"users", "products", "orders", "cards"} {
 			if s, ok := v.Summary[k]; ok {
 				md += fmt.Sprintf("| %s | %s |\n", k, s)

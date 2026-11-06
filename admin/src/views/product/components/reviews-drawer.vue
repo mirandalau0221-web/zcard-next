@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// 评价管理抽屉：真实评价审核流（pending→通过/拒绝）+ 虚拟评价创建。
-// catalog:review_read 查看 / catalog:review_manage 审核+虚拟评价（超管专属）。
+// 評價管理抽屜：真實評價審核流（pending→通過/拒絕）+ 虛擬評價創建。
+// catalog:review_read 查看 / catalog:review_manage 審核+虛擬評價（超管專屬）。
 import { watch, ref, computed, h } from "vue";
 import {
   NDrawer,
@@ -39,14 +39,14 @@ const canManage = computed(() => checkAuth("catalog:review_manage"));
 
 const statusOptions = [
   { label: "全部", value: "" },
-  { label: "待审核", value: "pending" },
-  { label: "已通过", value: "approved" },
-  { label: "已拒绝", value: "rejected" },
+  { label: "待審核", value: "pending" },
+  { label: "已通過", value: "approved" },
+  { label: "已拒絕", value: "rejected" },
 ];
 
 function statusTag(s: string) {
   const type = s === "approved" ? "success" : s === "pending" ? "warning" : "error";
-  const text = s === "approved" ? "已通过" : s === "pending" ? "待审核" : "已拒绝";
+  const text = s === "approved" ? "已通過" : s === "pending" ? "待審核" : "已拒絕";
   return h(NTag, { type, size: "small" }, { default: () => text });
 }
 
@@ -55,15 +55,15 @@ const columns: DataTableColumns<any> = [
   { title: "商品ID", key: "product_id", width: 76 },
   { title: "用户ID", key: "user_id", width: 76 },
   {
-    title: "评分",
+    title: "評分",
     key: "rating",
     width: 90,
     render: (row) => h(NRate, { value: row.rating, size: "small", readonly: true }),
   },
-  { title: "内容", key: "content", minWidth: 180, ellipsis: true },
-  { title: "状态", key: "status", width: 84, render: (row) => statusTag(row.status) },
+  { title: "內容", key: "content", minWidth: 180, ellipsis: true },
+  { title: "狀態", key: "status", width: 84, render: (row) => statusTag(row.status) },
   {
-    title: "时间",
+    title: "時間",
     key: "created_at",
     width: 150,
     render: (row) => (row.created_at ? new Date(row.created_at * 1000).toLocaleString() : "-"),
@@ -82,12 +82,12 @@ const columns: DataTableColumns<any> = [
                 h(
                   NButton,
                   { size: "tiny", type: "success", secondary: true, onClick: () => handleApprove(row.id) },
-                  { default: () => "通过" },
+                  { default: () => "通過" },
                 ),
                 h(
                   NButton,
                   { size: "tiny", type: "error", secondary: true, onClick: () => handleReject(row.id) },
-                  { default: () => "拒绝" },
+                  { default: () => "拒絕" },
                 ),
               ],
             },
@@ -116,7 +116,7 @@ async function load() {
 async function handleApprove(id: number) {
   const { error } = await approveReview(id);
   if (!error) {
-    window.$message?.success("已通过（前台可见）");
+    window.$message?.success("已通過（前台可見）");
     load();
   }
 }
@@ -124,12 +124,12 @@ async function handleApprove(id: number) {
 async function handleReject(id: number) {
   const { error } = await rejectReview(id);
   if (!error) {
-    window.$message?.success("已拒绝（前台不可见）");
+    window.$message?.success("已拒絕（前台不可見）");
     load();
   }
 }
 
-// ── 虚拟评价 ──
+// ── 虛擬評價 ──
 const showVirtual = ref(false);
 const virtualSaving = ref(false);
 const virtualForm = ref({ nickname: "", content: "", rating: 5, sort: 0 });
@@ -152,7 +152,7 @@ async function handleVirtual() {
       sort: virtualForm.value.sort,
     });
     if (!error) {
-      window.$message?.success("虚拟评价已创建（与真实已通过评价合并展示）");
+      window.$message?.success("虛擬評價已創建（與真實已通過評價合併展示）");
       showVirtual.value = false;
     }
   } finally {
@@ -172,7 +172,7 @@ watch(() => props.show, (show) => {
     :auto-focus="false"
     @update:show="(v: boolean) => emit('update:show', v)"
   >
-    <NDrawerContent :title="`评价管理${product ? '：' + product.name : ''}`" closable>
+    <NDrawerContent :title="`評價管理${product ? '：' + product.name : ''}`" closable>
       <div class="mb-8px flex items-center gap-8px">
         <NSelect
           v-model:value="statusFilter"
@@ -184,50 +184,50 @@ watch(() => props.show, (show) => {
             load();
           "
         />
-        <span class="text-12px text-gray-400">共 {{ total }} 条真实评价</span>
+        <span class="text-12px text-gray-400">共 {{ total }} 條真實評價</span>
         <NButton
           v-if="canManage && product"
           size="small"
           type="primary"
           class="ml-auto"
           :disabled="product.is_locked"
-          :title="product.is_locked ? '请先解锁商品后再添加虚拟评价' : ''"
+          :title="product.is_locked ? '請先解鎖商品後再添加虛擬評價' : ''"
           @click="openVirtual"
         >
-          新增虚拟评价
+          新增虛擬評價
         </NButton>
       </div>
       <NDataTable :columns="columns" :data="reviews" :loading="loading" size="small"  :max-height="540" />
       <div class="mt-8px flex items-center justify-between">
-        <span class="text-12px text-gray-400">第 {{ page }} 页</span>
+        <span class="text-12px text-gray-400">第 {{ page }} 頁</span>
         <div class="flex gap-8px">
-          <NButton size="small" :disabled="page <= 1" @click="page--, load()">上一页</NButton>
-          <NButton size="small" :disabled="reviews.length < 20" @click="page++, load()">下一页</NButton>
+          <NButton size="small" :disabled="page <= 1" @click="page--, load()">上一頁</NButton>
+          <NButton size="small" :disabled="reviews.length < 20" @click="page++, load()">下一頁</NButton>
         </div>
       </div>
     </NDrawerContent>
   </NDrawer>
 
-  <!-- 虚拟评价（catalog:review_manage 超管专属） -->
+  <!-- 虛擬評價（catalog:review_manage 超管專屬） -->
   <NModal
     v-model:show="showVirtual"
     preset="dialog"
-    :title="`虚拟评价：${product?.name || ''}`"
+    :title="`虛擬評價：${product?.name || ''}`"
     style="width: 460px"
   >
     <NForm label-placement="top">
-      <NFormItem label="昵称">
-        <NInput v-model:value="virtualForm.nickname" placeholder="选填，默认随机昵称" />
+      <NFormItem label="暱稱">
+        <NInput v-model:value="virtualForm.nickname" placeholder="選填，默認隨機暱稱" />
       </NFormItem>
-      <NFormItem label="评分" required>
+      <NFormItem label="評分" required>
         <NRate v-model:value="virtualForm.rating" />
       </NFormItem>
-      <NFormItem label="内容" required>
+      <NFormItem label="內容" required>
         <NInput
           v-model:value="virtualForm.content"
           type="textarea"
           :rows="3"
-          placeholder="展示在前台商品评论区（与真实已通过评价合并）"
+          placeholder="展示在前台商品評論區（與真實已通過評價合併）"
         />
       </NFormItem>
       <NFormItem label="排序">
@@ -236,7 +236,7 @@ watch(() => props.show, (show) => {
     </NForm>
     <template #action>
       <NButton @click="showVirtual = false">取消</NButton>
-      <NButton type="primary" :loading="virtualSaving" @click="handleVirtual">创建</NButton>
+      <NButton type="primary" :loading="virtualSaving" @click="handleVirtual">創建</NButton>
     </template>
   </NModal>
 </template>

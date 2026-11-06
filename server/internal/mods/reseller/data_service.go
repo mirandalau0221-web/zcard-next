@@ -21,12 +21,12 @@ type AdminResellerService struct {
 	repo *ResellerRepo
 }
 
-// NewAdminResellerService 构造。
+// NewAdminResellerService 構造。
 func NewAdminResellerService(repo *ResellerRepo) *AdminResellerService {
 	return &AdminResellerService{repo: repo}
 }
 
-// ReviewApply 审核。
+// ReviewApply 審核。
 func (s *AdminResellerService) ReviewApply(ctx context.Context, req *adminv1.ReviewApplyRequest) (*adminv1.ResellerProfile, error) {
 	p, err := s.repo.Review(ctx, req.GetId(), req.GetApprove(), req.GetReason(),
 		adminUID(ctx), req.GetDefaultMarkupPercent(), req.GetMaxMarkupPercent(), req.GetConfirmDays())
@@ -50,9 +50,9 @@ func (s *AdminResellerService) ListProfiles(ctx context.Context, req *adminv1.Li
 	return reply, nil
 }
 
-// UpsertPricing 定价规则。
+// UpsertPricing 定價規則。
 func (s *AdminResellerService) UpsertPricing(ctx context.Context, req *adminv1.UpsertPricingRequest) (*emptypb.Empty, error) {
-	// 上限取分站 profile.max_markup_percent（subsite_id = profile 主键）
+	// 上限取分站 profile.max_markup_percent（subsite_id = profile 主鍵）
 	max := 0.0
 	if p, err := s.repo.GetProfile(ctx, req.GetSubsiteId()); err == nil {
 		max = p.MaxMarkupPercent
@@ -63,7 +63,7 @@ func (s *AdminResellerService) UpsertPricing(ctx context.Context, req *adminv1.U
 	return &emptypb.Empty{}, nil
 }
 
-// Ledger 账本流水。
+// Ledger 賬本流水。
 func (s *AdminResellerService) Ledger(ctx context.Context, req *adminv1.LedgerRequest) (*adminv1.LedgerReply, error) {
 	page, size := pageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.Ledger(ctx, req.GetSubsiteId(), req.GetStatus(), page, size)
@@ -85,7 +85,7 @@ func (s *AdminResellerService) Ledger(ctx context.Context, req *adminv1.LedgerRe
 	return reply, nil
 }
 
-// Balance 余额（缓存 + 重算对账）。
+// Balance 餘額（緩存 + 重算對賬）。
 func (s *AdminResellerService) Balance(ctx context.Context, req *adminv1.BalanceRequest) (*adminv1.BalanceReply, error) {
 	acc, err := s.repo.GetBalance(ctx, req.GetSubsiteId())
 	if err != nil {
@@ -120,11 +120,11 @@ func toProfilePB(p *ent.ResellerProfile) *adminv1.ResellerProfile {
 func mapErr(err error) error {
 	switch err {
 	case ErrNotFound:
-		return errors.NotFound("reseller.NOT_FOUND", "记录不存在")
+		return errors.NotFound("reseller.NOT_FOUND", "記錄不存在")
 	case ErrMarkupExceed:
-		return errors.BadRequest("reseller.MARKUP_EXCEED", "超过分站加价率上限")
+		return errors.BadRequest("reseller.MARKUP_EXCEED", "超過分站加價率上限")
 	case ErrBelowBase:
-		return errors.BadRequest("reseller.BELOW_BASE", "分站价不得低于主站基础价")
+		return errors.BadRequest("reseller.BELOW_BASE", "分站價不得低於主站基礎價")
 	}
 	return errors.InternalServer("reseller.ERROR", err.Error())
 }
@@ -151,17 +151,17 @@ func pageParams(page, pageSize int32) (int, int) {
 	return p, ps
 }
 
-// ── 分站主自服务面（reseller: 域；数据按本人 profile 隔离）─────────
+// ── 分站主自服務面（reseller: 域；數據按本人 profile 隔離）─────────
 
-// myProfile 当前登录分站主的 profile（claims.Subject → user_id 匹配）。
+// myProfile 當前登錄分站主的 profile（claims.Subject → user_id 匹配）。
 func (s *AdminResellerService) myProfile(ctx context.Context) (*ent.ResellerProfile, error) {
 	uid := adminUID(ctx)
 	p, err := s.repo.ProfileByUser(ctx, uid)
 	if err != nil {
-		return nil, errors.Forbidden("reseller.NOT_RESELLER", "非分站主或未过审")
+		return nil, errors.Forbidden("reseller.NOT_RESELLER", "非分站主或未過審")
 	}
 	if string(p.Status) != "approved" {
-		return nil, errors.Forbidden("reseller.NOT_APPROVED", "分站未过审")
+		return nil, errors.Forbidden("reseller.NOT_APPROVED", "分站未過審")
 	}
 	return p, nil
 }
@@ -183,7 +183,7 @@ func (s *AdminResellerService) MySites(ctx context.Context, _ *adminv1.MySitesRe
 	return reply, nil
 }
 
-// AddSite 登记域名（本人 profile 下）。
+// AddSite 登記域名（本人 profile 下）。
 func (s *AdminResellerService) AddSite(ctx context.Context, req *adminv1.AddSiteRequest) (*adminv1.ResellerSiteItem, error) {
 	p, err := s.myProfile(ctx)
 	if err != nil {
@@ -196,7 +196,7 @@ func (s *AdminResellerService) AddSite(ctx context.Context, req *adminv1.AddSite
 	return toSitePB(site), nil
 }
 
-// VerifySite 触发验证（本人站点归属校验）。
+// VerifySite 觸發驗證（本人站點歸屬校驗）。
 func (s *AdminResellerService) VerifySite(ctx context.Context, req *adminv1.VerifySiteRequest) (*adminv1.VerifySiteReply, error) {
 	p, err := s.myProfile(ctx)
 	if err != nil {
@@ -216,7 +216,7 @@ func (s *AdminResellerService) VerifySite(ctx context.Context, req *adminv1.Veri
 	return &adminv1.VerifySiteReply{Verified: ok, Method: method}, nil
 }
 
-// SetWhitelabel 白标设置（站名/LOGO/favicon）。
+// SetWhitelabel 白標設置（站名/LOGO/favicon）。
 func (s *AdminResellerService) SetWhitelabel(ctx context.Context, req *adminv1.SetWhitelabelRequest) (*emptypb.Empty, error) {
 	p, err := s.myProfile(ctx)
 	if err != nil {
@@ -235,18 +235,18 @@ func (s *AdminResellerService) SetWhitelabel(ctx context.Context, req *adminv1.S
 	return &emptypb.Empty{}, nil
 }
 
-// CreateProduct 分站主：自营商品上架（等级权限位——level>=1 允许自助上架；
-// subsite_id = 本人 profile.ID，与域名访问的下单上下文一致）。
+// CreateProduct 分站主：自營商品上架（等級權限位——level>=1 允許自助上架；
+// subsite_id = 本人 profile.ID，與域名訪問的下單上下文一致）。
 func (s *AdminResellerService) CreateProduct(ctx context.Context, req *adminv1.CreateResellerProductRequest) (*adminv1.ResellerProduct, error) {
 	p, err := s.myProfile(ctx)
 	if err != nil {
 		return nil, err
 	}
 	if p.Level < 1 {
-		return nil, errors.Forbidden("reseller.NO_LIST_PERMISSION", "当前等级无自助上架权限")
+		return nil, errors.Forbidden("reseller.NO_LIST_PERMISSION", "當前等級無自助上架權限")
 	}
 	if req.GetName() == "" || !money.ValidCents(req.GetPriceCents()) || !money.ValidCents(req.GetFactoryPriceCents()) {
-		return nil, errors.BadRequest("reseller.PRODUCT_INVALID", "名称必填、价格与成本须为非负且不超上限")
+		return nil, errors.BadRequest("reseller.PRODUCT_INVALID", "名稱必填、價格與成本須為非負且不超上限")
 	}
 	prod, err := s.repo.CreateOwnProduct(ctx, p.ID, OwnProductInput{
 		Name:         req.GetName(),
@@ -262,7 +262,7 @@ func (s *AdminResellerService) CreateProduct(ctx context.Context, req *adminv1.C
 		Status:       int8(req.GetStatus()),
 	})
 	if err != nil {
-		return nil, errors.InternalServer("reseller.PRODUCT_CREATE_FAILED", "上架失败: "+err.Error())
+		return nil, errors.InternalServer("reseller.PRODUCT_CREATE_FAILED", "上架失敗: "+err.Error())
 	}
 	out := &adminv1.ResellerProduct{
 		Id: prod.ID, SubsiteId: prod.SubsiteID, Name: prod.Name, Slug: prod.Slug,

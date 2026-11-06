@@ -1,12 +1,12 @@
 package identity
 
-// AdminUserManageService 前台用户管理（列表/详情聚合/封禁/新增/重置密码）。
-// 数据域 users 表（storefront 注册用户）；员工管理（admin_users）在 authz 模块。
-// 分站隔离：users 表无 subsite 列（全站账户），管理面按全站口径查询。
+// AdminUserManageService 前台用户管理（列表/詳情聚合/封禁/新增/重置密碼）。
+// 數據域 users 表（storefront 註冊用户）；員工管理（admin_users）在 authz 模塊。
+// 分站隔離：users 表無 subsite 列（全站賬户），管理面按全站口徑查詢。
 //
-// 聚合视图（等级/钱包/积分/优惠券/供货账户/订单）经共享 ent 层批量查询
-// （与 fulfillment.ProductNames 同模式——模块纪律禁 import 对方 biz/data，
-// 共享 data/ent 的只读聚合不在此列）；等级判定复用 memberlevel RateResolver。
+// 聚合視圖（等級/錢包/積分/優惠券/供貨賬户/訂單）經共享 ent 層批量查詢
+// （與 fulfillment.ProductNames 同模式——模塊紀律禁 import 對方 biz/data，
+// 共享 data/ent 的只讀聚合不在此列）；等級判定複用 memberlevel RateResolver。
 
 import (
 	"context"
@@ -29,19 +29,19 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminUserManageService 实现 adminv1.AdminUserManageService。
+// AdminUserManageService 實現 adminv1.AdminUserManageService。
 type AdminUserManageService struct {
 	adminv1.UnimplementedAdminUserManageServiceServer
 	repo *UserRepo
-	rate memberlevelport.RateResolver // 会员等级解析（0=无等级）
+	rate memberlevelport.RateResolver // 會員等級解析（0=無等級）
 }
 
-// NewAdminUserManageService 构造。
+// NewAdminUserManageService 構造。
 func NewAdminUserManageService(repo *UserRepo, rate memberlevelport.RateResolver) *AdminUserManageService {
 	return &AdminUserManageService{repo: repo, rate: rate}
 }
 
-// ListUsers 用户列表（关键词/状态/供货商筛选；逐条聚合等级/钱包/订单/供货标识）。
+// ListUsers 用户列表（關鍵詞/狀態/供貨商篩選；逐條聚合等級/錢包/訂單/供貨標識）。
 func (s *AdminUserManageService) ListUsers(ctx context.Context, req *adminv1.ListUsersRequest) (*adminv1.ListUsersReply, error) {
 	q := data.Client(ctx, s.repo.data).User.Query()
 	if kw := req.GetKeyword(); kw != "" {
@@ -52,7 +52,7 @@ func (s *AdminUserManageService) ListUsers(ctx context.Context, req *adminv1.Lis
 	}
 	if st := req.GetStatus(); st != "" {
 		if !validUserStatus(st) {
-			return nil, errors.BadRequest("identity.INVALID_STATUS", "状态仅支持 active/banned")
+			return nil, errors.BadRequest("identity.INVALID_STATUS", "狀態僅支持 active/banned")
 		}
 		q = q.Where(user.StatusEQ(user.Status(st)))
 	}
@@ -60,7 +60,7 @@ func (s *AdminUserManageService) ListUsers(ctx context.Context, req *adminv1.Lis
 	if req.GetIsSupplier() {
 		accts, err := client.SupplierAccount.Query().All(ctx)
 		if err != nil {
-			return nil, errors.InternalServer("identity.USER_LIST_FAILED", "读取用户列表失败")
+			return nil, errors.InternalServer("identity.USER_LIST_FAILED", "讀取用户列表失敗")
 		}
 		sids := make([]uint64, 0, len(accts))
 		for _, a := range accts {
@@ -71,7 +71,7 @@ func (s *AdminUserManageService) ListUsers(ctx context.Context, req *adminv1.Lis
 
 	total, err := q.Count(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("identity.USER_LIST_FAILED", "读取用户列表失败")
+		return nil, errors.InternalServer("identity.USER_LIST_FAILED", "讀取用户列表失敗")
 	}
 	page, size := normPage(req.GetPage(), req.GetPageSize())
 	rows, err := q.
@@ -80,7 +80,7 @@ func (s *AdminUserManageService) ListUsers(ctx context.Context, req *adminv1.Lis
 		Limit(size).
 		All(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("identity.USER_LIST_FAILED", "读取用户列表失败")
+		return nil, errors.InternalServer("identity.USER_LIST_FAILED", "讀取用户列表失敗")
 	}
 	reply := &adminv1.ListUsersReply{Total: int64(total)}
 	items, err := s.enrich(ctx, rows)
@@ -93,7 +93,7 @@ func (s *AdminUserManageService) ListUsers(ctx context.Context, req *adminv1.Lis
 	return reply, nil
 }
 
-// GetUser 用户详情（聚合：等级/钱包/优惠券/供货账户/邀请关系/最近订单）。
+// GetUser 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單）。
 func (s *AdminUserManageService) GetUser(ctx context.Context, req *adminv1.GetUserRequest) (*adminv1.UserDetail, error) {
 	client := data.Client(ctx, s.repo.data)
 	row, err := client.User.Get(ctx, req.GetId())
@@ -101,7 +101,7 @@ func (s *AdminUserManageService) GetUser(ctx context.Context, req *adminv1.GetUs
 		return nil, errors.NotFound("identity.USER_NOT_FOUND", "用户不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("identity.USER_GET_FAILED", "读取用户失败")
+		return nil, errors.InternalServer("identity.USER_GET_FAILED", "讀取用户失敗")
 	}
 	items, err := s.enrich(ctx, []*ent.User{row})
 	if err != nil {
@@ -110,7 +110,7 @@ func (s *AdminUserManageService) GetUser(ctx context.Context, req *adminv1.GetUs
 	item := items[row.ID]
 
 	detail := &adminv1.UserDetail{User: item}
-	// 持有优惠券（最多 50，未使用在前）
+	// 持有優惠券（最多 50，未使用在前）
 	coupons, _ := client.Coupon.Query().
 		Where(coupon.UserIDEQ(row.ID)).
 		Order(ent.Desc(coupon.FieldID)).
@@ -121,18 +121,18 @@ func (s *AdminUserManageService) GetUser(ctx context.Context, req *adminv1.GetUs
 			Id: c.ID, Title: c.Name, Status: string(c.Status),
 		})
 	}
-	// 最近订单 10 条
+	// 最近訂單 10 條
 	orders, err := client.Order.Query().
 		Where(order.UserIDEQ(row.ID)).
 		Order(ent.Desc(order.FieldID)).
 		Limit(10).
 		All(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("identity.ORDERS_FAILED", "读取最近订单失败")
+		return nil, errors.InternalServer("identity.ORDERS_FAILED", "讀取最近訂單失敗")
 	}
 	summaries, err := data.OrderProductSummaries(ctx, s.repo.data, orders)
 	if err != nil {
-		return nil, errors.InternalServer("identity.ORDER_PRODUCTS_FAILED", "读取最近订单商品失败")
+		return nil, errors.InternalServer("identity.ORDER_PRODUCTS_FAILED", "讀取最近訂單商品失敗")
 	}
 	for _, o := range orders {
 		ro := &adminv1.UserRecentOrder{
@@ -144,7 +144,7 @@ func (s *AdminUserManageService) GetUser(ctx context.Context, req *adminv1.GetUs
 		}
 		detail.RecentOrders = append(detail.RecentOrders, ro)
 	}
-	// 邀请关系
+	// 邀請關係
 	if row.InviteL1 > 0 {
 		if inviter, err := client.User.Get(ctx, row.InviteL1); err == nil {
 			detail.InviterUsername = inviter.Username
@@ -156,10 +156,10 @@ func (s *AdminUserManageService) GetUser(ctx context.Context, req *adminv1.GetUs
 	return detail, nil
 }
 
-// SetUserStatus 封禁/解封（deleted 不可经此设置）。
+// SetUserStatus 封禁/解封（deleted 不可經此設置）。
 func (s *AdminUserManageService) SetUserStatus(ctx context.Context, req *adminv1.SetUserStatusRequest) (*adminv1.UserItem, error) {
 	if !validUserStatus(req.GetStatus()) {
-		return nil, errors.BadRequest("identity.INVALID_STATUS", "状态仅支持 active/banned")
+		return nil, errors.BadRequest("identity.INVALID_STATUS", "狀態僅支持 active/banned")
 	}
 	row, err := data.Client(ctx, s.repo.data).User.UpdateOneID(req.GetId()).
 		SetStatus(user.Status(req.GetStatus())).
@@ -168,7 +168,7 @@ func (s *AdminUserManageService) SetUserStatus(ctx context.Context, req *adminv1
 		return nil, errors.NotFound("identity.USER_NOT_FOUND", "用户不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("identity.USER_STATUS_FAILED", "更新用户状态失败")
+		return nil, errors.InternalServer("identity.USER_STATUS_FAILED", "更新用户狀態失敗")
 	}
 	items, err := s.enrich(ctx, []*ent.User{row})
 	if err != nil {
@@ -177,13 +177,13 @@ func (s *AdminUserManageService) SetUserStatus(ctx context.Context, req *adminv1
 	return items[row.ID], nil
 }
 
-// CreateUser 后台新增用户（复用注册管线：校验/密码哈希/推广码全同源）。
+// CreateUser 後台新增用户（複用註冊管線：校驗/密碼哈希/推廣碼全同源）。
 func (s *AdminUserManageService) CreateUser(ctx context.Context, req *adminv1.CreateUserRequest) (*adminv1.UserItem, error) {
 	if req.GetUsername() == "" || req.GetPassword() == "" {
-		return nil, errors.BadRequest("identity.CREATE_INPUT", "用户名与密码必填")
+		return nil, errors.BadRequest("identity.CREATE_INPUT", "用户名與密碼必填")
 	}
 	if len(req.GetPassword()) < 6 {
-		return nil, errors.BadRequest("identity.PASSWORD_TOO_SHORT", "密码至少 6 位")
+		return nil, errors.BadRequest("identity.PASSWORD_TOO_SHORT", "密碼至少 6 位")
 	}
 	row, err := s.repo.Register(ctx, RegisterInput{
 		Username: req.GetUsername(), Password: req.GetPassword(), Email: req.GetEmail(),
@@ -198,14 +198,14 @@ func (s *AdminUserManageService) CreateUser(ctx context.Context, req *adminv1.Cr
 	return items[row.ID], nil
 }
 
-// ResetUserPassword 重置密码（bcrypt 全新哈希；全部已登录态不受影响——JWT 无状态）。
+// ResetUserPassword 重置密碼（bcrypt 全新哈希；全部已登錄態不受影響——JWT 無狀態）。
 func (s *AdminUserManageService) ResetUserPassword(ctx context.Context, req *adminv1.ResetUserPasswordRequest) (*emptypb.Empty, error) {
 	if len(req.GetNewPassword()) < 6 {
-		return nil, errors.BadRequest("identity.PASSWORD_TOO_SHORT", "密码至少 6 位")
+		return nil, errors.BadRequest("identity.PASSWORD_TOO_SHORT", "密碼至少 6 位")
 	}
 	hash, err := crypto.HashPassword(req.GetNewPassword())
 	if err != nil {
-		return nil, errors.InternalServer("identity.RESET_FAILED", "密码处理失败")
+		return nil, errors.InternalServer("identity.RESET_FAILED", "密碼處理失敗")
 	}
 	err = data.Client(ctx, s.repo.data).User.UpdateOneID(req.GetId()).
 		SetPasswordHash(hash).
@@ -214,13 +214,13 @@ func (s *AdminUserManageService) ResetUserPassword(ctx context.Context, req *adm
 		return nil, errors.NotFound("identity.USER_NOT_FOUND", "用户不存在")
 	}
 	if err != nil {
-		return nil, errors.InternalServer("identity.RESET_FAILED", "重置密码失败")
+		return nil, errors.InternalServer("identity.RESET_FAILED", "重置密碼失敗")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// enrich 批量聚合（一页用户 5 类批查 + 等级逐条解析，杜绝 N+1 逐行查询）：
-// 钱包/积分/供货账户 in 查询；订单数与消费额 group by；等级名字典批查。
+// enrich 批量聚合（一頁用户 5 類批查 + 等級逐條解析，杜絕 N+1 逐行查詢）：
+// 錢包/積分/供貨賬户 in 查詢；訂單數與消費額 group by；等級名字典批查。
 func (s *AdminUserManageService) enrich(ctx context.Context, rows []*ent.User) (map[uint64]*adminv1.UserItem, error) {
 	out := make(map[uint64]*adminv1.UserItem, len(rows))
 	if len(rows) == 0 {
@@ -250,7 +250,7 @@ func (s *AdminUserManageService) enrich(ctx context.Context, rows []*ent.User) (
 			suppliers[a.OwnerUserID] = string(a.Status)
 		}
 	}
-	// 订单聚合:两趟 group by 批量（杜绝逐用户 N+1）
+	// 訂單聚合:兩趟 group by 批量（杜絕逐用户 N+1）
 	orderCount := map[uint64]int{}
 	var cntRows []struct {
 		UserID uint64 `json:"user_id"`
@@ -265,10 +265,10 @@ func (s *AdminUserManageService) enrich(ctx context.Context, rows []*ent.User) (
 	}
 	spent, err := data.UserSpending(ctx, client, ids)
 	if err != nil {
-		return nil, errors.InternalServer("identity.USER_STATS_FAILED", "读取用户消费统计失败")
+		return nil, errors.InternalServer("identity.USER_STATS_FAILED", "讀取用户消費統計失敗")
 	}
 
-	// 等级:RateResolver 逐用户 + 名称字典批查
+	// 等級:RateResolver 逐用户 + 名稱字典批查
 	levelIDs := map[uint64]uint64{}
 	levelSources := map[uint64]string{}
 	for _, r := range rows {
@@ -276,7 +276,7 @@ func (s *AdminUserManageService) enrich(ctx context.Context, rows []*ent.User) (
 		if resolver, ok := s.rate.(memberlevelport.StateResolver); ok {
 			_, l, source, err := resolver.EffectiveState(ctx, r.ID)
 			if err != nil {
-				return nil, errors.InternalServer("identity.USER_LEVEL_FAILED", "读取客户等级失败")
+				return nil, errors.InternalServer("identity.USER_LEVEL_FAILED", "讀取客户等級失敗")
 			}
 			lid, levelSources[r.ID] = l, source
 		} else if s.rate != nil {

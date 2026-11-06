@@ -20,7 +20,7 @@ async function load() {
   try {
     const { data, error } = await previewDeleteProduct(props.product.id);
     if (current !== generation) return;
-    if (error || !data) loadError.value = "无法读取删除影响，请重新加载后再操作。";
+    if (error || !data) loadError.value = "無法讀取刪除影響，請重新加載後再操作。";
     else preview.value = data;
   } finally {
     if (current === generation) loading.value = false;
@@ -34,7 +34,7 @@ async function submit() {
   try {
     const { error } = await deleteProduct(props.product.id);
     if (!error) {
-      window.$message?.success("商品已删除，订单快照及交付记录已保留");
+      window.$message?.success("商品已刪除，訂單快照及交付記錄已保留");
       emit("deleted");
       emit("update:show", false);
     } else await load();
@@ -43,23 +43,23 @@ async function submit() {
 </script>
 
 <template>
-  <NModal :show="show" preset="card" title="删除商品" style="width: 560px; max-width: 94vw"
+  <NModal :show="show" preset="card" title="刪除商品" style="width: 560px; max-width: 94vw"
     :closable="!deleting" :mask-closable="false" :close-on-esc="!deleting" @update:show="!$event && close()">
     <NSpin :show="loading">
       <div class="delete-content">
         <p class="product-name">{{ preview?.name || product?.name }}</p>
-        <NAlert v-if="loadError" type="error" :bordered="false">{{ loadError }} <NButton size="small" @click="load">重新加载</NButton></NAlert>
+        <NAlert v-if="loadError" type="error" :bordered="false">{{ loadError }} <NButton size="small" @click="load">重新加載</NButton></NAlert>
         <template v-if="preview">
-          <p>保留关联订单：<strong>{{ orderCount }}</strong> 条</p>
-          <NAlert type="warning" :bordered="false">确认后商品立即从商城、商品管理和供货目录移除，详情链接失效。商品锁定、待付款或发货中的订单不会阻止删除。</NAlert>
-          <p>保留订单快照、交付内容、取货及退款记录，已有订单继续处理；账户余额不变。删除后无法通过上下架或自动同步恢复商品。</p>
+          <p>保留關聯訂單：<strong>{{ orderCount }}</strong> 條</p>
+          <NAlert type="warning" :bordered="false">確認後商品立即從商城、商品管理和供貨目錄移除，詳情鏈接失效。商品鎖定、待付款或發貨中的訂單不會阻止刪除。</NAlert>
+          <p>保留訂單快照、交付內容、取貨及退款記錄，已有訂單繼續處理；賬户餘額不變。刪除後無法通過上下架或自動同步恢復商品。</p>
         </template>
       </div>
     </NSpin>
     <template #footer>
       <NSpace justify="end">
         <NButton :disabled="deleting" @click="close">取消</NButton>
-        <NButton type="error" :loading="deleting" :disabled="loading || !preview" @click="submit">确认删除（保留订单）</NButton>
+        <NButton type="error" :loading="deleting" :disabled="loading || !preview" @click="submit">確認刪除（保留訂單）</NButton>
       </NSpace>
     </template>
   </NModal>

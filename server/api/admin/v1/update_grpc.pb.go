@@ -30,17 +30,17 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminUpdateService 在线更新（doc/在线更新方案.md ；system:update 超管专属）。
-// 更新链：备份 DB → 落盘下载（流式哈希+进度）→ 原子替换 → 重启三分支；
-// 重启后本接口随新进程复活——前端轮询 status 直到 current==target 即成功。
+// AdminUpdateService 在線更新（doc/在線更新方案.md ；system:update 超管專屬）。
+// 更新鏈：備份 DB → 落盤下載（流式哈希+進度）→ 原子替換 → 重啓三分支；
+// 重啓後本接口隨新進程復活——前端輪詢 status 直到 current==target 即成功。
 type AdminUpdateServiceClient interface {
-	// GetUpdateStatus 当前状态（幂等轮询；含生效源/supervisor 探测/最近 check 结果）。
+	// GetUpdateStatus 當前狀態（冪等輪詢；含生效源/supervisor 探測/最近 check 結果）。
 	GetUpdateStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UpdateStatus, error)
-	// CheckUpdate 手动检查更新（源解析+manifest 验签；结果缓存于 status）。
+	// CheckUpdate 手動檢查更新（源解析+manifest 驗籤；結果緩存於 status）。
 	CheckUpdate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UpdateCheckResult, error)
-	// ApplyUpdate 触发更新（单飞；进行中重复调用返回当前态）。
+	// ApplyUpdate 觸發更新（單飛；進行中重複調用返回當前態）。
 	ApplyUpdate(ctx context.Context, in *ApplyUpdateRequest, opts ...grpc.CallOption) (*UpdateStatus, error)
-	// RollbackUpdate 回滚上一版本（zcard.prev）并重启。
+	// RollbackUpdate 回滾上一版本（zcard.prev）並重啓。
 	RollbackUpdate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UpdateStatus, error)
 }
 
@@ -96,17 +96,17 @@ func (c *adminUpdateServiceClient) RollbackUpdate(ctx context.Context, in *empty
 // All implementations must embed UnimplementedAdminUpdateServiceServer
 // for forward compatibility.
 //
-// AdminUpdateService 在线更新（doc/在线更新方案.md ；system:update 超管专属）。
-// 更新链：备份 DB → 落盘下载（流式哈希+进度）→ 原子替换 → 重启三分支；
-// 重启后本接口随新进程复活——前端轮询 status 直到 current==target 即成功。
+// AdminUpdateService 在線更新（doc/在線更新方案.md ；system:update 超管專屬）。
+// 更新鏈：備份 DB → 落盤下載（流式哈希+進度）→ 原子替換 → 重啓三分支；
+// 重啓後本接口隨新進程復活——前端輪詢 status 直到 current==target 即成功。
 type AdminUpdateServiceServer interface {
-	// GetUpdateStatus 当前状态（幂等轮询；含生效源/supervisor 探测/最近 check 结果）。
+	// GetUpdateStatus 當前狀態（冪等輪詢；含生效源/supervisor 探測/最近 check 結果）。
 	GetUpdateStatus(context.Context, *emptypb.Empty) (*UpdateStatus, error)
-	// CheckUpdate 手动检查更新（源解析+manifest 验签；结果缓存于 status）。
+	// CheckUpdate 手動檢查更新（源解析+manifest 驗籤；結果緩存於 status）。
 	CheckUpdate(context.Context, *emptypb.Empty) (*UpdateCheckResult, error)
-	// ApplyUpdate 触发更新（单飞；进行中重复调用返回当前态）。
+	// ApplyUpdate 觸發更新（單飛；進行中重複調用返回當前態）。
 	ApplyUpdate(context.Context, *ApplyUpdateRequest) (*UpdateStatus, error)
-	// RollbackUpdate 回滚上一版本（zcard.prev）并重启。
+	// RollbackUpdate 回滾上一版本（zcard.prev）並重啓。
 	RollbackUpdate(context.Context, *emptypb.Empty) (*UpdateStatus, error)
 	mustEmbedUnimplementedAdminUpdateServiceServer()
 }

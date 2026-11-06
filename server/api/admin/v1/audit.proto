@@ -8,25 +8,25 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminAuditService 审计与风控管理：三类日志查询、黑名单管理。
+// AdminAuditService 審計與風控管理：三類日誌查詢、黑名單管理。
 service AdminAuditService {
-  // ListOpLogs 操作审计。
+  // ListOpLogs 操作審計。
   rpc ListOpLogs(ListOpLogsRequest) returns (ListOpLogsReply) {
     option (google.api.http) = { get: "/api/v1/admin/audit/op-logs" };
   }
-  // ListSecurityLogs 安全审计。
+  // ListSecurityLogs 安全審計。
   rpc ListSecurityLogs(ListSecurityLogsRequest) returns (ListSecurityLogsReply) {
     option (google.api.http) = { get: "/api/v1/admin/audit/security-logs" };
   }
-  // ListVisitStats 访问统计。
+  // ListVisitStats 訪問統計。
   rpc ListVisitStats(ListVisitStatsRequest) returns (ListVisitStatsReply) {
     option (google.api.http) = { get: "/api/v1/admin/audit/visit-stats" };
   }
-  // GetBlacklist IP 黑名单。
+  // GetBlacklist IP 黑名單。
   rpc GetBlacklist(google.protobuf.Empty) returns (GetBlacklistReply) {
     option (google.api.http) = { get: "/api/v1/admin/audit/blacklist" };
   }
-  // SetBlacklist 设置黑名单（精确 IP 或 CIDR 段，逗号分隔）。
+  // SetBlacklist 設置黑名單（精確 IP 或 CIDR 段，逗號分隔）。
   rpc SetBlacklist(SetBlacklistRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/api/v1/admin/audit/blacklist"
@@ -52,7 +52,7 @@ message OpLogItem {
   string after_json = 8;
   string ip = 9;
   int64 created_at = 10;
-  string operator_name = 11; // 读取时富化的操作者账号（已删除/未知为空）
+  string operator_name = 11; // 讀取時富化的操作者賬號（已刪除/未知為空）
 }
 
 message ListOpLogsReply {
@@ -76,7 +76,7 @@ message SecurityLogItem {
   string ip = 5;
   string metadata_json = 6;
   int64 created_at = 7;
-  string actor_name = 8; // 读取时富化的主体账号（guest/system/未知为空）
+  string actor_name = 8; // 讀取時富化的主體賬號（guest/system/未知為空）
 }
 
 message ListSecurityLogsReply {
@@ -112,5 +112,5 @@ message GetBlacklistReply {
 }
 
 message SetBlacklistRequest {
-  string entries = 1 [(google.api.field_behavior) = REQUIRED]; // 逗号分隔
+  string entries = 1 [(google.api.field_behavior) = REQUIRED]; // 逗號分隔
 }

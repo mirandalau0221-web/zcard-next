@@ -1,8 +1,8 @@
 package server
 
-// HTTP Server：单进程承载 admin/storefront/supply 三面 API + 回调 + 健康检查。
-// 中间件栈：recovery → logging → validate → tenant（全局）+ adminAuth（selector：
-// 仅 /api/v1/admin/* 前缀；回调与供货路由绝不挂 JWT，架构测试规则 9）。
+// HTTP Server：單進程承載 admin/storefront/supply 三面 API + 回調 + 健康檢查。
+// 中間件棧：recovery → logging → validate → tenant（全局）+ adminAuth（selector：
+// 僅 /api/v1/admin/* 前綴；回調與供貨路由絕不掛 JWT，架構測試規則 9）。
 
 import (
 	"context"
@@ -60,10 +60,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// Version 构建注入（-ldflags -X），health/ping 下发。
+// Version 構建注入（-ldflags -X），health/ping 下發。
 var Version = "dev"
 
-// NewHTTPServer 构造 HTTP server（wire provider）。
+// NewHTTPServer 構造 HTTP server（wire provider）。
 func NewHTTPServer(
 	c *conf.Server,
 	d *data.Data,
@@ -134,9 +134,9 @@ func NewHTTPServer(
 	seoSvc *seo.SeoService,
 	updateSvc *update.AdminUpdateService,
 ) *khttp.Server {
-	// ⚠️ Kratos khttp.Filter 是整体替换（o.filters = filters）非追加——
-	// 多次调用只有最后一次生效（曾致 supplier HMAC/CORS/租户被 audit 静默覆盖）。
-	// 全部 Filter 必须合并为一次注册。
+	// ⚠️ Kratos khttp.Filter 是整體替換（o.filters = filters）非追加——
+	// 多次調用只有最後一次生效（曾致 supplier HMAC/CORS/租户被 audit 靜默覆蓋）。
+	// 全部 Filter 必須合併為一次註冊。
 	requestTimeout := 30 * time.Second
 	if c != nil && c.Http != nil && c.Http.Timeout != nil {
 		requestTimeout = c.Http.Timeout.AsDuration()
@@ -146,16 +146,16 @@ func NewHTTPServer(
 			requestDeadlineFilter(requestTimeout),
 			privateOrderResponseFilter,
 			corsFilter,
-			// ：租户域名解析（Filter 层——中间件拿不到 Host；最外层确保全链路继承）
+			// ：租户域名解析（Filter 層——中間件拿不到 Host；最外層確保全鏈路繼承）
 			tenantFilter(tenancyMainDomain(c), resellerRepo),
 			settings.PreviewWriteGuard,
-			// 未安装守门（在线安装 Web 向导；Filter 层直写 302）
+			// 未安裝守門（在線安裝 Web 嚮導；Filter 層直寫 302）
 			installGuard(func() bool { return settings.Installed(context.Background(), d) }),
-			// ：对外供货 HMAC 四头鉴权（Filter 层能拿原始请求字节——签名不变式；
-			// 仅 /api/supply/*，Ping 免签名；不挂 JWT，架构测试规则 9）
+			// ：對外供貨 HMAC 四頭鑑權（Filter 層能拿原始請求字節——簽名不變式；
+			// 僅 /api/supply/*，Ping 免簽名；不掛 JWT，架構測試規則 9）
 			supplier.SupplyAuthFilter(supplierRepo, 0),
-			// ：变更类 admin 操作审计（Filter 层——中间件拿不到原始请求；
-			// POST/PUT/DELETE 且 2xx；异步落库失败不阻断）
+			// ：變更類 admin 操作審計（Filter 層——中間件拿不到原始請求；
+			// POST/PUT/DELETE 且 2xx；異步落庫失敗不阻斷）
 			audit.OpAuditFilter(auditRepo, signer,
 				func(op string) (string, bool) {
 					code, _, ok := dir.PermissionForOp(op)
@@ -174,19 +174,19 @@ func NewHTTPServer(
 				return nil
 			}),
 			i18nMiddleware(settings.NewRepoImpl(d)),
-			// ：storefront user realm JWT（解析失败放行——游客端点不受影响；
-			// 需登录端点由业务侧 claims==nil 自行 401）
+			// ：storefront user realm JWT（解析失敗放行——遊客端點不受影響；
+			// 需登錄端點由業務側 claims==nil 自行 401）
 			userAuthMiddleware(signer),
-			// ：storefront 访问埋点（PV/UV 明细 + 在线心跳；游客/登录均记，
-			// 失败忽略）。仅挂 storefront operation，admin/supply/回调不埋。
+			// ：storefront 訪問埋點（PV/UV 明細 + 在線心跳；遊客/登錄均記，
+			// 失敗忽略）。僅掛 storefront operation，admin/supply/回調不埋。
 			selector.Server(storefrontVisitMiddleware(tracker)).
 				Match(func(_ context.Context, operation string) bool {
 					return strings.HasPrefix(operation, "/zcard.api.storefront.v1.") ||
 						strings.HasPrefix(operation, "/api/v1/storefront/")
 				}).
 				Build(),
-			// admin realm 鉴权仅挂管理面 operation；Public 声明（登录）经目录豁免；
-			// storefront/supply/回调路由不挂 JWT（架构测试规则 9）。
+			// admin realm 鑑權僅掛管理面 operation；Public 聲明（登錄）經目錄豁免；
+			// storefront/supply/回調路由不掛 JWT（架構測試規則 9）。
 			selector.Server(adminAuthMiddleware(signer, az, dir, adminReader)).
 				Match(func(_ context.Context, operation string) bool {
 					return isAdminOperation(operation, dir)
@@ -205,7 +205,7 @@ func NewHTTPServer(
 	}
 	srv := khttp.NewServer(opts...)
 
-	// 业务路由（proto 注解生成；静态路由先于参数路由由注册顺序保证，铁律 4）
+	// 業務路由（proto 註解生成；靜態路由先於參數路由由註冊順序保證，鐵律 4）
 	adminv1.RegisterAdminAuthServiceHTTPServer(srv, authSvc)
 	adminv1.RegisterAdminInstallServiceHTTPServer(srv, installSvc)
 	adminv1.RegisterAdminSettingsServiceHTTPServer(srv, settingsSvc)
@@ -259,40 +259,40 @@ func NewHTTPServer(
 	storefrontv1.RegisterStoreUserServiceHTTPServer(srv, userStoreSvc)
 	storefrontv1.RegisterStoreSupplierServiceHTTPServer(srv, supplierStoreSvc)
 	adminv1.RegisterAdminUserManageServiceHTTPServer(srv, userManageSvc)
-	// ：素材静态服务（ETag + 白名单扩展；目录列表禁用）
+	// ：素材靜態服務（ETag + 白名單擴展；目錄列表禁用）
 	media.RegisterStatic(srv)
-	// 主题模板静态服务（预览图；白名单图片扩展 + 防穿越）
+	// 主題模板靜態服務（預覽圖；白名單圖片擴展 + 防穿越）
 	settings.RegisterTemplateStatic(srv)
 
-	// B/C：协议兼容层（对外供货——让 dujiao-next / acg-faka 平台不改代码
-	// 即可对接本站）。原生 handler 挂载（外部协议契约不进我们的 proto/OpenAPI）；
-	// 不挂 JWT（架构测试规则 9）；须在 SPA 兜底前注册。
+	// B/C：協議兼容層（對外供貨——讓 dujiao-next / acg-faka 平台不改代碼
+	// 即可對接本站）。原生 handler 掛載（外部協議契約不進我們的 proto/OpenAPI）；
+	// 不掛 JWT（架構測試規則 9）；須在 SPA 兜底前註冊。
 	supplier.RegisterDujiaoCompat(srv, supplyAPISvc)
 	supplier.RegisterAcgFakaCompat(srv, supplyAPISvc)
 
-	// E：上游回调接收（采购三通道之回调；不挂 JWT，验签在 handler 内按驱动分支）
+	// E：上游回調接收（採購三通道之回調；不掛 JWT，驗簽在 handler 內按驅動分支）
 	procurement.RegisterUpstreamCallback(srv, procureSvc, upstreamGW)
 
-	// 在线更新管理面（；system:update 超管专属）
+	// 在線更新管理面（；system:update 超管專屬）
 	adminv1.RegisterAdminUpdateServiceHTTPServer(srv, updateSvc)
 
-	// 保留路径（规划 ：/api /uploads /health /payments /install 为保留前缀）
+	// 保留路徑（規劃 ：/api /uploads /health /payments /install 為保留前綴）
 	registerHealth(srv, d, enq)
 
-	// 启动对账（ fail-fast）：管理路由未声明权限点 → 拒绝启动
+	// 啓動對賬（ fail-fast）：管理路由未聲明權限點 → 拒絕啓動
 	if err := reconcileRoutes(srv, dir); err != nil {
 		panic(err)
 	}
-	// ：审计过滤器路径 → operation 映射缓存（对账通过后必命中）
+	// ：審計過濾器路徑 → operation 映射緩存（對賬通過後必命中）
 	buildAuditOpMap(dir)
 	registerPaymentCallback(srv, payRepo, d)
 
-	// SEO 基础（robots.txt / sitemap.xml）：动态生成，须在 SPA 兜底前注册
+	// SEO 基礎（robots.txt / sitemap.xml）：動態生成，須在 SPA 兜底前註冊
 	registerSEO(srv, seoSvc)
 
-	// fullstack SPA（）：storefront 兜底根 + admin 独立前缀；未匹配回落
-	// index.html 由前端路由接管。保留前缀（/api /uploads /health /payments
-	// /install）已注册的业务/静态路由优先命中，回落仅在未匹配时发生。
+	// fullstack SPA（）：storefront 兜底根 + admin 獨立前綴；未匹配回落
+	// index.html 由前端路由接管。保留前綴（/api /uploads /health /payments
+	// /install）已註冊的業務/靜態路由優先命中，回落僅在未匹配時發生。
 	adminBase := "/admin"
 	if c != nil && c.AdminBasePath != "" {
 		adminBase = c.AdminBasePath
@@ -307,7 +307,7 @@ func NewHTTPServer(
 	return srv
 }
 
-// registerSEO robots.txt + sitemap.xml（SPA 兜底前注册；均免鉴权）。
+// registerSEO robots.txt + sitemap.xml（SPA 兜底前註冊；均免鑑權）。
 func registerSEO(srv *khttp.Server, seoSvc *seo.SeoService) {
 	srv.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -326,7 +326,7 @@ func registerSEO(srv *khttp.Server, seoSvc *seo.SeoService) {
 	})
 }
 
-// registerHealth 健康检查（DB 连通 + 队列模式 + 版本；/metrics Prometheus 接入内网口）。
+// registerHealth 健康檢查（DB 連通 + 隊列模式 + 版本；/metrics Prometheus 接入內網口）。
 func registerHealth(srv *khttp.Server, d *data.Data, enq queue.Enqueuer) {
 	srv.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		ctx, cancel := contextWithTimeout(r)
@@ -343,15 +343,15 @@ func registerHealth(srv *khttp.Server, d *data.Data, enq queue.Enqueuer) {
 	})
 }
 
-// registerPaymentCallback 支付回调（ 统一入口——四重校验+幂等+markPaid）。
-// 不挂 JWT（架构测试规则 9）；验签由渠道适配器完成（ 接真实渠道）。
+// registerPaymentCallback 支付回調（ 統一入口——四重校驗+冪等+markPaid）。
+// 不掛 JWT（架構測試規則 9）；驗籤由渠道適配器完成（ 接真實渠道）。
 func registerPaymentCallback(srv *khttp.Server, payRepo *payment.PaymentRepoImpl, d *data.Data) {
 	payment.RegisterPaymentCallback(srv, payRepo, d)
 }
 
-// adminOpOfPath 请求路径 → Kratos operation（审计权限点查询用）。
-// 生成路由的 operation = /<package>.<Service>/<Method>；对账目录已建立
-// Method+Path → operation 映射，此处经 WalkRoute 反查（启动时缓存）。
+// adminOpOfPath 請求路徑 → Kratos operation（審計權限點查詢用）。
+// 生成路由的 operation = /<package>.<Service>/<Method>；對賬目錄已建立
+// Method+Path → operation 映射，此處經 WalkRoute 反查（啓動時緩存）。
 func adminOpOfPath(r *http.Request) string {
 	auditOpMu.Lock()
 	defer auditOpMu.Unlock()
@@ -361,13 +361,13 @@ func adminOpOfPath(r *http.Request) string {
 	return auditOpMap[r.Method+" "+r.URL.Path]
 }
 
-// auditOpMap (Method Path) → operation 缓存（NewHTTPServer 装配时填充）。
+// auditOpMap (Method Path) → operation 緩存（NewHTTPServer 裝配時填充）。
 var (
 	auditOpMap map[string]string
 	auditOpMu  sync.Mutex
 )
 
-// buildAuditOpMap 从对账目录构建路径映射。
+// buildAuditOpMap 從對賬目錄構建路徑映射。
 func buildAuditOpMap(dir *authz.Directory) {
 	m := map[string]string{}
 	for _, p := range dir.All() {
@@ -378,7 +378,7 @@ func buildAuditOpMap(dir *authz.Directory) {
 	auditOpMu.Unlock()
 }
 
-func tenancyMainDomain(c *conf.Server) string { return "" } // 由 bootstrap 注入 Tenancy 配置后补齐
+func tenancyMainDomain(c *conf.Server) string { return "" } // 由 bootstrap 注入 Tenancy 配置後補齊
 
 func contextWithTimeout(r *http.Request) (ctx context.Context, cancel context.CancelFunc) {
 	return context.WithTimeout(r.Context(), 3*time.Second)
@@ -397,7 +397,7 @@ func privateOrderResponseFilter(next http.Handler) http.Handler {
 	})
 }
 
-// corsFilter CORS 过滤器（开发阶段前后端联调）。
+// corsFilter CORS 過濾器（開發階段前後端聯調）。
 func corsFilter(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

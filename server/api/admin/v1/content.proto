@@ -8,34 +8,34 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminContentService 内容管理：横幅/文章/分类 CRUD。
-// content_json 入库前经 sanitize（与商品描述同一策略）；slug 唯一。
+// AdminContentService 內容管理：橫幅/文章/分類 CRUD。
+// content_json 入庫前經 sanitize（與商品描述同一策略）；slug 唯一。
 service AdminContentService {
-  // CreateBanner 创建横幅（时间窗/跳转类型）。
+  // CreateBanner 創建橫幅（時間窗/跳轉類型）。
   rpc CreateBanner(CreateBannerRequest) returns (Banner) {
     option (google.api.http) = {
       post: "/api/v1/admin/content/banners"
       body: "*"
     };
   }
-  // UpdateBanner 更新横幅。
+  // UpdateBanner 更新橫幅。
   rpc UpdateBanner(UpdateBannerRequest) returns (Banner) {
     option (google.api.http) = {
       put: "/api/v1/admin/content/banners/{id}"
       body: "*"
     };
   }
-  // DeleteBanner 删除横幅。
+  // DeleteBanner 刪除橫幅。
   rpc DeleteBanner(DeleteBannerRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/api/v1/admin/content/banners/{id}"
     };
   }
-  // ListBanners 横幅列表（全量含停用）。
+  // ListBanners 橫幅列表（全量含停用）。
   rpc ListBanners(ListBannersRequest) returns (ListBannersReply) {
     option (google.api.http) = { get: "/api/v1/admin/content/banners" };
   }
-  // CreatePost 创建文章（草稿/发布）。
+  // CreatePost 創建文章（草稿/發佈）。
   rpc CreatePost(CreatePostRequest) returns (Post) {
     option (google.api.http) = {
       post: "/api/v1/admin/content/posts"
@@ -49,14 +49,14 @@ service AdminContentService {
       body: "*"
     };
   }
-  // PublishPost 发布/取消发布（首发回填 published_at）。
+  // PublishPost 發佈/取消發佈（首發回填 published_at）。
   rpc PublishPost(PublishPostRequest) returns (Post) {
     option (google.api.http) = {
       post: "/api/v1/admin/content/posts/{id}/publish"
       body: "*"
     };
   }
-  // DeletePost 删除文章。
+  // DeletePost 刪除文章。
   rpc DeletePost(DeletePostRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/api/v1/admin/content/posts/{id}"
@@ -66,39 +66,39 @@ service AdminContentService {
   rpc ListPosts(ListPostsRequest) returns (ListPostsReply) {
     option (google.api.http) = { get: "/api/v1/admin/content/posts" };
   }
-  // CreateCategory 创建文章分类。
+  // CreateCategory 創建文章分類。
   rpc CreateCategory(CreatePostCategoryRequest) returns (PostCategory) {
     option (google.api.http) = {
       post: "/api/v1/admin/content/categories"
       body: "*"
     };
   }
-  // UpdateCategory 更新分类。
+  // UpdateCategory 更新分類。
   rpc UpdateCategory(UpdatePostCategoryRequest) returns (PostCategory) {
     option (google.api.http) = {
       put: "/api/v1/admin/content/categories/{id}"
       body: "*"
     };
   }
-  // DeleteCategory 删除分类（存在文章时拒绝）。
+  // DeleteCategory 刪除分類（存在文章時拒絕）。
   rpc DeleteCategory(DeletePostCategoryRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       delete: "/api/v1/admin/content/categories/{id}"
     };
   }
-  // ListCategories 分类列表。
+  // ListCategories 分類列表。
   rpc ListCategories(ListPostCategoriesAdminRequest) returns (ListPostCategoriesAdminReply) {
     option (google.api.http) = { get: "/api/v1/admin/content/categories" };
   }
 }
 
-// ── 横幅 ──────────────────────────────────────────────────
+// ── 橫幅 ──────────────────────────────────────────────────
 
 message Banner {
   uint64 id = 1;
   string name = 2;
   string position = 3; // top | middle | bottom
-  string title_json = 4; // 多语言标题 {"zh_CN": "...", "en": "..."}
+  string title_json = 4; // 多語言標題 {"zh_CN": "...", "en": "..."}
   string image = 5;
   string mobile_image = 6;
   string link_type = 7; // product | category | url | ad
@@ -172,7 +172,7 @@ message Post {
   int64 published_at = 10;
   int64 created_at = 11;
   int64 updated_at = 12;
-  int32 sort = 13; // 数字越小越靠前
+  int32 sort = 13; // 數字越小越靠前
 }
 
 message CreatePostRequest {
@@ -194,7 +194,7 @@ message UpdatePostRequest {
   string content_json = 4;
   string thumbnail = 5;
   uint64 category_id = 6;
-  optional int32 sort = 7; // 未传保留原值，允许重置为 0
+  optional int32 sort = 7; // 未傳保留原值，允許重置為 0
 }
 
 message PublishPostRequest {
@@ -219,7 +219,7 @@ message ListPostsReply {
   int32 page_size = 4;
 }
 
-// ── 分类 ──────────────────────────────────────────────────
+// ── 分類 ──────────────────────────────────────────────────
 
 message PostCategory {
   uint64 id = 1;

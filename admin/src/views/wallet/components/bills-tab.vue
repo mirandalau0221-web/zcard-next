@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 账单流水（全站钱包流水：user_id=0 拉全部用户；归属用户列 + 类型筛选 + 金额汇总）。
+// 賬單流水（全站錢包流水：user_id=0 拉全部用户；歸屬用户列 + 類型篩選 + 金額彙總）。
 import { onMounted, ref, h } from "vue";
 import { NDataTable, NInput, NSelect, NTag } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
@@ -14,11 +14,11 @@ const bills = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
 const pageSize = ref(20);
-// 类型筛选（客户端过滤当前页；服务端 type 筛选参数暂未开放）
+// 類型篩選（客户端過濾當前頁；服務端 type 篩選參數暫未開放）
 const typeFilter = ref<string | null>(null);
 
 function directionText(d?: string) {
-  return d === "in" ? "入账" : d === "out" ? "出账" : d || "-";
+  return d === "in" ? "入賬" : d === "out" ? "出賬" : d || "-";
 }
 
 const typeOptions = Object.entries(TRANSACTION_TYPES).map(([value, label]) => ({ label, value }));
@@ -42,7 +42,7 @@ async function load() {
   }
 }
 
-// 当页收支汇总（随筛选联动，给运营一眼对账）
+// 當頁收支彙總（隨篩選聯動，給運營一眼對賬）
 function sums() {
   let inCents = 0;
   let outCents = 0;
@@ -78,22 +78,22 @@ const columns: DataTableColumns<any> = [
         { default: () => directionText(row.direction) },
       ),
   },
-  { title: "类型", key: "type", width: 132, render: (row) => transactionType(row.type) },
+  { title: "類型", key: "type", width: 132, render: (row) => transactionType(row.type) },
   {
-    title: "金额",
+    title: "金額",
     key: "amount_cents",
     width: 110,
     render: (row) => formatSignedMoney(transactionAmount(row)),
   },
   {
-    title: "变动后余额",
+    title: "變動後餘額",
     key: "balance_after_cents",
     width: 110,
     render: (row) => formatMoney(row.balance_after_cents),
   },
-  { title: "关联单号", key: "reference", render: transactionReference, minWidth: 150, ellipsis: { tooltip: true } },
-  { title: "备注", key: "remark", render: (row) => transactionRemark(row), minWidth: 120, ellipsis: { tooltip: true } },
-  { title: "时间", key: "created_at", width: 160, render: (row) => formatTime(row.created_at) },
+  { title: "關聯單號", key: "reference", render: transactionReference, minWidth: 150, ellipsis: { tooltip: true } },
+  { title: "備註", key: "remark", render: (row) => transactionRemark(row), minWidth: 120, ellipsis: { tooltip: true } },
+  { title: "時間", key: "created_at", width: 160, render: (row) => formatTime(row.created_at) },
 ];
 
 onMounted(load);
@@ -106,14 +106,14 @@ onMounted(load);
         v-model:value="typeFilter"
         :options="typeOptions"
         clearable
-        placeholder="全部类型"
+        placeholder="全部類型"
         class="w-140px"
       />
       <NInput readonly disabled class="w-0px hidden" />
       <span class="text-12px text-gray-400">
-        当页收入 <b class="text-success">{{ formatMoney(sums().inCents) }}</b> · 支出
+        當頁收入 <b class="text-success">{{ formatMoney(sums().inCents) }}</b> · 支出
         <b class="text-error">{{ formatMoney(sums().outCents) }}</b>
-        · 共 {{ total }} 笔（充值/消费/退款/佣金/提现/调账全量流水）
+        · 共 {{ total }} 筆（充值/消費/退款/佣金/提現/調賬全量流水）
       </span>
     </div>
     <NDataTable :columns="columns" :data="filtered()" :loading="loading" :scroll-x="1200" :max-height="540" />

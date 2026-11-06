@@ -21,7 +21,7 @@ type LotteryPrize struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ActivityID holds the value of the "activity_id" field.
 	ActivityID uint64 `json:"activity_id,omitempty"`
@@ -45,7 +45,7 @@ type LotteryPrize struct {
 	Sort int32 `json:"sort,omitempty"`
 	// Enabled holds the value of the "enabled" field.
 	Enabled bool `json:"enabled,omitempty"`
-	// 固定内容/领取说明密文，仅获奖者或配置管理员读取
+	// 固定內容/領取説明密文，僅獲獎者或配置管理員讀取
 	Content      []byte `json:"content,omitempty"`
 	selectValues sql.SelectValues
 }

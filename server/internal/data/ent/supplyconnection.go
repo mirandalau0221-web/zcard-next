@@ -26,9 +26,9 @@ type SupplyConnection struct {
 	Name string `json:"name,omitempty"`
 	// zcard | dujiao_next | acg_faka
 	Driver string `json:"driver,omitempty"`
-	// 上游地址（httpx SSRF 校验）
+	// 上游地址（httpx SSRF 校驗）
 	BaseURL string `json:"base_url,omitempty"`
-	// AES-256-GCM 加密凭据（结构随 driver）
+	// AES-256-GCM 加密憑據（結構隨 driver）
 	Credentials []byte `json:"credentials,omitempty"`
 	// Status holds the value of the "status" field.
 	Status supplyconnection.Status `json:"status,omitempty"`
@@ -46,25 +46,25 @@ type SupplyConnection struct {
 	SyncLeaseToken string `json:"sync_lease_token,omitempty"`
 	// SyncLeaseUntil holds the value of the "sync_lease_until" field.
 	SyncLeaseUntil int64 `json:"sync_lease_until,omitempty"`
-	// 本站作下游时的回调登记
+	// 本站作下游時的回調登記
 	CallbackURL string `json:"callback_url,omitempty"`
 	// RetryMax holds the value of the "retry_max" field.
 	RetryMax int32 `json:"retry_max,omitempty"`
-	// 重试间隔数组（秒，JSON 字符串）
+	// 重試間隔數組（秒，JSON 字符串）
 	RetryIntervals string `json:"retry_intervals,omitempty"`
-	// 汇率（上游价 × 汇率 = 本地价）
+	// 匯率（上游價 × 匯率 = 本地價）
 	ExchangeRate float64 `json:"exchange_rate,omitempty"`
-	// 加价百分比（100=翻倍；与固定加价可组合）
+	// 加價百分比（100=翻倍；與固定加價可組合）
 	PriceMarkupPercent float64 `json:"price_markup_percent,omitempty"`
-	// 固定加价（分；本地价 = 上游价×汇率×(1+%) + 固定额 → 取整）
+	// 固定加價（分；本地價 = 上游價×匯率×(1+%) + 固定額 → 取整）
 	PriceMarkupAmount int64 `json:"price_markup_amount,omitempty"`
 	// PriceRoundingMode holds the value of the "price_rounding_mode" field.
 	PriceRoundingMode supplyconnection.PriceRoundingMode `json:"price_rounding_mode,omitempty"`
-	// 同步时自动更新本地价（manual 改价保护）
+	// 同步時自動更新本地價（manual 改價保護）
 	AutoSyncPrice bool `json:"auto_sync_price,omitempty"`
 	// StockMode holds the value of the "stock_mode" field.
 	StockMode supplyconnection.StockMode `json:"stock_mode,omitempty"`
-	// 其余开关（发卡模式/失败策略等）
+	// 其餘開關（髮卡模式/失敗策略等）
 	Settings map[string]interface{} `json:"settings,omitempty"`
 	// LastPingAt holds the value of the "last_ping_at" field.
 	LastPingAt time.Time `json:"last_ping_at,omitempty"`
@@ -74,7 +74,7 @@ type SupplyConnection struct {
 	LastSyncedAt time.Time `json:"last_synced_at,omitempty"`
 	// LastError holds the value of the "last_error" field.
 	LastError string `json:"last_error,omitempty"`
-	// 上游余额缓存（分）
+	// 上游餘額緩存（分）
 	BalanceCache int64 `json:"balance_cache,omitempty"`
 	// LastCollectAt holds the value of the "last_collect_at" field.
 	LastCollectAt time.Time `json:"last_collect_at,omitempty"`
@@ -82,9 +82,9 @@ type SupplyConnection struct {
 	LastPriceSyncAt time.Time `json:"last_price_sync_at,omitempty"`
 	// LastStatusSyncAt holds the value of the "last_status_sync_at" field.
 	LastStatusSyncAt time.Time `json:"last_status_sync_at,omitempty"`
-	// 节奏器持久状态（当前间隔/连续成功/封锁计数/冷却时长）
+	// 節奏器持久狀態（當前間隔/連續成功/封鎖計數/冷卻時長）
 	RateState map[string]interface{} `json:"rate_state,omitempty"`
-	// 熔断冷却截止（非空且未到=调度与出站跳过）
+	// 熔斷冷卻截止（非空且未到=調度與出站跳過）
 	RateLimitUntil time.Time `json:"rate_limit_until,omitempty"`
 	selectValues   sql.SelectValues
 }

@@ -32,19 +32,19 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreWalletService 顾客钱包：余额/积分/流水/充值。
+// StoreWalletService 顧客錢包：餘額/積分/流水/充值。
 type StoreWalletServiceClient interface {
-	// GetBalance 余额+积分。
+	// GetBalance 餘額+積分。
 	GetBalance(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BalanceReply, error)
-	// ListTransactions 流水（余额）。
+	// ListTransactions 流水（餘額）。
 	ListTransactions(ctx context.Context, in *ListTxRequest, opts ...grpc.CallOption) (*ListTxReply, error)
-	// CreateRecharge 充值（走支付管线）。
+	// CreateRecharge 充值（走支付管線）。
 	CreateRecharge(ctx context.Context, in *CreateRechargeRequest, opts ...grpc.CallOption) (*CreateRechargeReply, error)
-	// RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破；余额入账幂等键 giftcard:<id>）。
+	// RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(ctx context.Context, in *RedeemGiftcardRequest, opts ...grpc.CallOption) (*RedeemGiftcardReply, error)
-	// ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+	// ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 	ListMyWithdrawals(ctx context.Context, in *ListMyWithdrawalsRequest, opts ...grpc.CallOption) (*ListMyWithdrawalsReply, error)
-	// CreateWithdrawal 提现申请（佣金提现：冻结口径+白名单+USDT 校验； 执行）。
+	// CreateWithdrawal 提現申請（佣金提現：凍結口徑+白名單+USDT 校驗； 執行）。
 	CreateWithdrawal(ctx context.Context, in *CreateWithdrawalRequest, opts ...grpc.CallOption) (*CreateWithdrawalReply, error)
 }
 
@@ -120,19 +120,19 @@ func (c *storeWalletServiceClient) CreateWithdrawal(ctx context.Context, in *Cre
 // All implementations must embed UnimplementedStoreWalletServiceServer
 // for forward compatibility.
 //
-// StoreWalletService 顾客钱包：余额/积分/流水/充值。
+// StoreWalletService 顧客錢包：餘額/積分/流水/充值。
 type StoreWalletServiceServer interface {
-	// GetBalance 余额+积分。
+	// GetBalance 餘額+積分。
 	GetBalance(context.Context, *emptypb.Empty) (*BalanceReply, error)
-	// ListTransactions 流水（余额）。
+	// ListTransactions 流水（餘額）。
 	ListTransactions(context.Context, *ListTxRequest) (*ListTxReply, error)
-	// CreateRecharge 充值（走支付管线）。
+	// CreateRecharge 充值（走支付管線）。
 	CreateRecharge(context.Context, *CreateRechargeRequest) (*CreateRechargeReply, error)
-	// RedeemGiftcard 礼品卡兑换（哈希检索 + 防爆破；余额入账幂等键 giftcard:<id>）。
+	// RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(context.Context, *RedeemGiftcardRequest) (*RedeemGiftcardReply, error)
-	// ListMyWithdrawals 本人提现记录（状态/驳回原因/时间）。
+	// ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 	ListMyWithdrawals(context.Context, *ListMyWithdrawalsRequest) (*ListMyWithdrawalsReply, error)
-	// CreateWithdrawal 提现申请（佣金提现：冻结口径+白名单+USDT 校验； 执行）。
+	// CreateWithdrawal 提現申請（佣金提現：凍結口徑+白名單+USDT 校驗； 執行）。
 	CreateWithdrawal(context.Context, *CreateWithdrawalRequest) (*CreateWithdrawalReply, error)
 	mustEmbedUnimplementedStoreWalletServiceServer()
 }

@@ -60,7 +60,7 @@ type SupplySyncTask struct {
 	ErrorContext string `json:"error_context,omitempty"`
 	// StartedAt holds the value of the "started_at" field.
 	StartedAt time.Time `json:"started_at,omitempty"`
-	// 心跳（卡死检测）
+	// 心跳（卡死檢測）
 	HeartbeatAt time.Time `json:"heartbeat_at,omitempty"`
 	// CurrentStage holds the value of the "current_stage" field.
 	CurrentStage string `json:"current_stage,omitempty"`

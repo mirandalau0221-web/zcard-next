@@ -32,20 +32,20 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreTicketService 用户工单：创建/列表/详情/回复/评价/付费加急。
-// 游客可创建（guest_contact 必填）；内部备注用户侧自动过滤。
+// StoreTicketService 用户工單：創建/列表/詳情/回覆/評價/付費加急。
+// 遊客可創建（guest_contact 必填）；內部備註用户側自動過濾。
 type StoreTicketServiceClient interface {
-	// CreateTicket 创建工单（登录用户或游客）。
+	// CreateTicket 創建工單（登錄用户或遊客）。
 	CreateTicket(ctx context.Context, in *CreateTicketRequest, opts ...grpc.CallOption) (*Ticket, error)
-	// ListMyTickets 我的工单列表。
+	// ListMyTickets 我的工單列表。
 	ListMyTickets(ctx context.Context, in *ListMyTicketsRequest, opts ...grpc.CallOption) (*ListMyTicketsReply, error)
-	// GetTicket 工单详情（消息流；内部备注过滤）。
+	// GetTicket 工單詳情（消息流；內部備註過濾）。
 	GetTicket(ctx context.Context, in *GetTicketRequest, opts ...grpc.CallOption) (*GetTicketReply, error)
-	// ReplyTicket 追加回复。
+	// ReplyTicket 追加回復。
 	ReplyTicket(ctx context.Context, in *ReplyTicketRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// RateTicket 评价（resolved 后 1-5）。
+	// RateTicket 評價（resolved 後 1-5）。
 	RateTicket(ctx context.Context, in *RateTicketRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// PayUrgent 付费加急（余额支付 urgent_fee；成功即 priority=urgent_paid）。
+	// PayUrgent 付費加急（餘額支付 urgent_fee；成功即 priority=urgent_paid）。
 	PayUrgent(ctx context.Context, in *PayUrgentRequest, opts ...grpc.CallOption) (*PayUrgentReply, error)
 }
 
@@ -121,20 +121,20 @@ func (c *storeTicketServiceClient) PayUrgent(ctx context.Context, in *PayUrgentR
 // All implementations must embed UnimplementedStoreTicketServiceServer
 // for forward compatibility.
 //
-// StoreTicketService 用户工单：创建/列表/详情/回复/评价/付费加急。
-// 游客可创建（guest_contact 必填）；内部备注用户侧自动过滤。
+// StoreTicketService 用户工單：創建/列表/詳情/回覆/評價/付費加急。
+// 遊客可創建（guest_contact 必填）；內部備註用户側自動過濾。
 type StoreTicketServiceServer interface {
-	// CreateTicket 创建工单（登录用户或游客）。
+	// CreateTicket 創建工單（登錄用户或遊客）。
 	CreateTicket(context.Context, *CreateTicketRequest) (*Ticket, error)
-	// ListMyTickets 我的工单列表。
+	// ListMyTickets 我的工單列表。
 	ListMyTickets(context.Context, *ListMyTicketsRequest) (*ListMyTicketsReply, error)
-	// GetTicket 工单详情（消息流；内部备注过滤）。
+	// GetTicket 工單詳情（消息流；內部備註過濾）。
 	GetTicket(context.Context, *GetTicketRequest) (*GetTicketReply, error)
-	// ReplyTicket 追加回复。
+	// ReplyTicket 追加回復。
 	ReplyTicket(context.Context, *ReplyTicketRequest) (*emptypb.Empty, error)
-	// RateTicket 评价（resolved 后 1-5）。
+	// RateTicket 評價（resolved 後 1-5）。
 	RateTicket(context.Context, *RateTicketRequest) (*emptypb.Empty, error)
-	// PayUrgent 付费加急（余额支付 urgent_fee；成功即 priority=urgent_paid）。
+	// PayUrgent 付費加急（餘額支付 urgent_fee；成功即 priority=urgent_paid）。
 	PayUrgent(context.Context, *PayUrgentRequest) (*PayUrgentReply, error)
 	mustEmbedUnimplementedStoreTicketServiceServer()
 }

@@ -29,21 +29,21 @@ const OperationAdminSettingsServiceUpdateSetting = "/zcard.api.admin.v1.AdminSet
 const OperationAdminSettingsServiceUpdateSettings = "/zcard.api.admin.v1.AdminSettingsService/UpdateSettings"
 
 type AdminSettingsServiceHTTPServer interface {
-	// GetSetting GetSetting 读取单个设置项。
+	// GetSetting GetSetting 讀取單個設置項。
 	GetSetting(context.Context, *GetSettingRequest) (*Setting, error)
 	GetThemeSettings(context.Context, *ThemeSettingsRequest) (*ThemeSettingsReply, error)
-	// InstallTemplate InstallTemplate 安装主题（zip base64；解压校验后原子落盘到模板目录）。
+	// InstallTemplate InstallTemplate 安裝主題（zip base64；解壓校驗後原子落盤到模板目錄）。
 	InstallTemplate(context.Context, *InstallTemplateRequest) (*TemplateItem, error)
-	// ListSettings ListSettings 按分组列出设置项。
+	// ListSettings ListSettings 按分組列出設置項。
 	ListSettings(context.Context, *ListSettingsRequest) (*ListSettingsReply, error)
-	// ListTemplates ListTemplates 可用模板清单（扫描 web/storefront/templates/*/theme.json；
-	// 目录缺失回退内置 classic 清单）。
+	// ListTemplates ListTemplates 可用模板清單（掃描 web/storefront/templates/*/theme.json；
+	// 目錄缺失回退內置 classic 清單）。
 	ListTemplates(context.Context, *emptypb.Empty) (*TemplateList, error)
 	PreviewThemeSettings(context.Context, *SaveThemeSettingsRequest) (*ThemePreviewReply, error)
 	SaveThemeSettings(context.Context, *SaveThemeSettingsRequest) (*ThemeSettingsReply, error)
-	// UpdateSetting UpdateSetting 更新单个设置项（value 为任意 JSON 文档）。
+	// UpdateSetting UpdateSetting 更新單個設置項（value 為任意 JSON 文檔）。
 	UpdateSetting(context.Context, *UpdateSettingRequest) (*Setting, error)
-	// UpdateSettings UpdateSettings 批量更新（表单级保存；单事务原子写入）。
+	// UpdateSettings UpdateSettings 批量更新（表單級保存；單事務原子寫入）。
 	UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsReply, error)
 }
 
@@ -247,21 +247,21 @@ func _AdminSettingsService_UpdateSettings0_HTTP_Handler(srv AdminSettingsService
 }
 
 type AdminSettingsServiceHTTPClient interface {
-	// GetSetting GetSetting 读取单个设置项。
+	// GetSetting GetSetting 讀取單個設置項。
 	GetSetting(ctx context.Context, req *GetSettingRequest, opts ...http.CallOption) (rsp *Setting, err error)
 	GetThemeSettings(ctx context.Context, req *ThemeSettingsRequest, opts ...http.CallOption) (rsp *ThemeSettingsReply, err error)
-	// InstallTemplate InstallTemplate 安装主题（zip base64；解压校验后原子落盘到模板目录）。
+	// InstallTemplate InstallTemplate 安裝主題（zip base64；解壓校驗後原子落盤到模板目錄）。
 	InstallTemplate(ctx context.Context, req *InstallTemplateRequest, opts ...http.CallOption) (rsp *TemplateItem, err error)
-	// ListSettings ListSettings 按分组列出设置项。
+	// ListSettings ListSettings 按分組列出設置項。
 	ListSettings(ctx context.Context, req *ListSettingsRequest, opts ...http.CallOption) (rsp *ListSettingsReply, err error)
-	// ListTemplates ListTemplates 可用模板清单（扫描 web/storefront/templates/*/theme.json；
-	// 目录缺失回退内置 classic 清单）。
+	// ListTemplates ListTemplates 可用模板清單（掃描 web/storefront/templates/*/theme.json；
+	// 目錄缺失回退內置 classic 清單）。
 	ListTemplates(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *TemplateList, err error)
 	PreviewThemeSettings(ctx context.Context, req *SaveThemeSettingsRequest, opts ...http.CallOption) (rsp *ThemePreviewReply, err error)
 	SaveThemeSettings(ctx context.Context, req *SaveThemeSettingsRequest, opts ...http.CallOption) (rsp *ThemeSettingsReply, err error)
-	// UpdateSetting UpdateSetting 更新单个设置项（value 为任意 JSON 文档）。
+	// UpdateSetting UpdateSetting 更新單個設置項（value 為任意 JSON 文檔）。
 	UpdateSetting(ctx context.Context, req *UpdateSettingRequest, opts ...http.CallOption) (rsp *Setting, err error)
-	// UpdateSettings UpdateSettings 批量更新（表单级保存；单事务原子写入）。
+	// UpdateSettings UpdateSettings 批量更新（表單級保存；單事務原子寫入）。
 	UpdateSettings(ctx context.Context, req *UpdateSettingsRequest, opts ...http.CallOption) (rsp *UpdateSettingsReply, err error)
 }
 
@@ -273,7 +273,7 @@ func NewAdminSettingsServiceHTTPClient(client *http.Client) AdminSettingsService
 	return &AdminSettingsServiceHTTPClientImpl{client}
 }
 
-// GetSetting GetSetting 读取单个设置项。
+// GetSetting GetSetting 讀取單個設置項。
 func (c *AdminSettingsServiceHTTPClientImpl) GetSetting(ctx context.Context, in *GetSettingRequest, opts ...http.CallOption) (*Setting, error) {
 	var out Setting
 	pattern := "/api/v1/admin/settings/{group}/{key}"
@@ -306,7 +306,7 @@ func (c *AdminSettingsServiceHTTPClientImpl) GetThemeSettings(ctx context.Contex
 	return &out, nil
 }
 
-// InstallTemplate InstallTemplate 安装主题（zip base64；解压校验后原子落盘到模板目录）。
+// InstallTemplate InstallTemplate 安裝主題（zip base64；解壓校驗後原子落盤到模板目錄）。
 func (c *AdminSettingsServiceHTTPClientImpl) InstallTemplate(ctx context.Context, in *InstallTemplateRequest, opts ...http.CallOption) (*TemplateItem, error) {
 	var out TemplateItem
 	pattern := "/api/v1/admin/settings/templates/install"
@@ -324,7 +324,7 @@ func (c *AdminSettingsServiceHTTPClientImpl) InstallTemplate(ctx context.Context
 	return &out, nil
 }
 
-// ListSettings ListSettings 按分组列出设置项。
+// ListSettings ListSettings 按分組列出設置項。
 func (c *AdminSettingsServiceHTTPClientImpl) ListSettings(ctx context.Context, in *ListSettingsRequest, opts ...http.CallOption) (*ListSettingsReply, error) {
 	var out ListSettingsReply
 	pattern := "/api/v1/admin/settings"
@@ -341,8 +341,8 @@ func (c *AdminSettingsServiceHTTPClientImpl) ListSettings(ctx context.Context, i
 	return &out, nil
 }
 
-// ListTemplates ListTemplates 可用模板清单（扫描 web/storefront/templates/*/theme.json；
-// 目录缺失回退内置 classic 清单）。
+// ListTemplates ListTemplates 可用模板清單（掃描 web/storefront/templates/*/theme.json；
+// 目錄缺失回退內置 classic 清單）。
 func (c *AdminSettingsServiceHTTPClientImpl) ListTemplates(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*TemplateList, error) {
 	var out TemplateList
 	pattern := "/api/v1/admin/settings/templates"
@@ -393,7 +393,7 @@ func (c *AdminSettingsServiceHTTPClientImpl) SaveThemeSettings(ctx context.Conte
 	return &out, nil
 }
 
-// UpdateSetting UpdateSetting 更新单个设置项（value 为任意 JSON 文档）。
+// UpdateSetting UpdateSetting 更新單個設置項（value 為任意 JSON 文檔）。
 func (c *AdminSettingsServiceHTTPClientImpl) UpdateSetting(ctx context.Context, in *UpdateSettingRequest, opts ...http.CallOption) (*Setting, error) {
 	var out Setting
 	pattern := "/api/v1/admin/settings/{group}/{key}"
@@ -411,7 +411,7 @@ func (c *AdminSettingsServiceHTTPClientImpl) UpdateSetting(ctx context.Context, 
 	return &out, nil
 }
 
-// UpdateSettings UpdateSettings 批量更新（表单级保存；单事务原子写入）。
+// UpdateSettings UpdateSettings 批量更新（表單級保存；單事務原子寫入）。
 func (c *AdminSettingsServiceHTTPClientImpl) UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...http.CallOption) (*UpdateSettingsReply, error) {
 	var out UpdateSettingsReply
 	pattern := "/api/v1/admin/settings"

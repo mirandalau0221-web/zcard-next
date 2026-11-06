@@ -41,13 +41,13 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 		expectedFee = fees[0].Expected
 	}
 	if !money.ValidCents(amount) || !money.ValidCents(feeAmount) || amount+feeAmount <= 0 || !money.ValidCents(amount+feeAmount) {
-		return nil, refundInvalid("退款本金和手续费不能为负，合计必须大于 0 且不超限")
+		return nil, refundInvalid("退款本金和手續費不能為負，合計必須大於 0 且不超限")
 	}
 	if expectedRefunded == nil {
-		return nil, refundInvalid("请刷新订单详情后重新确认退款金额")
+		return nil, refundInvalid("請刷新訂單詳情後重新確認退款金額")
 	}
 	if len([]rune(reason)) > 180 {
-		return nil, refundInvalid("退款原因不能超过 180 字")
+		return nil, refundInvalid("退款原因不能超過 180 字")
 	}
 	var result *ent.RefundOrder
 	err := data.Tx(ctx, r.data, func(ctx context.Context) error {
@@ -63,10 +63,10 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 			return refundInvalid(err.Error())
 		}
 		if o.CommerceVersion == 1 {
-			return refundInvalid("该订单必须按商品项退款")
+			return refundInvalid("該訂單必須按商品項退款")
 		}
 		if o.UserID == 0 {
-			return refundInvalid("游客订单没有会员余额，不能退款到钱包，请联系买家核实退款方式")
+			return refundInvalid("遊客訂單沒有會員餘額，不能退款到錢包，請聯繫買家核實退款方式")
 		}
 		receipts, err := c.RefundOrder.Query().Where(refundorder.OrderID(orderID)).All(ctx)
 		if err != nil {
@@ -76,16 +76,16 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 		for _, rf := range receipts {
 			if rf.Status == refundorder.StatusSucceeded {
 				if rf.Amount < 0 || rf.Amount > o.TotalAmount-refunded {
-					return refundInvalid("历史退款金额异常，请核对退款记录")
+					return refundInvalid("歷史退款金額異常，請核對退款記錄")
 				}
 				refunded += rf.Amount
 				if rf.FeeAmount < 0 || refundedFee > money.MaxCents-rf.FeeAmount {
-					return refundInvalid("历史手续费退款金额异常")
+					return refundInvalid("歷史手續費退款金額異常")
 				}
 				refundedFee += rf.FeeAmount
 			}
 			if rf.Status == refundorder.StatusProcessing || (rf.Status == refundorder.StatusCreated && rf.Channel != refundorder.ChannelWallet) {
-				return refundInvalid("存在待核对的其他渠道退款，请先核对，避免重复退款")
+				return refundInvalid("存在待核對的其他渠道退款，請先核對，避免重複退款")
 			}
 		}
 		limit, hasSocial, socialErr := data.SocialRetailRefundLimit(ctx, c, o.ID)
@@ -93,7 +93,7 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 			return refundInvalid(socialErr.Error())
 		}
 		if hasSocial && (refunded > limit || amount > limit-refunded) {
-			return refundInvalid("退款超过已确认服务额度")
+			return refundInvalid("退款超過已確認服務額度")
 		}
 		paid, payErr := c.Payment.Query().Where(payment.OrderID(o.ID), payment.StatusEQ(payment.StatusSuccess), payment.ReviewReasonEQ("")).Order(ent.Asc(payment.FieldID)).First(ctx)
 		if payErr != nil && !ent.IsNotFound(payErr) {
@@ -104,25 +104,25 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 			totalFee = paid.Fee
 		}
 		if refundedFee > totalFee || feeAmount > totalFee-refundedFee {
-			return refundInvalid("手续费退款超过剩余可退金额")
+			return refundInvalid("手續費退款超過剩餘可退金額")
 		}
 		if (feeAmount > 0 && expectedFee == nil) || (expectedFee != nil && *expectedFee != refundedFee) {
-			return refundInvalid("手续费退款金额已变化，请刷新后确认")
+			return refundInvalid("手續費退款金額已變化，請刷新後確認")
 		}
 		if refunded != *expectedRefunded {
-			return refundInvalid("退款金额已变化，请刷新订单详情核对，勿重复退款")
+			return refundInvalid("退款金額已變化，請刷新訂單詳情核對，勿重複退款")
 		}
 		switch o.Status {
 		case order.StatusRefunded:
 			if amount != 0 {
-				return refundInvalid("订单本金已退清，只能退还剩余手续费")
+				return refundInvalid("訂單本金已退清，只能退還剩餘手續費")
 			}
 		case order.StatusPaid, order.StatusFulfilling, order.StatusPartiallyDelivered, order.StatusDelivered, order.StatusCompleted:
 		default:
-			return refundInvalid("当前订单状态不支持退款")
+			return refundInvalid("當前訂單狀態不支持退款")
 		}
 		if amount > o.TotalAmount-refunded {
-			return refundInvalid("退款金额超过订单剩余可退金额")
+			return refundInvalid("退款金額超過訂單剩餘可退金額")
 		}
 		full := amount > 0 && refunded+amount == o.TotalAmount
 		if !full {
@@ -131,7 +131,7 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 				return e
 			}
 			if pending {
-				return refundInvalid("人工服务未完成，暂不支持无法归属到商品项的部分退款")
+				return refundInvalid("人工服務未完成，暫不支持無法歸屬到商品項的部分退款")
 			}
 		}
 		// Existing commission reversal consumers are order-level, so such orders must
@@ -142,11 +142,11 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 				return err
 			}
 			if hasCommission || o.SubsiteProfit > 0 {
-				return refundInvalid("该订单有关联佣金或分站利润，请使用全额退款")
+				return refundInvalid("該訂單有關聯佣金或分站利潤，請使用全額退款")
 			}
 		}
 		if r.wallet == nil || r.outbox == nil {
-			return kerrors.ServiceUnavailable("payment.REFUND_UNAVAILABLE", "退款服务暂不可用")
+			return kerrors.ServiceUnavailable("payment.REFUND_UNAVAILABLE", "退款服務暫不可用")
 		}
 		// Version CAS serializes refunds with other order changes before any credit.
 		update := c.Order.Update().Where(order.ID(o.ID), order.Version(o.Version), order.StatusEQ(o.Status)).AddVersion(1)
@@ -160,18 +160,18 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 			return err
 		}
 		if n != 1 {
-			return refundInvalid("订单状态已变化，请刷新后核对退款结果")
+			return refundInvalid("訂單狀態已變化，請刷新後核對退款結果")
 		}
 		result, err = c.RefundOrder.Create().SetOrderID(orderID).SetAmount(amount).SetFeeAmount(feeAmount).SetChannel(refundorder.ChannelWallet).SetStatus(refundorder.StatusSucceeded).SetOperatorID(operatorID).SetReason(reason).Save(ctx)
 		if err != nil {
 			return err
 		}
 		reference := fmt.Sprintf("order_refund:%d", result.ID)
-		if err = r.wallet.CreditInTx(ctx, walletport.Entry{UserID: o.UserID, Direction: "in", Type: "refund", Amount: money.Cents(amount + feeAmount), Reference: reference, OrderID: o.ID, Remark: "订单 " + o.OrderNo + " 退款"}); err != nil {
+		if err = r.wallet.CreditInTx(ctx, walletport.Entry{UserID: o.UserID, Direction: "in", Type: "refund", Amount: money.Cents(amount + feeAmount), Reference: reference, OrderID: o.ID, Remark: "訂單 " + o.OrderNo + " 退款"}); err != nil {
 			return err
 		}
 		// Old wallet rows were intents only; supersede them after an actual credit.
-		if _, err = c.RefundOrder.Update().Where(refundorder.OrderID(orderID), refundorder.ChannelEQ(refundorder.ChannelWallet), refundorder.StatusEQ(refundorder.StatusCreated)).SetStatus(refundorder.StatusFailed).SetReason("旧退款申请未执行，已由新的余额退款记录替代").Save(ctx); err != nil {
+		if _, err = c.RefundOrder.Update().Where(refundorder.OrderID(orderID), refundorder.ChannelEQ(refundorder.ChannelWallet), refundorder.StatusEQ(refundorder.StatusCreated)).SetStatus(refundorder.StatusFailed).SetReason("舊退款申請未執行，已由新的餘額退款記錄替代").Save(ctx); err != nil {
 			return err
 		}
 		event := "refund_partial"
@@ -181,7 +181,7 @@ func (r *PaymentRepoImpl) RefundToWallet(ctx context.Context, orderID uint64, am
 		if full {
 			event = "refunded"
 		}
-		audit := fmt.Sprintf("退至会员余额：本金 %d 分，手续费 %d 分；累计本金 %d 分，手续费 %d 分", amount, feeAmount, refunded+amount, refundedFee+feeAmount)
+		audit := fmt.Sprintf("退至會員餘額：本金 %d 分，手續費 %d 分；累計本金 %d 分，手續費 %d 分", amount, feeAmount, refunded+amount, refundedFee+feeAmount)
 		if strings.TrimSpace(reason) != "" {
 			audit += "；" + reason
 		}

@@ -1,6 +1,6 @@
 package coupon
 
-// AdminCouponService 管理面优惠券服务（M1b 基础版：批量生成 + 列表 + 作废）。
+// AdminCouponService 管理面優惠券服務（M1b 基礎版：批量生成 + 列表 + 作廢）。
 
 import (
 	"context"
@@ -14,22 +14,22 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminCouponService 服务。
+// AdminCouponService 服務。
 type AdminCouponService struct {
 	adminv1.UnimplementedAdminCouponServiceServer
 	repo *CouponRepoImpl
 }
 
-// NewAdminCouponService 构造。
+// NewAdminCouponService 構造。
 func NewAdminCouponService(repo *CouponRepoImpl) *AdminCouponService {
 	return &AdminCouponService{repo: repo}
 }
 
-// ListCoupons 券列表（状态/批次 + 分页）。
+// ListCoupons 券列表（狀態/批次 + 分頁）。
 func (s *AdminCouponService) ListCoupons(ctx context.Context, req *adminv1.ListCouponsRequest) (*adminv1.CouponList, error) {
 	rows, total, batches, err := s.repo.ListCoupons(ctx, req.GetStatus(), req.GetBatchId(), int(req.GetPage()), int(req.GetPageSize()))
 	if err != nil {
-		return nil, errors.InternalServer("coupon.LIST_FAILED", "读取券失败")
+		return nil, errors.InternalServer("coupon.LIST_FAILED", "讀取券失敗")
 	}
 	reply := &adminv1.CouponList{
 		Total:    int64(total),
@@ -49,7 +49,7 @@ func (s *AdminCouponService) ListCoupons(ctx context.Context, req *adminv1.ListC
 // CreateCouponBatch 批量生成。
 func (s *AdminCouponService) CreateCouponBatch(ctx context.Context, req *adminv1.CreateCouponBatchRequest) (*adminv1.CreateCouponBatchReply, error) {
 	if req.GetName() == "" || req.GetCount() <= 0 {
-		return nil, errors.BadRequest("coupon.INVALID_INPUT", "名称/数量必填且数量>0")
+		return nil, errors.BadRequest("coupon.INVALID_INPUT", "名稱/數量必填且數量>0")
 	}
 	var expireAt *time.Time
 	if req.GetExpireAt() > 0 {
@@ -58,20 +58,20 @@ func (s *AdminCouponService) CreateCouponBatch(ctx context.Context, req *adminv1
 	}
 	n, err := s.repo.CreateBatch(ctx, req.GetName(), req.GetType(), req.GetValue(), req.GetCount(), expireAt)
 	if err != nil {
-		return nil, errors.InternalServer("coupon.CREATE_FAILED", "生成失败: "+err.Error())
+		return nil, errors.InternalServer("coupon.CREATE_FAILED", "生成失敗: "+err.Error())
 	}
 	return &adminv1.CreateCouponBatchReply{Count: n}, nil
 }
 
-// DisableCoupon 作废（按 batch_id）。
+// DisableCoupon 作廢（按 batch_id）。
 func (s *AdminCouponService) DisableCoupon(ctx context.Context, req *adminv1.DisableCouponRequest) (*emptypb.Empty, error) {
 	if _, err := s.repo.Disable(ctx, req.GetBatchId()); err != nil {
-		return nil, errors.InternalServer("coupon.DISABLE_FAILED", "作废失败")
+		return nil, errors.InternalServer("coupon.DISABLE_FAILED", "作廢失敗")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// DeleteCoupons 批量删除（ids 优先；否则删整批次未使用）。已使用/已作废的跳过保审计。
+// DeleteCoupons 批量刪除（ids 優先；否則刪整批次未使用）。已使用/已作廢的跳過保審計。
 func (s *AdminCouponService) DeleteCoupons(ctx context.Context, req *adminv1.DeleteCouponsRequest) (*adminv1.DeleteCouponsReply, error) {
 	var (
 		n   int
@@ -83,19 +83,19 @@ func (s *AdminCouponService) DeleteCoupons(ctx context.Context, req *adminv1.Del
 		n, err = s.repo.DeleteBatchUnused(ctx, req.GetBatchId())
 	}
 	if err != nil {
-		return nil, errors.InternalServer("coupon.DELETE_FAILED", "删除失败")
+		return nil, errors.InternalServer("coupon.DELETE_FAILED", "刪除失敗")
 	}
 	if n == 0 && len(req.GetIds()) == 0 && req.GetBatchId() == "" {
-		return nil, errors.BadRequest("coupon.NO_TARGET", "未选择要删除的券")
+		return nil, errors.BadRequest("coupon.NO_TARGET", "未選擇要刪除的券")
 	}
 	return &adminv1.DeleteCouponsReply{Deleted: int32(n)}, nil
 }
 
-// ExportCoupons 导出券码 CSV。
+// ExportCoupons 導出券碼 CSV。
 func (s *AdminCouponService) ExportCoupons(ctx context.Context, req *adminv1.ExportCouponsRequest) (*adminv1.ExportCouponsReply, error) {
 	csv, err := s.repo.ExportCSV(ctx, req.GetStatus(), req.GetBatchId())
 	if err != nil {
-		return nil, errors.InternalServer("coupon.EXPORT_FAILED", "导出失败")
+		return nil, errors.InternalServer("coupon.EXPORT_FAILED", "導出失敗")
 	}
 	name := time.Now().Format("20060102_150405")
 	if b := req.GetBatchId(); b != "" {
@@ -106,9 +106,9 @@ func (s *AdminCouponService) ExportCoupons(ctx context.Context, req *adminv1.Exp
 	return &adminv1.ExportCouponsReply{Filename: "coupons_" + name + ".csv", Csv: csv}, nil
 }
 
-// ── M3 扩展 ────────────────────────────────────────────────
+// ── M3 擴展 ────────────────────────────────────────────────
 
-// GrantCoupon 批次赠送。
+// GrantCoupon 批次贈送。
 func (s *AdminCouponService) GrantCoupon(ctx context.Context, req *adminv1.GrantCouponRequest) (*adminv1.GrantCouponReply, error) {
 	if req.GetCount() <= 0 || req.GetCount() > 1000 {
 		return nil, fmt.Errorf("coupon.COUNT_INVALID: 1-1000")
@@ -120,7 +120,7 @@ func (s *AdminCouponService) GrantCoupon(ctx context.Context, req *adminv1.Grant
 	return &adminv1.GrantCouponReply{Granted: n}, nil
 }
 
-// CreateFlashSale 创建秒杀。
+// CreateFlashSale 創建秒殺。
 func (s *AdminCouponService) CreateFlashSale(ctx context.Context, req *adminv1.CreateFlashSaleRequest) (*adminv1.FlashSaleItem, error) {
 	if req.GetFlashPrice() <= 0 || req.GetLimitQty() <= 0 || req.GetEndAt() <= req.GetStartAt() {
 		return nil, fmt.Errorf("coupon.FLASH_PARAMS_INVALID")
@@ -135,7 +135,7 @@ func (s *AdminCouponService) CreateFlashSale(ctx context.Context, req *adminv1.C
 	return toFlashPB(fs), nil
 }
 
-// ListFlashSales 秒杀列表。
+// ListFlashSales 秒殺列表。
 func (s *AdminCouponService) ListFlashSales(ctx context.Context, req *adminv1.ListFlashSalesRequest) (*adminv1.ListFlashSalesReply, error) {
 	page, size := couponPageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListFlashAll(ctx, page, size)
@@ -149,7 +149,7 @@ func (s *AdminCouponService) ListFlashSales(ctx context.Context, req *adminv1.Li
 	return reply, nil
 }
 
-// DeleteFlashSale 删除秒杀。
+// DeleteFlashSale 刪除秒殺。
 func (s *AdminCouponService) DeleteFlashSale(ctx context.Context, req *adminv1.DeleteFlashSaleRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteFlash(ctx, req.GetId()); err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func (s *AdminCouponService) DeleteFlashSale(ctx context.Context, req *adminv1.D
 	return &emptypb.Empty{}, nil
 }
 
-// UpsertPromotion 创建/更新促销。
+// UpsertPromotion 創建/更新促銷。
 func (s *AdminCouponService) UpsertPromotion(ctx context.Context, req *adminv1.UpsertPromotionRequest) (*adminv1.PromotionItem, error) {
 	if req.GetEndAt() <= req.GetStartAt() {
 		return nil, fmt.Errorf("coupon.PROMO_WINDOW_INVALID")
@@ -165,7 +165,7 @@ func (s *AdminCouponService) UpsertPromotion(ctx context.Context, req *adminv1.U
 	scope := map[string]any{}
 	if req.GetScopeJson() != "" {
 		if err := json.Unmarshal([]byte(req.GetScopeJson()), &scope); err != nil {
-			return nil, errors.BadRequest("coupon.SCOPE_JSON_INVALID", "范围 JSON 格式不正确，请参考商品或分类编号示例")
+			return nil, errors.BadRequest("coupon.SCOPE_JSON_INVALID", "範圍 JSON 格式不正確，請參考商品或分類編號示例")
 		}
 	}
 	if err := validatePromotionScope(scope); err != nil {
@@ -180,7 +180,7 @@ func (s *AdminCouponService) UpsertPromotion(ctx context.Context, req *adminv1.U
 	return toPromoPB(p), nil
 }
 
-// ListPromotions 促销列表。
+// ListPromotions 促銷列表。
 func (s *AdminCouponService) ListPromotions(ctx context.Context, req *adminv1.ListPromotionsRequest) (*adminv1.ListPromotionsReply, error) {
 	page, size := couponPageParams(req.GetPage(), req.GetPageSize())
 	rows, total, err := s.repo.ListPromotions(ctx, page, size)

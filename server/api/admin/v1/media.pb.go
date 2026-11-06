@@ -345,8 +345,8 @@ func (x *ListMediaCategoriesReply) GetCategories() []*MediaCategory {
 
 type UploadMediaRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                  // 原始文件名（含扩展名）
-	ContentType   string                 `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"` // 声明 MIME（可空——魔数兜底）
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                  // 原始文件名（含擴展名）
+	ContentType   string                 `protobuf:"bytes,2,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"` // 聲明 MIME（可空——魔數兜底）
 	DataBase64    string                 `protobuf:"bytes,3,opt,name=data_base64,json=dataBase64,proto3" json:"data_base64,omitempty"`
 	CategoryId    uint64                 `protobuf:"varint,4,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -585,7 +585,7 @@ type ListMediaRequest struct {
 	Keyword    string                 `protobuf:"bytes,2,opt,name=keyword,proto3" json:"keyword,omitempty"`
 	Page       int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize   int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// 仅未分类素材（category_id 为空；与 category_id=0「不过滤」区分）
+	// 僅未分類素材（category_id 為空；與 category_id=0「不過濾」區分）
 	Uncategorized bool   `protobuf:"varint,5,opt,name=uncategorized,proto3" json:"uncategorized,omitempty"`
 	Kind          string `protobuf:"bytes,6,opt,name=kind,proto3" json:"kind,omitempty"` // image (default), video, or all
 	unknownFields protoimpl.UnknownFields
@@ -795,7 +795,7 @@ func (x *RenameMediaRequest) GetName() string {
 type MoveMediaRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ids           []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	CategoryId    uint64                 `protobuf:"varint,2,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // 0 = 未分类
+	CategoryId    uint64                 `protobuf:"varint,2,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // 0 = 未分類
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -847,7 +847,7 @@ func (x *MoveMediaRequest) GetCategoryId() uint64 {
 type DeleteMediaRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Ids           []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	Confirm       bool                   `protobuf:"varint,2,opt,name=confirm,proto3" json:"confirm,omitempty"` // ref_count>0 时必须 true
+	Confirm       bool                   `protobuf:"varint,2,opt,name=confirm,proto3" json:"confirm,omitempty"` // ref_count>0 時必須 true
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -899,7 +899,7 @@ func (x *DeleteMediaRequest) GetConfirm() bool {
 type DeleteMediaReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Deleted       int32                  `protobuf:"varint,1,opt,name=deleted,proto3" json:"deleted,omitempty"`
-	Referenced    []*MediaItem           `protobuf:"bytes,2,rep,name=referenced,proto3" json:"referenced,omitempty"` // 被 confirm=false 拒绝时返回引用清单
+	Referenced    []*MediaItem           `protobuf:"bytes,2,rep,name=referenced,proto3" json:"referenced,omitempty"` // 被 confirm=false 拒絕時返回引用清單
 	NeedConfirm   bool                   `protobuf:"varint,3,opt,name=need_confirm,json=needConfirm,proto3" json:"need_confirm,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

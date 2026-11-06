@@ -61,7 +61,7 @@ function categoryPath(id?: number) {
     seen.add(node.id);
     node = props.categories?.find((c) => c.id === node!.parent_id);
   }
-  return parts.join(" / ") || "未分类";
+  return parts.join(" / ") || "未分類";
 }
 function accept(data: { version: number; items: CategoryPlacementRow[] }) {
   version.value = Number(data.version || 0);
@@ -85,7 +85,7 @@ async function load() {
     const { data, error } = await fetchCategoryPlacements(props.categoryId);
     if (seq !== generation || !props.show) return;
     if (error || !data) {
-      errorText.value = "无法读取分类设置，请重试。";
+      errorText.value = "無法讀取分類設置，請重試。";
       return;
     }
     accept(data);
@@ -108,7 +108,7 @@ async function search(reset = true) {
     });
     if (seq !== searchSequence || !props.show) return;
     if (error || !data) {
-      searchError.value = "商品加载失败，请重试。";
+      searchError.value = "商品加載失敗，請重試。";
       return;
     }
     candidates.value = (data as any).products || [];
@@ -145,7 +145,7 @@ function add(p: PlacementProduct) {
   rows.value.push({
     product: p,
     placement: { product_id: p.id, is_pinned: true, is_recommended: true, position },
-    unavailable_reason: p.status !== 1 ? "商品未上架，恢复上架后展示" : "",
+    unavailable_reason: p.status !== 1 ? "商品未上架，恢復上架後展示" : "",
   });
   rows.value.sort(
     (a, b) =>
@@ -187,7 +187,7 @@ function move(from: number, to: number) {
   const lo = Math.min(from, to),
     hi = Math.max(from, to);
   if (rows.value.slice(lo, hi + 1).some((r) => r.product.is_locked)) {
-    window.$message?.info("此调整会改变锁定商品的顺序，请先解锁该商品");
+    window.$message?.info("此調整會改變鎖定商品的順序，請先解鎖該商品");
     return;
   }
   // Reuse existing rank slots: unrelated locked rows retain their positions.
@@ -208,10 +208,10 @@ function close() {
   if (saving.value) return;
   if (dirty.value) {
     window.$dialog?.warning({
-      title: "放弃未保存的设置？",
-      content: "本次调整尚未生效，关闭将放弃这些修改。",
-      positiveText: "放弃修改",
-      negativeText: "继续编辑",
+      title: "放棄未保存的設置？",
+      content: "本次調整尚未生效，關閉將放棄這些修改。",
+      positiveText: "放棄修改",
+      negativeText: "繼續編輯",
       onPositiveClick: () => emit("update:show", false),
     });
     return;
@@ -231,13 +231,13 @@ async function save() {
     if (error || !data) {
       errorText.value =
         (error as any)?.response?.data?.message ||
-        "保存未成功，当前选择和顺序已保留。请检查网络后重试。";
+        "保存未成功，當前選擇和順序已保留。請檢查網絡後重試。";
       return;
     }
     accept(data);
     saved.value = true;
     emit("saved");
-    window.$message?.success(`已保存「${props.categoryName}」的置顶与推荐`);
+    window.$message?.success(`已保存「${props.categoryName}」的置頂與推薦`);
   } finally {
     saving.value = false;
   }
@@ -245,9 +245,9 @@ async function save() {
 function reload() {
   if (dirty.value) {
     window.$dialog?.warning({
-      title: "重新加载最新设置？",
-      content: "重新加载将放弃当前草稿，读取其他管理员保存的最新设置。",
-      positiveText: "重新加载",
+      title: "重新加載最新設置？",
+      content: "重新加載將放棄當前草稿，讀取其他管理員保存的最新設置。",
+      positiveText: "重新加載",
       negativeText: "保留草稿",
       onPositiveClick: load,
     });
@@ -258,10 +258,10 @@ onBeforeRouteLeave(() => {
   if (saving.value) return false;
   return new Promise<boolean>((resolve) => {
     window.$dialog?.warning({
-      title: "离开并放弃修改？",
-      content: "当前分类设置尚未保存。",
-      positiveText: "放弃并离开",
-      negativeText: "继续编辑",
+      title: "離開並放棄修改？",
+      content: "當前分類設置尚未保存。",
+      positiveText: "放棄並離開",
+      negativeText: "繼續編輯",
       onPositiveClick: () => resolve(true),
       onNegativeClick: () => resolve(false),
       onClose: () => resolve(false),
@@ -291,17 +291,17 @@ onBeforeUnmount(() => {
     :close-on-esc="!saving"
     @update:show="!$event && close()"
   >
-    <NDrawerContent title="置顶与推荐" :closable="!saving" class="category-placements">
+    <NDrawerContent title="置頂與推薦" :closable="!saving" class="category-placements">
       <div class="placement-context">
-        <strong>当前分类：{{ categoryName }}</strong>
-        <p>可选择本分类及全部子分类的商品；设置仅在此分类生效。</p>
-        <p>置顶只影响商城的综合排序；推荐标签与首页推荐独立。</p>
+        <strong>當前分類：{{ categoryName }}</strong>
+        <p>可選擇本分類及全部子分類的商品；設置僅在此分類生效。</p>
+        <p>置頂隻影響商城的綜合排序；推薦標籤與首頁推薦獨立。</p>
       </div>
       <NAlert v-if="errorText" type="error" class="mb-12px" role="alert"
-        >{{ errorText }} <NButton text @click="reload">重新加载</NButton></NAlert
+        >{{ errorText }} <NButton text @click="reload">重新加載</NButton></NAlert
       >
       <NAlert v-if="saved" type="success" class="mb-12px"
-        >设置已保存。未上架或分类隐藏的商品暂不展示。<a
+        >設置已保存。未上架或分類隱藏的商品暫不展示。<a
           :href="`/?category_id=${categoryId}&sort=default`"
           target="_blank"
           rel="noopener noreferrer"
@@ -310,15 +310,15 @@ onBeforeUnmount(() => {
       >
       <NSpin :show="loading">
         <div class="placement-heading">
-          <h3>已设置 {{ rows.length }} 件</h3>
+          <h3>已設置 {{ rows.length }} 件</h3>
           <span
-            >{{ pinnedCount }} 件置顶 ·
-            {{ rows.filter((r) => r.placement.is_recommended).length }} 件推荐</span
+            >{{ pinnedCount }} 件置頂 ·
+            {{ rows.filter((r) => r.placement.is_recommended).length }} 件推薦</span
           >
         </div>
         <NEmpty
           v-if="loaded && !rows.length"
-          description="还没有置顶或推荐商品，从下方选择商品即可开始。"
+          description="還沒有置頂或推薦商品，從下方選擇商品即可開始。"
           class="py-20px"
         />
         <div
@@ -334,7 +334,7 @@ onBeforeUnmount(() => {
             class="drag-handle"
             :draggable="canWrite && !saving && !row.product.is_locked"
             :disabled="!canWrite || saving || row.product.is_locked"
-            :aria-label="`拖动调整${row.product.name}顺序，也可使用上移下移按钮`"
+            :aria-label="`拖動調整${row.product.name}順序，也可使用上移下移按鈕`"
             @dragstart="dragIndex = index"
             @dragend="dragIndex = null"
           >
@@ -344,23 +344,23 @@ onBeforeUnmount(() => {
             <div class="placement-name">
               <NTag v-if="row.placement.is_pinned" size="small">第 {{ index + 1 }} 位</NTag
               ><strong>{{ row.product.name }}</strong
-              ><NTag v-if="row.product.is_locked" size="small">已锁定</NTag>
+              ><NTag v-if="row.product.is_locked" size="small">已鎖定</NTag>
             </div>
             <p>{{ categoryPath(row.product.category_id) }}</p>
             <p v-if="row.unavailable_reason" class="placement-note">{{ row.unavailable_reason }}</p>
-            <p v-if="row.product.is_locked">先在商品管理中解锁，才能调整此商品的设置。</p>
+            <p v-if="row.product.is_locked">先在商品管理中解鎖，才能調整此商品的設置。</p>
             <div class="placement-actions">
               <NCheckbox
                 :checked="row.placement.is_pinned"
                 :disabled="!canWrite || saving || row.product.is_locked"
                 @update:checked="toggle(index, 'is_pinned', $event)"
-                >本分类置顶</NCheckbox
+                >本分類置頂</NCheckbox
               >
               <NCheckbox
                 :checked="row.placement.is_recommended"
                 :disabled="!canWrite || saving || row.product.is_locked"
                 @update:checked="toggle(index, 'is_recommended', $event)"
-                >显示推荐标签</NCheckbox
+                >顯示推薦標籤</NCheckbox
               >
               <template v-if="row.placement.is_pinned">
                 <NButton
@@ -388,29 +388,29 @@ onBeforeUnmount(() => {
                 text
                 :disabled="!canWrite || saving || row.product.is_locked"
                 @click="remove(index)"
-                >移除设置</NButton
+                >移除設置</NButton
               >
             </div>
           </div>
         </div>
       </NSpin>
-      <section class="placement-search" aria-label="选择分类商品">
+      <section class="placement-search" aria-label="選擇分類商品">
         <h3>添加商品</h3>
         <div class="placement-search-bar">
           <NInput
             v-model:value="keyword"
-            placeholder="搜索本分类及子分类商品"
+            placeholder="搜索本分類及子分類商品"
             clearable
             @keyup.enter="search()"
           /><NButton :loading="searching" @click="search()">搜索</NButton>
         </div>
         <NAlert v-if="searchError" type="error"
-          >{{ searchError }}<NButton text @click="search(false)">重试</NButton></NAlert
+          >{{ searchError }}<NButton text @click="search(false)">重試</NButton></NAlert
         >
         <NSpin :show="searching">
           <NEmpty
             v-if="!searching && !searchError && !candidates.length"
-            description="没有找到商品，请换个关键词或检查商品所属分类。"
+            description="沒有找到商品，請換個關鍵詞或檢查商品所屬分類。"
             class="py-20px"
           />
           <div v-for="p in candidates" :key="p.id" class="placement-candidate">
@@ -419,14 +419,14 @@ onBeforeUnmount(() => {
             <div class="placement-product">
               <strong>{{ p.name }}</strong>
               <p>{{ categoryPath(p.category_id) }} · {{ formatMoney(p.price_cents || 0) }}</p>
-              <p v-if="p.is_locked">已锁定，请先在商品管理中解锁</p>
-              <p v-else-if="p.status !== 1">未上架 · 设置后暂不展示</p>
+              <p v-if="p.is_locked">已鎖定，請先在商品管理中解鎖</p>
+              <p v-else-if="p.status !== 1">未上架 · 設置後暫不展示</p>
             </div>
             <NButton
               size="small"
               :disabled="!canWrite || !loaded || saving || p.is_locked || selected.has(p.id)"
               @click="add(p)"
-              >{{ selected.has(p.id) ? "已添加" : p.is_locked ? "已锁定" : "置顶并推荐" }}</NButton
+              >{{ selected.has(p.id) ? "已添加" : p.is_locked ? "已鎖定" : "置頂並推薦" }}</NButton
             >
           </div>
         </NSpin>
@@ -447,17 +447,17 @@ onBeforeUnmount(() => {
               : dirty
                 ? "有未保存的修改"
                 : loaded
-                  ? "设置已同步"
-                  : "正在读取设置…"
+                  ? "設置已同步"
+                  : "正在讀取設置…"
           }}</span
-          ><NButton :disabled="saving" @click="close">关闭</NButton
+          ><NButton :disabled="saving" @click="close">關閉</NButton
           ><NButton
             v-if="canWrite"
             type="primary"
             :loading="saving"
             :disabled="!dirty || loading"
             @click="save"
-            >保存设置</NButton
+            >保存設置</NButton
           >
         </div></template
       >

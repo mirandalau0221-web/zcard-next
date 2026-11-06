@@ -1,14 +1,14 @@
 package order
 
-// 订单仓储骨架（M1a 交付：创建订单 + 锁卡同事务、金额行快照、状态事件、
-// 超时取消扫描、游标分页）。当前注册 wire provider。
+// 訂單倉儲骨架（M1a 交付：創建訂單 + 鎖卡同事務、金額行快照、狀態事件、
+// 超時取消掃描、遊標分頁）。當前註冊 wire provider。
 
 import "github.com/NovaWorks/zcard-next/server/internal/data"
 
-// OrderRepoImpl 订单仓储实现（M1a 交付方法体）。
+// OrderRepoImpl 訂單倉儲實現（M1a 交付方法體）。
 type OrderRepoImpl struct {
 	data *data.Data
 }
 
-// NewOrderRepoImpl 构造。
+// NewOrderRepoImpl 構造。
 func NewOrderRepoImpl(d *data.Data) *OrderRepoImpl { return &OrderRepoImpl{data: d} }

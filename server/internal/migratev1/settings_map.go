@@ -1,9 +1,9 @@
 package migratev1
 
 // 1.x settings（group=storefront）→ 2.0 settings(group,key) 首批映射表。
-// 与 mods/settings/directory.go 的组定义逐 key 对照；未命中的 key 原样进
-// group=v1_legacy（不丢数据，人工决定去向）；SECRET 类显式跳过（在 2.0 后台重配）。
-// 完整版随 P1 交付逐 key 补齐（《数据迁移工具开发计划》附录 C）。
+// 與 mods/settings/directory.go 的組定義逐 key 對照；未命中的 key 原樣進
+// group=v1_legacy（不丟數據，人工決定去向）；SECRET 類顯式跳過（在 2.0 後台重配）。
+// 完整版隨 P1 交付逐 key 補齊（《數據遷移工具開發計劃》附錄 C）。
 
 import (
 	"encoding/json"
@@ -11,14 +11,14 @@ import (
 	"strconv"
 )
 
-// settingRule 单条映射规则：目标组/键 + 值规范化类型。
+// settingRule 單條映射規則：目標組/鍵 + 值規範化類型。
 type settingRule struct {
 	Group string
 	Key   string
 	Kind  string // bool | int | string | enum_contact | passthrough
 }
 
-// settingsMap 首批映射（键 = 1.x settings.key）。
+// settingsMap 首批映射（鍵 = 1.x settings.key）。
 var settingsMap = map[string]settingRule{
 	// site
 	"site_name":       {Group: "site", Key: "name", Kind: "string"},
@@ -40,27 +40,27 @@ var settingsMap = map[string]settingRule{
 	"captcha_register":    {Group: "security", Key: "captcha_register", Kind: "bool"},
 	"captcha_login":       {Group: "security", Key: "captcha_login", Kind: "bool"},
 	"username_min_length": {Group: "security", Key: "username_min_len", Kind: "int"},
-	// template（1.x 外观列表类）
+	// template（1.x 外觀列表類）
 	"category_nav_style": {Group: "template", Key: "category_nav_style", Kind: "string"},
 	"list_default_view":  {Group: "template", Key: "default_view", Kind: "string"},
 	"grid_columns":       {Group: "template", Key: "per_row", Kind: "int"},
 	"page_size":          {Group: "template", Key: "per_page", Kind: "int"},
 }
 
-// settingsSkipped 显式不迁的 key（SECRET 类 / 1.x 专有加密开关）。
+// settingsSkipped 顯式不遷的 key（SECRET 類 / 1.x 專有加密開關）。
 var settingsSkipped = map[string]string{
-	"card_encryption_key":       "1.x 卡密钥匙（仅迁移期使用，绝不写入 2.0）",
-	"card_encryption_enabled":   "1.x 卡密加密开关（2.0 强制加密，无此开关）",
-	"mail_password":             "SMTP 密码（SECRET，请在 2.0 后台「通知设置」重配）",
-	"sms_access_key":            "短信 AK（SECRET，请在 2.0 后台重配）",
-	"sms_access_secret":         "短信 AS（SECRET，请在 2.0 后台重配）",
-	"admin_alert_tg_token":      "管理员 TG 告警 token（SECRET，请在 2.0 后台重配）",
-	"admin_alert_wecom_webhook": "管理员企微 webhook（SECRET，请在 2.0 后台重配）",
-	"footer_analytics":          "已弃用（1.x 数据已并入 analytics）",
+	"card_encryption_key":       "1.x 卡密鑰匙（僅遷移期使用，絕不寫入 2.0）",
+	"card_encryption_enabled":   "1.x 卡密加密開關（2.0 強制加密，無此開關）",
+	"mail_password":             "SMTP 密碼（SECRET，請在 2.0 後台「通知設置」重配）",
+	"sms_access_key":            "短信 AK（SECRET，請在 2.0 後台重配）",
+	"sms_access_secret":         "短信 AS（SECRET，請在 2.0 後台重配）",
+	"admin_alert_tg_token":      "管理員 TG 告警 token（SECRET，請在 2.0 後台重配）",
+	"admin_alert_wecom_webhook": "管理員企微 webhook（SECRET，請在 2.0 後台重配）",
+	"footer_analytics":          "已棄用（1.x 數據已併入 analytics）",
 }
 
-// normalizeSettingValue 按 rule.Kind 规范化 1.x value（JSON 编码，可能存在
-// 字符串化标量的历史形态："false"），输出 2.0 value 的 JSON 文档。
+// normalizeSettingValue 按 rule.Kind 規範化 1.x value（JSON 編碼，可能存在
+// 字符串化標量的歷史形態："false"），輸出 2.0 value 的 JSON 文檔。
 func normalizeSettingValue(rule settingRule, raw string) (json.RawMessage, error) {
 	var v any
 	if err := json.Unmarshal([]byte(raw), &v); err != nil {
@@ -82,15 +82,15 @@ func normalizeSettingValue(rule settingRule, raw string) (json.RawMessage, error
 	case "enum_contact":
 		s, ok := v.(string)
 		if !ok {
-			return nil, fmt.Errorf("contact_required 期望字符串，实际 %T", v)
+			return nil, fmt.Errorf("contact_required 期望字符串，實際 %T", v)
 		}
 		switch s {
 		case "none", "phone", "email", "qq", "any":
 			return json.Marshal(s)
 		default:
-			return nil, fmt.Errorf("require_contact 取值 %q 无 2.0 对应", s)
+			return nil, fmt.Errorf("require_contact 取值 %q 無 2.0 對應", s)
 		}
-	default: // string / passthrough：字符串解引号，其余原样
+	default: // string / passthrough：字符串解引號，其餘原樣
 		if s, ok := v.(string); ok {
 			return json.Marshal(s)
 		}
@@ -109,7 +109,7 @@ func asBool(v any) (bool, error) {
 	case float64:
 		return x != 0, nil
 	}
-	return false, fmt.Errorf("期望布尔值，实际 %T(%v)", v, v)
+	return false, fmt.Errorf("期望布爾值，實際 %T(%v)", v, v)
 }
 
 func asInt(v any) (int64, error) {
@@ -121,5 +121,5 @@ func asInt(v any) (int64, error) {
 			return i, nil
 		}
 	}
-	return 0, fmt.Errorf("期望整数，实际 %T(%v)", v, v)
+	return 0, fmt.Errorf("期望整數，實際 %T(%v)", v, v)
 }

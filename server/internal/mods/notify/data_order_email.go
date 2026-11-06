@@ -32,7 +32,7 @@ func (r *NotifyRepo) orderEmailVars(ctx context.Context, env events.Envelope, va
 	if rawID != "" {
 		id, err := strconv.ParseUint(rawID, 10, 64)
 		if err != nil {
-			return fmt.Errorf("notify: 订单标识无效: %w", err)
+			return fmt.Errorf("notify: 訂單標識無效: %w", err)
 		}
 		q.Where(order.ID(id))
 	}
@@ -95,13 +95,13 @@ func (r *NotifyRepo) orderEmailVars(ctx context.Context, env events.Envelope, va
 
 func defaultOrderTemplate(eventType, channel, locale string) (*ent.NotifyTemplate, error) {
 	if channel == "email" && (eventType == "order.paid" || eventType == "order.delivered") {
-		subject := "订单 {{.order_no}} 已支付"
-		body := "<p>您的订单 {{.order_no}} 已支付，订单金额：{{.amount}}。</p>"
+		subject := "訂單 {{.order_no}} 已支付"
+		body := "<p>您的訂單 {{.order_no}} 已支付，訂單金額：{{.amount}}。</p>"
 		if eventType == "order.delivered" {
-			subject = "订单 {{.order_no}} 已完成交付"
-			body = "<p>您的订单 {{.order_no}} 已完成交付。</p>"
+			subject = "訂單 {{.order_no}} 已完成交付"
+			body = "<p>您的訂單 {{.order_no}} 已完成交付。</p>"
 		}
-		body += "<p><a href=\"{{.fetch_url}}\">查看订单与交付结果</a></p><p>请使用下单邮箱验证、查询密码或订单所属账户查看。卡密仅在授权后的店铺页面显示。</p>"
+		body += "<p><a href=\"{{.fetch_url}}\">查看訂單與交付結果</a></p><p>請使用下單郵箱驗證、查詢密碼或訂單所屬賬户查看。卡密僅在授權後的店鋪頁面顯示。</p>"
 		if locale == "en" {
 			subject = "Order {{.order_no}} payment received"
 			body = "<p>Payment for order {{.order_no}} has been received. Order amount: {{.amount}}.</p>"
@@ -114,10 +114,10 @@ func defaultOrderTemplate(eventType, channel, locale string) (*ent.NotifyTemplat
 		return &ent.NotifyTemplate{SubjectTpl: subject, BodyTpl: body, Enabled: true}, nil
 	}
 	if eventType == "order.shipped" {
-		return &ent.NotifyTemplate{SubjectTpl: "订单 {{.order_no}} 的包裹已寄出", BodyTpl: "快递公司：{{.carrier}}；快递单号：{{.tracking_no}}。请在订单详情查看配送信息。", Enabled: true}, nil
+		return &ent.NotifyTemplate{SubjectTpl: "訂單 {{.order_no}} 的包裹已寄出", BodyTpl: "快遞公司：{{.carrier}}；快遞單號：{{.tracking_no}}。請在訂單詳情查看配送信息。", Enabled: true}, nil
 	}
 	if eventType == "order.received" {
-		return &ent.NotifyTemplate{SubjectTpl: "订单 {{.order_no}} 已确认收货", BodyTpl: "实体商品已确认收货，请在订单详情查看配送及售后记录。", Enabled: true}, nil
+		return &ent.NotifyTemplate{SubjectTpl: "訂單 {{.order_no}} 已確認收貨", BodyTpl: "實體商品已確認收貨，請在訂單詳情查看配送及售後記錄。", Enabled: true}, nil
 	}
 	return nil, ErrNotFound
 }

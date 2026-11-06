@@ -69,7 +69,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminCatalogService 商品目录管理：商品/分类/标签/控件/商品组/评价。
+// AdminCatalogService 商品目錄管理：商品/分類/標籤/控件/商品組/評價。
 type AdminCatalogServiceClient interface {
 	ClassifyProducts(ctx context.Context, in *ClassifyProductsRequest, opts ...grpc.CallOption) (*ClassifyProductsReply, error)
 	GetDeliverySources(ctx context.Context, in *DeliverySourcesRequest, opts ...grpc.CallOption) (*DeliverySourcesReply, error)
@@ -81,7 +81,7 @@ type AdminCatalogServiceClient interface {
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*AdminProduct, error)
 	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	PreviewDeleteProduct(ctx context.Context, in *GetProductRequest, opts ...grpc.CallOption) (*DeleteProductPreview, error)
-	// BatchUpdateProductStatus 批量上下架（列表多选操作；status 1=上架 0=下架 2=隐藏）。
+	// BatchUpdateProductStatus 批量上下架（列表多選操作；status 1=上架 0=下架 2=隱藏）。
 	BatchUpdateProductStatus(ctx context.Context, in *BatchUpdateProductStatusRequest, opts ...grpc.CallOption) (*BatchUpdateProductStatusReply, error)
 	BatchUpdateProductCategory(ctx context.Context, in *BatchUpdateProductCategoryRequest, opts ...grpc.CallOption) (*BatchUpdateProductCategoryReply, error)
 	PreviewBatchUpdateProductContent(ctx context.Context, in *PreviewBatchProductContentRequest, opts ...grpc.CallOption) (*BatchProductContentPreview, error)
@@ -91,34 +91,34 @@ type AdminCatalogServiceClient interface {
 	SetProductLock(ctx context.Context, in *SetProductLockRequest, opts ...grpc.CallOption) (*AdminProduct, error)
 	GetCategoryPlacements(ctx context.Context, in *GetCategoryPlacementsRequest, opts ...grpc.CallOption) (*CategoryPlacementsReply, error)
 	SetCategoryPlacements(ctx context.Context, in *SetCategoryPlacementsRequest, opts ...grpc.CallOption) (*CategoryPlacementsReply, error)
-	// ── 分类 ──
+	// ── 分類 ──
 	ListCategories(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CategoryList, error)
 	CreateCategory(ctx context.Context, in *CreateCategoryRequest, opts ...grpc.CallOption) (*Category, error)
 	UpdateCategory(ctx context.Context, in *UpdateCategoryRequest, opts ...grpc.CallOption) (*Category, error)
 	DeleteCategory(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	MergeCategories(ctx context.Context, in *MergeCategoriesRequest, opts ...grpc.CallOption) (*MergeCategoriesReply, error)
-	// ReorderCategories 分类排序（拖拽重排：把某层级全部兄弟按 ids 顺序重排并归一化 sort）。
+	// ReorderCategories 分類排序（拖拽重排：把某層級全部兄弟按 ids 順序重排並歸一化 sort）。
 	ReorderCategories(ctx context.Context, in *ReorderCategoriesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ── 标签 ──
+	// ── 標籤 ──
 	ListTags(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TagList, error)
 	CreateTag(ctx context.Context, in *CreateTagRequest, opts ...grpc.CallOption) (*Tag, error)
 	DeleteTag(ctx context.Context, in *DeleteTagRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ── 自定义控件 ──
+	// ── 自定義控件 ──
 	ListControls(ctx context.Context, in *ListControlsRequest, opts ...grpc.CallOption) (*ControlList, error)
 	CreateControl(ctx context.Context, in *CreateControlRequest, opts ...grpc.CallOption) (*AdminControl, error)
 	UpdateControl(ctx context.Context, in *UpdateControlRequest, opts ...grpc.CallOption) (*AdminControl, error)
 	DeleteControl(ctx context.Context, in *DeleteControlRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ── 评价（真实一单一评审核 + 虚拟评价）──
+	// ── 評價（真實一單一評審核 + 虛擬評價）──
 	ListReviews(ctx context.Context, in *ListReviewsRequest, opts ...grpc.CallOption) (*ListReviewsReply, error)
 	ApproveReview(ctx context.Context, in *ApproveReviewRequest, opts ...grpc.CallOption) (*ReviewItem, error)
 	RejectReview(ctx context.Context, in *RejectReviewRequest, opts ...grpc.CallOption) (*ReviewItem, error)
 	CreateVirtualReview(ctx context.Context, in *CreateVirtualReviewRequest, opts ...grpc.CallOption) (*VirtualReviewItem, error)
-	// ── SKU 多规格 ──
+	// ── SKU 多規格 ──
 	ListSkus(ctx context.Context, in *ListSkusRequest, opts ...grpc.CallOption) (*SkuList, error)
 	CreateSku(ctx context.Context, in *CreateSkuRequest, opts ...grpc.CallOption) (*Sku, error)
 	UpdateSku(ctx context.Context, in *UpdateSkuRequest, opts ...grpc.CallOption) (*Sku, error)
 	DeleteSku(ctx context.Context, in *DeleteSkuRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ── 会员商品组 ──
+	// ── 會員商品組 ──
 	ListMemberGroups(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MemberGroupList, error)
 	CreateMemberGroup(ctx context.Context, in *CreateMemberGroupRequest, opts ...grpc.CallOption) (*MemberGroup, error)
 	UpdateMemberGroup(ctx context.Context, in *UpdateMemberGroupRequest, opts ...grpc.CallOption) (*MemberGroup, error)
@@ -567,7 +567,7 @@ func (c *adminCatalogServiceClient) DeleteMemberGroup(ctx context.Context, in *D
 // All implementations must embed UnimplementedAdminCatalogServiceServer
 // for forward compatibility.
 //
-// AdminCatalogService 商品目录管理：商品/分类/标签/控件/商品组/评价。
+// AdminCatalogService 商品目錄管理：商品/分類/標籤/控件/商品組/評價。
 type AdminCatalogServiceServer interface {
 	ClassifyProducts(context.Context, *ClassifyProductsRequest) (*ClassifyProductsReply, error)
 	GetDeliverySources(context.Context, *DeliverySourcesRequest) (*DeliverySourcesReply, error)
@@ -579,7 +579,7 @@ type AdminCatalogServiceServer interface {
 	UpdateProduct(context.Context, *UpdateProductRequest) (*AdminProduct, error)
 	DeleteProduct(context.Context, *DeleteProductRequest) (*emptypb.Empty, error)
 	PreviewDeleteProduct(context.Context, *GetProductRequest) (*DeleteProductPreview, error)
-	// BatchUpdateProductStatus 批量上下架（列表多选操作；status 1=上架 0=下架 2=隐藏）。
+	// BatchUpdateProductStatus 批量上下架（列表多選操作；status 1=上架 0=下架 2=隱藏）。
 	BatchUpdateProductStatus(context.Context, *BatchUpdateProductStatusRequest) (*BatchUpdateProductStatusReply, error)
 	BatchUpdateProductCategory(context.Context, *BatchUpdateProductCategoryRequest) (*BatchUpdateProductCategoryReply, error)
 	PreviewBatchUpdateProductContent(context.Context, *PreviewBatchProductContentRequest) (*BatchProductContentPreview, error)
@@ -589,34 +589,34 @@ type AdminCatalogServiceServer interface {
 	SetProductLock(context.Context, *SetProductLockRequest) (*AdminProduct, error)
 	GetCategoryPlacements(context.Context, *GetCategoryPlacementsRequest) (*CategoryPlacementsReply, error)
 	SetCategoryPlacements(context.Context, *SetCategoryPlacementsRequest) (*CategoryPlacementsReply, error)
-	// ── 分类 ──
+	// ── 分類 ──
 	ListCategories(context.Context, *emptypb.Empty) (*CategoryList, error)
 	CreateCategory(context.Context, *CreateCategoryRequest) (*Category, error)
 	UpdateCategory(context.Context, *UpdateCategoryRequest) (*Category, error)
 	DeleteCategory(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error)
 	MergeCategories(context.Context, *MergeCategoriesRequest) (*MergeCategoriesReply, error)
-	// ReorderCategories 分类排序（拖拽重排：把某层级全部兄弟按 ids 顺序重排并归一化 sort）。
+	// ReorderCategories 分類排序（拖拽重排：把某層級全部兄弟按 ids 順序重排並歸一化 sort）。
 	ReorderCategories(context.Context, *ReorderCategoriesRequest) (*emptypb.Empty, error)
-	// ── 标签 ──
+	// ── 標籤 ──
 	ListTags(context.Context, *emptypb.Empty) (*TagList, error)
 	CreateTag(context.Context, *CreateTagRequest) (*Tag, error)
 	DeleteTag(context.Context, *DeleteTagRequest) (*emptypb.Empty, error)
-	// ── 自定义控件 ──
+	// ── 自定義控件 ──
 	ListControls(context.Context, *ListControlsRequest) (*ControlList, error)
 	CreateControl(context.Context, *CreateControlRequest) (*AdminControl, error)
 	UpdateControl(context.Context, *UpdateControlRequest) (*AdminControl, error)
 	DeleteControl(context.Context, *DeleteControlRequest) (*emptypb.Empty, error)
-	// ── 评价（真实一单一评审核 + 虚拟评价）──
+	// ── 評價（真實一單一評審核 + 虛擬評價）──
 	ListReviews(context.Context, *ListReviewsRequest) (*ListReviewsReply, error)
 	ApproveReview(context.Context, *ApproveReviewRequest) (*ReviewItem, error)
 	RejectReview(context.Context, *RejectReviewRequest) (*ReviewItem, error)
 	CreateVirtualReview(context.Context, *CreateVirtualReviewRequest) (*VirtualReviewItem, error)
-	// ── SKU 多规格 ──
+	// ── SKU 多規格 ──
 	ListSkus(context.Context, *ListSkusRequest) (*SkuList, error)
 	CreateSku(context.Context, *CreateSkuRequest) (*Sku, error)
 	UpdateSku(context.Context, *UpdateSkuRequest) (*Sku, error)
 	DeleteSku(context.Context, *DeleteSkuRequest) (*emptypb.Empty, error)
-	// ── 会员商品组 ──
+	// ── 會員商品組 ──
 	ListMemberGroups(context.Context, *emptypb.Empty) (*MemberGroupList, error)
 	CreateMemberGroup(context.Context, *CreateMemberGroupRequest) (*MemberGroup, error)
 	UpdateMemberGroup(context.Context, *UpdateMemberGroupRequest) (*MemberGroup, error)

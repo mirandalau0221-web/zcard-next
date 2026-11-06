@@ -28,27 +28,27 @@ func (r *DeliveryRepoImpl) serviceTarget(ctx context.Context, no string, id, adm
 	}
 	it, e := c.OrderItem.Query().Where(orderitem.ID(id), orderitem.OrderID(o.ID), orderitem.FulfillmentTypeEQ(orderitem.FulfillmentTypeManual)).Only(ctx)
 	if e != nil {
-		return nil, nil, fmt.Errorf("该商品项不是人工服务")
+		return nil, nil, fmt.Errorf("該商品項不是人工服務")
 	}
 	if it.FulfillmentStatus != "pending" && it.FulfillmentStatus != "delivering" {
-		return nil, nil, fmt.Errorf("商品项已处理，请刷新")
+		return nil, nil, fmt.Errorf("商品項已處理，請刷新")
 	}
 	if it.AssignedAdminID != 0 && it.AssignedAdminID != admin {
-		return nil, nil, fmt.Errorf("该服务已由其他管理员领取")
+		return nil, nil, fmt.Errorf("該服務已由其他管理員領取")
 	}
 	pending, e := c.RefundOrder.Query().Where(refundorder.OrderID(o.ID), refundorder.StatusIn(refundorder.StatusCreated, refundorder.StatusProcessing)).Exist(ctx)
 	if e != nil {
 		return nil, nil, e
 	}
 	if pending {
-		return nil, nil, fmt.Errorf("订单有退款待核对，不能处理")
+		return nil, nil, fmt.Errorf("訂單有退款待核對，不能處理")
 	}
 	return o, it, nil
 }
 func (s *AdminFulfillmentService) StartService(ctx context.Context, req *adminv1.StartServiceRequest) (*emptypb.Empty, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
-		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "请登录")
+		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "請登錄")
 	}
 	e := data.Tx(ctx, s.data, func(ctx context.Context) error {
 		o, it, e := s.repo.serviceTarget(ctx, req.OrderNo, req.OrderItemId, claims.Subject)
@@ -62,7 +62,7 @@ func (s *AdminFulfillmentService) StartService(ctx context.Context, req *adminv1
 		if e = c.OrderItem.UpdateOneID(it.ID).SetAssignedAdminID(claims.Subject).SetFulfillmentStatus("delivering").Exec(ctx); e != nil {
 			return e
 		}
-		return c.OrderStatusEvent.Create().SetOrderID(o.ID).SetFromStatus(string(o.Status)).SetToStatus(string(o.Status)).SetEvent("service_started").SetOperator("admin").SetOperatorID(claims.Subject).SetReason(fmt.Sprintf("开始处理商品项 %d", it.ID)).Exec(ctx)
+		return c.OrderStatusEvent.Create().SetOrderID(o.ID).SetFromStatus(string(o.Status)).SetToStatus(string(o.Status)).SetEvent("service_started").SetOperator("admin").SetOperatorID(claims.Subject).SetReason(fmt.Sprintf("開始處理商品項 %d", it.ID)).Exec(ctx)
 	})
 	if e != nil {
 		return nil, errors.BadRequest("fulfillment.START_FAILED", e.Error())
@@ -72,7 +72,7 @@ func (s *AdminFulfillmentService) StartService(ctx context.Context, req *adminv1
 func (r *DeliveryRepoImpl) CompleteService(ctx context.Context, no string, id uint64, content, remark string, admin uint64) error {
 	content = strings.TrimSpace(content)
 	if content == "" || len([]rune(content)) > 4000 || len([]rune(remark)) > 180 {
-		return fmt.Errorf("请填写4000字以内的交付说明，内部备注不超过180字")
+		return fmt.Errorf("請填寫4000字以內的交付説明，內部備註不超過180字")
 	}
 	return data.Tx(ctx, r.data, func(ctx context.Context) error {
 		o, it, e := r.serviceTarget(ctx, no, id, admin)
@@ -80,7 +80,7 @@ func (r *DeliveryRepoImpl) CompleteService(ctx context.Context, no string, id ui
 			return e
 		}
 		if it.FulfillmentStatus != "delivering" {
-			return fmt.Errorf("请先开始处理该服务")
+			return fmt.Errorf("請先開始處理該服務")
 		}
 		c := data.Client(ctx, r.data)
 		if r.cipher == nil {
@@ -116,11 +116,11 @@ func (r *DeliveryRepoImpl) serviceText(ctx context.Context, d *ent.OrderDelivery
 	c := data.Client(ctx, r.data)
 	it, e := c.OrderItem.Get(ctx, d.ItemID)
 	if e != nil {
-		return "（交付信息暂不可用）"
+		return "（交付信息暫不可用）"
 	}
 	plain, e := r.cipher.Open(d.ServiceContent, it.ProductID, it.SubsiteID)
 	if e != nil {
-		return "（解密失败）"
+		return "（解密失敗）"
 	}
 	return plain
 }

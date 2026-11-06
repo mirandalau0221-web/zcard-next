@@ -22,9 +22,9 @@ const OperationStorePaymentServiceListChannels = "/zcard.api.storefront.v1.Store
 const OperationStorePaymentServiceQuotePayment = "/zcard.api.storefront.v1.StorePaymentService/QuotePayment"
 
 type StorePaymentServiceHTTPServer interface {
-	// CreatePayment CreatePayment 创建支付（返回收银台/二维码跳转信息）。
+	// CreatePayment CreatePayment 創建支付（返回收銀台/二維碼跳轉信息）。
 	CreatePayment(context.Context, *CreatePaymentRequest) (*CreatePaymentReply, error)
-	// ListChannels ListChannels 启用渠道列表（支付页渠道下拉数据源—— 替代前端硬编码枚举）。
+	// ListChannels ListChannels 啓用渠道列表（支付頁渠道下拉數據源—— 替代前端硬編碼枚舉）。
 	ListChannels(context.Context, *ListPaymentChannelsRequest) (*ChannelListReply, error)
 	QuotePayment(context.Context, *PaymentQuoteRequest) (*PaymentQuote, error)
 }
@@ -94,9 +94,9 @@ func _StorePaymentService_CreatePayment0_HTTP_Handler(srv StorePaymentServiceHTT
 }
 
 type StorePaymentServiceHTTPClient interface {
-	// CreatePayment CreatePayment 创建支付（返回收银台/二维码跳转信息）。
+	// CreatePayment CreatePayment 創建支付（返回收銀台/二維碼跳轉信息）。
 	CreatePayment(ctx context.Context, req *CreatePaymentRequest, opts ...http.CallOption) (rsp *CreatePaymentReply, err error)
-	// ListChannels ListChannels 启用渠道列表（支付页渠道下拉数据源—— 替代前端硬编码枚举）。
+	// ListChannels ListChannels 啓用渠道列表（支付頁渠道下拉數據源—— 替代前端硬編碼枚舉）。
 	ListChannels(ctx context.Context, req *ListPaymentChannelsRequest, opts ...http.CallOption) (rsp *ChannelListReply, err error)
 	QuotePayment(ctx context.Context, req *PaymentQuoteRequest, opts ...http.CallOption) (rsp *PaymentQuote, err error)
 }
@@ -109,7 +109,7 @@ func NewStorePaymentServiceHTTPClient(client *http.Client) StorePaymentServiceHT
 	return &StorePaymentServiceHTTPClientImpl{client}
 }
 
-// CreatePayment CreatePayment 创建支付（返回收银台/二维码跳转信息）。
+// CreatePayment CreatePayment 創建支付（返回收銀台/二維碼跳轉信息）。
 func (c *StorePaymentServiceHTTPClientImpl) CreatePayment(ctx context.Context, in *CreatePaymentRequest, opts ...http.CallOption) (*CreatePaymentReply, error) {
 	var out CreatePaymentReply
 	pattern := "/api/v1/storefront/payments"
@@ -127,7 +127,7 @@ func (c *StorePaymentServiceHTTPClientImpl) CreatePayment(ctx context.Context, i
 	return &out, nil
 }
 
-// ListChannels ListChannels 启用渠道列表（支付页渠道下拉数据源—— 替代前端硬编码枚举）。
+// ListChannels ListChannels 啓用渠道列表（支付頁渠道下拉數據源—— 替代前端硬編碼枚舉）。
 func (c *StorePaymentServiceHTTPClientImpl) ListChannels(ctx context.Context, in *ListPaymentChannelsRequest, opts ...http.CallOption) (*ChannelListReply, error) {
 	var out ChannelListReply
 	pattern := "/api/v1/storefront/payment/channels"

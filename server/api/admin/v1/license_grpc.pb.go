@@ -29,14 +29,14 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminLicenseService 订阅许可证管理：安装/查询/清除。
-// 校验引擎 ed25519 签名 + 实例 ID/域名绑定 + 到期（fail-closed）。
+// AdminLicenseService 訂閲許可證管理：安裝/查詢/清除。
+// 校驗引擎 ed25519 簽名 + 實例 ID/域名綁定 + 到期（fail-closed）。
 type AdminLicenseServiceClient interface {
-	// GetLicenseStatus 许可证状态（安装/有效性/特性清单/到期）。
+	// GetLicenseStatus 許可證狀態（安裝/有效性/特性清單/到期）。
 	GetLicenseStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*LicenseStatus, error)
-	// InstallLicense 安装许可证（校验通过才落库；绑定当前实例）。
+	// InstallLicense 安裝許可證（校驗通過才落庫；綁定當前實例）。
 	InstallLicense(ctx context.Context, in *InstallLicenseRequest, opts ...grpc.CallOption) (*LicenseStatus, error)
-	// ClearLicense 清除许可证（回到社区版）。
+	// ClearLicense 清除許可證（回到社區版）。
 	ClearLicense(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -82,14 +82,14 @@ func (c *adminLicenseServiceClient) ClearLicense(ctx context.Context, in *emptyp
 // All implementations must embed UnimplementedAdminLicenseServiceServer
 // for forward compatibility.
 //
-// AdminLicenseService 订阅许可证管理：安装/查询/清除。
-// 校验引擎 ed25519 签名 + 实例 ID/域名绑定 + 到期（fail-closed）。
+// AdminLicenseService 訂閲許可證管理：安裝/查詢/清除。
+// 校驗引擎 ed25519 簽名 + 實例 ID/域名綁定 + 到期（fail-closed）。
 type AdminLicenseServiceServer interface {
-	// GetLicenseStatus 许可证状态（安装/有效性/特性清单/到期）。
+	// GetLicenseStatus 許可證狀態（安裝/有效性/特性清單/到期）。
 	GetLicenseStatus(context.Context, *emptypb.Empty) (*LicenseStatus, error)
-	// InstallLicense 安装许可证（校验通过才落库；绑定当前实例）。
+	// InstallLicense 安裝許可證（校驗通過才落庫；綁定當前實例）。
 	InstallLicense(context.Context, *InstallLicenseRequest) (*LicenseStatus, error)
-	// ClearLicense 清除许可证（回到社区版）。
+	// ClearLicense 清除許可證（回到社區版）。
 	ClearLicense(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAdminLicenseServiceServer()
 }

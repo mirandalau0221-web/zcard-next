@@ -1,9 +1,9 @@
 package bootstrap
 
-// 队列/事件/周期任务装配（ // 的 wiring）：
-// - Enqueuer：Redis 配置存在 → AsynqQueue；否则 SyncQueue（Dispatcher 直连 + 死信落库）
-// - Dispatcher：消费分发（processed_events 幂等）； 处理器目录为空， 随交易闭环注册
-// - Cron：周期任务注册表（ 空目录；订单超时取消/佣金确认等随 + 在此追加）
+// 隊列/事件/週期任務裝配（ // 的 wiring）：
+// - Enqueuer：Redis 配置存在 → AsynqQueue；否則 SyncQueue（Dispatcher 直連 + 死信落庫）
+// - Dispatcher：消費分發（processed_events 冪等）； 處理器目錄為空， 隨交易閉環註冊
+// - Cron：週期任務註冊表（ 空目錄；訂單超時取消/佣金確認等隨 + 在此追加）
 
 import (
 	"context"
@@ -33,7 +33,7 @@ var queueProviderSet = wire.NewSet(
 	NewCron,
 )
 
-// NewEnqueuer 队列决策（ADR-D6 降级矩阵）：conf.Redis.Addr 非空 → asynq；否则同步降级。
+// NewEnqueuer 隊列決策（ADR-D6 降級矩陣）：conf.Redis.Addr 非空 → asynq；否則同步降級。
 func NewEnqueuer(c *conf.Data, dp *data.Dispatcher, dead *data.FailedTaskWriter, logger *slog.Logger) (queue.Enqueuer, func(), error) {
 	if c != nil && c.Redis != nil && c.Redis.Addr != "" {
 		opt := asynq.RedisClientOpt{Addr: c.Redis.Addr}
@@ -46,7 +46,7 @@ func NewEnqueuer(c *conf.Data, dp *data.Dispatcher, dead *data.FailedTaskWriter,
 		client := asynq.NewClient(opt)
 		return queue.NewAsynqQueue(client), func() { _ = client.Close() }, nil
 	}
-	logger.Warn("bootstrap.queue.sync_mode", "msg", "未配置 Redis：队列同步降级（失败落 failed_tasks），周期任务走进程内 cron")
+	logger.Warn("bootstrap.queue.sync_mode", "msg", "未配置 Redis：隊列同步降級（失敗落 failed_tasks），週期任務走進程內 cron")
 	sq := &queue.SyncQueue{
 		Log:     logger,
 		Handler: dp.HandleTask,
@@ -55,38 +55,38 @@ func NewEnqueuer(c *conf.Data, dp *data.Dispatcher, dead *data.FailedTaskWriter,
 	return sq, func() {}, nil
 }
 
-// NewDispatcher 消费分发器（事件处理器注册点）。
-// 订阅注册在 cmd/zcard newApp 装配（wire 破环：Dispatcher → ProcureService → Enqueuer → Dispatcher）。
+// NewDispatcher 消費分發器（事件處理器註冊點）。
+// 訂閲註冊在 cmd/zcard newApp 裝配（wire 破環：Dispatcher → ProcureService → Enqueuer → Dispatcher）。
 func NewDispatcher(d *data.Data, logger *slog.Logger) *data.Dispatcher {
 	return data.NewDispatcher(d, logger)
 }
 
-// NewOutboxRelay relay 构造（生命周期由 server.BackgroundServer 托管）。
+// NewOutboxRelay relay 構造（生命週期由 server.BackgroundServer 託管）。
 func NewOutboxRelay(d *data.Data, q queue.Enqueuer, logger *slog.Logger) *data.OutboxRelay {
 	return data.NewOutboxRelay(d, q, logger)
 }
 
-// NewCron 进程内周期任务（注册表）。
+// NewCron 進程內週期任務（註冊表）。
 func NewCron(catalogPreview *supply.AdminSupplyService, notifyDisp *notify.Dispatcher, supplySync *supply.SyncService, supplyScheduler *supply.Scheduler, procure *procurement.ProcureService, supplierRepo *supplier.SupplierRepoImpl, auditRepo *audit.AuditRepo, visitCounter *audit.VisitCounter, trackRepo *audit.TrackRepo, broadcastSvc *notify.BroadcastService, ticketAdmin *ticket.AdminTicketService, affiliateSvc *affiliate.AffiliateService, orderUC *order.OrderUsecase) *queue.Cron {
 	c := queue.NewCron()
-	// 订单超时取消（每分钟扫 pending_payment 到期单；慢支付顺延在其内）
+	// 訂單超時取消（每分鐘掃 pending_payment 到期單；慢支付順延在其內）
 	c.AddEvery("order.expire_pending", time.Minute, func(ctx context.Context) {
 		if _, err := orderUC.ExpireOrder(ctx); err != nil {
 			slog.ErrorContext(ctx, "order.expiry.failed", "error", err)
 		}
 	})
-	// ：货源连接周期探活（健康度累计 → M4 供应商评分基础数据，）
+	// ：貨源連接週期探活（健康度累計 → M4 供應商評分基礎數據，）
 	c.AddEvery("supply.health_ping", 5*time.Minute, func(ctx context.Context) {
 		supplySync.PingAllActive(ctx)
 	})
-	// S3：定时同步调度（每分钟扫描 settings.schedule 到期任务）+ 看门狗（僵死任务回收）
+	// S3：定時同步調度（每分鐘掃描 settings.schedule 到期任務）+ 看門狗（僵死任務回收）
 	c.AddEvery("supply.catalog_snapshots", 5*time.Second, catalogPreview.ResumeCatalogSnapshots)
 	c.AddEvery("supply.resume_tasks", 5*time.Second, supplySync.ResumeTasks)
 	c.AddEvery("supply.schedule_scan", time.Minute, supplyScheduler.Scan)
 	c.AddEvery("supply.low_stock", time.Minute, supplySync.ScanLowStock)
 	c.AddEvery("notify.low_stock", time.Minute, notifyDisp.ScanLowStock)
 	c.AddEvery("supply.sync_reap_stale", 10*time.Minute, supplyScheduler.ReapStaleTasks)
-	// ：采购巡检兜底（每 30 分钟拉 polling/submitted 单查上游；24h 卡死转人工）
+	// ：採購巡檢兜底（每 30 分鐘拉 polling/submitted 單查上游；24h 卡死轉人工）
 	c.AddEvery("procurement.reusable", 5*time.Second, func(ctx context.Context) {
 		if err := procure.ResumeReusable(ctx); err != nil {
 			slog.ErrorContext(ctx, "procurement.reusable.failed", "error", err)
@@ -95,27 +95,27 @@ func NewCron(catalogPreview *supply.AdminSupplyService, notifyDisp *notify.Dispa
 	c.AddEvery("procurement.sms", 5*time.Second, procure.RunSMS)
 	c.AddEvery("procurement.social", 5*time.Second, procure.RunSocial)
 	c.AddEvery("procurement.patrol", 30*time.Minute, procure.Patrol)
-	// ：供货 nonce 过期清理（每小时）
+	// ：供貨 nonce 過期清理（每小時）
 	c.AddEvery("supplier.nonce_cleanup", time.Hour, func(ctx context.Context) {
 		_ = supplierRepo.CleanupExpiredNonces(ctx)
 	})
-	// ：风控锁过期清理（每 5 分钟）+ 访问统计批量落库（每分钟）
+	// ：風控鎖過期清理（每 5 分鐘）+ 訪問統計批量落庫（每分鐘）
 	c.AddEvery("audit.lock_cleanup", 5*time.Minute, func(ctx context.Context) {
 		_ = auditRepo.CleanupExpiredLocks(ctx)
 	})
 	c.AddEvery("audit.visit_flush", time.Minute, func(ctx context.Context) {
 		visitCounter.Flush()
 	})
-	// ：访问明细/在线心跳清理（每小时——明细保留 90 天，心跳保留 24 小时）
+	// ：訪問明細/在線心跳清理（每小時——明細保留 90 天，心跳保留 24 小時）
 	c.AddEvery("audit.visit_cleanup", time.Hour, func(ctx context.Context) {
 		_ = trackRepo.CleanupVisitData(ctx)
 	})
-	// ：定时群发扫描（到期 pending → 入队）
+	// ：定時羣發掃描（到期 pending → 入隊）
 	c.AddEvery("notify.broadcast_scan", time.Minute, broadcastSvc.ScanDue)
 	c.AddEvery("notify.telegram_delivery", 10*time.Second, notifyDisp.ScanTelegram)
-	// ：工单 resolved 超 7 天自动关闭
+	// ：工單 resolved 超 7 天自動關閉
 	c.AddEvery("ticket.autoclose", time.Hour, ticketAdmin.AutoCloseResolved)
-	// ：佣金到期确认（冻结期过 → wallet 入账；负债行重试抵扣）
+	// ：佣金到期確認（凍結期過 → wallet 入賬；負債行重試抵扣）
 	c.AddEvery("affiliate.confirm", time.Hour, affiliateSvc.ConfirmDue)
 	return c
 }

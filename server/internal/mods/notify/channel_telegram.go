@@ -1,11 +1,11 @@
 package notify
 
 // Telegram bot 通道（ 收尾）：sendMessage HTTP API
-// （友商 telegram/notify/botapi 协议知识参照；配置运行时读取）。
+// （友商 telegram/notify/botapi 協議知識參照；配置運行時讀取）。
 //
-// 端点：POST https://api.telegram.org/bot{token}/sendMessage
-// 载荷：{"chat_id": "...", "text": "...", "parse_mode": "HTML"}
-// 出站经 httpx 安全客户端（SSRF 防护）；未配置 → skipped 降级。
+// 端點：POST https://api.telegram.org/bot{token}/sendMessage
+// 載荷：{"chat_id": "...", "text": "...", "parse_mode": "HTML"}
+// 出站經 httpx 安全客户端（SSRF 防護）；未配置 → skipped 降級。
 
 import (
 	"bytes"
@@ -23,14 +23,14 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/httpx"
 )
 
-// TelegramConfig bot 配置（settings notify 组 telegram 键）。
+// TelegramConfig bot 配置（settings notify 組 telegram 鍵）。
 type TelegramConfig struct {
 	LowStockEnabled bool     `json:"low_stock_enabled"`
 	OrderEnabled    bool     `json:"order_enabled"`
 	Events          []string `json:"events"`
 	Enabled         bool     `json:"enabled"`
 	BotToken        string   `json:"bot_token"`
-	// ChatIDs 管理员群/频道（逗号分隔；告警与群发多目标）
+	// ChatIDs 管理員羣/頻道（逗號分隔；告警與羣發多目標）
 	ChatIDs string                      `json:"chat_ids"`
 	Targets []notifyport.TelegramTarget `json:"targets"`
 }
@@ -41,14 +41,14 @@ type TelegramChannel struct {
 	client   *http.Client
 }
 
-// NewTelegramChannel 构造。
+// NewTelegramChannel 構造。
 func NewTelegramChannel(settings notifyport.SettingsReader) *TelegramChannel {
 	return &TelegramChannel{settings: settings, client: httpx.NewSafeClient(15 * time.Second)}
 }
 
 func (*TelegramChannel) Name() string { return "telegram" }
 
-// tgConfig 运行时读配置。
+// tgConfig 運行時讀配置。
 func (c *TelegramChannel) tgConfig(ctx context.Context) (*TelegramConfig, error) {
 	cfg := &TelegramConfig{Events: []string{"order.paid"}}
 	// Legacy security-alert config remains supported until flat settings are saved.
@@ -62,10 +62,10 @@ func (c *TelegramChannel) tgConfig(ctx context.Context) (*TelegramConfig, error)
 			return nil, err
 		}
 		if err = json.Unmarshal(raw, cfg); err != nil {
-			return nil, fmt.Errorf("Telegram 配置格式错误")
+			return nil, fmt.Errorf("Telegram 配置格式錯誤")
 		}
 	} else if err = json.Unmarshal(raw, &cfg.Enabled); err != nil {
-		return nil, fmt.Errorf("Telegram 配置格式错误")
+		return nil, fmt.Errorf("Telegram 配置格式錯誤")
 	}
 	for key, dest := range map[string]any{"telegram_bot_token": &cfg.BotToken, "telegram_chat_ids": &cfg.ChatIDs, "telegram_order_enabled": &cfg.OrderEnabled, "telegram_low_stock_enabled": &cfg.LowStockEnabled, "telegram_events": &cfg.Events} {
 		raw, err = c.settings.GetJSON(ctx, "notify", key)
@@ -73,7 +73,7 @@ func (c *TelegramChannel) tgConfig(ctx context.Context) (*TelegramConfig, error)
 			return nil, err
 		}
 		if len(raw) > 0 && json.Unmarshal(raw, dest) != nil {
-			return nil, fmt.Errorf("Telegram 配置格式错误")
+			return nil, fmt.Errorf("Telegram 配置格式錯誤")
 		}
 	}
 	// Saving the new form must not discard the token from the legacy object.
@@ -102,7 +102,7 @@ func (c *TelegramChannel) tgConfig(ctx context.Context) (*TelegramConfig, error)
 	return cfg, nil
 }
 
-// Deliver 发送消息（Recipient = chat_id；空则发配置的全部 chat_ids）。
+// Deliver 發送消息（Recipient = chat_id；空則發配置的全部 chat_ids）。
 func (c *TelegramChannel) Ready(ctx context.Context) bool {
 	cfg, err := c.tgConfig(ctx)
 	return err == nil && cfg != nil && cfg.Enabled && cfg.BotToken != ""
@@ -134,7 +134,7 @@ func (c *TelegramChannel) Deliver(ctx context.Context, msg notifyport.Message) e
 	return lastErr
 }
 
-// sendOne 单目标发送（HTML parse mode；Subject+Body 合并文本）。
+// sendOne 單目標發送（HTML parse mode；Subject+Body 合併文本）。
 func (c *TelegramChannel) sendOne(ctx context.Context, token, chatID, text string) error {
 	_, err := c.sendResult(ctx, token, chatID, text)
 	return err
@@ -165,7 +165,7 @@ func (c *TelegramChannel) sendResult(ctx context.Context, token, chatID, text st
 	endpoint := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(payload))
 	if err != nil {
-		return "", &TelegramError{Permanent: true, Detail: "Bot Token 格式错误"}
+		return "", &TelegramError{Permanent: true, Detail: "Bot Token 格式錯誤"}
 	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := c.client.Do(req)
@@ -174,7 +174,7 @@ func (c *TelegramChannel) sendResult(ctx context.Context, token, chatID, text st
 		if errors.As(err, &ue) {
 			err = ue.Err
 		}
-		return "", &TelegramError{Detail: "网络请求未确认，可能已送达；重试可能重复：" + strings.ReplaceAll(err.Error(), token, "[redacted]")}
+		return "", &TelegramError{Detail: "網絡請求未確認，可能已送達；重試可能重複：" + strings.ReplaceAll(err.Error(), token, "[redacted]")}
 	}
 	defer resp.Body.Close()
 	raw, readErr := io.ReadAll(io.LimitReader(resp.Body, 64<<10))
@@ -190,7 +190,7 @@ func (c *TelegramChannel) sendResult(ctx context.Context, token, chatID, text st
 		} `json:"parameters"`
 	}
 	if readErr != nil || json.Unmarshal(raw, &result) != nil {
-		return "", &TelegramError{Code: resp.StatusCode, Detail: "响应无法确认，可能已送达"}
+		return "", &TelegramError{Code: resp.StatusCode, Detail: "響應無法確認，可能已送達"}
 	}
 	if result.OK && resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return fmt.Sprint(result.Result.MessageID), nil
@@ -235,15 +235,15 @@ func telegramFailureDetail(code int, description string) string {
 	lower := strings.ToLower(description)
 	switch {
 	case code == 401:
-		return "Bot Token 无效，请重新检查机器人配置"
+		return "Bot Token 無效，請重新檢查機器人配置"
 	case strings.Contains(lower, "message thread not found"):
-		return "指定话题不存在或不可用，请检查 Chat ID 和 Topic ID；未改投群主聊天"
+		return "指定話題不存在或不可用，請檢查 Chat ID 和 Topic ID；未改投羣主聊天"
 	case strings.Contains(lower, "topic_closed"):
-		return "指定话题已关闭，请在 Telegram 中重新开启后重试"
+		return "指定話題已關閉，請在 Telegram 中重新開啓後重試"
 	case strings.Contains(lower, "chat not found"):
-		return "接收位置不可用，请检查 Chat ID、机器人是否已加入群，或接收人是否已发送 /start"
+		return "接收位置不可用，請檢查 Chat ID、機器人是否已加入羣，或接收人是否已發送 /start"
 	case code == 403:
-		return "机器人没有发送权限或已被移除，请检查目标群或接收人的权限"
+		return "機器人沒有發送權限或已被移除，請檢查目標羣或接收人的權限"
 	default:
 		return truncateStr(description, 200)
 	}

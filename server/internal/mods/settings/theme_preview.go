@@ -30,11 +30,11 @@ func (s *AdminSettingsService) PreviewThemeSettings(ctx context.Context, req *ad
 	defer themeChanges.RUnlock()
 	t, schema, err := resolveSettingsTheme(req.Key, req.ThemeRevision)
 	if err != nil || schema == nil {
-		return nil, errors.BadRequest("theme.PREVIEW_UNAVAILABLE", "主题版本或扩展设置不可用")
+		return nil, errors.BadRequest("theme.PREVIEW_UNAVAILABLE", "主題版本或擴展設置不可用")
 	}
 	var values map[string]any
 	if len(req.ValuesJson) > 128<<10 || json.Unmarshal([]byte(req.ValuesJson), &values) != nil {
-		return nil, errors.BadRequest("theme.INVALID_VALUES", "设置格式无效")
+		return nil, errors.BadRequest("theme.INVALID_VALUES", "設置格式無效")
 	}
 	if err = schema.ValidateValues(values); err != nil {
 		return nil, errors.BadRequest("theme.INVALID_VALUES", err.Error())
@@ -44,7 +44,7 @@ func (s *AdminSettingsService) PreviewThemeSettings(ctx context.Context, req *ad
 		return nil, err
 	}
 	if st.Revision != req.ExpectedRevision {
-		return nil, errors.Conflict("theme.CONFLICT", "设置已更新，请重新加载")
+		return nil, errors.Conflict("theme.CONFLICT", "設置已更新，請重新加載")
 	}
 	runtime := &theme.Runtime{Key: req.Key, ThemeRevision: revisionOf(t), Values: values, Capabilities: themeCapabilities(ctx, s.uc.repo), Preview: true, Theme: t}
 	token := newThemeRevision() + newThemeRevision()
@@ -57,7 +57,7 @@ func (s *AdminSettingsService) PreviewThemeSettings(ctx context.Context, req *ad
 		}
 	}
 	if len(themePreviews.items) >= 256 {
-		return nil, errors.TooManyRequests("theme.PREVIEW_LIMIT", "预览过多，请稍后再试")
+		return nil, errors.TooManyRequests("theme.PREVIEW_LIMIT", "預覽過多，請稍後再試")
 	}
 	themePreviews.items[token] = themePreview{Runtime: runtime, Expires: expires, Site: tenancy.FromContext(ctx).SubsiteID}
 	return &adminv1.ThemePreviewReply{Url: "/?theme_preview=" + token, ExpiresAt: expires.Unix()}, nil
@@ -67,7 +67,7 @@ func (s *AdminSettingsService) PreviewThemeSettings(ctx context.Context, req *ad
 func PreviewWriteGuard(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if (r.Header.Get("X-Theme-Preview") != "" || r.URL.Query().Get("theme_preview") != "") && r.Method != "GET" && r.Method != "HEAD" && r.Method != "OPTIONS" {
-			http.Error(w, "主题预览为只读", http.StatusForbidden)
+			http.Error(w, "主題預覽為只讀", http.StatusForbidden)
 			return
 		}
 		token := r.Header.Get("X-Theme-Preview")
@@ -76,7 +76,7 @@ func PreviewWriteGuard(next http.Handler) http.Handler {
 			preview, ok := themePreviews.items[token]
 			themePreviews.Unlock()
 			if !ok || time.Now().After(preview.Expires) || preview.Site != tenancy.FromContext(r.Context()).SubsiteID {
-				http.Error(w, "预览已过期", http.StatusGone)
+				http.Error(w, "預覽已過期", http.StatusGone)
 				return
 			}
 			w.Header().Set("Cache-Control", "no-store")
@@ -138,7 +138,7 @@ func (s *AdminSettingsService) ThemeMiddleware(next http.Handler) http.Handler {
 			preview, ok := themePreviews.items[token]
 			themePreviews.Unlock()
 			if !ok || time.Now().After(preview.Expires) || preview.Site != tenancy.FromContext(r.Context()).SubsiteID {
-				http.Error(w, "预览已过期，请返回后台重新预览", http.StatusGone)
+				http.Error(w, "預覽已過期，請返回後台重新預覽", http.StatusGone)
 				return
 			}
 			runtime = preview.Runtime
@@ -148,7 +148,7 @@ func (s *AdminSettingsService) ThemeMiddleware(next http.Handler) http.Handler {
 		} else {
 			runtime, err = s.runtime(r.Context())
 			if err != nil {
-				http.Error(w, "主题设置读取失败，请稍后重试", http.StatusServiceUnavailable)
+				http.Error(w, "主題設置讀取失敗，請稍後重試", http.StatusServiceUnavailable)
 				return
 			}
 		}
@@ -160,7 +160,7 @@ func (s *AdminSettingsService) ThemeMiddleware(next http.Handler) http.Handler {
 			ctx := theme.WithRuntime(r.Context(), runtime)
 			config, configErr := NewStorefrontConfigService(s.uc.repo).GetPublicConfig(ctx, nil)
 			if configErr != nil {
-				http.Error(w, "店铺配置暂时无法读取，请稍后重试", http.StatusServiceUnavailable)
+				http.Error(w, "店鋪配置暫時無法讀取，請稍後重試", http.StatusServiceUnavailable)
 				return
 			}
 			runtime.PublicConfig = &theme.PublicConfig{Entries: []theme.ConfigEntry{}}

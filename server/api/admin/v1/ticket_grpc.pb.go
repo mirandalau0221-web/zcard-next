@@ -31,18 +31,18 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminTicketService 客服工单工作台：urgent_paid 置顶持续高亮、
-// 认领/回复/内部备注/解决/关闭、筛选。
+// AdminTicketService 客服工單工作台：urgent_paid 置頂持續高亮、
+// 認領/回覆/內部備註/解決/關閉、篩選。
 type AdminTicketServiceClient interface {
-	// ListTickets 工作台列表（urgent_paid 置顶 → 高 → 中 → 低；状态/类型/订单筛选）。
+	// ListTickets 工作台列表（urgent_paid 置頂 → 高 → 中 → 低；狀態/類型/訂單篩選）。
 	ListTickets(ctx context.Context, in *ListTicketsRequest, opts ...grpc.CallOption) (*ListTicketsReply, error)
-	// GetTicket 详情（含内部备注——客服侧全量）。
+	// GetTicket 詳情（含內部備註——客服側全量）。
 	GetTicket(ctx context.Context, in *GetTicketRequest, opts ...grpc.CallOption) (*GetTicketReply, error)
-	// ReplyTicket 客服回复（可内部备注）。
+	// ReplyTicket 客服回覆（可內部備註）。
 	ReplyTicket(ctx context.Context, in *AdminReplyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ResolveTicket 解决。
+	// ResolveTicket 解決。
 	ResolveTicket(ctx context.Context, in *TicketNoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// CloseTicket 关闭。
+	// CloseTicket 關閉。
 	CloseTicket(ctx context.Context, in *TicketNoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -108,18 +108,18 @@ func (c *adminTicketServiceClient) CloseTicket(ctx context.Context, in *TicketNo
 // All implementations must embed UnimplementedAdminTicketServiceServer
 // for forward compatibility.
 //
-// AdminTicketService 客服工单工作台：urgent_paid 置顶持续高亮、
-// 认领/回复/内部备注/解决/关闭、筛选。
+// AdminTicketService 客服工單工作台：urgent_paid 置頂持續高亮、
+// 認領/回覆/內部備註/解決/關閉、篩選。
 type AdminTicketServiceServer interface {
-	// ListTickets 工作台列表（urgent_paid 置顶 → 高 → 中 → 低；状态/类型/订单筛选）。
+	// ListTickets 工作台列表（urgent_paid 置頂 → 高 → 中 → 低；狀態/類型/訂單篩選）。
 	ListTickets(context.Context, *ListTicketsRequest) (*ListTicketsReply, error)
-	// GetTicket 详情（含内部备注——客服侧全量）。
+	// GetTicket 詳情（含內部備註——客服側全量）。
 	GetTicket(context.Context, *GetTicketRequest) (*GetTicketReply, error)
-	// ReplyTicket 客服回复（可内部备注）。
+	// ReplyTicket 客服回覆（可內部備註）。
 	ReplyTicket(context.Context, *AdminReplyRequest) (*emptypb.Empty, error)
-	// ResolveTicket 解决。
+	// ResolveTicket 解決。
 	ResolveTicket(context.Context, *TicketNoRequest) (*emptypb.Empty, error)
-	// CloseTicket 关闭。
+	// CloseTicket 關閉。
 	CloseTicket(context.Context, *TicketNoRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAdminTicketServiceServer()
 }

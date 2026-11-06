@@ -91,7 +91,7 @@ export function deleteProduct(id: number, params?: { delete_orders: boolean; con
   });
 }
 
-// 批量上下架（列表多选；status 1=上架 0=下架 2=隐藏）
+// 批量上下架（列表多選；status 1=上架 0=下架 2=隱藏）
 export function batchUpdateProductStatus(ids: number[], status: number) {
   return request<{ updated: number; skipped_locked?: number }>({
     url: "/api/v1/admin/products/batch-status",
@@ -108,7 +108,7 @@ export function batchUpdateProductCategory(ids: number[], categoryId: number) {
   });
 }
 
-// ── 分类管理 ──
+// ── 分類管理 ──
 
 export function fetchCategories() {
   return request({ url: "/api/v1/admin/categories" });
@@ -143,7 +143,7 @@ export function deleteCategory(id: number, silentError = false) {
   });
 }
 
-// 分类排序（拖拽重排：把 parent_id 层级下全部兄弟按 ids 顺序重排并归一化 sort）
+// 分類排序（拖拽重排：把 parent_id 層級下全部兄弟按 ids 順序重排並歸一化 sort）
 export function reorderCategories(parent_id: number, ids: number[]) {
   return request({
     url: "/api/v1/admin/categories/reorder",
@@ -152,7 +152,7 @@ export function reorderCategories(parent_id: number, ids: number[]) {
   });
 }
 
-// ── SKU 多规格（ ；price_cents 0=继承商品价）──
+// ── SKU 多規格（ ；price_cents 0=繼承商品價）──
 
 export function fetchSkus(productId: number) {
   return request<{ skus: any[] }>({ url: `/api/v1/admin/products/${productId}/skus` });
@@ -179,7 +179,7 @@ export function deleteSku(id: number) {
   return request({ url: `/api/v1/admin/skus/${id}`, method: "delete" });
 }
 
-// ── 自定义控件（下单收集：text|password|select|number|checkbox|radio）──
+// ── 自定義控件（下單收集：text|password|select|number|checkbox|radio）──
 
 export function fetchControls(productId: number) {
   return request<{ controls: any[] }>({ url: `/api/v1/admin/products/${productId}/controls` });
@@ -206,7 +206,7 @@ export function deleteControl(id: number) {
   return request({ url: `/api/v1/admin/controls/${id}`, method: "delete" });
 }
 
-// ── 标签 ──
+// ── 標籤 ──
 
 export function fetchTags() {
   return request({ url: "/api/v1/admin/tags" });
@@ -226,16 +226,16 @@ export function deleteTag(id: number) {
   return request({ url: `/api/v1/admin/tags/${id}`, method: "delete" });
 }
 
-// ── 货源连接（跨域只读：商品列表展示「自营/代发 + 供应商名」）──
+// ── 貨源連接（跨域只讀：商品列表展示「自營/代發 + 供應商名」）──
 
-// 旧只读别名（商品页"自营/代发"展示用）；完整连接管理见 supply.ts。
+// 舊只讀別名（商品頁"自營/代發"展示用）；完整連接管理見 supply.ts。
 export function fetchSupplyConnectionOptions() {
   return request<{ connections: { id: number; name: string; driver: string; status: string }[] }>({
     url: "/api/v1/admin/supply/connections",
   });
 }
 
-// ── 评价管理（catalog:review_read / review_manage）──
+// ── 評價管理（catalog:review_read / review_manage）──
 
 export function fetchReviews(params: { status?: string; page?: number; page_size?: number }) {
   return request({ url: "/api/v1/admin/reviews", params });

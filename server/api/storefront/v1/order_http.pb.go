@@ -30,16 +30,16 @@ const OperationStoreOrderServiceSendOrderAccessCode = "/zcard.api.storefront.v1.
 const OperationStoreOrderServiceShippingRegions = "/zcard.api.storefront.v1.StoreOrderService/ShippingRegions"
 
 type StoreOrderServiceHTTPServer interface {
-	// CancelMyOrder CancelMyOrder 取消本人待支付订单（pending 可取消；锁卡释放+返券）。
+	// CancelMyOrder CancelMyOrder 取消本人待支付訂單（pending 可取消；鎖卡釋放+返券）。
 	CancelMyOrder(context.Context, *CancelMyOrderRequest) (*emptypb.Empty, error)
-	// CreateOrder CreateOrder 下单（锁卡→算价→快照→事件；Idempotency-Key 头防重）。
+	// CreateOrder CreateOrder 下單（鎖卡→算價→快照→事件；Idempotency-Key 頭防重）。
 	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderReply, error)
-	// GetOrder GetOrder 凭单号+查询密码查单（三重门之一二：查询密码/登录态本人）。
+	// GetOrder GetOrder 憑單號+查詢密碼查單（三重門之一二：查詢密碼/登錄態本人）。
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderReply, error)
-	// ListGuestOrders ListGuestOrders 游客按下单联系方式查订单列表（邮箱/手机号；精简信息——
-	// 卡密仍需逐单查询密码，防枚举：查不到返回空）。
+	// ListGuestOrders ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號；精簡信息——
+	// 卡密仍需逐單查詢密碼，防枚舉：查不到返回空）。
 	ListGuestOrders(context.Context, *ListGuestOrdersRequest) (*ListGuestOrdersReply, error)
-	// ListMyOrders ListMyOrders 我的订单（登录态；offset 分页）。
+	// ListMyOrders ListMyOrders 我的訂單（登錄態；offset 分頁）。
 	ListMyOrders(context.Context, *ListMyOrdersRequest) (*ListMyOrdersReply, error)
 	QuoteOrder(context.Context, *CreateOrderRequest) (*CreateOrderReply, error)
 	ReceiveShipment(context.Context, *ReceiveShipmentRequest) (*emptypb.Empty, error)
@@ -268,16 +268,16 @@ func _StoreOrderService_CancelMyOrder0_HTTP_Handler(srv StoreOrderServiceHTTPSer
 }
 
 type StoreOrderServiceHTTPClient interface {
-	// CancelMyOrder CancelMyOrder 取消本人待支付订单（pending 可取消；锁卡释放+返券）。
+	// CancelMyOrder CancelMyOrder 取消本人待支付訂單（pending 可取消；鎖卡釋放+返券）。
 	CancelMyOrder(ctx context.Context, req *CancelMyOrderRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// CreateOrder CreateOrder 下单（锁卡→算价→快照→事件；Idempotency-Key 头防重）。
+	// CreateOrder CreateOrder 下單（鎖卡→算價→快照→事件；Idempotency-Key 頭防重）。
 	CreateOrder(ctx context.Context, req *CreateOrderRequest, opts ...http.CallOption) (rsp *CreateOrderReply, err error)
-	// GetOrder GetOrder 凭单号+查询密码查单（三重门之一二：查询密码/登录态本人）。
+	// GetOrder GetOrder 憑單號+查詢密碼查單（三重門之一二：查詢密碼/登錄態本人）。
 	GetOrder(ctx context.Context, req *GetOrderRequest, opts ...http.CallOption) (rsp *GetOrderReply, err error)
-	// ListGuestOrders ListGuestOrders 游客按下单联系方式查订单列表（邮箱/手机号；精简信息——
-	// 卡密仍需逐单查询密码，防枚举：查不到返回空）。
+	// ListGuestOrders ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號；精簡信息——
+	// 卡密仍需逐單查詢密碼，防枚舉：查不到返回空）。
 	ListGuestOrders(ctx context.Context, req *ListGuestOrdersRequest, opts ...http.CallOption) (rsp *ListGuestOrdersReply, err error)
-	// ListMyOrders ListMyOrders 我的订单（登录态；offset 分页）。
+	// ListMyOrders ListMyOrders 我的訂單（登錄態；offset 分頁）。
 	ListMyOrders(ctx context.Context, req *ListMyOrdersRequest, opts ...http.CallOption) (rsp *ListMyOrdersReply, err error)
 	QuoteOrder(ctx context.Context, req *CreateOrderRequest, opts ...http.CallOption) (rsp *CreateOrderReply, err error)
 	ReceiveShipment(ctx context.Context, req *ReceiveShipmentRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
@@ -294,7 +294,7 @@ func NewStoreOrderServiceHTTPClient(client *http.Client) StoreOrderServiceHTTPCl
 	return &StoreOrderServiceHTTPClientImpl{client}
 }
 
-// CancelMyOrder CancelMyOrder 取消本人待支付订单（pending 可取消；锁卡释放+返券）。
+// CancelMyOrder CancelMyOrder 取消本人待支付訂單（pending 可取消；鎖卡釋放+返券）。
 func (c *StoreOrderServiceHTTPClientImpl) CancelMyOrder(ctx context.Context, in *CancelMyOrderRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/storefront/orders/{order_no}/cancel"
@@ -312,7 +312,7 @@ func (c *StoreOrderServiceHTTPClientImpl) CancelMyOrder(ctx context.Context, in 
 	return &out, nil
 }
 
-// CreateOrder CreateOrder 下单（锁卡→算价→快照→事件；Idempotency-Key 头防重）。
+// CreateOrder CreateOrder 下單（鎖卡→算價→快照→事件；Idempotency-Key 頭防重）。
 func (c *StoreOrderServiceHTTPClientImpl) CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...http.CallOption) (*CreateOrderReply, error) {
 	var out CreateOrderReply
 	pattern := "/api/v1/storefront/orders"
@@ -330,7 +330,7 @@ func (c *StoreOrderServiceHTTPClientImpl) CreateOrder(ctx context.Context, in *C
 	return &out, nil
 }
 
-// GetOrder GetOrder 凭单号+查询密码查单（三重门之一二：查询密码/登录态本人）。
+// GetOrder GetOrder 憑單號+查詢密碼查單（三重門之一二：查詢密碼/登錄態本人）。
 func (c *StoreOrderServiceHTTPClientImpl) GetOrder(ctx context.Context, in *GetOrderRequest, opts ...http.CallOption) (*GetOrderReply, error) {
 	var out GetOrderReply
 	pattern := "/api/v1/storefront/orders/{order_no}"
@@ -347,8 +347,8 @@ func (c *StoreOrderServiceHTTPClientImpl) GetOrder(ctx context.Context, in *GetO
 	return &out, nil
 }
 
-// ListGuestOrders ListGuestOrders 游客按下单联系方式查订单列表（邮箱/手机号；精简信息——
-// 卡密仍需逐单查询密码，防枚举：查不到返回空）。
+// ListGuestOrders ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號；精簡信息——
+// 卡密仍需逐單查詢密碼，防枚舉：查不到返回空）。
 func (c *StoreOrderServiceHTTPClientImpl) ListGuestOrders(ctx context.Context, in *ListGuestOrdersRequest, opts ...http.CallOption) (*ListGuestOrdersReply, error) {
 	var out ListGuestOrdersReply
 	pattern := "/api/v1/storefront/guest-orders"
@@ -365,7 +365,7 @@ func (c *StoreOrderServiceHTTPClientImpl) ListGuestOrders(ctx context.Context, i
 	return &out, nil
 }
 
-// ListMyOrders ListMyOrders 我的订单（登录态；offset 分页）。
+// ListMyOrders ListMyOrders 我的訂單（登錄態；offset 分頁）。
 func (c *StoreOrderServiceHTTPClientImpl) ListMyOrders(ctx context.Context, in *ListMyOrdersRequest, opts ...http.CallOption) (*ListMyOrdersReply, error) {
 	var out ListMyOrdersReply
 	pattern := "/api/v1/storefront/my-orders"

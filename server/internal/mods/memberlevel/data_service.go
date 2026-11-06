@@ -1,6 +1,6 @@
 package memberlevel
 
-// AdminMemberLevelService 管理面会员等级服务（：CRUD + points_rule 透传）。
+// AdminMemberLevelService 管理面會員等級服務（：CRUD + points_rule 透傳）。
 
 import (
 	"context"
@@ -13,18 +13,18 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminMemberLevelService 服务。
+// AdminMemberLevelService 服務。
 type AdminMemberLevelService struct {
 	adminv1.UnimplementedAdminMemberLevelServiceServer
 	repo *MemberLevelRepoImpl
 }
 
-// NewAdminMemberLevelService 构造。
+// NewAdminMemberLevelService 構造。
 func NewAdminMemberLevelService(repo *MemberLevelRepoImpl) *AdminMemberLevelService {
 	return &AdminMemberLevelService{repo: repo}
 }
 
-// parsePointsRule points_rule JSON 解析（空串 = 不设置；"{}" = 清除）。
+// parsePointsRule points_rule JSON 解析（空串 = 不設置；"{}" = 清除）。
 func parsePointsRule(raw string) (map[string]any, error) {
 	if raw == "" {
 		return nil, nil
@@ -36,11 +36,11 @@ func parsePointsRule(raw string) (map[string]any, error) {
 	return rule, nil
 }
 
-// ListMemberLevels 等级列表。
+// ListMemberLevels 等級列表。
 func (s *AdminMemberLevelService) ListMemberLevels(ctx context.Context, _ *emptypb.Empty) (*adminv1.MemberLevelList, error) {
 	rows, err := s.repo.ListLevels(ctx)
 	if err != nil {
-		return nil, errors.InternalServer("memberlevel.LIST_FAILED", "读取等级失败")
+		return nil, errors.InternalServer("memberlevel.LIST_FAILED", "讀取等級失敗")
 	}
 	reply := &adminv1.MemberLevelList{}
 	canView := s.canViewDiscount(ctx)
@@ -54,22 +54,22 @@ func (s *AdminMemberLevelService) ListMemberLevels(ctx context.Context, _ *empty
 	return reply, nil
 }
 
-// CreateMemberLevel 创建。
+// CreateMemberLevel 創建。
 func (s *AdminMemberLevelService) CreateMemberLevel(ctx context.Context, req *adminv1.CreateMemberLevelRequest) (*adminv1.MemberLevel, error) {
 	if !s.canViewDiscount(ctx) {
-		return nil, errors.Forbidden("memberlevel.FORBIDDEN", "修改等级需同时拥有折扣查看权限")
+		return nil, errors.Forbidden("memberlevel.FORBIDDEN", "修改等級需同時擁有折扣查看權限")
 	}
 	if req.GetName() == "" {
-		return nil, errors.BadRequest("memberlevel.INVALID_INPUT", "名称必填")
+		return nil, errors.BadRequest("memberlevel.INVALID_INPUT", "名稱必填")
 	}
 	rule, err := parsePointsRule(req.GetPointsRuleJson())
 	if err != nil {
-		return nil, errors.BadRequest("memberlevel.POINTS_RULE_INVALID", "积分规则 JSON 非法（应为 {\"spend_cents\":X,\"points\":Y}）")
+		return nil, errors.BadRequest("memberlevel.POINTS_RULE_INVALID", "積分規則 JSON 非法（應為 {\"spend_cents\":X,\"points\":Y}）")
 	}
 	lv, err := s.repo.CreateLevel(ctx, req.GetName(), req.GetThresholdType(),
 		req.GetThresholdRecharge(), req.GetThresholdConsume(), req.GetDiscount(), req.GetSort(), req.GetEnabled(), rule, LevelSettings{AcquireMode: req.GetAcquireMode(), DisplayMode: req.GetDisplayMode()})
 	if err != nil {
-		return nil, errors.InternalServer("memberlevel.CREATE_FAILED", "创建失败")
+		return nil, errors.InternalServer("memberlevel.CREATE_FAILED", "創建失敗")
 	}
 	return levelPB(lv), nil
 }
@@ -77,11 +77,11 @@ func (s *AdminMemberLevelService) CreateMemberLevel(ctx context.Context, req *ad
 // UpdateMemberLevel 更新。
 func (s *AdminMemberLevelService) UpdateMemberLevel(ctx context.Context, req *adminv1.UpdateMemberLevelRequest) (*adminv1.MemberLevel, error) {
 	if !s.canViewDiscount(ctx) {
-		return nil, errors.Forbidden("memberlevel.FORBIDDEN", "修改等级需同时拥有折扣查看权限")
+		return nil, errors.Forbidden("memberlevel.FORBIDDEN", "修改等級需同時擁有折扣查看權限")
 	}
 	rule, err := parsePointsRule(req.GetPointsRuleJson())
 	if err != nil {
-		return nil, errors.BadRequest("memberlevel.POINTS_RULE_INVALID", "积分规则 JSON 非法（应为 {\"spend_cents\":X,\"points\":Y}）")
+		return nil, errors.BadRequest("memberlevel.POINTS_RULE_INVALID", "積分規則 JSON 非法（應為 {\"spend_cents\":X,\"points\":Y}）")
 	}
 	lv, err := s.repo.UpdateLevel(ctx, req.GetId(), req.GetName(), req.GetDiscount(), req.GetSort(), req.GetEnabled(), rule, LevelSettings{AcquireMode: req.GetAcquireMode(), DisplayMode: req.GetDisplayMode()})
 	if err != nil {
@@ -90,7 +90,7 @@ func (s *AdminMemberLevelService) UpdateMemberLevel(ctx context.Context, req *ad
 	return levelPB(lv), nil
 }
 
-// DeleteMemberLevel 删除。
+// DeleteMemberLevel 刪除。
 func (s *AdminMemberLevelService) DeleteMemberLevel(ctx context.Context, req *adminv1.DeleteMemberLevelRequest) (*emptypb.Empty, error) {
 	if err := s.repo.DeleteLevel(ctx, req.GetId()); err != nil {
 		return nil, errors.BadRequest("memberlevel.INVALID_INPUT", err.Error())
@@ -98,7 +98,7 @@ func (s *AdminMemberLevelService) DeleteMemberLevel(ctx context.Context, req *ad
 	return &emptypb.Empty{}, nil
 }
 
-// levelPB 等级转协议（含 points_rule JSON）。
+// levelPB 等級轉協議（含 points_rule JSON）。
 func levelPB(lv *ent.MemberLevel) *adminv1.MemberLevel {
 	out := &adminv1.MemberLevel{
 		Id: lv.ID, Name: lv.Name, ThresholdType: string(lv.ThresholdType),

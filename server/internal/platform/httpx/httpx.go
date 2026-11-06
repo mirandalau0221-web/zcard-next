@@ -1,11 +1,11 @@
-// Package httpx 出站 HTTP 客户端（规划 §5.7.3 货源对接安全）。
+// Package httpx 出站 HTTP 客户端（規劃 §5.7.3 貨源對接安全）。
 //
-// 统一强制（架构测试断言，适配器无感知）：
-//  1. 仅允许 http/https；
-//  2. 私有地址段黑名单（SSRF 防护：回环/内网/链路本地/ULA）——阻断「供货站填内网地址探测元数据」；
-//  3. DNS rebinding 防护：连接建立时对实际 IP 复核（防「校验后解析漂移到内网」）；
-//  4. 重定向逐跳重校验（禁止「白名单 → 302 → 内网」）；
-//  5. 凭据与签名串永不进日志（RedactURL）。
+// 統一強制（架構測試斷言，適配器無感知）：
+//  1. 僅允許 http/https；
+//  2. 私有地址段黑名單（SSRF 防護：迴環/內網/鏈路本地/ULA）——阻斷「供貨站填內網地址探測元數據」；
+//  3. DNS rebinding 防護：連接建立時對實際 IP 複核（防「校驗後解析漂移到內網」）；
+//  4. 重定向逐跳重校驗（禁止「白名單 → 302 → 內網」）；
+//  5. 憑據與簽名串永不進日誌（RedactURL）。
 package httpx
 
 import (
@@ -18,9 +18,9 @@ import (
 	"time"
 )
 
-// PrivateCIDRs 私有/保留地址段黑名单（§5.7.3 清单）。
-// IPv4-mapped IPv6 由 IsPrivateIP 的 To4 归一化覆盖，不单列 CIDR
-// （::ffff:0:0/96 经 net.IPNet.Contains 规范化后会误判所有公网 IPv4）。
+// PrivateCIDRs 私有/保留地址段黑名單（§5.7.3 清單）。
+// IPv4-mapped IPv6 由 IsPrivateIP 的 To4 歸一化覆蓋，不單列 CIDR
+// （::ffff:0:0/96 經 net.IPNet.Contains 規範化後會誤判所有公網 IPv4）。
 var privateCIDRs = mustCIDRs(
 	"127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16",
 	"169.254.0.0/16", "0.0.0.0/8", "100.64.0.0/10",
@@ -39,11 +39,11 @@ func mustCIDRs(cidrs ...string) []*net.IPNet {
 	return out
 }
 
-// allowPrivate 联调开关（ZCARD_HTTPX_ALLOW_PRIVATE=1）：放行私有/保留段出站，
-// 供本机多服务端到端联调。生产严禁开启（SSRF 防护旁路）。
+// allowPrivate 聯調開關（ZCARD_HTTPX_ALLOW_PRIVATE=1）：放行私有/保留段出站，
+// 供本機多服務端到端聯調。生產嚴禁開啓（SSRF 防護旁路）。
 var allowPrivate = os.Getenv("ZCARD_HTTPX_ALLOW_PRIVATE") == "1"
 
-// IsPrivateIP 判断 IP 是否落在私有/保留段（导出供测试与诊断）。
+// IsPrivateIP 判斷 IP 是否落在私有/保留段（導出供測試與診斷）。
 func IsPrivateIP(ip net.IP) bool {
 	if ip == nil {
 		return true
@@ -59,21 +59,21 @@ func IsPrivateIP(ip net.IP) bool {
 	return false
 }
 
-// ErrBlockedAddress 目标地址被 SSRF 防护拦截。
+// ErrBlockedAddress 目標地址被 SSRF 防護攔截。
 type ErrBlockedAddress struct{ Host string }
 
 func (e *ErrBlockedAddress) Error() string {
-	return fmt.Sprintf("httpx: 目标地址被 SSRF 防护拦截（私有/保留段）: %s", e.Host)
+	return fmt.Sprintf("httpx: 目標地址被 SSRF 防護攔截（私有/保留段）: %s", e.Host)
 }
 
-// ValidateURL 校验出站 URL：仅 http/https 且 host 不在私有段（按解析结果判定）。
+// ValidateURL 校驗出站 URL：僅 http/https 且 host 不在私有段（按解析結果判定）。
 func ValidateURL(raw string) error {
 	u, err := url.Parse(raw)
 	if err != nil {
 		return fmt.Errorf("httpx: 非法 URL: %w", err)
 	}
 	if u.Scheme != "http" && u.Scheme != "https" {
-		return fmt.Errorf("httpx: 仅允许 http/https，得到 %q", u.Scheme)
+		return fmt.Errorf("httpx: 僅允許 http/https，得到 %q", u.Scheme)
 	}
 	return checkHost(u.Hostname())
 }
@@ -94,7 +94,7 @@ func resolveHost(ctx context.Context, host string, lookup lookupIPAddrFunc) ([]n
 		var err error
 		addrs, err = lookup(ctx, host)
 		if err != nil {
-			return nil, fmt.Errorf("httpx: 解析 %s 失败: %w", host, err)
+			return nil, fmt.Errorf("httpx: 解析 %s 失敗: %w", host, err)
 		}
 	}
 	if len(addrs) == 0 {
@@ -153,7 +153,7 @@ func safeDialContext(ctx context.Context, network, addr string, lookup lookupIPA
 	return nil, firstErr
 }
 
-// NewSafeClient 构造安全出站客户端：超时 + 重定向逐跳校验 + 连接期 IP 复核。
+// NewSafeClient 構造安全出站客户端：超時 + 重定向逐跳校驗 + 連接期 IP 複核。
 func NewSafeClient(timeout time.Duration) *http.Client {
 	dialer := &net.Dialer{Timeout: 10 * time.Second, KeepAlive: 30 * time.Second}
 	transport := &http.Transport{
@@ -168,17 +168,17 @@ func NewSafeClient(timeout time.Duration) *http.Client {
 		Transport: transport,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) >= 10 {
-				return fmt.Errorf("httpx: 重定向超过 10 跳")
+				return fmt.Errorf("httpx: 重定向超過 10 跳")
 			}
 			return ValidateURL(req.URL.String())
 		},
 	}
 }
 
-// UserAgent 统一出站 UA（上游对接可识别来源）。
+// UserAgent 統一出站 UA（上游對接可識別來源）。
 const UserAgent = "ZCard/2.0"
 
-// Get 简易 GET（带 UA + SSRF 校验）。适配器签名头定制请直接使用 NewSafeClient。
+// Get 簡易 GET（帶 UA + SSRF 校驗）。適配器簽名頭定製請直接使用 NewSafeClient。
 func Get(ctx context.Context, c *http.Client, rawURL string) (*http.Response, error) {
 	if c == nil {
 		c = NewSafeClient(15 * time.Second)
@@ -194,7 +194,7 @@ func Get(ctx context.Context, c *http.Client, rawURL string) (*http.Response, er
 	return c.Do(req)
 }
 
-// RedactURL 日志脱敏：去除 userinfo（凭据永不进日志，铁律 §5.7.3）。
+// RedactURL 日誌脱敏：去除 userinfo（憑據永不進日誌，鐵律 §5.7.3）。
 func RedactURL(raw string) string {
 	if u, err := url.Parse(raw); err == nil && u.User != nil {
 		u.User = nil

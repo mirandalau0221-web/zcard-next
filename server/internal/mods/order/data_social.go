@@ -41,10 +41,10 @@ func (uc *OrderUsecase) socialQuote(ctx context.Context, p *ent.Product, in Crea
 	c := data.Client(ctx, uc.Data)
 	q, e := c.SocialQuote.Query().Where(socialquote.ID(in.SocialQuoteID), socialquote.Role("retail"), socialquote.ProductID(p.ID), socialquote.UserID(in.UserID), socialquote.SubsiteID(in.SubsiteID)).Only(ctx)
 	if e != nil {
-		return nil, fmt.Errorf("order.FORM_INVALID: 服务报价不存在或不属于当前会员")
+		return nil, fmt.Errorf("order.FORM_INVALID: 服務報價不存在或不屬於當前會員")
 	}
 	if p.Status != 1 || p.DeliveryKind != supplyport.SocialDelivery || q.ConsumedBy != "" || q.ExpiresAt <= time.Now().Unix() || q.ProductRevision != p.LockVersion || q.ConnectionID != p.UpstreamSourceID || q.UpstreamProductID != p.UpstreamProductCode || q.CostCents <= 0 || q.AmountCents < q.CostCents || q.Currency != "CNY" {
-		return nil, fmt.Errorf("order.FORM_INVALID: 服务报价已变化，请重新获取")
+		return nil, fmt.Errorf("order.FORM_INVALID: 服務報價已變化，請重新獲取")
 	}
 	conn, e := c.SupplyConnection.Get(ctx, q.ConnectionID)
 	if e != nil {
@@ -55,7 +55,7 @@ func (uc *OrderUsecase) socialQuote(ctx context.Context, p *ent.Product, in Crea
 		return nil, e
 	}
 	if string(conn.Status) != "active" || conn.Driver != "zcard" || conn.ExchangeRate != 1 || data.SocialConnectionIdentity(conn) != q.ConnectionIdentity || data.SocialRetailPricingRevision(conn, m) != q.PricingRevision {
-		return nil, fmt.Errorf("order.FORM_INVALID: 服务货源或定价已变化，请重新获取报价")
+		return nil, fmt.Errorf("order.FORM_INVALID: 服務貨源或定價已變化，請重新獲取報價")
 	}
 	return q, nil
 }
@@ -67,13 +67,13 @@ func (uc *OrderUsecase) createSocialOrder(ctx context.Context, in CreateOrderInp
 		in.SubsiteID = tenancy.FromContext(ctx).SubsiteID
 	}
 	if in.UserID == 0 || in.SubsiteID != 0 || len(in.Items) != 1 || in.Items[0].Quantity != 1 || in.Items[0].SkuID != 0 || in.SMSQuoteID != "" || in.UsePoints || in.CouponCode != "" || in.QuoteOnly || in.IdempotencyKey == "" || len(in.ControlAnswers) > 0 || len(in.Items[0].ControlAnswers) > 0 {
-		return nil, fmt.Errorf("order.FORM_INVALID: 服务须由登录会员使用独立报价购买")
+		return nil, fmt.Errorf("order.FORM_INVALID: 服務須由登錄會員使用獨立報價購買")
 	}
 	if old, e := uc.ReplayOrder(ctx, in); e != nil || old != nil {
 		return old, e
 	}
 	if uc.AccessCipher == nil || uc.Gen == nil {
-		return nil, fmt.Errorf("order.CREATE_FAILED: 服务购买暂不可用")
+		return nil, fmt.Errorf("order.CREATE_FAILED: 服務購買暫不可用")
 	}
 	if uc.Gate != nil && in.ClientIP != "" {
 		if e := uc.Gate.Check(ctx, auditport.GateInput{RiskIP: in.ClientIP, UserID: in.UserID}); e != nil {
@@ -94,14 +94,14 @@ func (uc *OrderUsecase) createSocialOrder(ctx context.Context, in CreateOrderInp
 			return e
 		}
 		if p.DeliveryKind != supplyport.SocialDelivery || p.ProductKind != supplyport.SocialProductKind || p.Status != 1 || p.UpstreamSourceID == 0 || p.GoodsType == "physical" {
-			return fmt.Errorf("order.FORM_INVALID: 服务商品不可售")
+			return fmt.Errorf("order.FORM_INVALID: 服務商品不可售")
 		}
 		hidden, e := data.HiddenCategoryIDs(ctx, c, 0)
 		if e != nil {
 			return e
 		}
 		if data.CategoryHidden(hidden, p.CategoryID) {
-			return fmt.Errorf("order.FORM_INVALID: 服务商品不可售")
+			return fmt.Errorf("order.FORM_INVALID: 服務商品不可售")
 		}
 		if e := c.Product.UpdateOneID(p.ID).AddLockVersion(0).Exec(ctx); e != nil {
 			return e
@@ -115,7 +115,7 @@ func (uc *OrderUsecase) createSocialOrder(ctx context.Context, in CreateOrderInp
 			return e
 		}
 		if currency != "CNY" {
-			return fmt.Errorf("order.FORM_INVALID: 服务购买仅支持人民币基础币种")
+			return fmt.Errorf("order.FORM_INVALID: 服務購買僅支持人民幣基礎幣種")
 		}
 		q, e := uc.socialQuote(ctx, p, in)
 		if e != nil {
@@ -127,11 +127,11 @@ func (uc *OrderUsecase) createSocialOrder(ctx context.Context, in CreateOrderInp
 		}
 		var params supplyport.SocialParameters
 		if json.Unmarshal([]byte(raw), &params) != nil {
-			return fmt.Errorf("order.FORM_INVALID: 报价参数无法读取")
+			return fmt.Errorf("order.FORM_INVALID: 報價參數無法讀取")
 		}
 		var schema supplyport.SocialSchema
 		if json.Unmarshal([]byte(q.SchemaJSON), &schema) != nil {
-			return fmt.Errorf("order.FORM_INVALID: 报价定义无法读取")
+			return fmt.Errorf("order.FORM_INVALID: 報價定義無法讀取")
 		}
 		if _, _, e := supplyport.ValidateSocialParameters(schema, params); e != nil {
 			return e
@@ -169,7 +169,7 @@ func (uc *OrderUsecase) createSocialOrder(ctx context.Context, in CreateOrderInp
 			return e
 		}
 		if n != 1 {
-			return fmt.Errorf("order.FORM_INVALID: 报价已使用")
+			return fmt.Errorf("order.FORM_INVALID: 報價已使用")
 		}
 		if e = c.OrderAmountLine.Create().SetOrderID(o.ID).SetItemID(it.ID).SetType("base_price").SetAmount(q.AmountCents).SetSourceType("social_quote").SetSeq(1).Exec(ctx); e != nil {
 			return e
@@ -218,7 +218,7 @@ func (uc *OrderUsecase) validateSocialPayment(ctx context.Context, oid uint64) e
 		}
 		q, e := c.SocialQuote.Query().Where(socialquote.Role("retail"), socialquote.ConsumedBy(o.OrderNo), socialquote.UserID(o.UserID), socialquote.ProductID(it.ProductID)).Only(ctx)
 		if e != nil || q.ExpiresAt <= time.Now().Unix() {
-			return fmt.Errorf("服务报价已过期，请重新下单")
+			return fmt.Errorf("服務報價已過期，請重新下單")
 		}
 		f, e := uc.readFrozenSocial(it)
 		if e != nil {
@@ -229,7 +229,7 @@ func (uc *OrderUsecase) validateSocialPayment(ctx context.Context, oid uint64) e
 			return e
 		}
 		if data.SocialConnectionIdentity(conn) != f.Identity || string(conn.Status) != "active" {
-			return fmt.Errorf("服务货源账号已变化，请重新下单")
+			return fmt.Errorf("服務貨源賬號已變化，請重新下單")
 		}
 		p, e := c.Product.Get(ctx, it.ProductID)
 		if e != nil {
@@ -240,7 +240,7 @@ func (uc *OrderUsecase) validateSocialPayment(ctx context.Context, oid uint64) e
 			return e
 		}
 		if p.LockVersion != q.ProductRevision || p.Status != 1 || p.UpstreamSourceID != conn.ID || p.UpstreamProductCode != f.Request.ProductID || data.SocialRetailPricingRevision(conn, m) != q.PricingRevision || q.AmountCents != o.TotalAmount || q.CostCents != int64(f.Request.MaxSupplyAmountCents) || q.SupplyQuoteID != f.Request.QuoteID {
-			return fmt.Errorf("服务商品或定价已变化，请重新下单")
+			return fmt.Errorf("服務商品或定價已變化，請重新下單")
 		}
 
 	}

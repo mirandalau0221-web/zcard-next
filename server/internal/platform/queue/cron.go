@@ -1,8 +1,8 @@
 package queue
 
-// 进程内周期任务（无 Redis 时的 cron 兜底，ADR-D6；有 Redis 时由 asynq Scheduler 承接，M1 评估切换）。
-// 采用固定间隔注册（AddEvery）而非 cron 表达式——M0 周期任务均为等间隔扫描型；
-// 多实例部署纪律：进程内 cron 仅在 worker/all 模式运行（多实例 = 需单 worker）。
+// 進程內週期任務（無 Redis 時的 cron 兜底，ADR-D6；有 Redis 時由 asynq Scheduler 承接，M1 評估切換）。
+// 採用固定間隔註冊（AddEvery）而非 cron 表達式——M0 週期任務均為等間隔掃描型；
+// 多實例部署紀律：進程內 cron 僅在 worker/all 模式運行（多實例 = 需單 worker）。
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// Cron 进程内定时器（并发安全；panic 恢复防单任务拖垮循环）。
+// Cron 進程內定時器（併發安全；panic 恢復防單任務拖垮循環）。
 type Cron struct {
 	mu      sync.Mutex
 	entries map[string]cronEntry
@@ -31,14 +31,14 @@ type cronEntry struct {
 	next     time.Time
 }
 
-// NewCron 构造。
+// NewCron 構造。
 func NewCron() *Cron {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Cron{entries: map[string]cronEntry{}, running: map[string]bool{}, stop: make(chan struct{}), ctx: ctx, cancel: cancel}
 }
 
-// AddEvery 注册周期任务（name 唯一，重复注册覆盖——测试与重装配友好）。
-// interval ≤0 拒绝注册（返回错误由调用方决定是否致命）。
+// AddEvery 註冊週期任務（name 唯一，重複註冊覆蓋——測試與重裝配友好）。
+// interval ≤0 拒絕註冊（返回錯誤由調用方決定是否致命）。
 func (c *Cron) AddEvery(name string, interval time.Duration, fn func(context.Context)) error {
 	if interval <= 0 {
 		return errInvalidInterval(name, interval)
@@ -49,7 +49,7 @@ func (c *Cron) AddEvery(name string, interval time.Duration, fn func(context.Con
 	return nil
 }
 
-// Start 启动调度循环（500ms 粒度扫描；幂等：重复 Start 无效）。
+// Start 啓動調度循環（500ms 粒度掃描；冪等：重複 Start 無效）。
 func (c *Cron) Start(log *slog.Logger) {
 	c.mu.Lock()
 	if c.started {
@@ -61,7 +61,7 @@ func (c *Cron) Start(log *slog.Logger) {
 	go c.loop(log)
 }
 
-// Stop 停止（幂等）。
+// Stop 停止（冪等）。
 func (c *Cron) Stop() {
 	c.stopped.Do(func() {
 		c.cancel()
@@ -134,7 +134,7 @@ func (c *Cron) safeRun(e cronEntry, log *slog.Logger) {
 	e.fn(ctx)
 }
 
-// Entries 快照（测试与诊断）。
+// Entries 快照（測試與診斷）。
 func (c *Cron) Entries() map[string]time.Duration {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -149,12 +149,12 @@ func errInvalidInterval(name string, d time.Duration) error {
 	return &InvalidIntervalError{Name: name, Interval: d}
 }
 
-// InvalidIntervalError 非法间隔。
+// InvalidIntervalError 非法間隔。
 type InvalidIntervalError struct {
 	Name     string
 	Interval time.Duration
 }
 
 func (e *InvalidIntervalError) Error() string {
-	return "queue: cron 任务 " + e.Name + " 间隔非法（≤0）"
+	return "queue: cron 任務 " + e.Name + " 間隔非法（≤0）"
 }

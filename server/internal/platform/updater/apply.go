@@ -1,12 +1,12 @@
-// updater 应用层：rename 舞步（原子替换）+ 状态机 + 回滚 + 健康门（）。
+// updater 應用層：rename 舞步（原子替換）+ 狀態機 + 回滾 + 健康門（）。
 //
-// 磁盘布局（同目录，保证 rename 原子性——跨文件系统 rename 退化为 copy 即拒绝）：
+// 磁盤佈局（同目錄，保證 rename 原子性——跨文件系統 rename 退化為 copy 即拒絕）：
 //
-//	<dir>/zcard 当前二进制（新版本落位后由进程管理器/exec 拉起，方案 ）
-//	<dir>/zcard.prev 上一代（回滚位，仅保留一代）
-//	<dir>/zcard.new 下载临时文件（验证通过后 rename 落位，失败即删）
-//	<dir>/update.state 状态机文件（pending → ok）
-//	<dir>/backups/ 更新前备份（二进制+DB，MarkOK 后保留最近 N 代）
+//	<dir>/zcard 當前二進制（新版本落位後由進程管理器/exec 拉起，方案 ）
+//	<dir>/zcard.prev 上一代（回滾位，僅保留一代）
+//	<dir>/zcard.new 下載臨時文件（驗證通過後 rename 落位，失敗即刪）
+//	<dir>/update.state 狀態機文件（pending → ok）
+//	<dir>/backups/ 更新前備份（二進制+DB，MarkOK 後保留最近 N 代）
 package updater
 
 import (
@@ -23,16 +23,16 @@ import (
 	"time"
 )
 
-// 状态机取值。
+// 狀態機取值。
 const (
-	StatePending = "pending" // 已替换二进制，等待新进程健康门确认
-	StateOK      = "ok"      // 更新闭环（或无更新进行中）
+	StatePending = "pending" // 已替換二進制，等待新進程健康門確認
+	StateOK      = "ok"      // 更新閉環（或無更新進行中）
 )
 
-// ErrNoRollback 无回滚位（update.state 非 pending 且无 zcard.prev）。
-var ErrNoRollback = errors.New("updater: 无可回滚版本")
+// ErrNoRollback 無回滾位（update.state 非 pending 且無 zcard.prev）。
+var ErrNoRollback = errors.New("updater: 無可回滾版本")
 
-// State 更新状态文件（serve 启动读取；pending 态装配/迁移失败自动回滚）。
+// State 更新狀態文件（serve 啓動讀取；pending 態裝配/遷移失敗自動回滾）。
 type State struct {
 	Status     string `json:"status"`
 	FromVer    string `json:"from_version"`
@@ -42,8 +42,8 @@ type State struct {
 	RolledBack bool   `json:"rolled_back,omitempty"`
 }
 
-// BackupFunc 更新前 DB 备份（cmd 层注入方言实现：SQLite VACUUM INTO /
-// mysqldump / pg_dump；返回备份目录）。nil = 跳过（仅告警）。
+// BackupFunc 更新前 DB 備份（cmd 層注入方言實現：SQLite VACUUM INTO /
+// mysqldump / pg_dump；返回備份目錄）。nil = 跳過（僅告警）。
 type BackupFunc func(ctx context.Context, destDir string) error
 
 const (
@@ -53,12 +53,12 @@ const (
 	backupDir = "backups"
 )
 
-// statePath / SidecarPath 状态文件路径（binaryPath 所在目录）。
+// statePath / SidecarPath 狀態文件路徑（binaryPath 所在目錄）。
 func statePath(binaryPath string) string {
 	return filepath.Join(filepath.Dir(binaryPath), stateName)
 }
 
-// LoadState 读取状态（不存在 = 无更新进行中，Status=ok）。
+// LoadState 讀取狀態（不存在 = 無更新進行中，Status=ok）。
 func LoadState(binaryPath string) (*State, error) {
 	raw, err := os.ReadFile(statePath(binaryPath))
 	if err != nil {
@@ -69,7 +69,7 @@ func LoadState(binaryPath string) (*State, error) {
 	}
 	var s State
 	if err := json.Unmarshal(raw, &s); err != nil {
-		// 损坏状态按无更新处理（fail-open 仅影响回滚位清理，不影响服务）
+		// 損壞狀態按無更新處理（fail-open 僅影響回滾位清理，不影響服務）
 		return &State{Status: StateOK}, nil
 	}
 	return &s, nil
@@ -83,12 +83,12 @@ func saveState(binaryPath string, s *State) error {
 	return os.WriteFile(statePath(binaryPath), raw, 0o644)
 }
 
-// Apply 原子替换（内存版薄包装——小产物/测试用；生产更新链走 ApplyFile，
-// 124MB 大二进制禁止整包进内存，方案 ）。
+// Apply 原子替換（內存版薄包裝——小產物/測試用；生產更新鏈走 ApplyFile，
+// 124MB 大二進制禁止整包進內存，方案 ）。
 func Apply(binaryPath, fromVer, toVer string, newBin []byte) error {
 	tmp := filepath.Join(filepath.Dir(binaryPath), newName)
 	if err := os.WriteFile(tmp, newBin, 0o755); err != nil {
-		return fmt.Errorf("updater: 写入临时文件失败: %w", err)
+		return fmt.Errorf("updater: 寫入臨時文件失敗: %w", err)
 	}
 	if err := ApplyFile(binaryPath, fromVer, toVer, tmp); err != nil {
 		_ = os.Remove(tmp)
@@ -97,28 +97,28 @@ func Apply(binaryPath, fromVer, toVer string, newBin []byte) error {
 	return nil
 }
 
-// ApplyFile 原子替换（rename 舞步，落盘版）：downloaded 为已通过哈希校验的
-// 新二进制文件（调用方直接下载到 <dir>/zcard.new，边写边校验零内存）。
-// chmod → current 改名 .prev → downloaded 落位 current → 写 pending 态。
-// 任何一步失败磁盘可恢复（downloaded 可删，未到 rename 阶段 current 未动）。
-// downloaded 必须与 binaryPath 同目录（同文件系统，rename 原子性前提）。
+// ApplyFile 原子替換（rename 舞步，落盤版）：downloaded 為已通過哈希校驗的
+// 新二進制文件（調用方直接下載到 <dir>/zcard.new，邊寫邊校驗零內存）。
+// chmod → current 改名 .prev → downloaded 落位 current → 寫 pending 態。
+// 任何一步失敗磁盤可恢復（downloaded 可刪，未到 rename 階段 current 未動）。
+// downloaded 必須與 binaryPath 同目錄（同文件系統，rename 原子性前提）。
 func ApplyFile(binaryPath, fromVer, toVer, downloaded string) error {
 	dir := filepath.Dir(binaryPath)
 	if filepath.Dir(downloaded) != dir {
-		return fmt.Errorf("updater: 下载临时文件与二进制不同目录（rename 原子性前提）")
+		return fmt.Errorf("updater: 下載臨時文件與二進制不同目錄（rename 原子性前提）")
 	}
 	if err := os.Chmod(downloaded, 0o755); err != nil {
-		return fmt.Errorf("updater: 临时文件加执行位失败: %w", err)
+		return fmt.Errorf("updater: 臨時文件加執行位失敗: %w", err)
 	}
 	prev := filepath.Join(dir, prevName)
-	_ = os.Remove(prev) // 上一代残留（上次更新未闭环）直接覆盖
+	_ = os.Remove(prev) // 上一代殘留（上次更新未閉環）直接覆蓋
 	if err := os.Rename(binaryPath, prev); err != nil {
-		return fmt.Errorf("updater: 保留回滚位失败: %w", err)
+		return fmt.Errorf("updater: 保留回滾位失敗: %w", err)
 	}
 	if err := os.Rename(downloaded, binaryPath); err != nil {
-		// 舞步中断：回放 current（.prev 尚在）
+		// 舞步中斷：回放 current（.prev 尚在）
 		_ = os.Rename(prev, binaryPath)
-		return fmt.Errorf("updater: 落位新版本失败: %w", err)
+		return fmt.Errorf("updater: 落位新版本失敗: %w", err)
 	}
 	return saveState(binaryPath, &State{
 		Status: StatePending, FromVer: fromVer, ToVer: toVer,
@@ -126,8 +126,8 @@ func ApplyFile(binaryPath, fromVer, toVer, downloaded string) error {
 	})
 }
 
-// Rollback 显式回滚：.prev swap 回 current，状态清理。
-// 无 .prev 返回 ErrNoRollback（OnFailure 单元随机崩溃不误伤）。
+// Rollback 顯式回滾：.prev swap 回 current，狀態清理。
+// 無 .prev 返回 ErrNoRollback（OnFailure 單元隨機崩潰不誤傷）。
 func Rollback(binaryPath string) error {
 	dir := filepath.Dir(binaryPath)
 	prev := filepath.Join(dir, prevName)
@@ -138,7 +138,7 @@ func Rollback(binaryPath string) error {
 		return err
 	}
 	if err := os.Rename(prev, binaryPath); err != nil {
-		return fmt.Errorf("updater: 回滚落位失败: %w", err)
+		return fmt.Errorf("updater: 回滾落位失敗: %w", err)
 	}
 	s, _ := LoadState(binaryPath)
 	s.Status = StateOK
@@ -146,19 +146,19 @@ func Rollback(binaryPath string) error {
 	return saveState(binaryPath, s)
 }
 
-// copyOrRemoveBad 回滚前处理损坏的 current：改名留证（failed-<ts>）便于排查。
+// copyOrRemoveBad 回滾前處理損壞的 current：改名留證（failed-<ts>）便於排查。
 func copyOrRemoveBad(binaryPath string) error {
 	if _, err := os.Stat(binaryPath); err != nil {
-		return nil // current 不存在（启动即崩场景）
+		return nil // current 不存在（啓動即崩場景）
 	}
 	dir := filepath.Dir(binaryPath)
 	keep := filepath.Join(dir, "zcard.failed-"+time.Now().UTC().Format("20060102T150405"))
-	_ = os.Rename(binaryPath, keep) // 失败即删，不阻塞回滚
+	_ = os.Rename(binaryPath, keep) // 失敗即刪，不阻塞回滾
 	return nil
 }
 
-// RollbackOnBootFailure serve 启动失败路径：pending 态才回滚（随机崩溃不动二进制）。
-// 返回是否执行了回滚（日志用）。
+// RollbackOnBootFailure serve 啓動失敗路徑：pending 態才回滾（隨機崩潰不動二進制）。
+// 返回是否執行了回滾（日誌用）。
 func RollbackOnBootFailure(binaryPath string) bool {
 	s, err := LoadState(binaryPath)
 	if err != nil || s.Status != StatePending {
@@ -170,7 +170,7 @@ func RollbackOnBootFailure(binaryPath string) bool {
 	return true
 }
 
-// MarkOK 健康门通过：pending → ok，清过期备份（保留最近 keep 代）。
+// MarkOK 健康門通過：pending → ok，清過期備份（保留最近 keep 代）。
 func MarkOK(binaryPath string, keep int) error {
 	s, err := LoadState(binaryPath)
 	if err != nil {
@@ -192,7 +192,7 @@ func pruneBackups(dir string, keep int) {
 	if err != nil || len(entries) <= keep {
 		return
 	}
-	// 目录名含时间戳，字典序即时间序
+	// 目錄名含時間戳，字典序即時間序
 	for _, e := range entries[:len(entries)-keep] {
 		if e.IsDir() {
 			_ = os.RemoveAll(filepath.Join(dir, e.Name()))
@@ -200,8 +200,8 @@ func pruneBackups(dir string, keep int) {
 	}
 }
 
-// HealthGate 启动后自检：轮询 /health 直到 database:true 或超时。
-// 通过 → MarkOK；超时 → 返回错误（调用方决定回滚/退出）。
+// HealthGate 啓動後自檢：輪詢 /health 直到 database:true 或超時。
+// 通過 → MarkOK；超時 → 返回錯誤（調用方決定回滾/退出）。
 func HealthGate(ctx context.Context, healthURL, binaryPath string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
@@ -215,7 +215,7 @@ func HealthGate(ctx context.Context, healthURL, binaryPath string, timeout time.
 		}
 		time.Sleep(2 * time.Second)
 	}
-	return fmt.Errorf("updater: 健康门超时（%s 未就绪，%s）", healthURL, timeout)
+	return fmt.Errorf("updater: 健康門超時（%s 未就緒，%s）", healthURL, timeout)
 }
 
 func pingHealth(url string) bool {
@@ -237,15 +237,15 @@ func pingHealth(url string) bool {
 	return json.NewDecoder(resp.Body).Decode(&body) == nil && body.Status.Database
 }
 
-// BackupPath 构造备份目录（pre-<版本>-<ts>；BackupFunc 落盘目标）。
+// BackupPath 構造備份目錄（pre-<版本>-<ts>；BackupFunc 落盤目標）。
 func BackupPath(binaryPath, version string) string {
 	return filepath.Join(filepath.Dir(binaryPath), backupDir,
 		"pre-"+version+"-"+time.Now().UTC().Format("20060102T150405"))
 }
 
-// RestartService 重启服务：systemd 优先（安装态），失败返回错误提示手动重启
-// （裸跑/容器态；容器内 self-update 本就被部署矩阵排除）。
-// inProcess=true（admin 面内触发）时由 serve 层重启三分支处理，不走本函数。
+// RestartService 重啓服務：systemd 優先（安裝態），失敗返回錯誤提示手動重啓
+// （裸跑/容器態；容器內 self-update 本就被部署矩陣排除）。
+// inProcess=true（admin 面內觸發）時由 serve 層重啓三分支處理，不走本函數。
 func RestartService(unit string) error {
 	if unit == "" {
 		unit = "zcard"
@@ -262,37 +262,37 @@ func RestartService(unit string) error {
 			_ = out
 		}
 	}
-	return errors.New("updater: 无法自动重启（非 systemd 环境）——请手动重启服务进程")
+	return errors.New("updater: 無法自動重啓（非 systemd 環境）——請手動重啓服務進程")
 }
 
 func fileExists(p string) bool { _, err := os.Stat(p); return err == nil }
 
-// CheckDiskSpace 磁盘预检（方案 ）：dir 所在文件系统可用空间不足 need 即报错
-// （124MB 下载 + GB 级 DB 备份，写一半 ENOSPC 远劣于提前拒绝）。
+// CheckDiskSpace 磁盤預檢（方案 ）：dir 所在文件系統可用空間不足 need 即報錯
+// （124MB 下載 + GB 級 DB 備份，寫一半 ENOSPC 遠劣於提前拒絕）。
 func CheckDiskSpace(dir string, need int64) error {
 	var st syscall.Statfs_t
 	if err := syscall.Statfs(dir, &st); err != nil {
-		return fmt.Errorf("updater: 磁盘预检失败: %w", err)
+		return fmt.Errorf("updater: 磁盤預檢失敗: %w", err)
 	}
 	avail := int64(st.Bavail) * int64(st.Bsize)
 	if avail < need {
-		return fmt.Errorf("updater: 磁盘空间不足（需 %dMB，%s 可用 %dMB）", need>>20, dir, avail>>20)
+		return fmt.Errorf("updater: 磁盤空間不足（需 %dMB，%s 可用 %dMB）", need>>20, dir, avail>>20)
 	}
 	return nil
 }
 
-// DetectSupervisor 探测进程管理器（方案 重启三分支依据），判据按可靠度排序：
-// 1. ZCARD_SUPERVISOR（install.sh unit 显式声明）
-// 2. systemd 运行时注入 env（INVOCATION_ID）
-// 3. supervisord 标准注入 env（SUPERVISOR_*）
-// 4. 父进程链 comm（宝塔「进程守护管理器」等封装不透传标准 env——实测有
-// env 缺失场景；父链出现 supervisord/pm2 是强判据，不可能误报）
-// 5. /proc/self/cgroup 含 supervisord（supervisord 被 systemd 托管时子进程
+// DetectSupervisor 探測進程管理器（方案 重啓三分支依據），判據按可靠度排序：
+// 1. ZCARD_SUPERVISOR（install.sh unit 顯式聲明）
+// 2. systemd 運行時注入 env（INVOCATION_ID）
+// 3. supervisord 標準注入 env（SUPERVISOR_*）
+// 4. 父進程鏈 comm（寶塔「進程守護管理器」等封裝不透傳標準 env——實測有
+// env 缺失場景；父鏈出現 supervisord/pm2 是強判據，不可能誤報）
+// 5. /proc/self/cgroup 含 supervisord（supervisord 被 systemd 託管時子進程
 // 同 cgroup 的兜底）
 //
-// 注意 cgroup 仍不能用于判 systemd——systemd 系统上 nohup 裸跑进程同样落在
-// systemd slice 内（误判即「优雅退出等拉起」而实际无人拉起，服务死透）。
-// 探测尽力的盲区由 settings system/update 的 supervisor 字段显式覆盖（service 层）。
+// 注意 cgroup 仍不能用於判 systemd——systemd 系統上 nohup 裸跑進程同樣落在
+// systemd slice 內（誤判即「優雅退出等拉起」而實際無人拉起，服務死透）。
+// 探測盡力的盲區由 settings system/update 的 supervisor 字段顯式覆蓋（service 層）。
 func DetectSupervisor() string {
 	if IsContainer() {
 		return "docker"
@@ -315,8 +315,8 @@ func DetectSupervisor() string {
 	return "none"
 }
 
-// detectAncestorManager 向上父进程链找进程管理器（supervisord / PM2 God Daemon /
-// 宝塔守护等——按 comm 名匹配；/proc 不可读（非 Linux）即跳过）。
+// detectAncestorManager 向上父進程鏈找進程管理器（supervisord / PM2 God Daemon /
+// 寶塔守護等——按 comm 名匹配；/proc 不可讀（非 Linux）即跳過）。
 func detectAncestorManager() string {
 	pid := os.Getppid()
 	for i := 0; i < 12 && pid > 1; i++ {
@@ -338,7 +338,7 @@ func detectAncestorManager() string {
 	return ""
 }
 
-// parentPID /proc/<pid>/stat 的 ppid（comm 含空格时括号定位）。
+// parentPID /proc/<pid>/stat 的 ppid（comm 含空格時括號定位）。
 func parentPID(pid int) (int, bool) {
 	raw, err := os.ReadFile(fmt.Sprintf("/proc/%d/stat", pid))
 	if err != nil {
@@ -357,13 +357,13 @@ func parentPID(pid int) (int, bool) {
 	return 0, false
 }
 
-// RestartSelf 裸跑降级路径：syscall.Exec 同进程映像替换（方案 ）。
-// PID/父子关系/env/cwd 全保留——systemd 主进程无感、nohup 挂载关系不变；
-// 成功不返回；失败则旧进程内存映像仍在（磁盘已换新，返回错误提示手动重启）。
-// 调用前必须已完成优雅停机（serve 层 app.Stop 后调用）。
+// RestartSelf 裸跑降級路徑：syscall.Exec 同進程映像替換（方案 ）。
+// PID/父子關係/env/cwd 全保留——systemd 主進程無感、nohup 掛載關係不變；
+// 成功不返回；失敗則舊進程內存映像仍在（磁盤已換新，返回錯誤提示手動重啓）。
+// 調用前必須已完成優雅停機（serve 層 app.Stop 後調用）。
 func RestartSelf(binaryPath string) error {
 	if _, err := os.Stat(binaryPath); err != nil {
-		return fmt.Errorf("updater: exec 目标不存在: %w", err)
+		return fmt.Errorf("updater: exec 目標不存在: %w", err)
 	}
 	return syscall.Exec(binaryPath, os.Args, os.Environ())
 }

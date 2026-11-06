@@ -30,26 +30,26 @@ const OperationSupplyServicePing = "/zcard.api.supply.v1.SupplyService/Ping"
 const OperationSupplyServiceRefundOrder = "/zcard.api.supply.v1.SupplyService/RefundOrder"
 
 type SupplyServiceHTTPServer interface {
-	// CancelOrder CancelOrder 取消（未交付订单释放锁卡）。
+	// CancelOrder CancelOrder 取消（未交付訂單釋放鎖卡）。
 	CancelOrder(context.Context, *CancelSupplyOrderRequest) (*CancelSupplyOrderReply, error)
-	// CreateOrder CreateOrder 下游下单（downstream_order_no 幂等；复用本地锁卡防超卖；
-	// 同步交付：响应 fulfillment.delivered + cards）。
+	// CreateOrder CreateOrder 下游下單（downstream_order_no 冪等；複用本地鎖卡防超賣；
+	// 同步交付：響應 fulfillment.delivered + cards）。
 	CreateOrder(context.Context, *CreateSupplyOrderRequest) (*CreateSupplyOrderReply, error)
-	// GetOrder GetOrder 订单查询（轮询/巡检兜底）。
+	// GetOrder GetOrder 訂單查詢（輪詢/巡檢兜底）。
 	GetOrder(context.Context, *GetSupplyOrderRequest) (*GetSupplyOrderReply, error)
-	// GetProduct GetProduct 商品详情。
+	// GetProduct GetProduct 商品詳情。
 	GetProduct(context.Context, *GetProductRequest) (*GetProductReply, error)
-	// GetStock GetStock 实时库存（-1=无限）。
+	// GetStock GetStock 實時庫存（-1=無限）。
 	GetStock(context.Context, *GetStockRequest) (*GetStockReply, error)
-	// ListCategories ListCategories 商品分类（下游建目录）。
+	// ListCategories ListCategories 商品分類（下游建目錄）。
 	ListCategories(context.Context, *emptypb.Empty) (*ListCategoriesReply, error)
-	// ListOrders ListOrders 时间窗内订单列表（对账数据源；按创建时间过滤）。
+	// ListOrders ListOrders 時間窗內訂單列表（對賬數據源；按創建時間過濾）。
 	ListOrders(context.Context, *ListSupplyOrdersRequest) (*ListSupplyOrdersReply, error)
-	// ListProducts ListProducts 商品列表（分页；include_inactive 回声字段防旧版误判）。
+	// ListProducts ListProducts 商品列表（分頁；include_inactive 回聲字段防舊版誤判）。
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsReply, error)
-	// Ping Ping 连通性与协议版本探测（免签名）。
+	// Ping Ping 連通性與協議版本探測（免簽名）。
 	Ping(context.Context, *emptypb.Empty) (*PingReply, error)
-	// RefundOrder RefundOrder 退款（已交付转人工；未交付释放）。
+	// RefundOrder RefundOrder 退款（已交付轉人工；未交付釋放）。
 	RefundOrder(context.Context, *RefundSupplyOrderRequest) (*RefundSupplyOrderReply, error)
 }
 
@@ -273,26 +273,26 @@ func _SupplyService_RefundOrder0_HTTP_Handler(srv SupplyServiceHTTPServer) func(
 }
 
 type SupplyServiceHTTPClient interface {
-	// CancelOrder CancelOrder 取消（未交付订单释放锁卡）。
+	// CancelOrder CancelOrder 取消（未交付訂單釋放鎖卡）。
 	CancelOrder(ctx context.Context, req *CancelSupplyOrderRequest, opts ...http.CallOption) (rsp *CancelSupplyOrderReply, err error)
-	// CreateOrder CreateOrder 下游下单（downstream_order_no 幂等；复用本地锁卡防超卖；
-	// 同步交付：响应 fulfillment.delivered + cards）。
+	// CreateOrder CreateOrder 下游下單（downstream_order_no 冪等；複用本地鎖卡防超賣；
+	// 同步交付：響應 fulfillment.delivered + cards）。
 	CreateOrder(ctx context.Context, req *CreateSupplyOrderRequest, opts ...http.CallOption) (rsp *CreateSupplyOrderReply, err error)
-	// GetOrder GetOrder 订单查询（轮询/巡检兜底）。
+	// GetOrder GetOrder 訂單查詢（輪詢/巡檢兜底）。
 	GetOrder(ctx context.Context, req *GetSupplyOrderRequest, opts ...http.CallOption) (rsp *GetSupplyOrderReply, err error)
-	// GetProduct GetProduct 商品详情。
+	// GetProduct GetProduct 商品詳情。
 	GetProduct(ctx context.Context, req *GetProductRequest, opts ...http.CallOption) (rsp *GetProductReply, err error)
-	// GetStock GetStock 实时库存（-1=无限）。
+	// GetStock GetStock 實時庫存（-1=無限）。
 	GetStock(ctx context.Context, req *GetStockRequest, opts ...http.CallOption) (rsp *GetStockReply, err error)
-	// ListCategories ListCategories 商品分类（下游建目录）。
+	// ListCategories ListCategories 商品分類（下游建目錄）。
 	ListCategories(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListCategoriesReply, err error)
-	// ListOrders ListOrders 时间窗内订单列表（对账数据源；按创建时间过滤）。
+	// ListOrders ListOrders 時間窗內訂單列表（對賬數據源；按創建時間過濾）。
 	ListOrders(ctx context.Context, req *ListSupplyOrdersRequest, opts ...http.CallOption) (rsp *ListSupplyOrdersReply, err error)
-	// ListProducts ListProducts 商品列表（分页；include_inactive 回声字段防旧版误判）。
+	// ListProducts ListProducts 商品列表（分頁；include_inactive 回聲字段防舊版誤判）。
 	ListProducts(ctx context.Context, req *ListProductsRequest, opts ...http.CallOption) (rsp *ListProductsReply, err error)
-	// Ping Ping 连通性与协议版本探测（免签名）。
+	// Ping Ping 連通性與協議版本探測（免簽名）。
 	Ping(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *PingReply, err error)
-	// RefundOrder RefundOrder 退款（已交付转人工；未交付释放）。
+	// RefundOrder RefundOrder 退款（已交付轉人工；未交付釋放）。
 	RefundOrder(ctx context.Context, req *RefundSupplyOrderRequest, opts ...http.CallOption) (rsp *RefundSupplyOrderReply, err error)
 }
 
@@ -304,7 +304,7 @@ func NewSupplyServiceHTTPClient(client *http.Client) SupplyServiceHTTPClient {
 	return &SupplyServiceHTTPClientImpl{client}
 }
 
-// CancelOrder CancelOrder 取消（未交付订单释放锁卡）。
+// CancelOrder CancelOrder 取消（未交付訂單釋放鎖卡）。
 func (c *SupplyServiceHTTPClientImpl) CancelOrder(ctx context.Context, in *CancelSupplyOrderRequest, opts ...http.CallOption) (*CancelSupplyOrderReply, error) {
 	var out CancelSupplyOrderReply
 	pattern := "/api/supply/orders/{id}/cancel"
@@ -321,8 +321,8 @@ func (c *SupplyServiceHTTPClientImpl) CancelOrder(ctx context.Context, in *Cance
 	return &out, nil
 }
 
-// CreateOrder CreateOrder 下游下单（downstream_order_no 幂等；复用本地锁卡防超卖；
-// 同步交付：响应 fulfillment.delivered + cards）。
+// CreateOrder CreateOrder 下游下單（downstream_order_no 冪等；複用本地鎖卡防超賣；
+// 同步交付：響應 fulfillment.delivered + cards）。
 func (c *SupplyServiceHTTPClientImpl) CreateOrder(ctx context.Context, in *CreateSupplyOrderRequest, opts ...http.CallOption) (*CreateSupplyOrderReply, error) {
 	var out CreateSupplyOrderReply
 	pattern := "/api/supply/orders"
@@ -340,7 +340,7 @@ func (c *SupplyServiceHTTPClientImpl) CreateOrder(ctx context.Context, in *Creat
 	return &out, nil
 }
 
-// GetOrder GetOrder 订单查询（轮询/巡检兜底）。
+// GetOrder GetOrder 訂單查詢（輪詢/巡檢兜底）。
 func (c *SupplyServiceHTTPClientImpl) GetOrder(ctx context.Context, in *GetSupplyOrderRequest, opts ...http.CallOption) (*GetSupplyOrderReply, error) {
 	var out GetSupplyOrderReply
 	pattern := "/api/supply/orders/{id}"
@@ -357,7 +357,7 @@ func (c *SupplyServiceHTTPClientImpl) GetOrder(ctx context.Context, in *GetSuppl
 	return &out, nil
 }
 
-// GetProduct GetProduct 商品详情。
+// GetProduct GetProduct 商品詳情。
 func (c *SupplyServiceHTTPClientImpl) GetProduct(ctx context.Context, in *GetProductRequest, opts ...http.CallOption) (*GetProductReply, error) {
 	var out GetProductReply
 	pattern := "/api/supply/products/{id}"
@@ -374,7 +374,7 @@ func (c *SupplyServiceHTTPClientImpl) GetProduct(ctx context.Context, in *GetPro
 	return &out, nil
 }
 
-// GetStock GetStock 实时库存（-1=无限）。
+// GetStock GetStock 實時庫存（-1=無限）。
 func (c *SupplyServiceHTTPClientImpl) GetStock(ctx context.Context, in *GetStockRequest, opts ...http.CallOption) (*GetStockReply, error) {
 	var out GetStockReply
 	pattern := "/api/supply/products/{id}/stock"
@@ -391,7 +391,7 @@ func (c *SupplyServiceHTTPClientImpl) GetStock(ctx context.Context, in *GetStock
 	return &out, nil
 }
 
-// ListCategories ListCategories 商品分类（下游建目录）。
+// ListCategories ListCategories 商品分類（下游建目錄）。
 func (c *SupplyServiceHTTPClientImpl) ListCategories(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListCategoriesReply, error) {
 	var out ListCategoriesReply
 	pattern := "/api/supply/categories"
@@ -408,7 +408,7 @@ func (c *SupplyServiceHTTPClientImpl) ListCategories(ctx context.Context, in *em
 	return &out, nil
 }
 
-// ListOrders ListOrders 时间窗内订单列表（对账数据源；按创建时间过滤）。
+// ListOrders ListOrders 時間窗內訂單列表（對賬數據源；按創建時間過濾）。
 func (c *SupplyServiceHTTPClientImpl) ListOrders(ctx context.Context, in *ListSupplyOrdersRequest, opts ...http.CallOption) (*ListSupplyOrdersReply, error) {
 	var out ListSupplyOrdersReply
 	pattern := "/api/supply/orders"
@@ -425,7 +425,7 @@ func (c *SupplyServiceHTTPClientImpl) ListOrders(ctx context.Context, in *ListSu
 	return &out, nil
 }
 
-// ListProducts ListProducts 商品列表（分页；include_inactive 回声字段防旧版误判）。
+// ListProducts ListProducts 商品列表（分頁；include_inactive 回聲字段防舊版誤判）。
 func (c *SupplyServiceHTTPClientImpl) ListProducts(ctx context.Context, in *ListProductsRequest, opts ...http.CallOption) (*ListProductsReply, error) {
 	var out ListProductsReply
 	pattern := "/api/supply/products"
@@ -442,7 +442,7 @@ func (c *SupplyServiceHTTPClientImpl) ListProducts(ctx context.Context, in *List
 	return &out, nil
 }
 
-// Ping Ping 连通性与协议版本探测（免签名）。
+// Ping Ping 連通性與協議版本探測（免簽名）。
 func (c *SupplyServiceHTTPClientImpl) Ping(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*PingReply, error) {
 	var out PingReply
 	pattern := "/api/supply/ping"
@@ -459,7 +459,7 @@ func (c *SupplyServiceHTTPClientImpl) Ping(ctx context.Context, in *emptypb.Empt
 	return &out, nil
 }
 
-// RefundOrder RefundOrder 退款（已交付转人工；未交付释放）。
+// RefundOrder RefundOrder 退款（已交付轉人工；未交付釋放）。
 func (c *SupplyServiceHTTPClientImpl) RefundOrder(ctx context.Context, in *RefundSupplyOrderRequest, opts ...http.CallOption) (*RefundSupplyOrderReply, error) {
 	var out RefundSupplyOrderReply
 	pattern := "/api/supply/orders/{id}/refund"

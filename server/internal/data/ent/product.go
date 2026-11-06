@@ -22,7 +22,7 @@ type Product struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ProductKind holds the value of the "product_kind" field.
 	ProductKind string `json:"product_kind,omitempty"`
@@ -32,7 +32,7 @@ type Product struct {
 	SmsProduct map[string]string `json:"sms_product,omitempty"`
 	// SocialSchema holds the value of the "social_schema" field.
 	SocialSchema map[string]interface{} `json:"social_schema,omitempty"`
-	// 分类（软外键，仅索引）
+	// 分類（軟外鍵，僅索引）
 	CategoryID uint64 `json:"category_id,omitempty"`
 	// CategoryProtected holds the value of the "category_protected" field.
 	CategoryProtected bool `json:"category_protected,omitempty"`
@@ -40,11 +40,11 @@ type Product struct {
 	Name string `json:"name,omitempty"`
 	// GoodsType holds the value of the "goods_type" field.
 	GoodsType string `json:"goods_type,omitempty"`
-	// 商品属性；goods_type 为旧客户端兼容镜像
+	// 商品屬性；goods_type 為舊客户端兼容鏡像
 	ProductProperty string `json:"product_property,omitempty"`
-	// 实体商品是否管理数量库存；规格继承
+	// 實體商品是否管理數量庫存；規格繼承
 	TrackInventory bool `json:"track_inventory,omitempty"`
-	// 是否向买家显示已售数量
+	// 是否向買家顯示已售數量
 	SalesVisible bool `json:"sales_visible,omitempty"`
 	// ShippingMode holds the value of the "shipping_mode" field.
 	ShippingMode string `json:"shipping_mode,omitempty"`
@@ -54,53 +54,53 @@ type Product struct {
 	ShippingCountries []string `json:"shipping_countries,omitempty"`
 	// PhysicalStock holds the value of the "physical_stock" field.
 	PhysicalStock int64 `json:"physical_stock,omitempty"`
-	// 唯一标识
+	// 唯一標識
 	Slug string `json:"slug,omitempty"`
-	// 详情（服务端 sanitize 后存储）
+	// 詳情（服務端 sanitize 後存儲）
 	Description string `json:"description,omitempty"`
 	// Cover holds the value of the "cover" field.
 	Cover string `json:"cover,omitempty"`
-	// 详情图集
+	// 詳情圖集
 	Images []string `json:"images,omitempty"`
 	// CoverProtected holds the value of the "cover_protected" field.
 	CoverProtected bool `json:"cover_protected,omitempty"`
 	// DescriptionProtected holds the value of the "description_protected" field.
 	DescriptionProtected bool `json:"description_protected,omitempty"`
-	// 售价（分）
+	// 售價（分）
 	Price int64 `json:"price,omitempty"`
-	// 成本价（分，上游/自营成本快照）
+	// 成本價（分，上游/自營成本快照）
 	FactoryPrice int64 `json:"factory_price,omitempty"`
-	// 预选卡密默认加价（分）
+	// 預選卡密默認加價（分）
 	DraftPremium int64 `json:"draft_premium,omitempty"`
-	// 按会员等级价 {level_id: 分}
+	// 按會員等級價 {level_id: 分}
 	MemberPrice map[string]int64 `json:"member_price,omitempty"`
-	// 积分兑换价（分单位积分；0=不参与积分商城，P3-01）
+	// 積分兑換價（分單位積分；0=不參與積分商城，P3-01）
 	PointsRequired int64 `json:"points_required,omitempty"`
-	// 卡密/链接/兑换码
+	// 卡密/鏈接/兑換碼
 	StockType product.StockType `json:"stock_type,omitempty"`
-	// 直发内容密文（url/code 商品：网盘链接/兑换码，AES-GCM AAD=product/subsite；同一内容发给每个买家
+	// 直髮內容密文（url/code 商品：網盤鏈接/兑換碼，AES-GCM AAD=product/subsite；同一內容發給每個買家
 	DirectContent []byte `json:"direct_content,omitempty"`
-	// 是否显示库存
+	// 是否顯示庫存
 	StockVisible bool `json:"stock_visible,omitempty"`
 	// FulfillmentMode holds the value of the "fulfillment_mode" field.
 	FulfillmentMode string `json:"fulfillment_mode,omitempty"`
-	// 人工共享总额度（含已售及预占），-1不限
+	// 人工共享總額度（含已售及預佔），-1不限
 	ManualStock int64 `json:"manual_stock,omitempty"`
-	// 发货模式：标记/即删
+	// 發貨模式：標記/即刪
 	DeliveryMode product.DeliveryMode `json:"delivery_mode,omitempty"`
-	// 自定义控件配置（结构化控件走 product_controls 表，M1）
+	// 自定義控件配置（結構化控件走 product_controls 表，M1）
 	ControlConfig map[string]interface{} `json:"control_config,omitempty"`
-	// 导入去重开关
+	// 導入去重開關
 	Dedup bool `json:"dedup,omitempty"`
 	// Sort holds the value of the "sort" field.
 	Sort int32 `json:"sort,omitempty"`
-	// 运营推荐（storefront 首页推荐位 recommend_only 过滤；admin 商品表单可标）
+	// 運營推薦（storefront 首頁推薦位 recommend_only 過濾；admin 商品表單可標）
 	IsRecommend bool `json:"is_recommend,omitempty"`
-	// 1=上架 0=下架 2=隐藏（游客不可见会员可见）
+	// 1=上架 0=下架 2=隱藏（遊客不可見會員可見）
 	Status int8 `json:"status,omitempty"`
-	// 货源连接（NULL=自营；M2）
+	// 貨源連接（NULL=自營；M2）
 	UpstreamSourceID uint64 `json:"upstream_source_id,omitempty"`
-	// 上游商品标识（M2）
+	// 上游商品標識（M2）
 	UpstreamProductCode string `json:"upstream_product_code,omitempty"`
 	// UpstreamSyncedAt holds the value of the "upstream_synced_at" field.
 	UpstreamSyncedAt time.Time `json:"upstream_synced_at,omitempty"`
@@ -138,9 +138,9 @@ type Product struct {
 
 // ProductEdges holds the relations/edges for other nodes in the graph.
 type ProductEdges struct {
-	// 多规格
+	// 多規格
 	Skus []*ProductSku `json:"skus,omitempty"`
-	// 库存卡密（硬 FK）
+	// 庫存卡密（硬 FK）
 	Cards []*Card `json:"cards,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.

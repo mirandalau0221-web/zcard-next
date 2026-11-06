@@ -29,7 +29,7 @@ func (r *PaymentRepoImpl) RefundSMS(ctx context.Context, id uint64) (refundID ui
 			return nil
 		}
 		if !data.SMSRefundConfirmed(row) {
-			return refundInvalid("接码供货退款凭证尚未确认")
+			return refundInvalid("接碼供貨退款憑證尚未確認")
 		}
 		o, e := c.Order.Get(ctx, row.OrderID)
 		if e != nil {
@@ -40,7 +40,7 @@ func (r *PaymentRepoImpl) RefundSMS(ctx context.Context, id uint64) (refundID ui
 			return e
 		}
 		if len(items) != 1 || items[0].ID != row.OrderItemID || items[0].DeliveryKind != "sms_activation" || o.UserID != row.UserID || o.SubsiteID != row.SubsiteID || o.BaseCurrency != "CNY" || o.TotalAmount <= 0 {
-			return refundInvalid("接码零售订单身份或金额异常")
+			return refundInvalid("接碼零售訂單身份或金額異常")
 		}
 		receipts, e := c.RefundOrder.Query().Where(refundorder.OrderID(o.ID)).All(ctx)
 		if e != nil {
@@ -49,11 +49,11 @@ func (r *PaymentRepoImpl) RefundSMS(ctx context.Context, id uint64) (refundID ui
 		var refunded int64
 		for _, rf := range receipts {
 			if rf.Status == refundorder.StatusCreated || rf.Status == refundorder.StatusProcessing {
-				return refundInvalid("已有退款待核对")
+				return refundInvalid("已有退款待核對")
 			}
 			if rf.Status == refundorder.StatusSucceeded {
 				if rf.Amount < 0 || rf.Amount > o.TotalAmount-refunded {
-					return refundInvalid("历史退款金额异常")
+					return refundInvalid("歷史退款金額異常")
 				}
 				refunded += rf.Amount
 			}
@@ -65,18 +65,18 @@ func (r *PaymentRepoImpl) RefundSMS(ctx context.Context, id uint64) (refundID ui
 			if o.CommerceVersion == 1 {
 				it := items[0]
 				if it.PaidAmount-it.RefundedAmount != remaining {
-					return refundInvalid("商品项退款分摊异常")
+					return refundInvalid("商品項退款分攤異常")
 				}
 				qty := int64(0)
 				if it.FulfillmentStatus == "pending" {
 					qty = int64(it.Quantity - it.CanceledQuantity)
 				}
 				raw, _ := json.Marshal([]map[string]int64{{"item_id": int64(it.ID), "amount_cents": remaining, "shipping_cents": 0, "cancel_quantity": qty}})
-				result, e = r.RefundPhysical(ctx, o.ID, 0, &adminv1.CreateRefundRequest{AmountCents: remaining, Channel: "wallet", Reason: "接码供货已确认退款", RequestKey: reference, ExpectedRefundedCents: &refunded, ItemAllocationsJson: string(raw)})
+				result, e = r.RefundPhysical(ctx, o.ID, 0, &adminv1.CreateRefundRequest{AmountCents: remaining, Channel: "wallet", Reason: "接碼供貨已確認退款", RequestKey: reference, ExpectedRefundedCents: &refunded, ItemAllocationsJson: string(raw)})
 			} else if o.CommerceVersion == 0 {
-				result, e = r.RefundToWallet(ctx, o.ID, remaining, &refunded, "接码供货已确认退款", 0)
+				result, e = r.RefundToWallet(ctx, o.ID, remaining, &refunded, "接碼供貨已確認退款", 0)
 			} else {
-				return refundInvalid("未知订单账务版本")
+				return refundInvalid("未知訂單賬務版本")
 			}
 			if e != nil {
 				return e

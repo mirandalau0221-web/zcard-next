@@ -1,6 +1,6 @@
 package coupon
 
-// 前台营销 API（）：我的券/兑换/秒杀营销位。
+// 前台營銷 API（）：我的券/兑換/秒殺營銷位。
 
 import (
 	"context"
@@ -14,18 +14,18 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// StoreCouponService 前台营销服务。
+// StoreCouponService 前台營銷服務。
 type StoreCouponService struct {
 	storefrontv1.UnimplementedStoreCouponServiceServer
 	repo *CouponRepoImpl
 }
 
-// NewStoreCouponService 构造。
+// NewStoreCouponService 構造。
 func NewStoreCouponService(repo *CouponRepoImpl) *StoreCouponService {
 	return &StoreCouponService{repo: repo}
 }
 
-// ListMyCoupons 我的可用券（user realm JWT；未登录空）。
+// ListMyCoupons 我的可用券（user realm JWT；未登錄空）。
 func (s *StoreCouponService) ListMyCoupons(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.ListMyCouponsReply, error) {
 	userID := currentUserID(ctx)
 	if userID == 0 {
@@ -53,11 +53,11 @@ func (s *StoreCouponService) ListMyCoupons(ctx context.Context, _ *emptypb.Empty
 	return reply, nil
 }
 
-// RedeemCoupon 兑换码领券。
+// RedeemCoupon 兑換碼領券。
 func (s *StoreCouponService) RedeemCoupon(ctx context.Context, req *storefrontv1.RedeemCouponRequest) (*emptypb.Empty, error) {
 	userID := currentUserID(ctx)
 	if userID == 0 {
-		return nil, errors.New("coupon.UNAUTHORIZED: 请先登录")
+		return nil, errors.New("coupon.UNAUTHORIZED: 請先登錄")
 	}
 	if req.GetCode() == "" {
 		return nil, errors.New("coupon.CODE_REQUIRED")
@@ -68,7 +68,7 @@ func (s *StoreCouponService) RedeemCoupon(ctx context.Context, req *storefrontv1
 	return &emptypb.Empty{}, nil
 }
 
-// ListFlashSales 秒杀营销位（进行中/即将开始 + 剩余量）。
+// ListFlashSales 秒殺營銷位（進行中/即將開始 + 剩餘量）。
 func (s *StoreCouponService) ListFlashSales(ctx context.Context, req *storefrontv1.ListFlashSalesRequest) (*storefrontv1.ListFlashSalesReply, error) {
 	rows, err := s.repo.ListFlash(ctx, time.Now().UTC(), req.GetUpcoming())
 	if err != nil {
@@ -85,7 +85,7 @@ func (s *StoreCouponService) ListFlashSales(ctx context.Context, req *storefront
 	return reply, nil
 }
 
-// currentUserID user realm JWT 主体。
+// currentUserID user realm JWT 主體。
 func currentUserID(ctx context.Context) uint64 {
 	if claims := identity.ClaimsFromContext(ctx); claims != nil {
 		return claims.Subject

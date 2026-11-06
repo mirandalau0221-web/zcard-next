@@ -44,7 +44,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/category',
     component: 'layout.base$view.category',
     meta: {
-      title: '商品分类',
+      title: '商品分類',
       i18nKey: 'route.category',
       icon: 'mdi:folder-outline',
       order: 2.1
@@ -66,7 +66,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/content',
     component: 'layout.base$view.content',
     meta: {
-      title: '内容管理',
+      title: '內容管理',
       i18nKey: 'route.content',
       icon: 'mdi:book-open-variant',
       order: 2.5
@@ -101,7 +101,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/inventory',
     component: 'layout.base$view.inventory',
     meta: {
-      title: '卡密库存',
+      title: '卡密庫存',
       i18nKey: 'route.inventory',
       icon: 'mdi:card-multiple-outline',
       order: 4
@@ -124,7 +124,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/marketing',
     component: 'layout.base$view.marketing',
     meta: {
-      title: '营销管理',
+      title: '營銷管理',
       i18nKey: 'route.marketing',
       icon: 'mdi:megaphone',
       order: 3
@@ -135,7 +135,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/order',
     component: 'layout.base$view.order',
     meta: {
-      title: '订单管理',
+      title: '訂單管理',
       i18nKey: 'route.order',
       icon: 'mdi:order-bool-ascending-variant',
       order: 5
@@ -168,7 +168,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/settings',
     component: 'layout.base$view.settings',
     meta: {
-      title: '系统设置',
+      title: '系統設置',
       i18nKey: 'route.settings',
       icon: 'mdi:cog-outline',
       order: 11
@@ -179,7 +179,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/staff',
     component: 'layout.base$view.staff',
     meta: {
-      title: '员工管理',
+      title: '員工管理',
       i18nKey: 'route.staff',
       icon: 'mdi:account-group-outline',
       order: 7
@@ -190,7 +190,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/ticket',
     component: 'layout.base$view.ticket',
     meta: {
-      title: '工单管理',
+      title: '工單管理',
       i18nKey: 'route.ticket',
       icon: 'mdi:face-agent',
       order: 5.5
@@ -212,7 +212,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/wallet',
     component: 'layout.base$view.wallet',
     meta: {
-      title: '钱包管理',
+      title: '錢包管理',
       i18nKey: 'route.wallet',
       icon: 'mdi:wallet-outline',
       order: 9

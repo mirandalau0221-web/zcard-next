@@ -40,36 +40,36 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminSupplierService 对外供货管理：下游账户申请/审核/启停/重置密钥、
-// 供货定价 CRUD、账本流水、回调记录查询与手动重发。
+// AdminSupplierService 對外供貨管理：下游賬户申請/審核/啓停/重置密鑰、
+// 供貨定價 CRUD、賬本流水、回調記錄查詢與手動重發。
 type AdminSupplierServiceClient interface {
-	// CreateAccount 下游申请（secret 明文只在此响应出现一次）。
+	// CreateAccount 下游申請（secret 明文只在此響應出現一次）。
 	CreateAccount(ctx context.Context, in *CreateSupplierAccountRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
-	// ListAccounts 账户列表（secret 零回显）。
+	// ListAccounts 賬户列表（secret 零回顯）。
 	ListAccounts(ctx context.Context, in *ListSupplierAccountsRequest, opts ...grpc.CallOption) (*ListSupplierAccountsReply, error)
-	// ReviewAccount 审核（applying → approved/rejected；驳回可带意见）。
+	// ReviewAccount 審核（applying → approved/rejected；駁回可帶意見）。
 	ReviewAccount(ctx context.Context, in *ReviewSupplierAccountRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
-	// ToggleAccount 启停。
+	// ToggleAccount 啓停。
 	ToggleAccount(ctx context.Context, in *ToggleSupplierAccountRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
-	// ResetSecret 重置密钥（返回明文一次）。
+	// ResetSecret 重置密鑰（返回明文一次）。
 	ResetSecret(ctx context.Context, in *ResetSupplierSecretRequest, opts ...grpc.CallOption) (*ResetSupplierSecretReply, error)
-	// SetNotifyURL 配置回调地址。
+	// SetNotifyURL 配置回調地址。
 	SetNotifyURL(ctx context.Context, in *SetSupplierNotifyURLRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
-	// Recharge 账户充值（账本入账）。
+	// Recharge 賬户充值（賬本入賬）。
 	Recharge(ctx context.Context, in *RechargeSupplierRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListLedger 账本流水（下游自助对账数据源）。
+	// ListLedger 賬本流水（下游自助對賬數據源）。
 	ListLedger(ctx context.Context, in *ListSupplierLedgerRequest, opts ...grpc.CallOption) (*ListSupplierLedgerReply, error)
-	// ListPrices 账号的专属价列表(补齐：浏览/管理覆盖价）。
+	// ListPrices 賬號的專屬價列表(補齊：瀏覽/管理覆蓋價）。
 	ListPrices(ctx context.Context, in *ListSupplierPricesRequest, opts ...grpc.CallOption) (*ListSupplierPricesReply, error)
-	// DeletePrice 删除专属价（恢复基础供货价）。
+	// DeletePrice 刪除專屬價（恢復基礎供貨價）。
 	DeletePrice(ctx context.Context, in *DeleteSupplierPriceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// UpsertPrice 供货定价（覆盖价）。
+	// UpsertPrice 供貨定價（覆蓋價）。
 	UpsertPrice(ctx context.Context, in *UpsertSupplierPriceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListCallbacks 回调记录（含死信）。
+	// ListCallbacks 回調記錄（含死信）。
 	ListCallbacks(ctx context.Context, in *ListSupplierCallbacksRequest, opts ...grpc.CallOption) (*ListSupplierCallbacksReply, error)
-	// ResendCallback 手动重发回调（死信恢复）。
+	// ResendCallback 手動重發回調（死信恢復）。
 	ResendCallback(ctx context.Context, in *ResendSupplierCallbackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// SetSupplierIPWhitelist 设置 IP 白名单（空 = 所有 IP 放行；接口鉴权层强制）。
+	// SetSupplierIPWhitelist 設置 IP 白名單（空 = 所有 IP 放行；接口鑑權層強制）。
 	SetSupplierIPWhitelist(ctx context.Context, in *SetSupplierIPWhitelistRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
 }
 
@@ -225,36 +225,36 @@ func (c *adminSupplierServiceClient) SetSupplierIPWhitelist(ctx context.Context,
 // All implementations must embed UnimplementedAdminSupplierServiceServer
 // for forward compatibility.
 //
-// AdminSupplierService 对外供货管理：下游账户申请/审核/启停/重置密钥、
-// 供货定价 CRUD、账本流水、回调记录查询与手动重发。
+// AdminSupplierService 對外供貨管理：下游賬户申請/審核/啓停/重置密鑰、
+// 供貨定價 CRUD、賬本流水、回調記錄查詢與手動重發。
 type AdminSupplierServiceServer interface {
-	// CreateAccount 下游申请（secret 明文只在此响应出现一次）。
+	// CreateAccount 下游申請（secret 明文只在此響應出現一次）。
 	CreateAccount(context.Context, *CreateSupplierAccountRequest) (*SupplierAccountReply, error)
-	// ListAccounts 账户列表（secret 零回显）。
+	// ListAccounts 賬户列表（secret 零回顯）。
 	ListAccounts(context.Context, *ListSupplierAccountsRequest) (*ListSupplierAccountsReply, error)
-	// ReviewAccount 审核（applying → approved/rejected；驳回可带意见）。
+	// ReviewAccount 審核（applying → approved/rejected；駁回可帶意見）。
 	ReviewAccount(context.Context, *ReviewSupplierAccountRequest) (*SupplierAccountReply, error)
-	// ToggleAccount 启停。
+	// ToggleAccount 啓停。
 	ToggleAccount(context.Context, *ToggleSupplierAccountRequest) (*SupplierAccountReply, error)
-	// ResetSecret 重置密钥（返回明文一次）。
+	// ResetSecret 重置密鑰（返回明文一次）。
 	ResetSecret(context.Context, *ResetSupplierSecretRequest) (*ResetSupplierSecretReply, error)
-	// SetNotifyURL 配置回调地址。
+	// SetNotifyURL 配置回調地址。
 	SetNotifyURL(context.Context, *SetSupplierNotifyURLRequest) (*SupplierAccountReply, error)
-	// Recharge 账户充值（账本入账）。
+	// Recharge 賬户充值（賬本入賬）。
 	Recharge(context.Context, *RechargeSupplierRequest) (*emptypb.Empty, error)
-	// ListLedger 账本流水（下游自助对账数据源）。
+	// ListLedger 賬本流水（下游自助對賬數據源）。
 	ListLedger(context.Context, *ListSupplierLedgerRequest) (*ListSupplierLedgerReply, error)
-	// ListPrices 账号的专属价列表(补齐：浏览/管理覆盖价）。
+	// ListPrices 賬號的專屬價列表(補齊：瀏覽/管理覆蓋價）。
 	ListPrices(context.Context, *ListSupplierPricesRequest) (*ListSupplierPricesReply, error)
-	// DeletePrice 删除专属价（恢复基础供货价）。
+	// DeletePrice 刪除專屬價（恢復基礎供貨價）。
 	DeletePrice(context.Context, *DeleteSupplierPriceRequest) (*emptypb.Empty, error)
-	// UpsertPrice 供货定价（覆盖价）。
+	// UpsertPrice 供貨定價（覆蓋價）。
 	UpsertPrice(context.Context, *UpsertSupplierPriceRequest) (*emptypb.Empty, error)
-	// ListCallbacks 回调记录（含死信）。
+	// ListCallbacks 回調記錄（含死信）。
 	ListCallbacks(context.Context, *ListSupplierCallbacksRequest) (*ListSupplierCallbacksReply, error)
-	// ResendCallback 手动重发回调（死信恢复）。
+	// ResendCallback 手動重發回調（死信恢復）。
 	ResendCallback(context.Context, *ResendSupplierCallbackRequest) (*emptypb.Empty, error)
-	// SetSupplierIPWhitelist 设置 IP 白名单（空 = 所有 IP 放行；接口鉴权层强制）。
+	// SetSupplierIPWhitelist 設置 IP 白名單（空 = 所有 IP 放行；接口鑑權層強制）。
 	SetSupplierIPWhitelist(context.Context, *SetSupplierIPWhitelistRequest) (*SupplierAccountReply, error)
 	mustEmbedUnimplementedAdminSupplierServiceServer()
 }

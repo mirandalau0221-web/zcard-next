@@ -28,21 +28,21 @@ const OperationStoreUserServiceSendRegisterCode = "/zcard.api.storefront.v1.Stor
 const OperationStoreUserServiceUpdateProfile = "/zcard.api.storefront.v1.StoreUserService/UpdateProfile"
 
 type StoreUserServiceHTTPServer interface {
-	// ChangePassword ChangePassword 登录态改密（旧密码校验；吊销全部 session、响应携带新 token 保当前会话）。
+	// ChangePassword ChangePassword 登錄態改密（舊密碼校驗；吊銷全部 session、響應攜帶新 token 保當前會話）。
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordReply, error)
-	// ForgotPassword ForgotPassword 发送找回密码验证码（：邮箱不存在同样成功——防枚举）。
+	// ForgotPassword ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordReply, error)
-	// Login Login 登录（返回 user realm JWT；username 混输：用户名/邮箱/手机号）。
+	// Login Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
-	// Me Me 我的信息（需登录）。
+	// Me Me 我的信息（需登錄）。
 	Me(context.Context, *emptypb.Empty) (*MeReply, error)
-	// Register Register 注册（username+password；invite_code 可选=上级 user_id）。
+	// Register Register 註冊（username+password；invite_code 可選=上級 user_id）。
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
-	// ResetPassword ResetPassword 验码重置密码（重置即登录——返回新 token；吊销全部 session）。
+	// ResetPassword ResetPassword 驗碼重置密碼（重置即登錄——返回新 token；吊銷全部 session）。
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordReply, error)
-	// SendRegisterCode SendRegisterCode 发送注册验证码（通道：email|phone——按 security.register_method 校验）。
+	// SendRegisterCode SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
 	SendRegisterCode(context.Context, *SendRegisterCodeRequest) (*SendRegisterCodeReply, error)
-	// UpdateProfile UpdateProfile 修改资料（邮箱；唯一性校验）。
+	// UpdateProfile UpdateProfile 修改資料（郵箱；唯一性校驗）。
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*MeReply, error)
 }
 
@@ -211,21 +211,21 @@ func _StoreUserService_UpdateProfile0_HTTP_Handler(srv StoreUserServiceHTTPServe
 }
 
 type StoreUserServiceHTTPClient interface {
-	// ChangePassword ChangePassword 登录态改密（旧密码校验；吊销全部 session、响应携带新 token 保当前会话）。
+	// ChangePassword ChangePassword 登錄態改密（舊密碼校驗；吊銷全部 session、響應攜帶新 token 保當前會話）。
 	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *ChangePasswordReply, err error)
-	// ForgotPassword ForgotPassword 发送找回密码验证码（：邮箱不存在同样成功——防枚举）。
+	// ForgotPassword ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
 	ForgotPassword(ctx context.Context, req *ForgotPasswordRequest, opts ...http.CallOption) (rsp *ForgotPasswordReply, err error)
-	// Login Login 登录（返回 user realm JWT；username 混输：用户名/邮箱/手机号）。
+	// Login Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
-	// Me Me 我的信息（需登录）。
+	// Me Me 我的信息（需登錄）。
 	Me(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *MeReply, err error)
-	// Register Register 注册（username+password；invite_code 可选=上级 user_id）。
+	// Register Register 註冊（username+password；invite_code 可選=上級 user_id）。
 	Register(ctx context.Context, req *RegisterRequest, opts ...http.CallOption) (rsp *RegisterReply, err error)
-	// ResetPassword ResetPassword 验码重置密码（重置即登录——返回新 token；吊销全部 session）。
+	// ResetPassword ResetPassword 驗碼重置密碼（重置即登錄——返回新 token；吊銷全部 session）。
 	ResetPassword(ctx context.Context, req *ResetPasswordRequest, opts ...http.CallOption) (rsp *ResetPasswordReply, err error)
-	// SendRegisterCode SendRegisterCode 发送注册验证码（通道：email|phone——按 security.register_method 校验）。
+	// SendRegisterCode SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
 	SendRegisterCode(ctx context.Context, req *SendRegisterCodeRequest, opts ...http.CallOption) (rsp *SendRegisterCodeReply, err error)
-	// UpdateProfile UpdateProfile 修改资料（邮箱；唯一性校验）。
+	// UpdateProfile UpdateProfile 修改資料（郵箱；唯一性校驗）。
 	UpdateProfile(ctx context.Context, req *UpdateProfileRequest, opts ...http.CallOption) (rsp *MeReply, err error)
 }
 
@@ -237,7 +237,7 @@ func NewStoreUserServiceHTTPClient(client *http.Client) StoreUserServiceHTTPClie
 	return &StoreUserServiceHTTPClientImpl{client}
 }
 
-// ChangePassword ChangePassword 登录态改密（旧密码校验；吊销全部 session、响应携带新 token 保当前会话）。
+// ChangePassword ChangePassword 登錄態改密（舊密碼校驗；吊銷全部 session、響應攜帶新 token 保當前會話）。
 func (c *StoreUserServiceHTTPClientImpl) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...http.CallOption) (*ChangePasswordReply, error) {
 	var out ChangePasswordReply
 	pattern := "/api/v1/storefront/user/password/change"
@@ -255,7 +255,7 @@ func (c *StoreUserServiceHTTPClientImpl) ChangePassword(ctx context.Context, in 
 	return &out, nil
 }
 
-// ForgotPassword ForgotPassword 发送找回密码验证码（：邮箱不存在同样成功——防枚举）。
+// ForgotPassword ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
 func (c *StoreUserServiceHTTPClientImpl) ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...http.CallOption) (*ForgotPasswordReply, error) {
 	var out ForgotPasswordReply
 	pattern := "/api/v1/storefront/user/password/forgot"
@@ -273,7 +273,7 @@ func (c *StoreUserServiceHTTPClientImpl) ForgotPassword(ctx context.Context, in 
 	return &out, nil
 }
 
-// Login Login 登录（返回 user realm JWT；username 混输：用户名/邮箱/手机号）。
+// Login Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
 func (c *StoreUserServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
 	var out LoginReply
 	pattern := "/api/v1/storefront/user/login"
@@ -291,7 +291,7 @@ func (c *StoreUserServiceHTTPClientImpl) Login(ctx context.Context, in *LoginReq
 	return &out, nil
 }
 
-// Me Me 我的信息（需登录）。
+// Me Me 我的信息（需登錄）。
 func (c *StoreUserServiceHTTPClientImpl) Me(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*MeReply, error) {
 	var out MeReply
 	pattern := "/api/v1/storefront/user/me"
@@ -308,7 +308,7 @@ func (c *StoreUserServiceHTTPClientImpl) Me(ctx context.Context, in *emptypb.Emp
 	return &out, nil
 }
 
-// Register Register 注册（username+password；invite_code 可选=上级 user_id）。
+// Register Register 註冊（username+password；invite_code 可選=上級 user_id）。
 func (c *StoreUserServiceHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*RegisterReply, error) {
 	var out RegisterReply
 	pattern := "/api/v1/storefront/user/register"
@@ -326,7 +326,7 @@ func (c *StoreUserServiceHTTPClientImpl) Register(ctx context.Context, in *Regis
 	return &out, nil
 }
 
-// ResetPassword ResetPassword 验码重置密码（重置即登录——返回新 token；吊销全部 session）。
+// ResetPassword ResetPassword 驗碼重置密碼（重置即登錄——返回新 token；吊銷全部 session）。
 func (c *StoreUserServiceHTTPClientImpl) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...http.CallOption) (*ResetPasswordReply, error) {
 	var out ResetPasswordReply
 	pattern := "/api/v1/storefront/user/password/reset"
@@ -344,7 +344,7 @@ func (c *StoreUserServiceHTTPClientImpl) ResetPassword(ctx context.Context, in *
 	return &out, nil
 }
 
-// SendRegisterCode SendRegisterCode 发送注册验证码（通道：email|phone——按 security.register_method 校验）。
+// SendRegisterCode SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
 func (c *StoreUserServiceHTTPClientImpl) SendRegisterCode(ctx context.Context, in *SendRegisterCodeRequest, opts ...http.CallOption) (*SendRegisterCodeReply, error) {
 	var out SendRegisterCodeReply
 	pattern := "/api/v1/storefront/user/register/send-code"
@@ -362,7 +362,7 @@ func (c *StoreUserServiceHTTPClientImpl) SendRegisterCode(ctx context.Context, i
 	return &out, nil
 }
 
-// UpdateProfile UpdateProfile 修改资料（邮箱；唯一性校验）。
+// UpdateProfile UpdateProfile 修改資料（郵箱；唯一性校驗）。
 func (c *StoreUserServiceHTTPClientImpl) UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...http.CallOption) (*MeReply, error) {
 	var out MeReply
 	pattern := "/api/v1/storefront/user/profile"

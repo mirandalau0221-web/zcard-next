@@ -78,7 +78,7 @@ async function loadRefundHistory(append = false) {
   if (requestId !== historyRequest || no !== props.order.order_no) return;
   historyLoading.value = false;
   if (r.error) {
-    historyError.value = "退款记录读取失败，请重试";
+    historyError.value = "退款記錄讀取失敗，請重試";
     return;
   }
   const rows = (r.data as any)?.refunds || [];
@@ -97,17 +97,17 @@ function refundStatus(value: string) {
   return (
     (
       {
-        created: "待处理",
-        processing: "处理中",
+        created: "待處理",
+        processing: "處理中",
         succeeded: "已退款",
-        failed: "退款失败",
+        failed: "退款失敗",
       } as Record<string, string>
     )[value] || value
   );
 }
 function refundItemName(id: any) {
   const item = (props.order.items || []).find((x: any) => String(x.id) === String(id));
-  return (item?.name || `商品项 #${id}`) + (item?.sku_name ? `（${item.sku_name}）` : "");
+  return (item?.name || `商品項 #${id}`) + (item?.sku_name ? `（${item.sku_name}）` : "");
 }
 watch(
   () => props.order,
@@ -138,7 +138,7 @@ const regions = ref<RegionData>({});
 const address = reactive<Record<string, string>>({});
 const addressErrors = ref<Record<string, string>>({});
 const addressLocationFields = computed(() => addressFields(regions.value, address.country || ""));
-const addressFieldNames = { city: "郊区或城市", district: "区 / 县", region: "州 / 省 / 地区", postal_code: "邮政编码" };
+const addressFieldNames = { city: "郊區或城市", district: "區 / 縣", region: "州 / 省 / 地區", postal_code: "郵政編碼" };
 const editAddress = ref(false);
 const correctionReason = ref("");
 watch(address, () => {
@@ -202,7 +202,7 @@ async function ship() {
       carrier.value = "";
       tracking.value = "";
     }
-  } catch (error) { window.$message?.error(error instanceof Error ? error.message : "发货失败，请重试"); }
+  } catch (error) { window.$message?.error(error instanceof Error ? error.message : "發貨失敗，請重試"); }
 }
 function startRefund() {
   refundKey = "";
@@ -273,11 +273,11 @@ async function refund() {
     });
     if (!r.error) {
       showRefund.value = false;
-      window.$message?.success("退款及取消记录已保存");
+      window.$message?.success("退款及取消記錄已保存");
       emit("refresh");
     }
   } catch (error) {
-    window.$message?.error(error instanceof Error ? error.message : "退款请求失败，请重试");
+    window.$message?.error(error instanceof Error ? error.message : "退款請求失敗，請重試");
   } finally {
     busy.value = false;
   }
@@ -309,17 +309,17 @@ async function restock() {
       })
     )
       returnItem.value = null;
-  } catch (error) { window.$message?.error(error instanceof Error ? error.message : "入库失败，请重试"); }
+  } catch (error) { window.$message?.error(error instanceof Error ? error.message : "入庫失敗，請重試"); }
 }
 </script>
 <template>
-  <NCard title="实体配送" size="small" class="my-16px">
+  <NCard title="實體配送" size="small" class="my-16px">
     <NSpace class="mb-12px"
       ><NTag type="info">{{ shippingStatus(order.shipping_status) }}</NTag
-      ><span>{{ collectItemIds.size ? "在线支付运费" : "运费" }} {{ formatMoney(order.shipping_cents || 0) }}</span></NSpace
+      ><span>{{ collectItemIds.size ? "在線支付運費" : "運費" }} {{ formatMoney(order.shipping_cents || 0) }}</span></NSpace
     >
     <NAlert v-if="collectItemIds.size" type="info" class="mb-12px">
-      本单含运费到付商品。请按商品项核对，发货时向承运公司选择运费到付。
+      本單含運費到付商品。請按商品項核對，發貨時向承運公司選擇運費到付。
     </NAlert>
     <p class="break-all">{{ order.shipping_address?.name }} · {{ order.shipping_address?.phone }}</p>
     <p v-for="(line, index) in addressLines(order.shipping_address || {})" :key="index" class="break-all">{{ line }}</p>
@@ -328,23 +328,23 @@ async function restock() {
       size="small"
       class="my-12px"
       @click="editAddress = !editAddress"
-      >更正收货地址</NButton
+      >更正收貨地址</NButton
     >
     <div v-if="editAddress" class="shipping-grid">
-      <NFormItem label="国家或地区"
+      <NFormItem label="國家或地區"
         ><NSelect
           v-model:value="address.country"
           disabled
           :options="countryOptions(regions)"
       /></NFormItem>
-      <NFormItem v-for="field in [{ key: 'address', label: '地址第一行' }, { key: 'address_line2', label: '地址第二行（选填）' }]" :key="field.key" :label="field.label" :validation-status="addressErrors[field.key] ? 'error' : undefined" :feedback="addressErrors[field.key]">
+      <NFormItem v-for="field in [{ key: 'address', label: '地址第一行' }, { key: 'address_line2', label: '地址第二行（選填）' }]" :key="field.key" :label="field.label" :validation-status="addressErrors[field.key] ? 'error' : undefined" :feedback="addressErrors[field.key]">
         <NInput v-model:value="address[field.key]" :maxlength="300" />
       </NFormItem>
-      <NFormItem v-for="field in addressLocationFields" :key="field" :label="addressFieldNames[field] + (addressRequired(regions, address.country, field) ? '' : '（选填）')" :validation-status="addressErrors[field] ? 'error' : undefined" :feedback="addressErrors[field]">
+      <NFormItem v-for="field in addressLocationFields" :key="field" :label="addressFieldNames[field] + (addressRequired(regions, address.country, field) ? '' : '（選填）')" :validation-status="addressErrors[field] ? 'error' : undefined" :feedback="addressErrors[field]">
         <NSelect v-if="field === 'region' && regionOptions(regions, address.country || '').length" v-model:value="address.region" :options="regionOptions(regions, address.country || '')" :clearable="!addressRequired(regions, address.country, field)" />
         <NInput v-else v-model:value="address[field]" :maxlength="field === 'postal_code' ? 30 : 100" />
       </NFormItem>
-      <NFormItem v-for="field in [{ key: 'name', label: '收货人姓名' }, { key: 'phone', label: '电话号码' }]" :key="field.key" :label="field.label" :validation-status="addressErrors[field.key] ? 'error' : undefined" :feedback="addressErrors[field.key]">
+      <NFormItem v-for="field in [{ key: 'name', label: '收貨人姓名' }, { key: 'phone', label: '電話號碼' }]" :key="field.key" :label="field.label" :validation-status="addressErrors[field.key] ? 'error' : undefined" :feedback="addressErrors[field.key]">
         <NInput v-model:value="address[field.key]" :maxlength="field.key === 'phone' ? 30 : 100" />
       </NFormItem>
       <NFormItem label="更正原因"
@@ -359,38 +359,38 @@ async function restock() {
     <div v-for="p in packages" :key="p.id" class="package-row">
       <b
         >包裹 #{{ p.id }} ·
-        {{ p.status === "received" ? "已收货" : "已寄出" }}</b
+        {{ p.status === "received" ? "已收貨" : "已寄出" }}</b
       >
       <p>{{ p.carrier }} · {{ p.tracking_no }}</p>
       <p v-for="(qty, id) in p.items" :key="id">
         {{ refundItemName(id) }}
         × {{ qty }}
-        <strong v-if="collectItemIds.has(String(id))"> · 运费到付</strong>
+        <strong v-if="collectItemIds.has(String(id))"> · 運費到付</strong>
       </p>
       <NSpace v-if="checkAuth('order:deliver') && p.status === 'shipped'"
-        ><NButton size="small" @click="editPackage(p)">更正快递信息</NButton
+        ><NButton size="small" @click="editPackage(p)">更正快遞信息</NButton
         ><NPopconfirm
           @positive-click="
             act('shipping', {
               shipment_id: p.id,
               received: true,
-              reason: '管理员核实包裹已签收',
+              reason: '管理員核實包裹已簽收',
             })
           "
           ><template #trigger
             ><NButton size="small" :loading="busy"
-              >确认已收货</NButton
+              >確認已收貨</NButton
             ></template
-          >已向买家核实收到此包裹？</NPopconfirm
+          >已向買家核實收到此包裹？</NPopconfirm
         ></NSpace
       >
     </div>
     <div v-if="correction" class="shipping-grid">
-      <NFormItem label="快递公司"
+      <NFormItem label="快遞公司"
         ><NInput
           v-model:value="correction.carrier"
           :maxlength="100" /></NFormItem
-      ><NFormItem label="快递单号"
+      ><NFormItem label="快遞單號"
         ><NInput
           v-model:value="correction.tracking_no"
           :maxlength="100" /></NFormItem
@@ -412,11 +412,11 @@ async function restock() {
               correction = null;
           }
         "
-        >保存快递信息</NButton
+        >保存快遞信息</NButton
       >
     </div>
     <template v-if="editable && pending.length && checkAuth('order:deliver')">
-      <h4 class="my-12px">选择本次寄出的商品（每项发出全部剩余数量）</h4>
+      <h4 class="my-12px">選擇本次寄出的商品（每項發出全部剩餘數量）</h4>
       <div v-for="it in pending" :key="it.id" class="my-8px">
         <NCheckbox
           :checked="selected.includes(Number(it.id))"
@@ -426,21 +426,21 @@ async function restock() {
                 ? [...selected, Number(it.id)]
                 : selected.filter((id) => id !== Number(it.id)))
           "
-          >{{ it.name }} {{ it.sku_name }} · 待发
+          >{{ it.name }} {{ it.sku_name }} · 待發
           {{
             Number(it.quantity) -
             Number(it.canceled_quantity || 0) -
             Number(it.shipped_quantity || 0)
-          }}<strong v-if="it.shipping_collect"> · 运费到付</strong></NCheckbox
+          }}<strong v-if="it.shipping_collect"> · 運費到付</strong></NCheckbox
         >
       </div>
       <div class="shipping-grid">
-        <NFormItem label="快递公司"
+        <NFormItem label="快遞公司"
           ><NInput
             v-model:value="carrier"
-            placeholder="填写承运公司"
+            placeholder="填寫承運公司"
             :maxlength="100" /></NFormItem
-        ><NFormItem label="快递单号"
+        ><NFormItem label="快遞單號"
           ><NInput v-model:value="tracking" :maxlength="100"
         /></NFormItem>
       </div>
@@ -450,9 +450,9 @@ async function restock() {
             type="primary"
             :loading="busy"
             :disabled="!selected.length || !carrier.trim() || !tracking.trim()"
-            >确认发货</NButton
+            >確認發貨</NButton
           ></template
-        >确认所选商品已交给快递公司？</NPopconfirm
+        >確認所選商品已交給快遞公司？</NPopconfirm
       >
     </template>
     <div v-if="checkAuth('order:deliver')" class="my-12px">
@@ -465,12 +465,12 @@ async function restock() {
           size="small"
           class="mr-8px"
           @click="startReturn(it)"
-          >{{ refundItemName(it.id) }}：{{ it.inventory_tracked === false ? '登记退货' : '退货验收入库' }}</NButton
+          >{{ refundItemName(it.id) }}：{{ it.inventory_tracked === false ? '登記退貨' : '退貨驗收入庫' }}</NButton
         ></template
       >
     </div>
     <div v-if="returnItem" class="shipping-grid">
-      <NFormItem :label="returnItem.inventory_tracked === false ? '退货登记数量' : '验收入库数量'"
+      <NFormItem :label="returnItem.inventory_tracked === false ? '退貨登記數量' : '驗收入庫數量'"
         ><NInputNumber
           v-model:value="returnQty"
           :min="1"
@@ -479,28 +479,28 @@ async function restock() {
             Number(returnItem.returned_quantity || 0)
           "
           :precision="0" /></NFormItem
-      ><NFormItem label="验收原因"
+      ><NFormItem label="驗收原因"
         ><NInput v-model:value="returnReason" :maxlength="120" /></NFormItem
       ><NPopconfirm @positive-click="restock"
         ><template #trigger
           ><NButton :loading="busy" :disabled="!returnReason.trim()"
-            >{{ returnItem.inventory_tracked === false ? '确认商品已退回' : '确认商品已退回并可重新销售' }}</NButton
+            >{{ returnItem.inventory_tracked === false ? '確認商品已退回' : '確認商品已退回並可重新銷售' }}</NButton
           ></template
-        >{{ returnItem.inventory_tracked === false ? '登记已验收的退货，不调整库存，不会自动退款。' : '此操作会增加可售库存，不会自动退款。' }}</NPopconfirm
+        >{{ returnItem.inventory_tracked === false ? '登記已驗收的退貨，不調整庫存，不會自動退款。' : '此操作會增加可售庫存，不會自動退款。' }}</NPopconfirm
       >
     </div>
     <section
       v-if="checkAuth('order:refund')"
       class="my-16px"
-      aria-label="退款记录"
+      aria-label="退款記錄"
     >
-      <h3>退款记录</h3>
+      <h3>退款記錄</h3>
       <p v-if="historyError" role="alert">
         {{ historyError }}
-        <NButton size="small" @click="loadRefundHistory()">重试</NButton>
+        <NButton size="small" @click="loadRefundHistory()">重試</NButton>
       </p>
       <p v-else-if="!refundHistory.length">
-        {{ historyLoading ? "正在读取…" : "暂无退款记录" }}
+        {{ historyLoading ? "正在讀取…" : "暫無退款記錄" }}
       </p>
       <div v-for="row in refundHistory" :key="row.id" class="package-row">
         <b>退款 #{{ row.id }} · {{ refundStatus(row.status) }}</b>
@@ -511,17 +511,17 @@ async function restock() {
               Number(row.amount_cents || 0) - Number(row.shipping_cents || 0),
             )
           }}
-          · 运费 {{ formatMoney(row.shipping_cents || 0) }} · 支付手续费
+          · 運費 {{ formatMoney(row.shipping_cents || 0) }} · 支付手續費
           {{ formatMoney(row.fee_cents || 0) }}
         </p>
         <p>
-          {{ row.channel === "wallet" ? "退至会员余额" : "外部退款登记" }} ·
+          {{ row.channel === "wallet" ? "退至會員餘額" : "外部退款登記" }} ·
           {{ new Date(Number(row.created_at) * 1000).toLocaleString() }}
         </p>
-        <p v-if="row.upstream_refund_id">凭证：{{ row.upstream_refund_id }}</p>
+        <p v-if="row.upstream_refund_id">憑證：{{ row.upstream_refund_id }}</p>
         <p v-for="a in allocations(row)" :key="a.item_id">
           {{ refundItemName(a.item_id) }}：商品
-          {{ formatMoney(a.amount_cents || 0) }}，运费
+          {{ formatMoney(a.amount_cents || 0) }}，運費
           {{ formatMoney(a.shipping_cents || 0) }}，取消
           {{ a.cancel_quantity || 0 }} 件
         </p>
@@ -531,7 +531,7 @@ async function restock() {
         v-if="historyMore"
         :loading="historyLoading"
         @click="loadRefundHistory(true)"
-        >加载更早记录</NButton
+        >加載更早記錄</NButton
       >
     </section>
     <NButton
@@ -541,31 +541,31 @@ async function restock() {
       type="error"
       class="my-12px"
       @click="startRefund"
-      >按商品退款 / 取消未发货数量</NButton
+      >按商品退款 / 取消未發貨數量</NButton
     >
     <div v-if="showRefund">
       <NAlert type="info" class="mb-12px"
-        >退款金额、取消未发货数量、退货入库分别记录。已发货商品退款不会自动补回库存。</NAlert
+        >退款金額、取消未發貨數量、退貨入庫分別記錄。已發貨商品退款不會自動補回庫存。</NAlert
       >
       <NButton size="small" class="mb-12px" @click="fillRemaining"
-        >填入全部可退金额及可取消数量</NButton
+        >填入全部可退金額及可取消數量</NButton
       >
       <div v-for="r in refundRows" :key="r.id" class="package-row">
         <b>{{ r.name }} {{ r.sku_name }}</b>
         <div class="shipping-grid">
-          <NFormItem :label="`退商品金额（最多 ${formatMoney(r.maxAmount)}）`"
+          <NFormItem :label="`退商品金額（最多 ${formatMoney(r.maxAmount)}）`"
             ><NInputNumber
               v-model:value="r.amount"
               :min="0"
               :max="centsToYuan(r.maxAmount)"
               :precision="2" /></NFormItem
-          ><NFormItem :label="`退运费（最多 ${formatMoney(r.maxShipping)}）`"
+          ><NFormItem :label="`退運費（最多 ${formatMoney(r.maxShipping)}）`"
             ><NInputNumber
               v-model:value="r.shipping"
               :min="0"
               :max="centsToYuan(r.maxShipping)"
               :precision="2" /></NFormItem
-          ><NFormItem label="取消尚未发货数量"
+          ><NFormItem label="取消尚未發貨數量"
             ><NInputNumber
               v-model:value="r.cancel"
               :min="0"
@@ -581,21 +581,21 @@ async function restock() {
           v-model:value="channel"
           :options="[
             {
-              label: '退至会员余额',
+              label: '退至會員餘額',
               value: 'wallet',
               disabled: !Number(order.user_id),
             },
-            { label: '已在线下或渠道完成退款，登记凭证', value: 'gateway' },
+            { label: '已在線下或渠道完成退款，登記憑證', value: 'gateway' },
           ]"
       /></NFormItem>
       <NFormItem
         v-if="
           channel === 'gateway' && refundTotal + yuanToFen(refundFee || 0) > 0
         "
-        label="渠道退款凭证（须已实际退款成功）"
+        label="渠道退款憑證（須已實際退款成功）"
         ><NInput v-model:value="externalReference" :maxlength="64"
       /></NFormItem>
-      <NFormItem label="退支付手续费"
+      <NFormItem label="退支付手續費"
         ><NInputNumber
           v-model:value="refundFee"
           :min="0"
@@ -606,7 +606,7 @@ async function restock() {
         ><NInput v-model:value="reason" :maxlength="180"
       /></NFormItem>
       <p class="my-12px">
-        本次退款合计 {{ formatMoney(refundTotal + yuanToFen(refundFee || 0)) }}
+        本次退款合計 {{ formatMoney(refundTotal + yuanToFen(refundFee || 0)) }}
       </p>
       <NPopconfirm @positive-click="refund"
         ><template #trigger
@@ -619,15 +619,15 @@ async function restock() {
                 refundTotal + yuanToFen(refundFee || 0) > 0 &&
                 !externalReference.trim())
             "
-            >确认退款及取消内容</NButton
+            >確認退款及取消內容</NButton
           ></template
         >{{
           refundTotal + yuanToFen(refundFee || 0) === 0
-            ? "仅取消未发货数量，不产生资金退款。"
+            ? "僅取消未發貨數量，不產生資金退款。"
             : channel === "wallet"
-              ? "将实际退入会员余额。"
-              : "请确认外部渠道退款已经成功，此处只登记凭证。"
-        }}确认退款分摊和取消数量无误？</NPopconfirm
+              ? "將實際退入會員餘額。"
+              : "請確認外部渠道退款已經成功，此處只登記憑證。"
+        }}確認退款分攤和取消數量無誤？</NPopconfirm
       >
     </div>
   </NCard>

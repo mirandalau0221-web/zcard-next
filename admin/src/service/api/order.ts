@@ -1,6 +1,6 @@
 import { request } from "../request";
 
-// ── 订单管理 ──
+// ── 訂單管理 ──
 
 export function fetchOrders(params?: {
   status?: string;
@@ -44,7 +44,7 @@ export function cancelOrder(orderNo: string, reason: string) {
   });
 }
 
-// ── 退款（payment 域，order:refund 超管专属）──
+// ── 退款（payment 域，order:refund 超管專屬）──
 
 export function createRefund(data: {
   request_key?: string;
@@ -66,7 +66,7 @@ export function fetchRefunds(status?: string, order_no?: string, before_id?: num
   return request({ url: "/api/v1/admin/refunds", params: {status, order_no, before_id} });
 }
 
-// ── 履约（fulfillment 域）──
+// ── 履約（fulfillment 域）──
 
 export function fetchPendingDeliveries(page = 1, pageSize = 20) {
   return request({

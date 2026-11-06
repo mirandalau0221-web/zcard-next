@@ -1,8 +1,8 @@
 package migratev1
 
-// 通用迁移引擎：keyset 分批扫描源表 → 每批一个目标事务（行转换 + v1id_maps 原子写入）。
-// 幂等语义：行级——old_id 已在 v1id_maps 即跳过（重跑=增量，切换窗口模型的基础）。
-// 源端经 *sql.DB 抽象（MySQL 生产 / sqlite 单测双跑），扫描 SQL 保持双方言兼容。
+// 通用遷移引擎：keyset 分批掃描源表 → 每批一個目標事務（行轉換 + v1id_maps 原子寫入）。
+// 冪等語義：行級——old_id 已在 v1id_maps 即跳過（重跑=增量，切換窗口模型的基礎）。
+// 源端經 *sql.DB 抽象（MySQL 生產 / sqlite 單測雙跑），掃描 SQL 保持雙方言兼容。
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent"
 )
 
-// Migrator 一次迁移会话（preflight 通过后构造）。
+// Migrator 一次遷移會話（preflight 通過後構造）。
 type Migrator struct {
 	Src    *Source
 	Client *ent.Client
@@ -22,9 +22,9 @@ type Migrator struct {
 	RW     *ReportWriter
 	Opts   Options
 
-	// 1.x 密钥（preflight 解析产物）
+	// 1.x 密鑰（preflight 解析產物）
 	AppKey, CardKey []byte
-	// 2.0 新密钥（凭据重加密 DataBox / 卡密与直发内容 CardCipher 用）
+	// 2.0 新密鑰（憑據重加密 DataBox / 卡密與直髮內容 CardCipher 用）
 	DataKey    []byte
 	NewCardKey []byte
 
@@ -33,7 +33,7 @@ type Migrator struct {
 	dry bool
 }
 
-// NewMigrator 构造。
+// NewMigrator 構造。
 func NewMigrator(src *Source, client *ent.Client, ids *IDMapper, rw *ReportWriter, opts Options, tz string) *Migrator {
 	if opts.Batch <= 0 {
 		opts.Batch = 1000
@@ -50,9 +50,9 @@ func NewMigrator(src *Source, client *ent.Client, ids *IDMapper, rw *ReportWrite
 	}
 }
 
-// subsiteFor 1.x merchant → 2.0 subsite_id 解析（分站补迁的核心开关）：
-// merchant=1 主站 → (0, true)；merchant>1 且其 reseller_profile 已迁 → (profileID, true)；
-// 未迁（主站先行阶段）→ (0, false) 调用方跳过计数。P6 迁完 merchants 后重跑即补上。
+// subsiteFor 1.x merchant → 2.0 subsite_id 解析（分站補遷的核心開關）：
+// merchant=1 主站 → (0, true)；merchant>1 且其 reseller_profile 已遷 → (profileID, true)；
+// 未遷（主站先行階段）→ (0, false) 調用方跳過計數。P6 遷完 merchants 後重跑即補上。
 func (m *Migrator) subsiteFor(ctx context.Context, merchantID int64) (uint64, bool) {
 	if merchantID == 1 {
 		return 0, true
@@ -64,7 +64,7 @@ func (m *Migrator) subsiteFor(ctx context.Context, merchantID int64) (uint64, bo
 	return sid, ok
 }
 
-// productSubsite 查已迁商品的 subsite_id（卡密 Seal 的 AAD 必须与商品一致）。
+// productSubsite 查已遷商品的 subsite_id（卡密 Seal 的 AAD 必須與商品一致）。
 func (m *Migrator) productSubsite(ctx context.Context, productID uint64) uint64 {
 	p, err := m.Client.Product.Get(ctx, productID)
 	if err != nil {
@@ -73,23 +73,23 @@ func (m *Migrator) productSubsite(ctx context.Context, productID uint64) uint64 
 	return p.SubsiteID
 }
 
-// Stats 迁移统计（报告用）。
+// Stats 遷移統計（報告用）。
 func (m *Migrator) Stats() *Stats { return m.st }
 
-// Stats 逐表计数。
+// Stats 逐表計數。
 type Stats struct {
 	Tables map[string]*TableStat
 }
 
-// TableStat 单表统计。Planned 仅 dry-run 填充（源行数预估）。
+// TableStat 單表統計。Planned 僅 dry-run 填充（源行數預估）。
 type TableStat struct {
 	Migrated      int64 `json:"migrated"`
-	SkippedExists int64 `json:"skipped_exists"` // 幂等跳过（已在 v1id_maps / 唯一键存在）
+	SkippedExists int64 `json:"skipped_exists"` // 冪等跳過（已在 v1id_maps / 唯一鍵存在）
 	Failed        int64 `json:"failed"`
 	Planned       int64 `json:"planned,omitempty"`
 }
 
-// NewStats 构造。
+// NewStats 構造。
 func NewStats() *Stats { return &Stats{Tables: map[string]*TableStat{}} }
 
 func (s *Stats) table(name string) *TableStat {
@@ -101,7 +101,7 @@ func (s *Stats) table(name string) *TableStat {
 	return t
 }
 
-// Record 记一笔。
+// Record 記一筆。
 func (s *Stats) Record(table string, outcome string) {
 	t := s.table(table)
 	switch outcome {
@@ -114,8 +114,8 @@ func (s *Stats) Record(table string, outcome string) {
 	}
 }
 
-// scanTable keyset 分批扫描。dest 每行调用一次返回 scan 目标切片（首列必须是 id *int64）；
-// fn 每行调用一次做转换写入（返回 error 计入失败行）。dry 模式只计数不调 fn。
+// scanTable keyset 分批掃描。dest 每行調用一次返回 scan 目標切片（首列必須是 id *int64）；
+// fn 每行調用一次做轉換寫入（返回 error 計入失敗行）。dry 模式只計數不調 fn。
 func (m *Migrator) scanTable(ctx context.Context, table string, cols []string,
 	dest func() []any, fn func(id int64) error) error {
 
@@ -143,7 +143,7 @@ func (m *Migrator) scanTable(ctx context.Context, table string, cols []string,
 	for {
 		rows, err := m.Src.DB.QueryContext(ctx, query, cursor, m.Opts.Batch)
 		if err != nil {
-			return fmt.Errorf("扫描 %s 失败: %w", table, err)
+			return fmt.Errorf("掃描 %s 失敗: %w", table, err)
 		}
 		var batchLast int64
 		count := 0
@@ -151,7 +151,7 @@ func (m *Migrator) scanTable(ctx context.Context, table string, cols []string,
 			targets := dest()
 			if err := rows.Scan(targets...); err != nil {
 				rows.Close()
-				return fmt.Errorf("扫描 %s 行失败: %w", table, err)
+				return fmt.Errorf("掃描 %s 行失敗: %w", table, err)
 			}
 			id := *targets[0].(*int64)
 			batchLast = id
@@ -159,7 +159,7 @@ func (m *Migrator) scanTable(ctx context.Context, table string, cols []string,
 			if err := fn(id); err != nil {
 				if m.Opts.OnError == "abort" {
 					rows.Close()
-					return fmt.Errorf("表 %s 行 %d 迁移失败（abort）: %w", table, id, err)
+					return fmt.Errorf("表 %s 行 %d 遷移失敗（abort）: %w", table, id, err)
 				}
 				t.Failed++
 				m.RW.AddError(table, uint64(id), err.Error())
@@ -180,8 +180,8 @@ func (m *Migrator) scanTable(ctx context.Context, table string, cols []string,
 	}
 }
 
-// scanAll 无 id 主键的小表全量扫描（如 currencies：1.x 主键是 code，无自增 id）。
-// dest/fn 语义同 scanTable；表必须有界（字典级数据）。
+// scanAll 無 id 主鍵的小表全量掃描（如 currencies：1.x 主鍵是 code，無自增 id）。
+// dest/fn 語義同 scanTable；表必須有界（字典級數據）。
 func (m *Migrator) scanAll(ctx context.Context, table string, cols []string,
 	dest func() []any, fn func() error) error {
 
@@ -202,17 +202,17 @@ func (m *Migrator) scanAll(ctx context.Context, table string, cols []string,
 	rows, err := m.Src.DB.QueryContext(ctx,
 		fmt.Sprintf("SELECT %s FROM `%s`", strings.Join(colList, ", "), table))
 	if err != nil {
-		return fmt.Errorf("扫描 %s 失败: %w", table, err)
+		return fmt.Errorf("掃描 %s 失敗: %w", table, err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		targets := dest()
 		if err := rows.Scan(targets...); err != nil {
-			return fmt.Errorf("扫描 %s 行失败: %w", table, err)
+			return fmt.Errorf("掃描 %s 行失敗: %w", table, err)
 		}
 		if err := fn(); err != nil {
 			if m.Opts.OnError == "abort" {
-				return fmt.Errorf("表 %s 行迁移失败（abort）: %w", table, err)
+				return fmt.Errorf("表 %s 行遷移失敗（abort）: %w", table, err)
 			}
 			t.Failed++
 		}
@@ -220,10 +220,10 @@ func (m *Migrator) scanAll(ctx context.Context, table string, cols []string,
 	return rows.Err()
 }
 
-// ErrNotDelivered 未交付阶段的占位错误。
-var ErrNotDelivered = fmt.Errorf("该阶段尚未交付（按计划 P2 起逐阶段实现）")
+// ErrNotDelivered 未交付階段的佔位錯誤。
+var ErrNotDelivered = fmt.Errorf("該階段尚未交付（按計劃 P2 起逐階段實現）")
 
-// nullStr sql.NullString 取值（NULL → 空串；时间列 NULL 即空串语义）。
+// nullStr sql.NullString 取值（NULL → 空串；時間列 NULL 即空串語義）。
 func nullStr(v sql.NullString) string {
 	if v.Valid {
 		return v.String

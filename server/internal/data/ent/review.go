@@ -21,7 +21,7 @@ type Review struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自动注入，业务不手写）
+	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ProductID holds the value of the "product_id" field.
 	ProductID uint64 `json:"product_id,omitempty"`
@@ -31,7 +31,7 @@ type Review struct {
 	OrderID uint64 `json:"order_id,omitempty"`
 	// 1-5
 	Rating int8 `json:"rating,omitempty"`
-	// 入库前 sanitize
+	// 入庫前 sanitize
 	Content string `json:"content,omitempty"`
 	// Status holds the value of the "status" field.
 	Status       review.Status `json:"status,omitempty"`

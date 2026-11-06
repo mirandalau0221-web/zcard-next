@@ -1,8 +1,8 @@
 <template>
   <div v-if="p" class="pd-page">
-    <!-- 面包屑 -->
+    <!-- 麪包屑 -->
     <div v-if="p.product_kind !== 'sms_channel'" class="pd-crumb">
-      <router-link to="/">{{ $t('首页') }}</router-link>
+      <router-link to="/">{{ $t('首頁') }}</router-link>
       <span class="pd-crumb-sep">/</span>
       <router-link to="/products">{{ $t('全部商品') }}</router-link>
       <span class="pd-crumb-sep">/</span>
@@ -12,55 +12,55 @@
     <SocialProduct v-if="p.delivery_kind === 'social_service'" :key="p.id" :product="p" />
     <SMSProduct v-else-if="p.product_kind === 'sms_channel'" :key="p.id" :product="p" />
     <div v-else class="pd-main">
-      <!-- 左栏：商品图 -->
+      <!-- 左欄：商品圖 -->
       <div class="pd-gallery">
-        <div class="pd-cover" :role="p.cover ? 'button' : undefined" :tabindex="p.cover ? 0 : undefined" :aria-label="$t('查看商品大图')" @click="openCover" @keydown.enter="openCover" @keydown.space.prevent="openCover">
+        <div class="pd-cover" :role="p.cover ? 'button' : undefined" :tabindex="p.cover ? 0 : undefined" :aria-label="$t('查看商品大圖')" @click="openCover" @keydown.enter="openCover" @keydown.space.prevent="openCover">
           <img v-if="p.cover" :src="p.cover" :alt="p.name" @error="onImgError" />
           <img v-else :src="NO_IMAGE" :alt="p.name" class="pd-noimg" />
-          <span v-if="p.cover" class="pd-zoom-hint">{{ $t('🔍 点击查看大图') }}</span>
+          <span v-if="p.cover" class="pd-zoom-hint">{{ $t('🔍 點擊查看大圖') }}</span>
         </div>
       </div>
 
-      <!-- 右栏：购买区 -->
+      <!-- 右欄：購買區 -->
       <div class="pd-buy">
 <p v-if="physicalProduct" class="muted">
-  {{ $t('实体商品 ·') }}
-  <template v-if="p.shipping_mode === 'fixed'">{{ $t('运费 {0} / 商品 / 订单', [formatMoney(p.shipping_fee_cents || 0)]) }}</template>
-  <template v-else-if="p.shipping_mode === 'collect'">{{ $t('运费到付') }}</template>
-  <template v-else>{{ $t('包邮') }}</template>
+  {{ $t('實體商品 ·') }}
+  <template v-if="p.shipping_mode === 'fixed'">{{ $t('運費 {0} / 商品 / 訂單', [formatMoney(p.shipping_fee_cents || 0)]) }}</template>
+  <template v-else-if="p.shipping_mode === 'collect'">{{ $t('運費到付') }}</template>
+  <template v-else>{{ $t('包郵') }}</template>
 </p>
         <h1 class="pd-name">{{ p.name }}</h1>
         <div class="pd-sub">
-          <span class="tag">{{ physicalProduct ? $t('实体商品') : manualDelivery ? $t('人工服务') : stockTypeLabel(p.stock_type) }}</span>
-          <span v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="tag pd-points-tag">{{ p.points_required }} {{ $t('积分') }}</span>
+          <span class="tag">{{ physicalProduct ? $t('實體商品') : manualDelivery ? $t('人工服務') : stockTypeLabel(p.stock_type) }}</span>
+          <span v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="tag pd-points-tag">{{ p.points_required }} {{ $t('積分') }}</span>
         </div>
 
-        <!-- 促销价格区 -->
+        <!-- 促銷價格區 -->
         <div class="pd-price-card">
           <div class="pd-price-row">
             <span class="pd-price">{{ formatMoney(displayPrice) }}</span>
             <del v-if="selectedFlash && displayPrice < basePrice" class="muted">{{ formatMoney(basePrice) }}</del>
-            <span v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="pd-price-points">{{ $t('或') }} {{ p.points_required }} {{ $t('积分兑换') }}</span>
+            <span v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="pd-price-points">{{ $t('或') }} {{ p.points_required }} {{ $t('積分兑換') }}</span>
           </div>
-          <p v-if="selectedFlash" class="pd-flash-info">{{ flashSoldOut ? $t('本场秒杀已抢完') : $t('限时秒杀') }} · {{ new Date(selectedFlash.end_at * 1000).toLocaleString(localeTag) }} {{ $t('结束') }}<span v-if="!flashSoldOut"> {{ $t('· 剩余') }} {{ selectedFlash.remaining }} {{ $t('件') }}<span v-if="selectedFlash.per_user_limit > 0"> {{ $t('· 每人限购') }} {{ selectedFlash.per_user_limit }} {{ $t('件') }}</span></span></p>
+          <p v-if="selectedFlash" class="pd-flash-info">{{ flashSoldOut ? $t('本場秒殺已搶完') : $t('限時秒殺') }} · {{ new Date(selectedFlash.end_at * 1000).toLocaleString(localeTag) }} {{ $t('結束') }}<span v-if="!flashSoldOut"> {{ $t('· 剩餘') }} {{ selectedFlash.remaining }} {{ $t('件') }}<span v-if="selectedFlash.per_user_limit > 0"> {{ $t('· 每人限購') }} {{ selectedFlash.per_user_limit }} {{ $t('件') }}</span></span></p>
         </div>
 
-        <!-- 汇总条：销量/库存（template.show_sales/show_stock 后台开关可关） -->
+        <!-- 彙總條：銷量/庫存（template.show_sales/show_stock 後台開關可關） -->
         <div v-if="salesShown || stockShown" class="pd-stats">
-          <div v-if="salesShown" class="pd-stat"><b>{{ p.sales_count || 0 }}</b><span>{{ $t('销量') }}</span></div>
-          <div v-if="stockShown" class="pd-stat"><b>{{ stockDisplay }}</b><span>{{ $t('库存') }}</span></div>
+          <div v-if="salesShown" class="pd-stat"><b>{{ p.sales_count || 0 }}</b><span>{{ $t('銷量') }}</span></div>
+          <div v-if="stockShown" class="pd-stat"><b>{{ stockDisplay }}</b><span>{{ $t('庫存') }}</span></div>
         </div>
 
-        <!-- 服务保障 -->
+        <!-- 服務保障 -->
         <div class="pd-assure">
-          <span>{{ physicalProduct ? $t('📦 快递配送') : manualDelivery ? $t('👤 人工处理') : $t('⚡ 自动发货') }}</span>
+          <span>{{ physicalProduct ? $t('📦 快遞配送') : manualDelivery ? $t('👤 人工處理') : $t('⚡ 自動發貨') }}</span>
           <span>{{ $t('🛡️ 正品保障') }}</span>
-          <span>{{ $t('💬 售后无忧') }}</span>
+          <span>{{ $t('💬 售後無憂') }}</span>
         </div>
 
-        <!-- SKU 选择（卡片式） -->
+        <!-- SKU 選擇（卡片式） -->
         <div v-if="p.skus?.length" class="pd-field">
-          <label class="pd-label">{{ $t('选择规格') }} <span class="pd-req">*</span></label>
+          <label class="pd-label">{{ $t('選擇規格') }} <span class="pd-req">*</span></label>
           <div class="pd-skus">
             <button
               v-for="s in p.skus"
@@ -75,9 +75,9 @@
           </div>
         </div>
 
-        <!-- 数量步进器 -->
+        <!-- 數量步進器 -->
         <div class="pd-field">
-          <label class="pd-label">{{ $t('购买数量') }}</label>
+          <label class="pd-label">{{ $t('購買數量') }}</label>
           <div class="pd-qty">
             <button class="pd-qty-btn" @click="quantity = Math.max(1, quantity - 1)">−</button>
             <input v-model.number="quantity" type="number" min="1" :max="reusableDelivery||smsProduct?1:99" :disabled="reusableDelivery||smsProduct" class="pd-qty-input" />
@@ -85,92 +85,92 @@
           </div>
         </div>
 
-        <!-- 库存进度条 -->
+        <!-- 庫存進度條 -->
         <div v-if="stockShown && p.stock_type === 'card' && p.stock >= 0" class="pd-stock-bar">
           <div class="pd-stock-track"><div class="pd-stock-fill" :style="{ width: stockPct }"></div></div>
         </div>
 
-        <!-- 评价入口（锚点；大厂电商：评分摘要卡 → 点击滚动到评价区） -->
+        <!-- 評價入口（錨點；大廠電商：評分摘要卡 → 點擊滾動到評價區） -->
         <button v-if="showReviews" class="pd-review-entry" @click="scrollToReviews">
-          <span class="pd-review-entry-score">{{ p.reviews?.length ? `★ ${reviewAvg}` : $t('暂无评分') }}</span>
-          <span class="pd-review-entry-count">{{ (p.reviews?.length || 0) }} {{ $t('条评价') }}</span>
+          <span class="pd-review-entry-score">{{ p.reviews?.length ? `★ ${reviewAvg}` : $t('暫無評分') }}</span>
+          <span class="pd-review-entry-count">{{ (p.reviews?.length || 0) }} {{ $t('條評價') }}</span>
           <span class="pd-review-entry-go">{{ $t('查看 ›') }}</span>
         </button>
 
-        <!-- 自定义控件（下单收集） -->
+        <!-- 自定義控件（下單收集） -->
         <OrderFields :controls="p.controls || []" v-model="controlAnswers" />
-        <p v-if="reusableDelivery" class="muted">{{ $t('此规格每次购买一份即可。') }}</p>
-        <p v-if="manualDelivery" class="muted">{{ $t('人工处理：付款后请在订单详情查看处理进度与交付结果。') }}</p>
+        <p v-if="reusableDelivery" class="muted">{{ $t('此規格每次購買一份即可。') }}</p>
+        <p v-if="manualDelivery" class="muted">{{ $t('人工處理：付款後請在訂單詳情查看處理進度與交付結果。') }}</p>
 
         <div v-if="!physicalProduct" class="pd-field">
-          <label class="pd-label">{{ $t('查询密码（取货用，至少 4 位）') }}<span v-if="trade.queryPasswordRequired" class="pd-req">*</span></label>
-          <input v-model="queryPassword" type="text" class="pd-input" :placeholder="$t('用于取货验证（忘记将无法取货）')" />
+          <label class="pd-label">{{ $t('查詢密碼（取貨用，至少 4 位）') }}<span v-if="trade.queryPasswordRequired" class="pd-req">*</span></label>
+          <input v-model="queryPassword" type="text" class="pd-input" :placeholder="$t('用於取貨驗證（忘記將無法取貨）')" />
         </div>
         <div v-if="physicalProduct && isGuest" class="pd-field">
-          <label class="pd-label">{{ $t('邮箱（订单通知与找回）') }} *</label>
-          <input v-model="contact" type="email" autocomplete="email" class="pd-input" :placeholder="$t('填写用于接收订单验证码的邮箱')" />
+          <label class="pd-label">{{ $t('郵箱（訂單通知與找回）') }} *</label>
+          <input v-model="contact" type="email" autocomplete="email" class="pd-input" :placeholder="$t('填寫用於接收訂單驗證碼的郵箱')" />
         </div>
         <div v-else-if="!physicalProduct && (isGuest || trade.contactScope === 'all')" class="pd-field">
-          <label class="pd-label">{{ $t('联系方式') }} {{ trade.contactRequired !== 'none' ? ' *' : $t('（选填）') }}</label>
-          <input v-model="contact" type="text" class="pd-input" :placeholder="$t('用于订单查询与售后（{0}）', [contactRequiredLabel(trade.contactRequired)])" />
+          <label class="pd-label">{{ $t('聯繫方式') }} {{ trade.contactRequired !== 'none' ? ' *' : $t('（選填）') }}</label>
+          <input v-model="contact" type="text" class="pd-input" :placeholder="$t('用於訂單查詢與售後（{0}）', [contactRequiredLabel(trade.contactRequired)])" />
         </div>
         <div v-if="isGuest && captchaCfg.order" class="pd-field">
-          <label class="pd-label">{{ $t('图形验证码') }} <span class="pd-req">*</span></label>
+          <label class="pd-label">{{ $t('圖形驗證碼') }} <span class="pd-req">*</span></label>
           <CaptchaInput ref="captchaRef" @update:code="captchaCode = $event" @update:captcha-id="captchaId = $event" />
         </div>
         <div class="pd-field">
-          <label class="pd-label">{{ $t('优惠券码（选填）') }}</label>
-          <input v-if="!smsProduct" v-model="couponCode" type="text" class="pd-input" :placeholder="$t('输入优惠券码')" />
+          <label class="pd-label">{{ $t('優惠券碼（選填）') }}</label>
+          <input v-if="!smsProduct" v-model="couponCode" type="text" class="pd-input" :placeholder="$t('輸入優惠券碼')" />
         </div>
 
         <div v-if="error" class="error" style="margin-bottom: 12px;">{{ uiText(error) }}</div>
 
         <div v-if="stockUnknown" class="pd-stock-notice" role="status">
           <div>
-            <strong>{{ $t('暂时无法确认库存') }}</strong>
-            <p>{{ stockRefreshMessage || $t('尚未获取到有效库存，这不代表已售罄。请稍后重新查询，或联系客服确认。') }}</p>
+            <strong>{{ $t('暫時無法確認庫存') }}</strong>
+            <p>{{ stockRefreshMessage || $t('尚未獲取到有效庫存，這不代表已售罄。請稍後重新查詢，或聯繫客服確認。') }}</p>
           </div>
           <button type="button" :disabled="stockRefreshing || stockRetrySeconds > 0" :aria-busy="stockRefreshing" @click="refreshStock">
-            {{ stockRefreshing ? $t('查询中…') : stockRetrySeconds > 0 ? $t('{0} 秒后重试', [stockRetrySeconds]) : $t('重新查询库存') }}
+            {{ stockRefreshing ? $t('查詢中…') : stockRetrySeconds > 0 ? $t('{0} 秒後重試', [stockRetrySeconds]) : $t('重新查詢庫存') }}
           </button>
         </div>
 
-        <!-- 缺货和未知库存禁购；不限库存仍由后端按货源验证。 -->
-        <p v-if="smsProduct" class="muted">{{ $t('单次短信接码，仅限会员余额单件购买。付款后在本站订单页查看号码与短信；取消须经供货确认后退款。') }}{{p.sms_sales_enabled ? '' : $t('接码新购暂未开放。')}}</p>
+        <!-- 缺貨和未知庫存禁購；不限庫存仍由後端按貨源驗證。 -->
+        <p v-if="smsProduct" class="muted">{{ $t('單次短信接碼，僅限會員餘額單件購買。付款後在本站訂單頁查看號碼與短信；取消須經供貨確認後退款。') }}{{p.sms_sales_enabled ? '' : $t('接碼新購暫未開放。')}}</p>
         <div class="pd-actions">
           <button class="pd-btn-buy" :disabled="submitting || soldOut || stockUnknown || flashSoldOut || (smsProduct && !p.sms_sales_enabled)" @click="buy">
-            {{ submitting ? $t('提交中…') : stockUnknown ? $t('库存待确认') : soldOut ? $t('暂时缺货') : $t('立即购买') }}
+            {{ submitting ? $t('提交中…') : stockUnknown ? $t('庫存待確認') : soldOut ? $t('暫時缺貨') : $t('立即購買') }}
           </button>
           <button
             v-if="canCart"
             class="pd-btn-cart"
             :class="{ 'is-in': inCartNow }"
             :disabled="submitting || cartBusy || soldOut || stockUnknown || flashSoldOut"
-            :title="inCartNow ? $t('从购物车移除') : $t('加入购物车')"
+            :title="inCartNow ? $t('從購物車移除') : $t('加入購物車')"
             @click="inCartNow ? removeFromCart() : addToCart()"
           >
-            <template v-if="cartBusy">{{ addingCart ? $t('加入中…') : $t('处理中…') }}</template>
-            <template v-else-if="inCartNow"><ThemeIcon name="trash" />{{ $t('移除购物车') }}</template>
-            <template v-else><ThemeIcon name="cart" />{{ $t('加入购物车') }}</template>
+            <template v-if="cartBusy">{{ addingCart ? $t('加入中…') : $t('處理中…') }}</template>
+            <template v-else-if="inCartNow"><ThemeIcon name="trash" />{{ $t('移除購物車') }}</template>
+            <template v-else><ThemeIcon name="cart" />{{ $t('加入購物車') }}</template>
           </button>
           <button v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="pd-btn-points" :disabled="submitting || soldOut || stockUnknown || flashSoldOut" @click="exchangePoints">
-            {{ stockUnknown ? $t('库存待确认') : soldOut ? $t('已兑完') : $t('积分兑换（{0} 分）', [p.points_required]) }}
+            {{ stockUnknown ? $t('庫存待確認') : soldOut ? $t('已兑完') : $t('積分兑換（{0} 分）', [p.points_required]) }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- 描述区 -->
+    <!-- 描述區 -->
     <div v-if="p.description && p.product_kind !== 'sms_channel'" class="pd-section pd-details">
-      <h3 class="pd-section-title">{{ $t('商品详情') }}</h3>
+      <h3 class="pd-section-title">{{ $t('商品詳情') }}</h3>
       <div ref="description" class="pd-desc" @click="openDescriptionImage" @keydown="descriptionKeydown" v-html="p.description"></div>
     </div>
 
-    <!-- 评价区（template.show_reviews 开关控制；默认展示 3 条可展开） -->
+    <!-- 評價區（template.show_reviews 開關控制；默認展示 3 條可展開） -->
     <div v-if="showReviews" id="pd-reviews" class="pd-section">
-      <h3 class="pd-section-title">{{ $t('用户评价（{0}）', [p.reviews?.length || 0]) }}</h3>
-      <p v-if="!p.reviews?.length" class="muted">{{ $t('暂无评价，欢迎购买后分享使用体验。') }}</p>
-      <p class="muted"><router-link to="/member?tab=orders">{{ $t('前往我的订单评价') }}</router-link> {{ $t('· 发货完成后可提交，审核通过后展示。') }}</p>
+      <h3 class="pd-section-title">{{ $t('用户評價（{0}）', [p.reviews?.length || 0]) }}</h3>
+      <p v-if="!p.reviews?.length" class="muted">{{ $t('暫無評價，歡迎購買後分享使用體驗。') }}</p>
+      <p class="muted"><router-link to="/member?tab=orders">{{ $t('前往我的訂單評價') }}</router-link> {{ $t('· 發貨完成後可提交，審核通過後展示。') }}</p>
       <div v-for="r in visibleReviews" :key="`${r.is_virtual}-${r.id}`" class="pd-review">
         <span class="pd-avatar">{{ (r.nickname || $t('匿'))[0] }}</span>
         <div class="pd-review-body">
@@ -182,14 +182,14 @@
         </div>
       </div>
       <button v-if="(p.reviews?.length || 0) > reviewCollapsed" class="pd-review-more" @click="reviewsExpanded = !reviewsExpanded">
-        {{ reviewsExpanded ? $t('收起评价 ↑') : $t('查看全部 {0} 条评价 ↓', [(p.reviews?.length || 0)]) }}
+        {{ reviewsExpanded ? $t('收起評價 ↑') : $t('查看全部 {0} 條評價 ↓', [(p.reviews?.length || 0)]) }}
       </button>
     </div>
 
     <ImageViewer v-if="previewImages.length" :images="previewImages" :initial-index="previewIndex" @close="previewImages = []" />
   </div>
   <div v-else-if="error" class="error">{{ uiText(error) }}</div>
-  <div v-else class="muted" style="text-align: center; padding: 40px;">{{ $t('加载中…') }}</div>
+  <div v-else class="muted" style="text-align: center; padding: 40px;">{{ $t('加載中…') }}</div>
  <ShippingCheckout ref="shippingCheckout" />
 </template>
 
@@ -251,10 +251,10 @@ function openDescriptionImage(event: Event) {
   const images = [...(description.value?.querySelectorAll('img') || [])].filter(img => img.currentSrc || img.src);
   const index = images.indexOf(event.target);
   if (index < 0) return;
-  event.preventDefault(); // 图片包在链接内时，预览优先，避免跳离教程。
+  event.preventDefault(); // 圖片包在鏈接內時，預覽優先，避免跳離教程。
   event.target.focus({ preventScroll: true });
   previewIndex.value = index;
-  previewImages.value = images.map(img => ({ src: img.currentSrc || img.src, alt: img.alt || p.value?.name || $t("商品详情图片") }));
+  previewImages.value = images.map(img => ({ src: img.currentSrc || img.src, alt: img.alt || p.value?.name || $t("商品詳情圖片") }));
 }
 function descriptionKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' || event.key === ' ') openDescriptionImage(event);
@@ -263,12 +263,12 @@ watch([description, () => p.value?.description], () => {
   description.value?.querySelectorAll('img').forEach(img => {
     img.tabIndex = 0;
     img.setAttribute('role', 'button');
-    img.setAttribute('aria-label', $t("放大查看{0}", [img.alt || $t('商品详情图片')]));
+    img.setAttribute('aria-label', $t("放大查看{0}", [img.alt || $t('商品詳情圖片')]));
   });
 }, { flush: 'post' });
 watch(() => route.params, () => { previewImages.value = []; });
 
-// 购物车（淘宝式切换）：当前商品 + 所选 SKU 在购物车 → 按钮变灰「移除购物车」
+// 購物車（淘寶式切換）：當前商品 + 所選 SKU 在購物車 → 按鈕變灰「移除購物車」
 const canCart = computed(() => !smsProduct.value && cartEnabled.value && !(p.value?.points_required && p.value.points_required > 0));
 const inCartNow = computed(() => {
   if (!p.value || !canCart.value) return false;
@@ -276,7 +276,7 @@ const inCartNow = computed(() => {
 });
 const cartBusy = computed(() => addingCart.value || removingCart.value);
 
-// 当前显示价（跟随所选 SKU）
+// 當前顯示價（跟隨所選 SKU）
 const flash = useFlashOffers();
 const selectedFlash = computed(() => flash.active((selectedSku.value ? p.value?.skus?.find(s => Number(s.id) === selectedSku.value)?.flash_sale : p.value?.flash_sale)));
 const flashSoldOut = computed(() => !!selectedFlash.value && (selectedFlash.value.remaining || 0) <= 0);
@@ -294,11 +294,11 @@ const displayPrice = computed(() => flash.price(basePrice.value, selectedFlash.v
 const stockDisplay = computed(() => {
   if (!p.value) return '-';
   const s = effectiveStock.value;
-  if (s < -1) return p.value.stock_status === 'stale' && (p.value.stock_reference ?? -2) >= -1 ? $t("上次：{0}（待确认）", [p.value.stock_reference === -1 ? $t('不限') : p.value.stock_reference]) : $t("待确认");
+  if (s < -1) return p.value.stock_status === 'stale' && (p.value.stock_reference ?? -2) >= -1 ? $t("上次：{0}（待確認）", [p.value.stock_reference === -1 ? $t('不限') : p.value.stock_reference]) : $t("待確認");
   if (s === -1) return $t("不限");
   return String(s);
 });
-// 自营/对接均使用各自库存；proto3 省略零值时仍按缺货处理。
+// 自營/對接均使用各自庫存；proto3 省略零值時仍按缺貨處理。
 const effectiveStock = computed(()=>{if(manualDelivery.value)return p.value?.manual_stock ?? p.value?.stock ?? 0;const sku=p.value?.skus?.find(s=>Number(s.id)===Number(selectedSku.value));return sku && sku.stock !== -2 ? (sku.stock ?? 0) : (p.value?.stock ?? 0);});
 const stockUnknown = computed(() => effectiveStock.value < -1);
 const stockRefreshing = ref(false);
@@ -323,14 +323,14 @@ async function refreshStock() {
     const fresh = await getProduct(productID);
     if (p.value?.id !== productID) return;
     if (fresh.data) {
-      // 只更新库存，保留用户已填写的规格、数量和取货信息。
+      // 只更新庫存，保留用户已填寫的規格、數量和取貨信息。
       p.value.stock = fresh.data.stock ?? 0;
       p.value.stock_status = fresh.data.stock_status;
       p.value.stock_reference = fresh.data.stock_reference;
       p.value.stock_checked_at = fresh.data.stock_checked_at;
     }
     if (fresh.error || stockUnknown.value) {
-      stockRefreshMessage.value = $t("仍未获取到有效库存，请稍后重试，或联系客服确认。");
+      stockRefreshMessage.value = $t("仍未獲取到有效庫存，請稍後重試，或聯繫客服確認。");
       startStockCooldown();
     }
   } finally {
@@ -342,10 +342,10 @@ const soldOut = computed(() => {
   return effectiveStock.value === 0;
 });
 
-// ── 评价（template.show_reviews 后台开关；入口锚点 + 折叠展开）──
+// ── 評價（template.show_reviews 後台開關；入口錨點 + 摺疊展開）──
 const showReviews = ref(false);
 const reviewsExpanded = ref(false);
-// 销量在配置确认前隐藏；库存沿用原有开关。
+// 銷量在配置確認前隱藏；庫存沿用原有開關。
 const { showSales, applySalesConfig } = useSalesVisibility();
 const showStock = ref(false);
 const physicalProduct = computed(() => (p.value?.product_property || p.value?.goods_type) === 'physical');
@@ -369,7 +369,7 @@ const stockPct = computed(() => {
   return `${Math.min(100, Math.round((s / 600) * 100))}%`;
 });
 
-// 购物车：积分商品不可加购（积分单走兑换按钮）；游客加购进本地购物车（老项目同款）
+// 購物車：積分商品不可加購（積分單走兑換按鈕）；遊客加購進本地購物車（老項目同款）
 
 async function addToCart() {
   if (!p.value || soldOut.value || stockUnknown.value) return;
@@ -383,7 +383,7 @@ async function addToCart() {
     if (fresh.data) p.value = fresh.data;
     return;
   }
-  // 成功后按钮经 cartState 响应式切换为「移除购物车」（无临时态）
+  // 成功後按鈕經 cartState 響應式切換為「移除購物車」（無臨時態）
 }
 
 async function removeFromCart() {
@@ -397,10 +397,10 @@ async function removeFromCart() {
 }
 
 function stockTypeLabel(t: string) {
-  return ({ get card() { return $t("卡密"); }, get url() { return $t("链接"); }, get code() { return $t("兑换码"); } } as Record<string, string>)[t] || t;
+  return ({ get card() { return $t("卡密"); }, get url() { return $t("鏈接"); }, get code() { return $t("兑換碼"); } } as Record<string, string>)[t] || t;
 }
 
-// 手机端吸底操作栏点击后，表单校验失败要能看到错误提示：滚动到购买卡内的 error
+// 手機端吸底操作欄點擊後，表單校驗失敗要能看到錯誤提示：滾動到購買卡內的 error
 function scrollToFormError() {
   requestAnimationFrame(() => {
     document.querySelector('.pd-buy .error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -416,8 +416,8 @@ function toggleCheck(id: number, val: string) {
   controlAnswers.value[key] = cur.join(',');
 }
 
-// 交易设置（查询密码强制 / 游客联系方式）；游客判定（authState 响应式——
-// 登出/登录后自动切换字段显隐）
+// 交易設置（查詢密碼強制 / 遊客聯繫方式）；遊客判定（authState 響應式——
+// 登出/登錄後自動切換字段顯隱）
 const trade = ref<TradeConfig>({ queryPasswordRequired: true, contactRequired: 'any' });
 const captchaCfg = ref<CaptchaConfig>({ login: false, register: true, order: false, reset: true });
 const captchaId = ref('');
@@ -425,7 +425,7 @@ const captchaCode = ref('');
 const captchaRef = ref<InstanceType<typeof CaptchaInput> | null>(null);
 const isGuest = computed(() => !authState.loggedIn);
 
-// 商品数据预取（setup 顶层：SSG 静态化商品页内容 + 输出 SEO head）
+// 商品數據預取（setup 頂層：SSG 靜態化商品頁內容 + 輸出 SEO head）
 const productResp = await getProduct(Number(route.params.id));
 if (productResp.error) {
   error.value = productResp.error;
@@ -436,7 +436,7 @@ if (productResp.error) {
 }
 
 onMounted(async () => {
-  // 交易配置/验证码（客户端交互能力；SSG 不需要）+ 评价/销量/库存显示开关
+  // 交易配置/驗證碼（客户端交互能力；SSG 不需要）+ 評價/銷量/庫存顯示開關
   const [cfg, capCfg, tplResp] = await Promise.all([
     fetchTradeConfig(),
     fetchCaptchaConfig(),
@@ -454,7 +454,7 @@ onMounted(async () => {
   showStock.value = Array.isArray(tplResp?.entries) && parseFlag(pick('template.show_stock'));
 });
 
-/** 商品页 SEO：title/description/keywords/canonical/og + Product/Breadcrumb JSON-LD */
+/** 商品頁 SEO：title/description/keywords/canonical/og + Product/Breadcrumb JSON-LD */
 watch(locale, () => { if (p.value) void applyProductSeo(p.value); });
 async function applyProductSeo(product: Product) {
   await initCurrency();
@@ -503,23 +503,23 @@ async function applyProductSeo(product: Product) {
   );
 }
 
-/** 下单前校验（与后端 validateTradeRequirements 同口径） */
+/** 下單前校驗（與後端 validateTradeRequirements 同口徑） */
 function validateTradeFields(requireContact = true): boolean {
   if (physicalProduct.value) {
-    if(isGuest.value && !contactValid(contact.value.trim(),'email')) { error.value=$t('请填写有效邮箱，用于订单通知与找回'); return false; }
+    if(isGuest.value && !contactValid(contact.value.trim(),'email')) { error.value=$t('請填寫有效郵箱，用於訂單通知與找回'); return false; }
     return true;
   }
   if (!physicalProduct.value && trade.value.queryPasswordRequired && queryPassword.value.trim().length < 4) {
-    error.value = $t("请设置查询密码（至少 4 位，取货时使用）");
+    error.value = $t("請設置查詢密碼（至少 4 位，取貨時使用）");
     return false;
   }
   if (requireContact && (isGuest.value || trade.value.contactScope === 'all') && trade.value.contactRequired !== 'none') {
     if (!contact.value.trim()) {
-      error.value = $t("请填写联系方式（{0}），用于订单查询与售后", [contactRequiredLabel(trade.value.contactRequired)]);
+      error.value = $t("請填寫聯繫方式（{0}），用於訂單查詢與售後", [contactRequiredLabel(trade.value.contactRequired)]);
       return false;
     }
     if (!contactValid(contact.value, trade.value.contactRequired)) {
-      error.value = $t("联系方式格式不符（需要{0}）", [contactRequiredLabel(trade.value.contactRequired)]);
+      error.value = $t("聯繫方式格式不符（需要{0}）", [contactRequiredLabel(trade.value.contactRequired)]);
       return false;
     }
   }
@@ -528,12 +528,12 @@ function validateTradeFields(requireContact = true): boolean {
 
 async function buy() {
   if (!p.value || soldOut.value || stockUnknown.value) return;
-  // 交易设置校验（查询密码 / 游客联系方式）
+  // 交易設置校驗（查詢密碼 / 遊客聯繫方式）
   if (!validateTradeFields()) { scrollToFormError(); return; }
-  // 必填控件校验（proto3 空数组省略 → undefined 兜底空数组）
+  // 必填控件校驗（proto3 空數組省略 → undefined 兜底空數組）
   for (const c of p.value.controls || []) {
     if (c.required && !controlAnswers.value[String(c.id)]?.trim()) {
-      error.value = $t("请填写「{0}」", [c.name]);
+      error.value = $t("請填寫「{0}」", [c.name]);
       scrollToFormError();
       return;
     }
@@ -555,11 +555,11 @@ async function buy() {
   submitting.value = false;
   if (err) { error.value = err; return; }
   if(!data)return;
-  rememberOrderPassword(data!.order_no, queryPassword.value); // 支付成功自动取货用
+  rememberOrderPassword(data!.order_no, queryPassword.value); // 支付成功自動取貨用
   router.push(`/payment/${data!.order_no}`);
 }
 
-// 积分兑换（：use_points → 服务端同事务扣积分 → 订单直落 paid → 取货页交付）
+// 積分兑換（：use_points → 服務端同事務扣積分 → 訂單直落 paid → 取貨頁交付）
 async function exchangePoints() {
   if (!p.value || soldOut.value || stockUnknown.value) return;
   if (!getToken()) {
@@ -568,10 +568,10 @@ async function exchangePoints() {
   }
   if (!validateTradeFields(false)) return;
   if (!queryPassword.value || queryPassword.value.length < 4) {
-    error.value = $t("积分兑换同样需要设置查询密码（取货用，至少 4 位）");
+    error.value = $t("積分兑換同樣需要設置查詢密碼（取貨用，至少 4 位）");
     return;
   }
-  if (!confirm($t("确认用 {0} 积分兑换本商品？", [p.value.points_required]))) return;
+  if (!confirm($t("確認用 {0} 積分兑換本商品？", [p.value.points_required]))) return;
   submitting.value = true;
   error.value = '';
   const { data, error: err } = await createOrder({
@@ -581,7 +581,7 @@ async function exchangePoints() {
   });
   submitting.value = false;
   if (err) { error.value = err; return; }
-  alert($t("兑换成功，订单已支付，请前往取货页领取"));
+  alert($t("兑換成功，訂單已支付，請前往取貨頁領取"));
   router.push('/fetch');
 }
 </script>
@@ -597,13 +597,13 @@ async function exchangePoints() {
 .pd-main { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
 @media (min-width: 768px) { .pd-main { grid-template-columns: 1.05fr 1fr; } }
 
-/* ── 左栏图 ── */
+/* ── 左欄圖 ── */
 .pd-cover {
   position: relative; aspect-ratio: 1/1; border-radius: 14px; overflow: hidden;
   background: #f1f5f9; cursor: zoom-in; border: 1px solid #e5e7eb;
 }
 .pd-cover img { width: 100%; height: 100%; object-fit: cover; }
-/* 无图占位（SVG data URI）：contain 完整显示，不提示放大 */
+/* 無圖佔位（SVG data URI）：contain 完整顯示，不提示放大 */
 .pd-noimg { object-fit: contain !important; cursor: default; }
 .pd-cover-placeholder {
   width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
@@ -616,7 +616,7 @@ async function exchangePoints() {
   background: rgba(255,255,255,0.85); color: #6b7280;
 }
 
-/* ── 右栏购买区（独立白卡：固定白底，不受全站背景图影响）── */
+/* ── 右欄購買區（獨立白卡：固定白底，不受全站背景圖影響）── */
 .pd-buy {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -665,7 +665,7 @@ async function exchangePoints() {
   border: 2px solid #e5e7eb; border-radius: 10px; padding: 8px 14px;
   background: #fff; cursor: pointer; text-align: center; transition: all 0.15s;
   min-width: 90px;
-  max-width: 100%; /* 超长规格名不撑破容器（配合 name 断词） */
+  max-width: 100%; /* 超長規格名不撐破容器（配合 name 斷詞） */
 }
 .pd-sku:hover { border-color: color-mix(in srgb, var(--zc-primary) 40%, transparent); }
 .pd-sku.active { border-color: var(--zc-primary); background: var(--zc-primary-soft); }
@@ -709,7 +709,7 @@ async function exchangePoints() {
   background: #fff; color: var(--zc-primary); border: 2px solid var(--zc-primary); transition: all 0.15s;
 }
 .pd-btn-cart:hover:not(:disabled) { background: var(--zc-primary-soft); }
-/* 已在购物车：灰色「移除」形态（淘宝式切换） */
+/* 已在購物車：灰色「移除」形態（淘寶式切換） */
 .pd-btn-cart.is-in {
   background: #f3f4f6; color: #6b7280; border-color: #d1d5db;
 }
@@ -724,7 +724,7 @@ async function exchangePoints() {
 .pd-btn-points:hover:not(:disabled) { background: var(--zc-primary-soft); }
 .pd-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── 描述/评价 ── */
+/* ── 描述/評價 ── */
 .pd-section { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
 .pd-section-title {
   font-size: 15px; font-weight: 700; color: #111827;
@@ -742,7 +742,7 @@ async function exchangePoints() {
 
 .pd-review { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
 .pd-review:last-child { border-bottom: none; }
-/* 评价入口（评分摘要锚点卡） */
+/* 評價入口（評分摘要錨點卡） */
 .pd-review-entry {
   display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 12px;
   padding: 10px 14px; border: 1px solid #e5e7eb; border-radius: 10px;
@@ -770,7 +770,7 @@ async function exchangePoints() {
 
 .pd-desc :deep(img) { cursor: zoom-in; }
 .pd-desc :deep(img:focus-visible), .pd-cover:focus-visible { outline: 2px solid var(--zc-primary); outline-offset: 3px; }
-/* ── 手机端（大厂商品页范式：无面包屑、紧凑留白、底部吸底操作栏）── */
+/* ── 手機端（大廠商品頁範式：無麪包屑、緊湊留白、底部吸底操作欄）── */
 @media (max-width: 768px) {
   .pd-page { padding: 0 12px calc(76px + env(safe-area-inset-bottom)); gap: 12px; }
   .pd-crumb { display: none; }

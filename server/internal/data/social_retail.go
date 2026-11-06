@@ -47,17 +47,17 @@ func SocialRetailRefundLimit(ctx context.Context, c *ent.Client, orderID uint64)
 		return 0, true, e
 	}
 	if len(rows) != 1 {
-		return 0, true, fmt.Errorf("服务采购凭证缺失")
+		return 0, true, fmt.Errorf("服務採購憑證缺失")
 	}
 	row := rows[0]
 	if row.UpstreamOrderID == "" || row.RefundReference == "" || row.RetailPaidAmount <= 0 {
-		return 0, true, fmt.Errorf("服务供货退款凭证尚未确认")
+		return 0, true, fmt.Errorf("服務供貨退款憑證尚未確認")
 	}
 	if row.ChargedAmount == 0 && row.State == "rejected" && row.SettlementState == "refunded" && row.RefundReference == "rejected:"+row.UpstreamOrderID {
 		return row.RetailPaidAmount, true, nil
 	}
 	if row.SettlementState != "refunded" && row.SettlementState != "partially_refunded" {
-		return 0, true, fmt.Errorf("服务供货退款尚未确认")
+		return 0, true, fmt.Errorf("服務供貨退款尚未確認")
 	}
 	target, e := SocialRetailRefundTarget(row.RetailPaidAmount, row.ChargedAmount, row.RefundedAmount)
 	return target, true, e

@@ -1,8 +1,8 @@
 package migratev1
 
-// P6 内容/日志域：media（行 + 文件本体复制到 2.0 StorageRoot）、
-// visit_logs 聚合迁移（90 天窗口，pv 聚合 / uv 近似）、security_audit_logs（12 个月窗口）。
-// 映射规格《数据迁移工具开发计划》§5.9。
+// P6 內容/日誌域：media（行 + 文件本體複製到 2.0 StorageRoot）、
+// visit_logs 聚合遷移（90 天窗口，pv 聚合 / uv 近似）、security_audit_logs（12 個月窗口）。
+// 映射規格《數據遷移工具開發計劃》§5.9。
 
 import (
 	"context"
@@ -20,7 +20,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/media"
 )
 
-// MigrateContent P6 内容/日志域。
+// MigrateContent P6 內容/日誌域。
 func (m *Migrator) MigrateContent(ctx context.Context) error {
 	if err := m.migrateMedia(ctx); err != nil {
 		return err
@@ -31,9 +31,9 @@ func (m *Migrator) MigrateContent(ctx context.Context) error {
 	return m.migrateAuditLogs(ctx)
 }
 
-// migrateMedia 1.x media/media_categories → media + 文件复制。
+// migrateMedia 1.x media/media_categories → media + 文件複製。
 // 文件源：<OldStorage>/storage/app/public/<path>（--old-storage 指定 1.x 部署根）；
-// 缺失文件不阻断（清单进报告）。sha256 迁移时计算补齐。
+// 缺失文件不阻斷（清單進報告）。sha256 遷移時計算補齊。
 func (m *Migrator) migrateMedia(ctx context.Context) error {
 	var (
 		id                     int64
@@ -54,14 +54,14 @@ func (m *Migrator) migrateMedia(ctx context.Context) error {
 		},
 		func(int64) error {
 			if nullStr(deletedAt) != "" {
-				m.st.Record("media", "skip") // 软删媒体不迁
+				m.st.Record("media", "skip") // 軟刪媒體不遷
 				return nil
 			}
 			if _, ok := m.IDs.Get(ctx, "media", uint64(id)); ok {
 				m.st.Record("media", "skip")
 				return nil
 			}
-			// 文件复制（源缺失不阻断）
+			// 文件複製（源缺失不阻斷）
 			rel := strings.TrimPrefix(strings.ReplaceAll(pathCol, "\\", "/"), "/")
 			dst := filepath.Join(mediaStorageRoot(), filepath.FromSlash(rel))
 			sum := ""
@@ -69,7 +69,7 @@ func (m *Migrator) migrateMedia(ctx context.Context) error {
 				src := filepath.Join(oldRoot, "storage", "app", "public", filepath.FromSlash(rel))
 				data, err := os.ReadFile(src)
 				if err != nil {
-					m.RW.AddError("media", uint64(id), "文件缺失未复制："+rel)
+					m.RW.AddError("media", uint64(id), "文件缺失未複製："+rel)
 				} else {
 					if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 						return err
@@ -81,7 +81,7 @@ func (m *Migrator) migrateMedia(ctx context.Context) error {
 					sum = hex.EncodeToString(sh[:])
 				}
 			} else {
-				m.RW.AddError("media", uint64(id), "未提供 --old-storage，文件未复制（仅迁行）："+rel)
+				m.RW.AddError("media", uint64(id), "未提供 --old-storage，文件未複製（僅遷行）："+rel)
 			}
 			b := m.Client.Media.Create().
 				SetPath(rel).
@@ -115,7 +115,7 @@ func (m *Migrator) migrateMedia(ctx context.Context) error {
 
 func mediaStorageRoot() string { return media.StorageRoot }
 
-// migrateVisitLogs 1.x 原始 PV → 2.0 小时聚合行（uv 近似 = pv，报告注明口径）。
+// migrateVisitLogs 1.x 原始 PV → 2.0 小時聚合行（uv 近似 = pv，報告註明口徑）。
 func (m *Migrator) migrateVisitLogs(ctx context.Context) error {
 	t := m.st.table("visit_logs")
 	if m.dry {
@@ -135,7 +135,7 @@ func (m *Migrator) migrateVisitLogs(ctx context.Context) error {
 		"SELECT DATE_FORMAT(`created_at`, '%Y%m%d'), CAST(HOUR(`created_at`) AS SIGNED), COALESCE(`path`, ''), COUNT(*) "+
 			"FROM `visit_logs` WHERE `created_at` >= ? GROUP BY 1, 2, 3", since.Format("2006-01-02 15:04:05"))
 	if err != nil {
-		// sqlite 单测源无 DATE_FORMAT——退化为按天聚合（单测路径）
+		// sqlite 單測源無 DATE_FORMAT——退化為按天聚合（單測路徑）
 		return m.migrateVisitLogsByDay(ctx, since)
 	}
 	defer rows.Close()
@@ -155,7 +155,7 @@ func (m *Migrator) migrateVisitLogs(ctx context.Context) error {
 			SetStatHour(int8(hour)).
 			SetPath(truncateRunes(path, 255)).
 			SetPv(pv).
-			SetUv(pv). // 原始 PV 无访客标识，uv 近似（报告口径）
+			SetUv(pv). // 原始 PV 無訪客標識，uv 近似（報告口徑）
 			Save(ctx); err != nil {
 			return err
 		}
@@ -165,18 +165,18 @@ func (m *Migrator) migrateVisitLogs(ctx context.Context) error {
 		return err
 	}
 	t.Migrated = migrated
-	m.RW.AddError("visit_logs", 0, fmt.Sprintf("聚合 %d 行（近 %d 天，uv=pv 近似口径）", migrated, days))
+	m.RW.AddError("visit_logs", 0, fmt.Sprintf("聚合 %d 行（近 %d 天，uv=pv 近似口徑）", migrated, days))
 	return nil
 }
 
-// migrateVisitLogsByDay sqlite 兼容路径（仅单测）：按天聚合，hour=0。
+// migrateVisitLogsByDay sqlite 兼容路徑（僅單測）：按天聚合，hour=0。
 func (m *Migrator) migrateVisitLogsByDay(ctx context.Context, since time.Time) error {
 	rows, err := m.Src.DB.QueryContext(ctx,
 		"SELECT strftime('%Y%m%d', `created_at`), COALESCE(`path`, ''), COUNT(*) "+
 			"FROM `visit_logs` WHERE `created_at` >= ? GROUP BY 1, 2",
 		since.Format("2006-01-02 15:04:05"))
 	if err != nil {
-		return nil // 源无 visit_logs（可选项）
+		return nil // 源無 visit_logs（可選項）
 	}
 	defer rows.Close()
 	var migrated int64
@@ -207,8 +207,8 @@ func (m *Migrator) migrateVisitLogsByDay(ctx context.Context, since time.Time) e
 	return nil
 }
 
-// migrateAuditLogs 1.x security_audit_logs → security_audit_logs（窗口迁移）。
-// 1.x 列差异（source/method/path/status_code/user_agent）→ metadata 保真。
+// migrateAuditLogs 1.x security_audit_logs → security_audit_logs（窗口遷移）。
+// 1.x 列差異（source/method/path/status_code/user_agent）→ metadata 保真。
 func (m *Migrator) migrateAuditLogs(ctx context.Context) error {
 	months := m.Opts.AuditMonths
 	if months == -1 {
@@ -229,7 +229,7 @@ func (m *Migrator) migrateAuditLogs(ctx context.Context) error {
 	scan := func(query string, args ...any) error {
 		rows, err := m.Src.DB.QueryContext(ctx, query, args...)
 		if err != nil {
-			return nil // 源无此表（可选迁移）
+			return nil // 源無此表（可選遷移）
 		}
 		defer rows.Close()
 		for rows.Next() {

@@ -16,10 +16,10 @@ const recoverSession = createSessionRecovery({
 });
 
 /**
- * Kratos 后端请求客户端：
- * - 成功：HTTP 2xx，响应体为 proto JSON（snake_case）
- * - 失败：HTTP 4xx/5xx，响应体 { code, reason, message }
- * - 401：尝试 refresh，失败则登出
+ * Kratos 後端請求客户端：
+ * - 成功：HTTP 2xx，響應體為 proto JSON（snake_case）
+ * - 失敗：HTTP 4xx/5xx，響應體 { code, reason, message }
+ * - 401：嘗試 refresh，失敗則登出
  */
 export const request = createFlatRequest<App.Service.Response<any>, any, RequestInstanceState>(
   {
@@ -40,8 +40,8 @@ export const request = createFlatRequest<App.Service.Response<any>, any, Request
       if (Authorization) {
         Object.assign(config.headers, { Authorization });
       }
-      // Kratos 要求 POST/PUT/PATCH 必须带 JSON body：axios 对无 data 请求会移除
-      // Content-Type → 后端 400 CODEC（unregister Content-Type）。统一补空对象。
+      // Kratos 要求 POST/PUT/PATCH 必須帶 JSON body：axios 對無 data 請求會移除
+      // Content-Type → 後端 400 CODEC（unregister Content-Type）。統一補空對象。
       const method = (config.method || "").toLowerCase();
       if (["post", "put", "patch"].includes(method) && config.data == null) {
         config.data = {};
@@ -60,7 +60,7 @@ export const request = createFlatRequest<App.Service.Response<any>, any, Request
       // Closing an import preview intentionally aborts its in-flight quotes.
       if (err.code === "ERR_CANCELED" && err.config?.params?.quote_code
         && /^\/api\/v1\/admin\/supply\/connections\/\d+\/preview$/.test(err.config?.url || "")) return;
-      const msg = err.response?.data?.message || err.message || "网络异常";
+      const msg = err.response?.data?.message || err.message || "網絡異常";
       showErrorMsg(request.state as RequestInstanceState, msg);
     },
   },

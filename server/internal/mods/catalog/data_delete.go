@@ -28,7 +28,7 @@ func (s *AdminCatalogService) PreviewDeleteProduct(ctx context.Context, req *adm
 	c := data.Client(ctx, s.repo.data)
 	p, err := c.Product.Query().Where(product.ID(req.Id), product.SubsiteID(tenancy.FromContext(ctx).SubsiteID), product.StatusGTE(0)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return nil, errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在或已删除")
+		return nil, errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在或已刪除")
 	}
 	if err != nil {
 		return nil, err
@@ -37,13 +37,13 @@ func (s *AdminCatalogService) PreviewDeleteProduct(ctx context.Context, req *adm
 	if err != nil {
 		return nil, err
 	}
-	return &adminv1.DeleteProductPreview{Name: p.Name, OrderCount: int64(n), DeleteOrdersBlockReason: "删除商品时保留订单快照、交付及退款记录"}, nil
+	return &adminv1.DeleteProductPreview{Name: p.Name, OrderCount: int64(n), DeleteOrdersBlockReason: "刪除商品時保留訂單快照、交付及退款記錄"}, nil
 }
 
 func (s *AdminCatalogService) DeleteProduct(ctx context.Context, req *adminv1.DeleteProductRequest) (*emptypb.Empty, error) {
 	// Old clients cannot accidentally purge history through the former option.
 	if req.DeleteOrders {
-		return nil, errors.BadRequest("catalog.ORDER_HISTORY_REQUIRED", "删除商品时必须保留订单快照，不能同时删除订单")
+		return nil, errors.BadRequest("catalog.ORDER_HISTORY_REQUIRED", "刪除商品時必須保留訂單快照，不能同時刪除訂單")
 	}
 	if err := s.repo.DeleteProduct(ctx, req.Id); err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (r *ProductRepoImpl) archiveProduct(ctx context.Context, id uint64) error {
 	}
 	p, err := q.Only(ctx)
 	if ent.IsNotFound(err) {
-		return errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在或已删除")
+		return errors.NotFound("catalog.PRODUCT_NOT_FOUND", "商品不存在或已刪除")
 	}
 	if err != nil {
 		return err

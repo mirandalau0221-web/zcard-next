@@ -37,28 +37,28 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminNotifyService 通知管理：模板 CRUD/测试发送、发送日志查询/重发。
+// AdminNotifyService 通知管理：模板 CRUD/測試發送、發送日誌查詢/重發。
 type AdminNotifyServiceClient interface {
 	// TestEmail submits one message synchronously using saved SMTP settings.
 	TestEmail(ctx context.Context, in *TestEmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	TestTelegram(ctx context.Context, in *TestTelegramRequest, opts ...grpc.CallOption) (*TestTelegramReply, error)
-	// UpsertTemplate 创建/更新模板（事件 × 通道 × 语言）。
+	// UpsertTemplate 創建/更新模板（事件 × 通道 × 語言）。
 	UpsertTemplate(ctx context.Context, in *UpsertNotifyTemplateRequest, opts ...grpc.CallOption) (*NotifyTemplate, error)
 	// ListTemplates 模板列表。
 	ListTemplates(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListNotifyTemplatesReply, error)
-	// PreviewTemplate 模板预览（变量样例渲染；不发送）。
+	// PreviewTemplate 模板預覽（變量樣例渲染；不發送）。
 	PreviewTemplate(ctx context.Context, in *PreviewTemplateRequest, opts ...grpc.CallOption) (*PreviewTemplateReply, error)
-	// ListLogs 发送日志（按状态/事件筛选）。
+	// ListLogs 發送日誌（按狀態/事件篩選）。
 	ListLogs(ctx context.Context, in *ListNotifyLogsRequest, opts ...grpc.CallOption) (*ListNotifyLogsReply, error)
-	// ResendLog 重发失败日志（原变量重投）。
+	// ResendLog 重發失敗日誌（原變量重投）。
 	ResendLog(ctx context.Context, in *ResendNotifyLogRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// EstimateBroadcast 覆盖人数预估。
+	// EstimateBroadcast 覆蓋人數預估。
 	EstimateBroadcast(ctx context.Context, in *EstimateBroadcastRequest, opts ...grpc.CallOption) (*EstimateBroadcastReply, error)
-	// CreateBroadcast 创建群发任务。
+	// CreateBroadcast 創建羣發任務。
 	CreateBroadcast(ctx context.Context, in *CreateBroadcastRequest, opts ...grpc.CallOption) (*Broadcast, error)
-	// ListBroadcasts 群发任务列表。
+	// ListBroadcasts 羣發任務列表。
 	ListBroadcasts(ctx context.Context, in *ListBroadcastsRequest, opts ...grpc.CallOption) (*ListBroadcastsReply, error)
-	// CancelBroadcast 取消群发（仅 pending）。
+	// CancelBroadcast 取消羣發（僅 pending）。
 	CancelBroadcast(ctx context.Context, in *CancelBroadcastRequest, opts ...grpc.CallOption) (*Broadcast, error)
 }
 
@@ -184,28 +184,28 @@ func (c *adminNotifyServiceClient) CancelBroadcast(ctx context.Context, in *Canc
 // All implementations must embed UnimplementedAdminNotifyServiceServer
 // for forward compatibility.
 //
-// AdminNotifyService 通知管理：模板 CRUD/测试发送、发送日志查询/重发。
+// AdminNotifyService 通知管理：模板 CRUD/測試發送、發送日誌查詢/重發。
 type AdminNotifyServiceServer interface {
 	// TestEmail submits one message synchronously using saved SMTP settings.
 	TestEmail(context.Context, *TestEmailRequest) (*emptypb.Empty, error)
 	TestTelegram(context.Context, *TestTelegramRequest) (*TestTelegramReply, error)
-	// UpsertTemplate 创建/更新模板（事件 × 通道 × 语言）。
+	// UpsertTemplate 創建/更新模板（事件 × 通道 × 語言）。
 	UpsertTemplate(context.Context, *UpsertNotifyTemplateRequest) (*NotifyTemplate, error)
 	// ListTemplates 模板列表。
 	ListTemplates(context.Context, *emptypb.Empty) (*ListNotifyTemplatesReply, error)
-	// PreviewTemplate 模板预览（变量样例渲染；不发送）。
+	// PreviewTemplate 模板預覽（變量樣例渲染；不發送）。
 	PreviewTemplate(context.Context, *PreviewTemplateRequest) (*PreviewTemplateReply, error)
-	// ListLogs 发送日志（按状态/事件筛选）。
+	// ListLogs 發送日誌（按狀態/事件篩選）。
 	ListLogs(context.Context, *ListNotifyLogsRequest) (*ListNotifyLogsReply, error)
-	// ResendLog 重发失败日志（原变量重投）。
+	// ResendLog 重發失敗日誌（原變量重投）。
 	ResendLog(context.Context, *ResendNotifyLogRequest) (*emptypb.Empty, error)
-	// EstimateBroadcast 覆盖人数预估。
+	// EstimateBroadcast 覆蓋人數預估。
 	EstimateBroadcast(context.Context, *EstimateBroadcastRequest) (*EstimateBroadcastReply, error)
-	// CreateBroadcast 创建群发任务。
+	// CreateBroadcast 創建羣發任務。
 	CreateBroadcast(context.Context, *CreateBroadcastRequest) (*Broadcast, error)
-	// ListBroadcasts 群发任务列表。
+	// ListBroadcasts 羣發任務列表。
 	ListBroadcasts(context.Context, *ListBroadcastsRequest) (*ListBroadcastsReply, error)
-	// CancelBroadcast 取消群发（仅 pending）。
+	// CancelBroadcast 取消羣發（僅 pending）。
 	CancelBroadcast(context.Context, *CancelBroadcastRequest) (*Broadcast, error)
 	mustEmbedUnimplementedAdminNotifyServiceServer()
 }

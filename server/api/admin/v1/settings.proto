@@ -8,23 +8,23 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 
-// AdminSettingsService 设置中心（settings 表 = 运行时业务开关真理源，铁律 7）。
-// 读写 API；起补齐安装向导状态与分组目录。
+// AdminSettingsService 設置中心（settings 表 = 運行時業務開關真理源，鐵律 7）。
+// 讀寫 API；起補齊安裝嚮導狀態與分組目錄。
 service AdminSettingsService {
-  // ListSettings 按分组列出设置项。
+  // ListSettings 按分組列出設置項。
   rpc ListSettings(ListSettingsRequest) returns (ListSettingsReply) {
     option (google.api.http) = {
       get: "/api/v1/admin/settings"
     };
   }
-  // ListTemplates 可用模板清单（扫描 web/storefront/templates/*/theme.json；
-  // 目录缺失回退内置 classic 清单）。
+  // ListTemplates 可用模板清單（掃描 web/storefront/templates/*/theme.json；
+  // 目錄缺失回退內置 classic 清單）。
   rpc ListTemplates(google.protobuf.Empty) returns (TemplateList) {
     option (google.api.http) = {
       get: "/api/v1/admin/settings/templates"
     };
   }
-  // InstallTemplate 安装主题（zip base64；解压校验后原子落盘到模板目录）。
+  // InstallTemplate 安裝主題（zip base64；解壓校驗後原子落盤到模板目錄）。
   rpc InstallTemplate(InstallTemplateRequest) returns (TemplateItem) {
     option (google.api.http) = {
       post: "/api/v1/admin/settings/templates/install"
@@ -40,20 +40,20 @@ service AdminSettingsService {
   rpc PreviewThemeSettings(SaveThemeSettingsRequest) returns (ThemePreviewReply) {
     option (google.api.http) = { post: "/api/v1/admin/settings/themes/{key}/preview" body: "*" };
   }
-  // GetSetting 读取单个设置项。
+  // GetSetting 讀取單個設置項。
   rpc GetSetting(GetSettingRequest) returns (Setting) {
     option (google.api.http) = {
       get: "/api/v1/admin/settings/{group}/{key}"
     };
   }
-  // UpdateSetting 更新单个设置项（value 为任意 JSON 文档）。
+  // UpdateSetting 更新單個設置項（value 為任意 JSON 文檔）。
   rpc UpdateSetting(UpdateSettingRequest) returns (Setting) {
     option (google.api.http) = {
       put: "/api/v1/admin/settings/{group}/{key}"
       body: "*"
     };
   }
-  // UpdateSettings 批量更新（表单级保存；单事务原子写入）。
+  // UpdateSettings 批量更新（表單級保存；單事務原子寫入）。
   rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsReply) {
     option (google.api.http) = {
       put: "/api/v1/admin/settings"
@@ -63,7 +63,7 @@ service AdminSettingsService {
 }
 
 message ListSettingsRequest {
-  // 可选分组过滤（site/template/trade/security/ops/notify/...）
+  // 可選分組過濾（site/template/trade/security/ops/notify/...）
   string group = 1;
 }
 
@@ -79,30 +79,30 @@ message GetSettingRequest {
 message UpdateSettingRequest {
   string group = 1 [(google.api.field_behavior) = REQUIRED];
   string key = 2 [(google.api.field_behavior) = REQUIRED];
-  // 任意 JSON 文档（对象/数组/标量均可），服务端原样存储
+  // 任意 JSON 文檔（對象/數組/標量均可），服務端原樣存儲
   string value_json = 3 [(google.api.field_behavior) = REQUIRED];
 }
 
-// Setting 设置项（value_json 为 JSON 文档字符串）。
+// Setting 設置項（value_json 為 JSON 文檔字符串）。
 message Setting {
   string group = 1;
   string key = 2;
   string value_json = 3;
-  // 业务显示名称（目录裁决；缺失回落 key 本身）
+  // 業務顯示名稱（目錄裁決；缺失回落 key 本身）
   string label = 4;
-  // 枚举选项（如 category_nav_style: list/grid）；非枚举键为空
+  // 枚舉選項（如 category_nav_style: list/grid）；非枚舉鍵為空
   repeated OptionItem options = 5;
-  // 敏感键（值已脱敏 ****；前端渲染密码框）
+  // 敏感鍵（值已脱敏 ****；前端渲染密碼框）
   bool secret = 6;
 }
 
-// OptionItem 枚举选项（value 入库值，label 展示名）。
+// OptionItem 枚舉選項（value 入庫值，label 展示名）。
 message OptionItem {
   string value = 1;
   string label = 2;
 }
 
-// UpdateSettingsRequest 批量更新项。
+// UpdateSettingsRequest 批量更新項。
 message UpdateSettingsRequest {
   repeated SettingUpdate items = 1;
 }
@@ -121,15 +121,15 @@ message UpdateSettingsReply {
 
 // TemplateItem 可用模板。
 message TemplateItem {
-  string key = 1; // 模板目录名（settings.template.pc_template 存该值）
-  string name = 2; // 显示名称
+  string key = 1; // 模板目錄名（settings.template.pc_template 存該值）
+  string name = 2; // 顯示名稱
   string desc = 3; // 描述
-  string preview = 4; // 预览图 URL（可空）
+  string preview = 4; // 預覽圖 URL（可空）
   string author = 5; // 作者
-  string version = 6; // 版本号
+  string version = 6; // 版本號
 }
 
-// InstallTemplateRequest 主题安装（zip base64，对齐 media 上传模式）。
+// InstallTemplateRequest 主題安裝（zip base64，對齊 media 上傳模式）。
 message InstallTemplateRequest {
   string data_base64 = 1 [(google.api.field_behavior) = REQUIRED];
 }

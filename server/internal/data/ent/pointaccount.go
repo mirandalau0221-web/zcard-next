@@ -19,7 +19,7 @@ type PointAccount struct {
 	ID uint64 `json:"id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uint64 `json:"user_id,omitempty"`
-	// 积分余额（非负）
+	// 積分餘額（非負）
 	Balance int64 `json:"balance,omitempty"`
 	// Version holds the value of the "version" field.
 	Version int32 `json:"version,omitempty"`

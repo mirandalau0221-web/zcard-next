@@ -1,7 +1,7 @@
 package migratev1
 
-// v1id_maps 读写 + 内存缓存（《数据迁移工具开发计划》§2.4：内部 ID 不保留，
-// 新旧对照走 v1id_maps；幂等以 (table_name, old_id) 存在性为准）。
+// v1id_maps 讀寫 + 內存緩存（《數據遷移工具開發計劃》§2.4：內部 ID 不保留，
+// 新舊對照走 v1id_maps；冪等以 (table_name, old_id) 存在性為準）。
 
 import (
 	"context"
@@ -12,15 +12,15 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/data/ent/v1idmap"
 )
 
-// IDMapper ID 映射器。cache 仅缓存「已确认写入」的映射（Get 命中 DB 后也回填）。
-// users/products/orders 等常驻键量级十万级，全量缓存可控；cards 不建议走 Get 热查。
+// IDMapper ID 映射器。cache 僅緩存「已確認寫入」的映射（Get 命中 DB 後也回填）。
+// users/products/orders 等常駐鍵量級十萬級，全量緩存可控；cards 不建議走 Get 熱查。
 type IDMapper struct {
 	client *ent.Client
 	mu     sync.RWMutex
 	cache  map[string]map[uint64]uint64
 }
 
-// NewIDMapper 构造。
+// NewIDMapper 構造。
 func NewIDMapper(client *ent.Client) *IDMapper {
 	return &IDMapper{
 		client: client,
@@ -28,7 +28,7 @@ func NewIDMapper(client *ent.Client) *IDMapper {
 	}
 }
 
-// Get 查映射（缓存 → v1id_maps → 回填缓存）。
+// Get 查映射（緩存 → v1id_maps → 回填緩存）。
 func (m *IDMapper) Get(ctx context.Context, table string, oldID uint64) (uint64, bool) {
 	m.mu.RLock()
 	newID, ok := m.cache[table][oldID]
@@ -49,8 +49,8 @@ func (m *IDMapper) Get(ctx context.Context, table string, oldID uint64) (uint64,
 	return row.NewID, true
 }
 
-// Put 写映射（幂等：已存在时返回既有 newID，不重复插入）。
-// c 允许传事务客户端（loader 在行迁移同事务内写入，保证原子）。
+// Put 寫映射（冪等：已存在時返回既有 newID，不重複插入）。
+// c 允許傳事務客户端（loader 在行遷移同事務內寫入，保證原子）。
 func (m *IDMapper) Put(ctx context.Context, c *ent.Client, table string, oldID, newID uint64) (uint64, error) {
 	if existing, ok := m.Get(ctx, table, oldID); ok {
 		return existing, nil
@@ -61,18 +61,18 @@ func (m *IDMapper) Put(ctx context.Context, c *ent.Client, table string, oldID, 
 		SetNewID(newID).
 		Save(ctx)
 	if err != nil {
-		// 并发/重复插入撞唯一索引时兜底读回
+		// 併發/重複插入撞唯一索引時兜底讀回
 		if existing, ok := m.Get(ctx, table, oldID); ok {
 			return existing, nil
 		}
-		return 0, fmt.Errorf("写入 v1id_maps(%s,%d) 失败: %w", table, oldID, err)
+		return 0, fmt.Errorf("寫入 v1id_maps(%s,%d) 失敗: %w", table, oldID, err)
 	}
 	m.Remember(table, oldID, newID)
 	return newID, nil
 }
 
-// GetBatch 批量查映射（大表批处理用：一次 IN 查询回填缓存）。
-// 返回 oldID → newID（仅含命中的）。
+// GetBatch 批量查映射（大表批處理用：一次 IN 查詢回填緩存）。
+// 返回 oldID → newID（僅含命中的）。
 func (m *IDMapper) GetBatch(ctx context.Context, table string, oldIDs []uint64) map[uint64]uint64 {
 	out := make(map[uint64]uint64, len(oldIDs))
 	if len(oldIDs) == 0 {
@@ -99,7 +99,7 @@ func (m *IDMapper) GetBatch(ctx context.Context, table string, oldIDs []uint64) 
 		).
 		All(ctx)
 	if err != nil {
-		return out // 查询失败按全部未命中处理，调用方逐行兜底
+		return out // 查詢失敗按全部未命中處理，調用方逐行兜底
 	}
 	for _, r := range rows {
 		out[r.OldID] = r.NewID
@@ -108,8 +108,8 @@ func (m *IDMapper) GetBatch(ctx context.Context, table string, oldIDs []uint64) 
 	return out
 }
 
-// PutBatch 批量写映射（大表批处理：CreateBulk 一次插入）。
-// 假定 (table, oldID) 均不存在（调用方已按 GetBatch 过滤）；整批失败回退逐行。
+// PutBatch 批量寫映射（大表批處理：CreateBulk 一次插入）。
+// 假定 (table, oldID) 均不存在（調用方已按 GetBatch 過濾）；整批失敗回退逐行。
 func (m *IDMapper) PutBatch(ctx context.Context, c *ent.Client, table string, pairs [][2]uint64) error {
 	if len(pairs) == 0 {
 		return nil
@@ -134,7 +134,7 @@ func (m *IDMapper) PutBatch(ctx context.Context, c *ent.Client, table string, pa
 	return nil
 }
 
-// Remember 仅写缓存（loader 已在事务内写库后同步缓存用）。
+// Remember 僅寫緩存（loader 已在事務內寫庫後同步緩存用）。
 func (m *IDMapper) Remember(table string, oldID, newID uint64) {
 	m.mu.Lock()
 	defer m.mu.Unlock()

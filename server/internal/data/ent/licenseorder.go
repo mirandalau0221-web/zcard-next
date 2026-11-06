@@ -22,23 +22,23 @@ type LicenseOrder struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 套餐档位（3U/月、30U/年）
+	// 套餐檔位（3U/月、30U/年）
 	Plan licenseorder.Plan `json:"plan,omitempty"`
-	// 实付（分）
+	// 實付（分）
 	Amount int64 `json:"amount,omitempty"`
 	// Status holds the value of the "status" field.
 	Status licenseorder.Status `json:"status,omitempty"`
-	// 购买人（发行侧站点用户；钱包扣款对象）
+	// 購買人（發行側站點用户；錢包扣款對象）
 	PayerUserID uint64 `json:"payer_user_id,omitempty"`
-	// 目标实例 ID（许可证绑定；空=本实例）
+	// 目標實例 ID（許可證綁定；空=本實例）
 	InstanceID string `json:"instance_id,omitempty"`
-	// 目标域名（许可证绑定；空=不限）
+	// 目標域名（許可證綁定；空=不限）
 	Domain string `json:"domain,omitempty"`
-	// 授权特性快照
+	// 授權特性快照
 	Features []string `json:"features,omitempty"`
-	// 订阅到期（许可证签发口径）
+	// 訂閲到期（許可證簽發口徑）
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
-	// 签发的许可证文件（购买人下载后安装）
+	// 簽發的許可證文件（購買人下載後安裝）
 	LicenseFile string `json:"license_file,omitempty"`
 	// PaidAt holds the value of the "paid_at" field.
 	PaidAt       time.Time `json:"paid_at,omitempty"`

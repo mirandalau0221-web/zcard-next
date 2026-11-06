@@ -45,7 +45,7 @@ func LockFinancialOrder(ctx context.Context, d *Data, id uint64) (*ent.Order, er
 		return nil, e
 	}
 	if n != 1 {
-		return nil, fmt.Errorf("订单账务已变化，请重试")
+		return nil, fmt.Errorf("訂單賬務已變化，請重試")
 	}
 	if o.Extra == nil {
 		o.Extra = map[string]any{}

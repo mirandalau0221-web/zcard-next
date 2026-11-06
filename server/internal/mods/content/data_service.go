@@ -1,6 +1,6 @@
 package content
 
-// 管理面 API（）：banner/post/category CRUD + 发布状态机。
+// 管理面 API（）：banner/post/category CRUD + 發佈狀態機。
 
 import (
 	"context"
@@ -13,13 +13,13 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// AdminContentService 管理面内容服务。
+// AdminContentService 管理面內容服務。
 type AdminContentService struct {
 	adminv1.UnimplementedAdminContentServiceServer
 	repo *ContentRepo
 }
 
-// NewAdminContentService 构造。
+// NewAdminContentService 構造。
 func NewAdminContentService(repo *ContentRepo) *AdminContentService {
 	return &AdminContentService{repo: repo}
 }
@@ -164,7 +164,7 @@ func (s *AdminContentService) ListCategories(ctx context.Context, _ *adminv1.Lis
 	return reply, nil
 }
 
-// ── 转换 ──────────────────────────────────────────────────
+// ── 轉換 ──────────────────────────────────────────────────
 
 func bannerInputFromCreate(req *adminv1.CreateBannerRequest) BannerInput {
 	return BannerInput{

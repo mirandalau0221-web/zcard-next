@@ -22,11 +22,11 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Money 全仓统一金额表示（铁律 1）：amount 永远是基础货币的「分」（int64），
-// currency 为 ISO 4217 三字码。展示货币换算只发生在展示层与下单快照。
+// Money 全倉統一金額表示（鐵律 1）：amount 永遠是基礎貨幣的「分」（int64），
+// currency 為 ISO 4217 三字碼。展示貨幣換算只發生在展示層與下單快照。
 type Money struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Amount        int64                  `protobuf:"varint,1,opt,name=amount,proto3" json:"amount,omitempty"`    // 分（基础货币，默认 CNY）
+	Amount        int64                  `protobuf:"varint,1,opt,name=amount,proto3" json:"amount,omitempty"`    // 分（基礎貨幣，默認 CNY）
 	Currency      string                 `protobuf:"bytes,2,opt,name=currency,proto3" json:"currency,omitempty"` // CNY / USD / USDT ...
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -76,11 +76,11 @@ func (x *Money) GetCurrency() string {
 	return ""
 }
 
-// PageReq 分页请求（后台列表默认按 created_at 倒序；深分页走游标，报表除外）。
+// PageReq 分頁請求（後台列表默認按 created_at 倒序；深分頁走遊標，報表除外）。
 type PageReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                         // 从 1 起
-	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 默认 20，上限 100
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                         // 從 1 起
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 默認 20，上限 100
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -129,7 +129,7 @@ func (x *PageReq) GetPageSize() int32 {
 	return 0
 }
 
-// PageResp 分页响应。
+// PageResp 分頁響應。
 type PageResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Total         int64                  `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
@@ -190,7 +190,7 @@ func (x *PageResp) GetPageSize() int32 {
 	return 0
 }
 
-// TimeRange 时间范围（今日/7天/30天/自定义，规划)。
+// TimeRange 時間範圍（今日/7天/30天/自定義，規劃)。
 type TimeRange struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Start         int64                  `protobuf:"varint,1,opt,name=start,proto3" json:"start,omitempty"` // unix 秒（含）
