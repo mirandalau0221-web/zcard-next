@@ -7,7 +7,7 @@ import "context"
 type Message struct {
 	EventType string // 事件類型（order.paid 等）
 	Channel   string // email | inbox | sms | telegram
-	Recipient string // 收件人（郵箱/用户ID字符串/手機號/chat_id）
+	Recipient string // 收件人（郵箱/用戶ID字符串/手機號/chat_id）
 	Locale    string // zh_CN 默認
 	Subject   string
 	Body      string

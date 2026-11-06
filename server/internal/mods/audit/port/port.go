@@ -61,7 +61,7 @@ type TrafficDay struct {
 
 // TrafficReader 訪問統計讀取端口（dashboard 工作台消費，通道 A）。
 type TrafficReader interface {
-	// CountOnlineUsers 在線用户數（最近 since 內有活躍心跳；分站隔離）。
+	// CountOnlineUsers 在線用戶數（最近 since 內有活躍心跳；分站隔離）。
 	CountOnlineUsers(ctx context.Context, subsite uint64, since time.Time) (int64, error)
 	// TrafficByDay 近 N 天 PV/UV（不含缺日補零——調用方補齊日期序列）。
 	TrafficByDay(ctx context.Context, subsite uint64, days int) ([]TrafficDay, error)

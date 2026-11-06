@@ -662,7 +662,7 @@ func (x *RateTicketRequest) GetRating() int32 {
 type PayUrgentRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	TicketNo         string                 `protobuf:"bytes,1,opt,name=ticket_no,json=ticketNo,proto3" json:"ticket_no,omitempty"`
-	ExpectedFeeCents *int64                 `protobuf:"varint,2,opt,name=expected_fee_cents,json=expectedFeeCents,proto3,oneof" json:"expected_fee_cents,omitempty"` // 用户已確認的報價；缺失或變價拒絕扣費
+	ExpectedFeeCents *int64                 `protobuf:"varint,2,opt,name=expected_fee_cents,json=expectedFeeCents,proto3,oneof" json:"expected_fee_cents,omitempty"` // 用戶已確認的報價；缺失或變價拒絕扣費
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }

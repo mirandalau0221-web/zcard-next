@@ -25,9 +25,9 @@ const OperationStoreAffiliateServiceMyAffiliate = "/zcard.api.storefront.v1.Stor
 type StoreAffiliateServiceHTTPServer interface {
 	// ListCommissions ListCommissions 佣金流水（正 + 負債行）。
 	ListCommissions(context.Context, *ListMyCommissionsRequest) (*ListMyCommissionsReply, error)
-	// ListTeam ListTeam 下級列表（脱敏用户名）。
+	// ListTeam ListTeam 下級列表（脱敏用戶名）。
 	ListTeam(context.Context, *ListTeamRequest) (*ListTeamReply, error)
-	// MyAffiliate MyAffiliate 推廣碼 + 統計（登錄用户）。
+	// MyAffiliate MyAffiliate 推廣碼 + 統計（登錄用戶）。
 	MyAffiliate(context.Context, *emptypb.Empty) (*MyAffiliateReply, error)
 }
 
@@ -98,9 +98,9 @@ func _StoreAffiliateService_ListCommissions0_HTTP_Handler(srv StoreAffiliateServ
 type StoreAffiliateServiceHTTPClient interface {
 	// ListCommissions ListCommissions 佣金流水（正 + 負債行）。
 	ListCommissions(ctx context.Context, req *ListMyCommissionsRequest, opts ...http.CallOption) (rsp *ListMyCommissionsReply, err error)
-	// ListTeam ListTeam 下級列表（脱敏用户名）。
+	// ListTeam ListTeam 下級列表（脱敏用戶名）。
 	ListTeam(ctx context.Context, req *ListTeamRequest, opts ...http.CallOption) (rsp *ListTeamReply, err error)
-	// MyAffiliate MyAffiliate 推廣碼 + 統計（登錄用户）。
+	// MyAffiliate MyAffiliate 推廣碼 + 統計（登錄用戶）。
 	MyAffiliate(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *MyAffiliateReply, err error)
 }
 
@@ -129,7 +129,7 @@ func (c *StoreAffiliateServiceHTTPClientImpl) ListCommissions(ctx context.Contex
 	return &out, nil
 }
 
-// ListTeam ListTeam 下級列表（脱敏用户名）。
+// ListTeam ListTeam 下級列表（脱敏用戶名）。
 func (c *StoreAffiliateServiceHTTPClientImpl) ListTeam(ctx context.Context, in *ListTeamRequest, opts ...http.CallOption) (*ListTeamReply, error) {
 	var out ListTeamReply
 	pattern := "/api/v1/storefront/affiliate/team"
@@ -146,7 +146,7 @@ func (c *StoreAffiliateServiceHTTPClientImpl) ListTeam(ctx context.Context, in *
 	return &out, nil
 }
 
-// MyAffiliate MyAffiliate 推廣碼 + 統計（登錄用户）。
+// MyAffiliate MyAffiliate 推廣碼 + 統計（登錄用戶）。
 func (c *StoreAffiliateServiceHTTPClientImpl) MyAffiliate(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*MyAffiliateReply, error) {
 	var out MyAffiliateReply
 	pattern := "/api/v1/storefront/affiliate/me"

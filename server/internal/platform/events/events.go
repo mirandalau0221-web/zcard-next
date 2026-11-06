@@ -42,7 +42,7 @@ type Envelope struct {
 	Type string `json:"type"`
 	// AggregateID 聚合根標識（訂單號/支付單號）
 	AggregateID string `json:"aggregate_id"`
-	// SubsiteID 租户（worker 消費側恢復租户上下文用）
+	// SubsiteID 租戶（worker 消費側恢復租戶上下文用）
 	SubsiteID uint64 `json:"subsite_id"`
 	// Payload 事件載荷（各模塊 proto 定義）
 	Payload json.RawMessage `json:"payload,omitempty"`

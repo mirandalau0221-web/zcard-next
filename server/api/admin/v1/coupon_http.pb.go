@@ -41,7 +41,7 @@ type AdminCouponServiceHTTPServer interface {
 	DisableCoupon(context.Context, *DisableCouponRequest) (*emptypb.Empty, error)
 	// ExportCoupons ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
 	ExportCoupons(context.Context, *ExportCouponsRequest) (*ExportCouponsReply, error)
-	// GrantCoupon GrantCoupon 批次贈送指定用户。
+	// GrantCoupon GrantCoupon 批次贈送指定用戶。
 	GrantCoupon(context.Context, *GrantCouponRequest) (*GrantCouponReply, error)
 	ListCoupons(context.Context, *ListCouponsRequest) (*CouponList, error)
 	// ListFlashSales ListFlashSales 秒殺列表。
@@ -290,7 +290,7 @@ type AdminCouponServiceHTTPClient interface {
 	DisableCoupon(ctx context.Context, req *DisableCouponRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	// ExportCoupons ExportCoupons 導出券碼 CSV（按狀態/批次，含表頭）。
 	ExportCoupons(ctx context.Context, req *ExportCouponsRequest, opts ...http.CallOption) (rsp *ExportCouponsReply, err error)
-	// GrantCoupon GrantCoupon 批次贈送指定用户。
+	// GrantCoupon GrantCoupon 批次贈送指定用戶。
 	GrantCoupon(ctx context.Context, req *GrantCouponRequest, opts ...http.CallOption) (rsp *GrantCouponReply, err error)
 	ListCoupons(ctx context.Context, req *ListCouponsRequest, opts ...http.CallOption) (rsp *CouponList, err error)
 	// ListFlashSales ListFlashSales 秒殺列表。
@@ -413,7 +413,7 @@ func (c *AdminCouponServiceHTTPClientImpl) ExportCoupons(ctx context.Context, in
 	return &out, nil
 }
 
-// GrantCoupon GrantCoupon 批次贈送指定用户。
+// GrantCoupon GrantCoupon 批次贈送指定用戶。
 func (c *AdminCouponServiceHTTPClientImpl) GrantCoupon(ctx context.Context, in *GrantCouponRequest, opts ...http.CallOption) (*GrantCouponReply, error) {
 	var out GrantCouponReply
 	pattern := "/api/v1/admin/coupons/grant"

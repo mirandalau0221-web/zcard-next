@@ -24,7 +24,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// 防刷護欄：同一用户申請中 ≤5、賬户總數 ≤10。
+// 防刷護欄：同一用戶申請中 ≤5、賬戶總數 ≤10。
 const (
 	maxApplyingPerUser = 5
 	maxAccountsPerUser = 10
@@ -43,7 +43,7 @@ func NewStoreSupplierService(repo *SupplierRepoImpl, settings settingsport.Setti
 	return &StoreSupplierService{repo: repo, settings: settings, payer: payer}
 }
 
-// currentUser 當前登錄用户（user realm JWT；未登錄 401）。
+// currentUser 當前登錄用戶（user realm JWT；未登錄 401）。
 func currentUser(ctx context.Context) (uint64, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {
@@ -72,7 +72,7 @@ func (s *StoreSupplierService) SubmitSupplierApplication(ctx context.Context, re
 	if len([]rune(req.GetApplyReason())) > 500 {
 		return nil, errors.BadRequest("supplier.REASON_TOO_LONG", "申請理由不能超過 500 字")
 	}
-	// 回調地址：http/https 均支持；裸域名自動補 https://（用户只需填域名）
+	// 回調地址：http/https 均支持；裸域名自動補 https://（用戶只需填域名）
 	notifyURL := strings.TrimSpace(req.GetNotifyUrl())
 	if notifyURL != "" {
 		notifyURL = normalizeCallbackURL(notifyURL)
@@ -87,14 +87,14 @@ func (s *StoreSupplierService) SubmitSupplierApplication(ctx context.Context, re
 		return nil, err
 	}
 	if applying >= maxApplyingPerUser {
-		return nil, errors.Forbidden("supplier.APPLYING_LIMIT", "申請中的賬户已達上限，請等待審核")
+		return nil, errors.Forbidden("supplier.APPLYING_LIMIT", "申請中的賬戶已達上限，請等待審核")
 	}
 	total, err := s.repo.CountMyAccounts(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
 	if total >= maxAccountsPerUser {
-		return nil, errors.Forbidden("supplier.ACCOUNT_LIMIT", "對接賬户數量已達上限")
+		return nil, errors.Forbidden("supplier.ACCOUNT_LIMIT", "對接賬戶數量已達上限")
 	}
 	apiKey, apiSecret, err := generateCredentials()
 	if err != nil {
@@ -108,7 +108,7 @@ func (s *StoreSupplierService) SubmitSupplierApplication(ctx context.Context, re
 	return toStoreAccountPB(acc), nil
 }
 
-// ListMySupplierAccounts 我的對接賬户。
+// ListMySupplierAccounts 我的對接賬戶。
 func (s *StoreSupplierService) ListMySupplierAccounts(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.ListSupplierAccountsReply, error) {
 	uid, err := currentUser(ctx)
 	if err != nil {
@@ -189,12 +189,12 @@ func (s *StoreSupplierService) CancelSupplierApplication(ctx context.Context, re
 	return &emptypb.Empty{}, nil
 }
 
-// CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；支付確認前不入賬）。
+// CreateSupplierRecharge 對接賬戶自助充值（金額服務端檔位裁決；支付確認前不入賬）。
 //
 // 安全口徑：amount_cents 只是意向，服務端按 settings.supplier_recharge 檔位
 // （enabled/min_amount/max_amount——供貨充值獨立配置組，與錢包 recharge 組隔離）
 // 校驗；落 recharge_orders (pending, target=supply)。餘額入賬只發生在支付回調
-// 成功後（payment.succeeded → settleRecharge 按 target 分支入賬供貨賬户，
+// 成功後（payment.succeeded → settleRecharge 按 target 分支入賬供貨賬戶，
 // reference=recharge:<paymentID> 冪等）。供貨預存無贈送（gift=0）。
 func (s *StoreSupplierService) CreateSupplierRecharge(ctx context.Context, req *storefrontv1.CreateSupplierRechargeRequest) (*storefrontv1.CreateSupplierRechargeReply, error) {
 	uid, err := currentUser(ctx)
@@ -220,7 +220,7 @@ func (s *StoreSupplierService) CreateSupplierRecharge(ctx context.Context, req *
 		return nil, errors.InternalServer("supplier.PAYMENT_UNBOUND", "支付管線未裝配")
 	}
 	// 贈送檔位（settings.supplier_recharge.gift_tiers：充滿 X 分贈 Y 分供貨餘額；
-	// 服務端裁決，客户端不可指定——與錢包充值 giftFor 同口徑）
+	// 服務端裁決，客戶端不可指定——與錢包充值 giftFor 同口徑）
 	giftAmount := s.giftFor(ctx, amount)
 	ro, err := s.repo.CreateSupplyRechargeOrder(ctx, uid, acc.ID, amount, giftAmount)
 	if err != nil {
@@ -303,22 +303,22 @@ func mapSupplierRechargeErr(err error) error {
 	return errors.InternalServer("supplier.PAYMENT_FAILED", "發起支付失敗，請稍後重試")
 }
 
-// mine 屬主校驗：賬户必須歸屬當前用户。
+// mine 屬主校驗：賬戶必須歸屬當前用戶。
 func (s *StoreSupplierService) mine(ctx context.Context, uid, id uint64) (*ent.SupplierAccount, error) {
 	acc, err := s.repo.GetAccount(ctx, id)
 	if err != nil {
 		if err == ErrNotFound {
-			return nil, errors.NotFound("supplier.NOT_FOUND", "賬户不存在")
+			return nil, errors.NotFound("supplier.NOT_FOUND", "賬戶不存在")
 		}
 		return nil, err
 	}
 	if acc.OwnerUserID != uid {
-		return nil, errors.NotFound("supplier.NOT_FOUND", "賬户不存在")
+		return nil, errors.NotFound("supplier.NOT_FOUND", "賬戶不存在")
 	}
 	return acc, nil
 }
 
-// normalizeCallbackURL 裸域名補 https://（用户只填域名場景）；已帶 http/https
+// normalizeCallbackURL 裸域名補 https://（用戶只填域名場景）；已帶 http/https
 // 前綴原樣返回；帶其他 scheme（ftp:// 等）不處理——交由調用方格式校驗拒絕。
 func normalizeCallbackURL(raw string) string {
 	if strings.Contains(raw, "://") {
@@ -388,7 +388,7 @@ func generateCredentials() (apiKey, apiSecret string, err error) {
 	return hex.EncodeToString(keyBytes), hex.EncodeToString(secretBytes), nil
 }
 
-// toStoreAccountPB 前台賬户視圖（secret 永不出現；審核通過後走憑據接口）。
+// toStoreAccountPB 前台賬戶視圖（secret 永不出現；審核通過後走憑據接口）。
 func toStoreAccountPB(acc *ent.SupplierAccount) *storefrontv1.SupplierAccountReply {
 	p := &storefrontv1.SupplierAccountReply{
 		Id: acc.ID, Protocol: string(acc.Protocol), Status: string(acc.Status),

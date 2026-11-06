@@ -53,15 +53,15 @@ type AdminWalletServiceClient interface {
 	CreateGiftcardBatch(ctx context.Context, in *CreateGiftcardBatchRequest, opts ...grpc.CallOption) (*CreateGiftcardBatchReply, error)
 	// ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(ctx context.Context, in *ListGiftcardBatchesRequest, opts ...grpc.CallOption) (*ListGiftcardBatchesReply, error)
-	// DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
+	// DeleteGiftcardBatch 刪除批次並作廢未兌換卡，保留已兌換記錄。
 	DeleteGiftcardBatch(ctx context.Context, in *DeleteGiftcardBatchRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// GetBalance 指定用户餘額。
+	// GetBalance 指定用戶餘額。
 	GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...grpc.CallOption) (*Balance, error)
 	// Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
 	Adjust(ctx context.Context, in *AdjustRequest, opts ...grpc.CallOption) (*Balance, error)
 	// AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
 	AdjustPoints(ctx context.Context, in *AdjustPointsRequest, opts ...grpc.CallOption) (*PointsBalance, error)
-	// ListTransactions 指定用户流水。
+	// ListTransactions 指定用戶流水。
 	ListTransactions(ctx context.Context, in *ListWalletTxRequest, opts ...grpc.CallOption) (*ListWalletTxReply, error)
 }
 
@@ -194,15 +194,15 @@ type AdminWalletServiceServer interface {
 	CreateGiftcardBatch(context.Context, *CreateGiftcardBatchRequest) (*CreateGiftcardBatchReply, error)
 	// ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(context.Context, *ListGiftcardBatchesRequest) (*ListGiftcardBatchesReply, error)
-	// DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
+	// DeleteGiftcardBatch 刪除批次並作廢未兌換卡，保留已兌換記錄。
 	DeleteGiftcardBatch(context.Context, *DeleteGiftcardBatchRequest) (*emptypb.Empty, error)
-	// GetBalance 指定用户餘額。
+	// GetBalance 指定用戶餘額。
 	GetBalance(context.Context, *GetBalanceRequest) (*Balance, error)
 	// Adjust 手動調賬（需 wallet:adjust 權限 + 原因必填 + 審計）。
 	Adjust(context.Context, *AdjustRequest) (*Balance, error)
 	// AdjustPoints 積分調整（正=增加 負=扣減；複用積分賬本與審計）。
 	AdjustPoints(context.Context, *AdjustPointsRequest) (*PointsBalance, error)
-	// ListTransactions 指定用户流水。
+	// ListTransactions 指定用戶流水。
 	ListTransactions(context.Context, *ListWalletTxRequest) (*ListWalletTxReply, error)
 	mustEmbedUnimplementedAdminWalletServiceServer()
 }

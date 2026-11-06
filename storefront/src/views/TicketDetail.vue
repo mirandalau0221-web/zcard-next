@@ -61,7 +61,7 @@
     </div>
     <dialog ref="urgentDialog" class="urgent-dialog" aria-labelledby="urgent-title" @cancel.prevent="closeUrgent">
       <h3 id="urgent-title">{{ quotedFee > 0 ? $t('確認付費加急') : $t('確認免費加急') }}</h3>
-      <p>{{ quotedFee > 0 ? $t('本次將從賬户餘額扣除 {0}，確認後客服將優先處理。', [formatMoney(quotedFee)]) : $t('本次加急免費，確認後客服將優先處理。') }}</p>
+      <p>{{ quotedFee > 0 ? $t('本次將從賬戶餘額扣除 {0}，確認後客服將優先處理。', [formatMoney(quotedFee)]) : $t('本次加急免費，確認後客服將優先處理。') }}</p>
       <div class="urgent-dialog-actions">
         <button type="button" class="btn secondary" :disabled="urging" @click.stop.prevent="closeUrgent">{{ $t('取消') }}</button>
         <button type="button" class="btn btn-primary" :disabled="urging" @click.stop.prevent="doUrgent">{{ urging ? $t('處理中…') : quotedFee > 0 ? $t('確認支付 {0}', [formatMoney(quotedFee)]) : $t('確認免費加急') }}</button>

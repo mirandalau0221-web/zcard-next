@@ -30,7 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // StoreCatalogService 顧客前台商品目錄（遊客可訪問；隱藏商品對遊客 404，規劃)。
-// ； 骨架先打通「租户上下文 → Ent 查詢 → 薄 service」鏈路。
+// ； 骨架先打通「租戶上下文 → Ent 查詢 → 薄 service」鏈路。
 type StoreCatalogServiceClient interface {
 	// ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
 	ListProducts(ctx context.Context, in *ListProductsRequest, opts ...grpc.CallOption) (*ListProductsReply, error)
@@ -83,7 +83,7 @@ func (c *storeCatalogServiceClient) ListCategories(ctx context.Context, in *empt
 // for forward compatibility.
 //
 // StoreCatalogService 顧客前台商品目錄（遊客可訪問；隱藏商品對遊客 404，規劃)。
-// ； 骨架先打通「租户上下文 → Ent 查詢 → 薄 service」鏈路。
+// ； 骨架先打通「租戶上下文 → Ent 查詢 → 薄 service」鏈路。
 type StoreCatalogServiceServer interface {
 	// ListProducts 商品列表（上架 + 按排序；庫存數用於購買校驗，stock_visible 僅控制展示）。
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsReply, error)

@@ -19,7 +19,7 @@ type CartItem struct {
 
 // CouponResolver 優惠券解析（order 價格管線步驟 5 消費）。
 type CouponResolver interface {
-	// ResolveScoped 校驗券（存在/unused/未過期/用户匹配/範圍矩陣/每人限用）
+	// ResolveScoped 校驗券（存在/unused/未過期/用戶匹配/範圍矩陣/每人限用）
 	// 並返回面額（分；percent 按訂單應付折算，不找零）。
 	ResolveScoped(ctx context.Context, code string, userID, levelID uint64, items []CartItem) (value money.Cents, couponID uint64, err error)
 	// MarkUsed 核銷券（下單事務內回填 used_order_id/used_at）。
@@ -58,7 +58,7 @@ type FlashResolver interface {
 	// Consume 直接扣減（保留兼容；新下單使用 Reserve/Confirm；
 	// CAS：sold_qty+qty<=limit_qty，affected==0 → ErrFlashSoldOut）。
 	Consume(ctx context.Context, flashID uint64, qty int32) error
-	// UserPurchasedCount 用户在秒殺窗口內已購數量（paid+pending 累計，限購判據）。
+	// UserPurchasedCount 用戶在秒殺窗口內已購數量（paid+pending 累計，限購判據）。
 	UserPurchasedCount(ctx context.Context, productID, userID uint64, since time.Time) (int32, error)
 }
 

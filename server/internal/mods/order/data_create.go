@@ -70,7 +70,7 @@ type OrderUsecase struct {
 	Promos       couponport.PromotionResolver   // ：促銷（nil 跳過）
 	Settings     settingsport.SettingsReader    // ：互斥開關讀取（nil 默認互斥）
 	Reseller     resellerport.Pricer            // ：管線步驟 7 分站定價 + 防自購快照（nil 跳過）
-	Points       walletport.PointsDebiter       // ：積分兑換下單扣分（nil = 積分單不可用）
+	Points       walletport.PointsDebiter       // ：積分兌換下單扣分（nil = 積分單不可用）
 	SlowPay      paymentport.SlowPaymentChecker // ：慢通道順延探測（nil = 不順延直接取消；newApp 破環點注入）
 	StockGate    orderport.UpstreamStockGate    // ：上游代發項下單前實時庫存預檢（nil = 跳過；newApp 破環點注入）
 	AccessCipher *inventory.CardCipher
@@ -127,10 +127,10 @@ type CreateOrderInput struct {
 	ClientIP        string
 	SubsiteID       uint64
 	CouponCode      string            // 優惠券碼（可選）
-	ControlAnswers  map[string]string // 兼容舊客户端的控件答案（新數據落訂單項快照）
-	UsePoints       bool              // ：積分兑換下單（全部商品須為積分商品；同事務扣分直落 paid）
+	ControlAnswers  map[string]string // 兼容舊客戶端的控件答案（新數據落訂單項快照）
+	UsePoints       bool              // ：積分兌換下單（全部商品須為積分商品；同事務扣分直落 paid）
 	IdempotencyKey  string            // ：下單冪等鍵（頭 Idempotency-Key；同 key 返回首單）
-	RefCode         string            // 推廣歸因碼（遊客/無鏈用户：實時解析推廣者 → 訂單級快照）
+	RefCode         string            // 推廣歸因碼（遊客/無鏈用戶：實時解析推廣者 → 訂單級快照）
 }
 
 // OrderItemInput 商品行。
@@ -245,7 +245,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 		}
 		if p.GoodsType == "physical" {
 			if in.UsePoints {
-				return nil, fmt.Errorf("order.FORM_INVALID: 實體商品暫不支持積分兑換")
+				return nil, fmt.Errorf("order.FORM_INVALID: 實體商品暫不支持積分兌換")
 			}
 			if !hasPhysical {
 				a, e := shipping.Validate(in.ShippingAddress)
@@ -356,7 +356,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 			}
 		}
 
-		// ：積分兑換前置（登錄 + 引擎裝配；遊客/未裝配直接拒絕不建單）
+		// ：積分兌換前置（登錄 + 引擎裝配；遊客/未裝配直接拒絕不建單）
 		if in.UsePoints {
 			if in.UserID == 0 {
 				return fmt.Errorf("order.POINTS_LOGIN_REQUIRED")
@@ -368,7 +368,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 
 		// 1) 鎖卡（庫存不足整批迴滾）。上游代發商品跳過本地鎖卡——卡密在
 		// 支付後由 procurement 向上遊採購回填（ 鏈路；本地池無其卡）。
-		// url/code 直髮商品同樣跳過——直髮內容商品級共享（同一鏈接/兑換碼
+		// url/code 直發商品同樣跳過——直發內容商品級共享（同一鏈接/兌換碼
 		// 反覆發貨，無卡池概念），支付後由 fulfillment 直寫交付記錄。
 		hiddenCategories, err := data.HiddenCategoryIDs(txCtx, client, in.SubsiteID)
 		if err != nil {
@@ -404,7 +404,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 			}
 			if p.StockType != product.StockTypeCard {
 				directItem[itemKey(item.ProductID, item.SkuID)] = true
-				continue // 鏈接/兑換碼直髮：不佔卡池
+				continue // 鏈接/兌換碼直發：不佔卡池
 			}
 			reserveItems = append(reserveItems, port.ReserveItem{
 				ProductID: item.ProductID,
@@ -432,7 +432,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 		}
 		orderNo := id.FormatNo("S", snowflakeID)
 
-		// 3) 會員折扣（萬分比，按用户累計消費匹配；解析失敗則中止，避免指定等級失效時以錯誤價格成交）
+		// 3) 會員折扣（萬分比，按用戶累計消費匹配；解析失敗則中止，避免指定等級失效時以錯誤價格成交）
 		var memberRate int32
 		var memberLevelID uint64
 		if uc.MemberRate != nil && in.UserID > 0 {
@@ -453,7 +453,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 		}
 		var results []itemResult
 		var totalCents int64
-		var pointsTotal int64               // ：積分兑換單合計（積分單位）
+		var pointsTotal int64               // ：積分兌換單合計（積分單位）
 		var cartItems []couponport.CartItem // 券範圍判定輸入
 		var flashReservations []flashReservation
 		flashApplied := false        // 券×秒殺互斥判據
@@ -476,7 +476,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 			if (p.Status != 1 && !(p.ProductKind == "sms_channel" && p.Status == 2 && in.UserID > 0)) || data.CategoryHidden(hiddenCategories, p.CategoryID) {
 				return fmt.Errorf("order.PRODUCT_NOT_AVAILABLE") // 下架/隱藏
 			}
-			// ：積分兑換單——全部商品須為積分商品（混合單拒絕，口徑清晰）
+			// ：積分兌換單——全部商品須為積分商品（混合單拒絕，口徑清晰）
 			if in.UsePoints {
 				if p.PointsRequired <= 0 {
 					return fmt.Errorf("order.POINTS_MIXED_CART")
@@ -604,7 +604,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 		}
 
 		// 4.6) 優惠券（整單一次性；範圍矩陣 + 每人限用；券×秒殺互斥默認開）
-		// ：積分兑換單不參與券/金額管線——應付恆 0，憑據=積分流水（type=redeem）
+		// ：積分兌換單不參與券/金額管線——應付恆 0，憑據=積分流水（type=redeem）
 		var couponValue int64
 		var couponID uint64
 		if in.UsePoints {
@@ -696,9 +696,9 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 			extra["points_total"] = pointsTotal // 積分口徑快照（退款/審計讀此處）
 		}
 		// ：三級分銷歸因鏈快照（下單瞬間鎖定）。優先級：
-		// 1) 登錄用户讀自身邀請鏈（註冊時綁定）；
+		// 1) 登錄用戶讀自身邀請鏈（註冊時綁定）；
 		// 2) 鏈為空且帶 ref_code（推廣鏈接進站）→ 實時解析推廣者訂單級歸因
-		// （不改用户鏈——一次性快照；遊客/無鏈老用户下單均發傭）
+		// （不改用戶鏈——一次性快照；遊客/無鏈老用戶下單均發傭）
 		var invL1, invL2, invL3 uint64
 		if in.UserID > 0 {
 			if u, err := client.User.Get(txCtx, in.UserID); err == nil {
@@ -778,7 +778,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 			return fmt.Errorf("order.CREATE_FAILED: %w", err)
 		}
 
-		// 6) 綁定訂單到卡（Reserve 後回填 order_id；上游/直髮項無本地卡可綁）
+		// 6) 綁定訂單到卡（Reserve 後回填 order_id；上游/直發項無本地卡可綁）
 		if binder, ok := uc.Inv.(interface {
 			BindReserved(context.Context, uint64, []uint64) error
 		}); ok {
@@ -928,7 +928,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 				return err
 			}
 		}
-		// 9) 積分兑換收尾：同事務扣分（冪等鍵 points_pay:<orderNo>；
+		// 9) 積分兌換收尾：同事務扣分（冪等鍵 points_pay:<orderNo>；
 		// 不足整單回滾）→ 直落 paid（狀態機 CAS + order.paid 事件 → 自動交付）。
 		if in.UsePoints {
 			if err := uc.Points.PointDebitInTx(txCtx, walletport.PointEntry{
@@ -938,7 +938,7 @@ func (uc *OrderUsecase) CreateOrder(ctx context.Context, in CreateOrderInput) (*
 				Amount:    pointsTotal,
 				Reference: "points_pay:" + orderNo,
 				OrderID:   o.ID,
-				Remark:    "積分商城兑換",
+				Remark:    "積分商城兌換",
 			}); err != nil {
 				return fmt.Errorf("order.POINTS_INSUFFICIENT: %w", err)
 			}
@@ -1097,7 +1097,7 @@ func (uc *OrderUsecase) publishPaid(ctx context.Context, client *ent.Client, o *
 	return uc.Outbox.Write(ctx, "order", events.OrderPaid, o.OrderNo, DedupeKey(o.OrderNo, "paid"), raw)
 }
 
-// ListUserOrders 用户訂單列表（登錄態「我的訂單」；offset 分頁——單用户量級安全）。
+// ListUserOrders 用戶訂單列表（登錄態「我的訂單」；offset 分頁——單用戶量級安全）。
 func (uc *OrderUsecase) ListUserOrders(ctx context.Context, userID uint64, status string, page, size int) ([]*ent.Order, int64, error) {
 	if userID == 0 {
 		return nil, 0, fmt.Errorf("order.USER_REQUIRED")
@@ -1229,23 +1229,23 @@ func isDigitStr(s string) bool {
 }
 
 // validateTradeRequirements 交易設置下單校驗（settings.trade）：
-// - query_password（默認 true）：下單必須設置查詢密碼（≥4 位）——否則客户忘記
+// - query_password（默認 true）：下單必須設置查詢密碼（≥4 位）——否則客戶忘記
 // 密碼且無聯繫方式時訂單無法找回
 // - contact_required（默認 any）：none|phone|email|qq|any——遊客必須留對應
-// 格式聯繫方式作為查詢標識；登錄用户已有賬户可追溯，不強制
+// 格式聯繫方式作為查詢標識；登錄用戶已有賬戶可追溯，不強制
 //
 // 讀取失敗走保守默認（強制密碼 + any）。
 func (uc *OrderUsecase) validateTradeRequirements(ctx context.Context, in CreateOrderInput) error {
 	if in.SMSQuoteID != "" && in.UserID > 0 {
 		return nil
 	}
-	// 查詢密碼強制（所有下單者——含登錄用户：取貨三重門的核心憑證）
+	// 查詢密碼強制（所有下單者——含登錄用戶：取貨三重門的核心憑證）
 	if uc.queryPasswordRequired(ctx) {
 		if len(in.QueryPassword) < 4 {
 			return fmt.Errorf("order.QUERY_PASSWORD_REQUIRED: 請設置查詢密碼（至少 4 位，取貨時使用）")
 		}
 	}
-	// 聯繫方式（僅遊客；登錄用户有賬户可追溯；積分兑換遊客在事務內 POINTS_LOGIN 拒絕，
+	// 聯繫方式（僅遊客；登錄用戶有賬戶可追溯；積分兌換遊客在事務內 POINTS_LOGIN 拒絕，
 	// 此處跳過避免攔截語義——聯繫方式校驗只對常規遊客單生效）
 	if (in.UserID == 0 || uc.contactScope(ctx) == "all") && !in.UsePoints {
 		mode := uc.contactRequired(ctx)

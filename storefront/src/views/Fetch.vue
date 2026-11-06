@@ -50,7 +50,7 @@
           <span class="guide-num">2</span>
           <div>
             <b>{{ $t('輸入信息') }}</b>
-            <span class="muted">{{ $t('使用賬户、訂單訪問鏈接或郵箱驗證碼') }}</span>
+            <span class="muted">{{ $t('使用賬戶、訂單訪問鏈接或郵箱驗證碼') }}</span>
           </div>
         </div>
         <div class="guide-step">

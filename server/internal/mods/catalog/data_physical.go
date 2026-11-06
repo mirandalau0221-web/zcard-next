@@ -44,10 +44,10 @@ func (r *ProductRepoImpl) validatePhysicalProduct(ctx context.Context, p *ent.Pr
 		return fmt.Errorf("該商品已有虛擬交付配置，請新建實體商品")
 	}
 	if len(in.DirectContent) > 0 || (p != nil && p.PointsRequired > 0 && !in.PointsRequiredSet) {
-		return fmt.Errorf("實體商品不能配置虛擬內容或積分兑換")
+		return fmt.Errorf("實體商品不能配置虛擬內容或積分兌換")
 	}
 	if in.PointsRequired > 0 {
-		return fmt.Errorf("實體商品暫不支持積分兑換")
+		return fmt.Errorf("實體商品暫不支持積分兌換")
 	}
 	if in.FulfillmentMode != "" && in.FulfillmentMode != "auto" && in.FulfillmentMode != "shipping" {
 		return fmt.Errorf("實體商品只支持快遞發貨")

@@ -39,7 +39,7 @@ func (Session) Indexes() []ent.Index {
 	}
 }
 
-// UserGroup 1.x 用户組兼容映射表：僅 migrate-from-v1 寫入、memberlevel 讀取，業務不寫。
+// UserGroup 1.x 用戶組兼容映射表：僅 migrate-from-v1 寫入、memberlevel 讀取，業務不寫。
 type UserGroup struct {
 	ent.Schema
 }

@@ -50,7 +50,7 @@ func (m *IDMapper) Get(ctx context.Context, table string, oldID uint64) (uint64,
 }
 
 // Put 寫映射（冪等：已存在時返回既有 newID，不重複插入）。
-// c 允許傳事務客户端（loader 在行遷移同事務內寫入，保證原子）。
+// c 允許傳事務客戶端（loader 在行遷移同事務內寫入，保證原子）。
 func (m *IDMapper) Put(ctx context.Context, c *ent.Client, table string, oldID, newID uint64) (uint64, error) {
 	if existing, ok := m.Get(ctx, table, oldID); ok {
 		return existing, nil

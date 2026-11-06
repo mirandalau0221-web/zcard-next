@@ -31,7 +31,7 @@ type OwnProductInput struct {
 }
 
 // CreateOwnProduct 分站自營商品創建（subsite_id 顯式傳入——分站主自服務面，
-// 不經租户上下文；slug 在分站內唯一，分站間同 slug 不衝突）。
+// 不經租戶上下文；slug 在分站內唯一，分站間同 slug 不衝突）。
 func (r *ResellerRepo) createOwnProduct(ctx context.Context, subsiteID uint64, in OwnProductInput) (*ent.Product, error) {
 	client := data.Client(ctx, r.data)
 	slug, err := r.ownProductSlug(ctx, subsiteID, in.Name)

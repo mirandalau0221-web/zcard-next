@@ -30,7 +30,7 @@
 
     <div v-if="inviteBenefit?.has_benefit" class="card" style="margin-bottom: 16px;">
       <b>{{ $t('邀請註冊專享') }}</b>
-      <p>{{ $t('新客户通過你的推薦鏈接註冊，即可獲得 {0} 待遇', [inviteBenefit.level?.name || $t('專屬會員')]) }}{{ inviteBenefit.level?.display_mode === 'public' ? $t('，會員價享 {0}', [levelDiscount(inviteBenefit.level.discount)]) : '' }}。</p>
+      <p>{{ $t('新客戶通過你的推薦鏈接註冊，即可獲得 {0} 待遇', [inviteBenefit.level?.name || $t('專屬會員')]) }}{{ inviteBenefit.level?.display_mode === 'public' ? $t('，會員價享 {0}', [levelDiscount(inviteBenefit.level.discount)]) : '' }}。</p>
     </div>
     <!-- 收益統計 -->
     <div class="stat-grid" v-if="my">
@@ -69,7 +69,7 @@
         </select>
       </div>
       <table class="list">
-        <thead><tr><th>{{ $t('用户') }}</th><th>{{ $t('層級') }}</th><th>{{ $t('加入時間') }}</th></tr></thead>
+        <thead><tr><th>{{ $t('用戶') }}</th><th>{{ $t('層級') }}</th><th>{{ $t('加入時間') }}</th></tr></thead>
         <tbody>
           <tr v-for="m in team" :key="m.user_id">
             <td>{{ m.username_masked }}</td>

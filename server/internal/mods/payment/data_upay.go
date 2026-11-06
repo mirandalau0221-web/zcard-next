@@ -52,7 +52,7 @@ func (r *PaymentRepoImpl) nativeAttempt(ctx context.Context, q *ent.PaymentQuery
 				if time.Now().Before(attempt.LeaseUntil) {
 					return nil, fmt.Errorf("payment.IN_PROGRESS: 正在發起支付，請稍後重試")
 				}
-				return nil, fmt.Errorf("payment.RESULT_UNKNOWN: UPAY PRO 原支付結果待核對，網關商户單號 %s；請勿換鏈重複付款", row.GatewayOrderRef)
+				return nil, fmt.Errorf("payment.RESULT_UNKNOWN: UPAY PRO 原支付結果待核對，網關商戶單號 %s；請勿換鏈重複付款", row.GatewayOrderRef)
 			}
 		}
 	}

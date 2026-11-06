@@ -410,7 +410,7 @@ func (x *CancelSupplierApplicationRequest) GetId() uint64 {
 
 type CreateSupplierRechargeRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
-	Id          uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                      // 對接賬户（須 approved 且歸屬本人）
+	Id          uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                      // 對接賬戶（須 approved 且歸屬本人）
 	AmountCents int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"` // 意向金額（分；服務端按檔位裁決）
 	Channel     string                 `protobuf:"bytes,3,opt,name=channel,proto3" json:"channel,omitempty"`                             // 支付渠道 code
 	// 方式標識（多方式渠道必填：易支付 alipay/wxpay、USDT 選鏈；單方式渠道留空）

@@ -246,7 +246,7 @@ async function handleDelete(id: number) {
           </NFormItem>
         </div>
         <NFormItem label="填寫提示"><NInput v-model:value="formData.placeholder" placeholder="如：https://t.me/channel 或接收地址" /></NFormItem>
-        <NFormItem label="內容校驗"><NSelect v-model:value="formData.validation" :options="[{label:'普通文本',value:'text'},{label:'完整鏈接',value:'url'},{label:'用户名',value:'username'},{label:'TRON 地址',value:'tron'}]" /></NFormItem>
+        <NFormItem label="內容校驗"><NSelect v-model:value="formData.validation" :options="[{label:'普通文本',value:'text'},{label:'完整鏈接',value:'url'},{label:'用戶名',value:'username'},{label:'TRON 地址',value:'tron'}]" /></NFormItem>
         <NFormItem label="最多字符"><NInputNumber v-model:value="formData.max_length" :min="1" :max="4000" :precision="0" /></NFormItem>
         <NFormItem v-if="needOptions" label="選項（逗號分隔）">
           <NInput v-model:value="formData.options_text" placeholder="如：微信,QQ,郵箱" />

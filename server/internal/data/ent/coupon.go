@@ -40,7 +40,7 @@ type Coupon struct {
 	PerUserLimit int32 `json:"per_user_limit,omitempty"`
 	// Status holds the value of the "status" field.
 	Status coupon.Status `json:"status,omitempty"`
-	// 領取人（兑換碼/後台贈送回填）
+	// 領取人（兌換碼/後台贈送回填）
 	UserID uint64 `json:"user_id,omitempty"`
 	// UsedAt holds the value of the "used_at" field.
 	UsedAt time.Time `json:"used_at,omitempty"`

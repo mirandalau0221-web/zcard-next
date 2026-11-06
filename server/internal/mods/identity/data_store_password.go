@@ -1,6 +1,6 @@
 package identity
 
-// 用户自服務（）：找回密碼（郵箱驗證碼）/改密/改資料。
+// 用戶自服務（）：找回密碼（郵箱驗證碼）/改密/改資料。
 // 安全模型（ + ）：
 // - 防枚舉：郵箱不存在同樣返回成功（僅真實郵箱收碼）
 // - 防爆破：code_hash SHA-256 存儲（庫內無明文）；單條記錄 attempt≥5 作廢
@@ -109,7 +109,7 @@ func (s *PasswordService) sendResetCode(ctx context.Context, u *ent.User) error 
 		Save(ctx); err != nil {
 		return err
 	}
-	// 直髮（不走模板：無模板即 skipped 的降級語義不適用於驗證碼場景）
+	// 直發（不走模板：無模板即 skipped 的降級語義不適用於驗證碼場景）
 	return s.sender.Send(ctx, notifyport.Message{
 		EventType: "user.password_reset",
 		Channel:   "email",
@@ -117,7 +117,7 @@ func (s *PasswordService) sendResetCode(ctx context.Context, u *ent.User) error 
 		Locale:    "zh_CN",
 		Subject:   "ZCard 找回密碼驗證碼",
 		Body: fmt.Sprintf(
-			"<p>您正在重置賬户 <b>%s</b> 的密碼。</p><p>驗證碼：<b style=\"font-size:20px\">%s</b>（%d 分鐘內有效）。</p><p>若非本人操作請忽略本郵件。</p>",
+			"<p>您正在重置賬戶 <b>%s</b> 的密碼。</p><p>驗證碼：<b style=\"font-size:20px\">%s</b>（%d 分鐘內有效）。</p><p>若非本人操作請忽略本郵件。</p>",
 			u.Username, code, int(resetCodeTTL.Minutes())),
 		Variables: map[string]string{"username": u.Username},
 		BizType:   "password_reset", BizID: u.ID,
@@ -219,7 +219,7 @@ func (s *PasswordService) UpdateProfile(ctx context.Context, userID uint64, emai
 	return nil
 }
 
-// revokeUserSessions 吊銷用户全部 user session（改密/重置踢線）。
+// revokeUserSessions 吊銷用戶全部 user session（改密/重置踢線）。
 func revokeUserSessions(ctx context.Context, client *ent.Client, userID uint64) error {
 	_, err := client.Session.Update().
 		Where(

@@ -3,7 +3,7 @@ package wallet
 // 積分賬本（ ，與餘額 InTx 同構）：
 // point_accounts(balance, version) + point_transactions(reference 冪等鍵)；
 // 非負校驗 + 樂觀鎖 CAS + 流水快照——餘額永可由流水重算。
-// 產生口徑：充值贈送（earn_recharge）/消費（earn_consume）/兑換（redeem）/調賬（adjust）。
+// 產生口徑：充值贈送（earn_recharge）/消費（earn_consume）/兌換（redeem）/調賬（adjust）。
 
 import (
 	"context"
@@ -131,7 +131,7 @@ func (r *WalletRepoImpl) pointDebit(ctx context.Context, e PointEntry, allowDebt
 	})
 }
 
-// GetPoints 積分餘額（賬户不存在返回 0）。
+// GetPoints 積分餘額（賬戶不存在返回 0）。
 func (r *WalletRepoImpl) GetPoints(ctx context.Context, userID uint64) (int64, error) {
 	acc, err := data.Client(ctx, r.data).PointAccount.Query().
 		Where(pointaccount.UserID(userID)).Only(ctx)

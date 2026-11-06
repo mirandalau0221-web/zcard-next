@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { orderStatusText } from "@/utils/order-status";
-// 採購單管理（procurement:read / procurement:write）：上游拿貨單（客户購買 →
+// 採購單管理（procurement:read / procurement:write）：上游拿貨單（客戶購買 →
 // 上游採購 → 卡密回填鏈路的運行軌跡）。狀態篩選 + 手動重試 / 轉人工。
 import { h, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -158,7 +158,7 @@ const columns = computed<DataTableColumns<any>>(() => {
     cols.push({ title: "訂單項", key: "order_item_id", width: 110, render: (row: any) => h("span", { class: "whitespace-nowrap", title: String(row.order_item_id ?? "") }, String(row.order_item_id ?? "-")) });
     cols.push({ title: "渠道", key: "connection_id", width: 72, render: (row: any) => `#${row.connection_id}` });
   }
-  cols.push({ title: "客户訂單號", key: "order_no", minWidth: 120, maxWidth: 190, ellipsis: { tooltip: true }, render: (row: any) => row.order_no || "—" });
+  cols.push({ title: "客戶訂單號", key: "order_no", minWidth: 120, maxWidth: 190, ellipsis: { tooltip: true }, render: (row: any) => row.order_no || "—" });
   if (tr !== "compact") cols.push(orderNoCol(tr));
   cols.push({
     title: "狀態",
@@ -277,9 +277,9 @@ onMounted(load);
       </NCard>
     </NModal>
     <ManualDeliverDialog v-model:show="showManualDeliver" :order-no="detail?.order_no || ''" :default-item-id="detail?.order_item_id" @delivered="afterManualDeliver" />
-    <form class="mb-12px flex gap-8px" @submit.prevent="onSearch"><NInput v-model:value="orderNoFilter" clearable placeholder="輸入完整客户訂單號" aria-label="客户訂單號" /><NButton attr-type="submit" :loading="loading">查詢</NButton></form>
+    <form class="mb-12px flex gap-8px" @submit.prevent="onSearch"><NInput v-model:value="orderNoFilter" clearable placeholder="輸入完整客戶訂單號" aria-label="客戶訂單號" /><NButton attr-type="submit" :loading="loading">查詢</NButton></form>
     <FilterTabs v-model:value="statusFilter" :options="statusTabs" class="mb-12px" @change="onSearch" />
-    <NAlert v-if="!loading && orderNoFilter.trim() && !rows.length" type="info" class="mb-12px">未找到該客户訂單的採購單。請核對訂單號；若訂單已付款，可在訂單詳情核實商品後人工補發，系統巡檢也會為缺失的採購任務建立待人工處理記錄。</NAlert>
+    <NAlert v-if="!loading && orderNoFilter.trim() && !rows.length" type="info" class="mb-12px">未找到該客戶訂單的採購單。請核對訂單號；若訂單已付款，可在訂單詳情核實商品後人工補發，系統巡檢也會為缺失的採購任務建立待人工處理記錄。</NAlert>
     <NDataTable :columns="columns" :data="rows" :loading="loading" size="small" :row-key="(r: any) => r.id" :max-height="540" :scroll-x="300" />
     <div class="mt-12px flex justify-end">
       <TablePager v-model:page="page" v-model:page-size="pageSize" :total="total" @change="load" />

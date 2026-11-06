@@ -77,7 +77,7 @@ func (d Dialect) Open(dsn string) (*sql.DB, error) {
 }
 
 // ensureMySQLParams 補齊驅動必需參數：parseTime=True（掃描 time 列）與 loc=UTC
-// （統一 UTC，§3.4）；用户已配置則不覆蓋（如自定義 loc 的多租户場景）。
+// （統一 UTC，§3.4）；用戶已配置則不覆蓋（如自定義 loc 的多租戶場景）。
 func ensureMySQLParams(dsn string) string {
 	// DSN 形如 user:pass@tcp(host:port)/db?params
 	if !strings.Contains(dsn, "parseTime=") {

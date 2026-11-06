@@ -16,7 +16,7 @@ import (
 )
 
 // DeleteOrders 只從管理列表移除無用訂單，支付回調、對賬和冪等查詢保留原記錄。
-// 整批事務提交，狀態、付款或租户校驗失敗時不刪除任何一條。
+// 整批事務提交，狀態、付款或租戶校驗失敗時不刪除任何一條。
 func (s *AdminOrderService) DeleteOrders(ctx context.Context, req *adminv1.DeleteOrdersRequest) (*emptypb.Empty, error) {
 	if len(req.GetOrderNos()) == 0 || len(req.GetOrderNos()) > 100 {
 		return nil, errors.BadRequest("order.INVALID_SELECTION", "每次請選擇 1 至 100 條訂單")

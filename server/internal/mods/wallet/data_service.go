@@ -29,11 +29,11 @@ type StoreWalletService struct {
 	storefrontv1.UnimplementedStoreWalletServiceServer
 	repo *WalletRepoImpl
 	data *data.Data
-	// settings 充值檔位讀取（鐵律 16：客户端金額只作意向，檔位由服務端裁決）
+	// settings 充值檔位讀取（鐵律 16：客戶端金額只作意向，檔位由服務端裁決）
 	settings settingsport.SettingsReader
 	// payer 充值支付單創建（payment 端口，通道 A；nil = 支付管線未裝配）
 	payer paymentport.RechargePayer
-	// giftcards 禮品卡兑換（；nil = 未裝配）
+	// giftcards 禮品卡兌換（；nil = 未裝配）
 	giftcards *GiftcardRepo
 	// commissions 佣金讀取（提現校驗；通道 A；nil = 跳過校驗）
 	commissions CommissionSource
@@ -102,7 +102,7 @@ func (s *StoreWalletService) ListTransactions(ctx context.Context, req *storefro
 
 // CreateRecharge 充值（金額服務端檔位裁決；支付確認前絕不入賬——鐵律 16）。
 //
-// 安全口徑：客户端提交的 amount_cents 只是「意向」，服務端按 settings.recharge
+// 安全口徑：客戶端提交的 amount_cents 只是「意向」，服務端按 settings.recharge
 // 檔位（enabled/min_amount/max_amount）校驗，贈送（gift_tiers）由服務端計算，
 // 落 recharge_orders(pending)。餘額入賬只發生在支付回調成功後
 // （payment.succeeded → wallet 訂閲，reference=recharge:<paymentID>—— 支付
@@ -199,7 +199,7 @@ func (s *StoreWalletService) rechargePolicy(ctx context.Context) (minAmount, max
 	return
 }
 
-// giftFor 贈送檔位（gift_tiers 精確匹配充值金額；客户端無法指定贈送——
+// giftFor 贈送檔位（gift_tiers 精確匹配充值金額；客戶端無法指定贈送——
 // 防止「改贈送字段刷餘額」）。
 func (s *StoreWalletService) giftFor(ctx context.Context, amount int64) (giftAmount int64, giftPoints int32) {
 	if s.settings == nil {
@@ -240,7 +240,7 @@ func NewAdminWalletService(repo *WalletRepoImpl, d *data.Data, giftcards *Giftca
 	return &AdminWalletService{repo: repo, data: d, giftcards: giftcards}
 }
 
-// GetBalance 指定用户餘額。
+// GetBalance 指定用戶餘額。
 func (s *AdminWalletService) GetBalance(ctx context.Context, req *adminv1.GetBalanceRequest) (*adminv1.Balance, error) {
 	avail, locked, err := s.repo.GetBalance(ctx, req.GetUserId())
 	if err != nil {
@@ -290,7 +290,7 @@ func (s *AdminWalletService) AdjustPoints(ctx context.Context, req *adminv1.Adju
 	return &adminv1.PointsBalance{UserId: req.GetUserId(), Points: balance}, nil
 }
 
-// Adjust 手動調賬（管理面唯一合法「客户端提交金額」路徑——RBAC 權限 + 服務端
+// Adjust 手動調賬（管理面唯一合法「客戶端提交金額」路徑——RBAC 權限 + 服務端
 // 邊界校驗 + 審計覆蓋，鐵律 16）。
 func (s *AdminWalletService) Adjust(ctx context.Context, req *adminv1.AdjustRequest) (*adminv1.Balance, error) {
 	if req.GetReason() == "" {
@@ -330,7 +330,7 @@ func (s *AdminWalletService) Adjust(ctx context.Context, req *adminv1.AdjustRequ
 	}, nil
 }
 
-// ListTransactions 指定用户流水。
+// ListTransactions 指定用戶流水。
 func (s *AdminWalletService) ListTransactions(ctx context.Context, req *adminv1.ListWalletTxRequest) (*adminv1.ListWalletTxReply, error) {
 	page := int(req.GetPage())
 	size := int(req.GetPageSize())
@@ -347,7 +347,7 @@ func (s *AdminWalletService) ListTransactions(ctx context.Context, req *adminv1.
 		}
 		return nil, errors.InternalServer("wallet.TX_FAILED", "查詢流水失敗")
 	}
-	// 全站流水（user_id=0）：批量回填歸屬用户名
+	// 全站流水（user_id=0）：批量回填歸屬用戶名
 	names := map[uint64]string{}
 	if req.GetUserId() == 0 && len(rows) > 0 {
 		ids := make([]uint64, 0, len(rows))
@@ -359,7 +359,7 @@ func (s *AdminWalletService) ListTransactions(ctx context.Context, req *adminv1.
 			}
 		}
 		if names, err = s.repo.UsernamesByIDs(ctx, ids); err != nil {
-			names = map[uint64]string{} // 用户名回填失敗不阻斷流水列表
+			names = map[uint64]string{} // 用戶名回填失敗不阻斷流水列表
 		}
 	}
 	references, err := s.repo.DisplayReferences(ctx, rows)

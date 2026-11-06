@@ -12,7 +12,7 @@ package supplier
 // 協議事實來源：dujiao-next internal/modules/upstreamapi/transport/http/*（字段/
 // 錯誤碼/金額口徑逐字對齊）。金額：內部分 → 字符串元兩位小數；卡密：純文本
 // \n 連接（fulfillment.payload）；餘額不足：HTTP 200 + ok=false + payment_failed
-// （對方客户端的錢包扣款失敗口徑）。
+// （對方客戶端的錢包扣款失敗口徑）。
 //
 // 實現：原生 http.Handler（HandlePrefix 掛載）——外部協議契約不進我們的 proto/
 // OpenAPI；業務核心複用 SupplyAPIService.fulfillOrder。
@@ -95,7 +95,7 @@ func (h *dujiaoCompat) wrap(fn func(w http.ResponseWriter, r *http.Request, acco
 	}
 }
 
-// authenticate 3 頭校驗：解析 → ±60s → key 查賬户 → protocol=dujiao_next → 驗籤。
+// authenticate 3 頭校驗：解析 → ±60s → key 查賬戶 → protocol=dujiao_next → 驗籤。
 func (h *dujiaoCompat) authenticate(r *http.Request) (*ent.SupplierAccount, error) {
 	key := r.Header.Get("Dujiao-Next-Api-Key")
 	tsStr := r.Header.Get("Dujiao-Next-Timestamp")
@@ -112,7 +112,7 @@ func (h *dujiaoCompat) authenticate(r *http.Request) (*ent.SupplierAccount, erro
 		return nil, newAuthError(errUnknownKey, "未知 api_key")
 	}
 	if string(account.Status) != "approved" {
-		return nil, newAuthError(errAccountDisabled, "賬户未審核或已禁用")
+		return nil, newAuthError(errAccountDisabled, "賬戶未審核或已禁用")
 	}
 	// IP 白名單（空名單放行；非空須命中）
 	if !ipAllowed(account.IPWhitelist, r) {
@@ -251,7 +251,7 @@ func (h *dujiaoCompat) createOrder(w http.ResponseWriter, r *http.Request, accou
 		return
 	}
 	writeDujiaoOK(w, map[string]any{
-		"order_id": out.order.ID, // dujiao 客户端 uint
+		"order_id": out.order.ID, // dujiao 客戶端 uint
 		"order_no": out.order.DownstreamOrderNo,
 		"status":   dujiaoStatus(string(out.order.Status), out.delivered),
 		"amount":   centsToYuanStr(out.amount),
@@ -334,7 +334,7 @@ func (h *dujiaoCompat) dujiaoProduct(r *http.Request, account *ent.SupplierAccou
 		stockStatus = "out_of_stock"
 	}
 	return map[string]any{
-		"id":               p.ID, // dujiao 客户端 uint（字符串 unmarshal 失敗）
+		"id":               p.ID, // dujiao 客戶端 uint（字符串 unmarshal 失敗）
 		"slug":             fmt.Sprintf("p-%d", p.ID),
 		"seo_meta":         map[string]any{},
 		"title":            map[string]any{"zh-CN": p.Name}, // dujiao 多語言對象（jsonmap.JSON）
@@ -346,7 +346,7 @@ func (h *dujiaoCompat) dujiaoProduct(r *http.Request, account *ent.SupplierAccou
 		"fulfillment_type": "auto",
 		"is_active":        p.Status == 1,
 		"category_id":      p.CategoryID,
-		"updated_at":       time.Now().UTC().Format(time.RFC3339), // 客户端不消費（增量信任上游過濾）；對齊協議字段
+		"updated_at":       time.Now().UTC().Format(time.RFC3339), // 客戶端不消費（增量信任上游過濾）；對齊協議字段
 		"skus": []map[string]any{{
 			"id": p.ID, "sku_code": "default",
 			"price_amount": centsToYuanStr(price),
@@ -404,7 +404,7 @@ func writeDujiaoErr(w http.ResponseWriter, status int, code, msg string) {
 	_ = json.NewEncoder(w).Encode(map[string]any{"ok": false, "error_code": code, "error_message": msg})
 }
 
-// withAccount 注入賬户上下文（fulfillOrder/倉庫層消費 SupplyAccountID）。
+// withAccount 注入賬戶上下文（fulfillOrder/倉庫層消費 SupplyAccountID）。
 func withAccount(r *http.Request, accountID uint64) context.Context {
 	return context.WithValue(r.Context(), accountCtxKey{}, accountID)
 }

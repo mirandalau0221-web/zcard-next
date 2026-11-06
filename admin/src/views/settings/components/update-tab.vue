@@ -381,7 +381,7 @@ async function saveConfig() {
 // 不依賴內存 flag）：
 //  a) phase 處於進行中任一階段（含新進程健康檢查 verifying）
 //  b) 目標版本已登記且尚未到位（重啓間隙/刷新後 update.state 延續 target）
-// 進入即重開分步進度彈窗——用户刷新頁面回來直接看到更新進度而非乾等。
+// 進入即重開分步進度彈窗——用戶刷新頁面回來直接看到更新進度而非乾等。
 function enterWaitIfNeeded(st: UpdateStatus | null) {
   if (!st || waitingRestart || updateDone.value || pollingStopped.value || disposed) return;
   if (isUpdatePending(st) && (st.busy || st.phase !== "checking")) {

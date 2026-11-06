@@ -23,7 +23,7 @@ export function fetchAdminCaptchaConfig() {
   });
 }
 
-/** 獲取當前用户信息（Kratos：GET /api/v1/admin/auth/profile） */
+/** 獲取當前用戶信息（Kratos：GET /api/v1/admin/auth/profile） */
 export function fetchGetUserInfo() {
   return request<Api.Auth.UserInfo>({
     url: "/api/v1/admin/auth/profile",
@@ -48,9 +48,9 @@ export function fetchLogout(refreshToken: string) {
   });
 }
 
-// ── 前台用户管理（identity:user_read / identity:user_status）──
+// ── 前台用戶管理（identity:user_read / identity:user_status）──
 
-/** 用户列表（關鍵詞/狀態/供貨商篩選，分頁；含等級/錢包/訂單/供貨聚合） */
+/** 用戶列表（關鍵詞/狀態/供貨商篩選，分頁；含等級/錢包/訂單/供貨聚合） */
 export function fetchUsers(params?: {
   keyword?: string;
   status?: string;
@@ -65,22 +65,22 @@ export function fetchUsers(params?: {
   });
 }
 
-/** 用户詳情（聚合：等級/錢包/優惠券/供貨賬户/邀請關係/最近訂單） */
+/** 用戶詳情（聚合：等級/錢包/優惠券/供貨賬戶/邀請關係/最近訂單） */
 export function fetchUserDetail(id: number) {
   return request<any>({ url: `/api/v1/admin/users/${id}` });
 }
 
-/** 新增用户（identity:user_create，超管） */
+/** 新增用戶（identity:user_create，超管） */
 export function createUser(data: { username: string; password: string; email?: string }) {
   return request<any>({ url: "/api/v1/admin/users", method: "post", data });
 }
 
-/** 重置用户密碼（identity:user_reset_pwd，超管） */
+/** 重置用戶密碼（identity:user_reset_pwd，超管） */
 export function resetUserPassword(id: number, newPassword: string) {
   return request({ url: `/api/v1/admin/users/${id}/password`, method: "put", data: { new_password: newPassword } });
 }
 
-/** 封禁/解封用户（identity:user_status，超管專屬） */
+/** 封禁/解封用戶（identity:user_status，超管專屬） */
 export function setUserStatus(id: number, status: "active" | "banned") {
   return request<any>({
     url: `/api/v1/admin/users/${id}/status`,

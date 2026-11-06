@@ -119,7 +119,7 @@ func (s *RegisterCodeService) SendRegisterCode(ctx context.Context, target, chan
 		notifyChannel = "sms"
 	}
 	// 通道就緒前置校驗（fail-fast）：驗證碼是「必須送達」場景——Send 對未配置通道
-	// 按營銷降級語義返回成功，用户卻永遠收不到碼（實測踩坑），必須在發碼前攔下。
+	// 按營銷降級語義返回成功，用戶卻永遠收不到碼（實測踩坑），必須在發碼前攔下。
 	if cr, ok := s.sender.(interface {
 		ChannelReady(ctx context.Context, channel string) bool
 	}); ok && !cr.ChannelReady(ctx, notifyChannel) {

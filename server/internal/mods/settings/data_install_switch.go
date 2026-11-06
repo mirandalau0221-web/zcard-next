@@ -85,7 +85,7 @@ func buildDSN(in dbSwitchInput) (string, error) {
 // 返回可讀錯誤——嚮導「測試連接」與正式安裝共用）。
 func validateSwitch(ctx context.Context, in dbSwitchInput) error {
 	if in.Host == "" || in.Port <= 0 || in.User == "" || in.Name == "" {
-		return fmt.Errorf("數據庫主機/端口/用户/庫名不能為空")
+		return fmt.Errorf("數據庫主機/端口/用戶/庫名不能為空")
 	}
 	if in.RedisAddr == "" {
 		return fmt.Errorf("選擇 MySQL/PostgreSQL 必須配置 Redis（SQLite 模式可省略）")
@@ -146,7 +146,7 @@ func validateSwitch(ctx context.Context, in dbSwitchInput) error {
 		return fmt.Errorf("數據庫連接失敗: %v", err)
 	}
 	// 建表權限探測：能連 ≠ 能建表（PG 15+ 默認 public schema 不開放 CREATE，
-	// MySQL 用户也可能無 CREATE）——早報錯優於切庫自重啓後遷移失敗
+	// MySQL 用戶也可能無 CREATE）——早報錯優於切庫自重啓後遷移失敗
 	return probeCreateTable(ctx, db, in.Dialect, in.User, in.Name)
 }
 
@@ -173,7 +173,7 @@ func probeCreateTable(ctx context.Context, db *sql.DB, dialect, user, dbName str
 			} else {
 				hint = fmt.Sprintf("GRANT ALL PRIVILEGES ON `%s`.* TO '%s'@'%%'", dbName, user)
 			}
-			return fmt.Errorf("數據庫賬號無建表權限（%v）——請使用數據庫超級用户/owner 賬號，或執行授權：%s", err, hint)
+			return fmt.Errorf("數據庫賬號無建表權限（%v）——請使用數據庫超級用戶/owner 賬號，或執行授權：%s", err, hint)
 		}
 		return fmt.Errorf("建表權限探測失敗: %v", err)
 	}
@@ -215,7 +215,7 @@ data:
 }
 
 // scheduleSelfRestart 延遲自重啓（syscall.Exec 原位換進程：保 pid/端口，
-// systemd 與前台運行均適用；延遲讓安裝響應先送達客户端）。
+// systemd 與前台運行均適用；延遲讓安裝響應先送達客戶端）。
 func scheduleSelfRestart(delay time.Duration) {
 	time.AfterFunc(delay, func() {
 		exe, err := os.Executable()

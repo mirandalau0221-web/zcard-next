@@ -31,9 +31,9 @@ const (
 //
 // StoreAffiliateService 我的分銷：推廣碼/團隊/佣金流水/統計。
 type StoreAffiliateServiceClient interface {
-	// MyAffiliate 推廣碼 + 統計（登錄用户）。
+	// MyAffiliate 推廣碼 + 統計（登錄用戶）。
 	MyAffiliate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MyAffiliateReply, error)
-	// ListTeam 下級列表（脱敏用户名）。
+	// ListTeam 下級列表（脱敏用戶名）。
 	ListTeam(ctx context.Context, in *ListTeamRequest, opts ...grpc.CallOption) (*ListTeamReply, error)
 	// ListCommissions 佣金流水（正 + 負債行）。
 	ListCommissions(ctx context.Context, in *ListMyCommissionsRequest, opts ...grpc.CallOption) (*ListMyCommissionsReply, error)
@@ -83,9 +83,9 @@ func (c *storeAffiliateServiceClient) ListCommissions(ctx context.Context, in *L
 //
 // StoreAffiliateService 我的分銷：推廣碼/團隊/佣金流水/統計。
 type StoreAffiliateServiceServer interface {
-	// MyAffiliate 推廣碼 + 統計（登錄用户）。
+	// MyAffiliate 推廣碼 + 統計（登錄用戶）。
 	MyAffiliate(context.Context, *emptypb.Empty) (*MyAffiliateReply, error)
-	// ListTeam 下級列表（脱敏用户名）。
+	// ListTeam 下級列表（脱敏用戶名）。
 	ListTeam(context.Context, *ListTeamRequest) (*ListTeamReply, error)
 	// ListCommissions 佣金流水（正 + 負債行）。
 	ListCommissions(context.Context, *ListMyCommissionsRequest) (*ListMyCommissionsReply, error)

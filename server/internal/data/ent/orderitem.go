@@ -23,7 +23,7 @@ type OrderItem struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
+	// 租戶（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// 父訂單（硬外鍵 → orders）
 	OrderID uint64 `json:"order_id,omitempty"`

@@ -46,7 +46,7 @@ const roles = ref<any[]>([]);
 const permTree = ref<any[]>([]);
 const editing = ref<any>(null);
 
-// 啓用狀態快捷篩選（客户端過濾——員工列表全量加載無分頁，帶實時計數）
+// 啓用狀態快捷篩選（客戶端過濾——員工列表全量加載無分頁，帶實時計數）
 const enabledFilter = ref<"" | "on" | "off">("");
 const enabledTabs = [
   { label: "全部", value: "", type: "default" as const },
@@ -92,7 +92,7 @@ function isSuper(row: any) {
 const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 50 },
   {
-    title: "用户名",
+    title: "用戶名",
     key: "username",
     width: 150,
     render: (row) =>
@@ -383,7 +383,7 @@ onMounted(() => {
     <!-- 新增員工 -->
     <NModal v-model:show="showCreate" preset="dialog" title="新增員工" style="width: 480px">
       <NForm :model="form" label-placement="left" label-width="80">
-        <NFormItem label="用户名" required>
+        <NFormItem label="用戶名" required>
           <NInput v-model:value="form.username" />
         </NFormItem>
         <NFormItem label="密碼" required>

@@ -8,10 +8,10 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// WalletAccount 賬户（凍結分離，超越友商單一 Balance，《數據庫架構設計.md》§4.5）。
+// WalletAccount 賬戶（凍結分離，超越友商單一 Balance，《數據庫架構設計.md》§4.5）。
 //
 // 不變量：total = available + locked 恆真；一切餘額變動必須經 wallet.InTx：
-// 行鎖賬户 → 非負校驗 → 更新（樂觀鎖 version 兜底）→ 寫流水（reference 冪等重入）。
+// 行鎖賬戶 → 非負校驗 → 更新（樂觀鎖 version 兜底）→ 寫流水（reference 冪等重入）。
 type WalletAccount struct {
 	ent.Schema
 }

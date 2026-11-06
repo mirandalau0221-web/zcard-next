@@ -52,7 +52,7 @@ async function submit() {
         <template v-if="preview">
           <p>保留關聯訂單：<strong>{{ orderCount }}</strong> 條</p>
           <NAlert type="warning" :bordered="false">確認後商品立即從商城、商品管理和供貨目錄移除，詳情鏈接失效。商品鎖定、待付款或發貨中的訂單不會阻止刪除。</NAlert>
-          <p>保留訂單快照、交付內容、取貨及退款記錄，已有訂單繼續處理；賬户餘額不變。刪除後無法通過上下架或自動同步恢復商品。</p>
+          <p>保留訂單快照、交付內容、取貨及退款記錄，已有訂單繼續處理；賬戶餘額不變。刪除後無法通過上下架或自動同步恢復商品。</p>
         </template>
       </div>
     </NSpin>

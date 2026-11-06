@@ -271,7 +271,7 @@ func toWithdrawalPB(w *ent.Withdrawal) *adminv1.WithdrawalItem {
 	return out
 }
 
-// enrichUsernames 批量富化用户名（列表一次查詢防 N+1）。
+// enrichUsernames 批量富化用戶名（列表一次查詢防 N+1）。
 func (s *AdminWalletService) enrichUsernames(ctx context.Context, items []*adminv1.WithdrawalItem) {
 	if len(items) == 0 {
 		return

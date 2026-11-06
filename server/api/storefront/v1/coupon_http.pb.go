@@ -25,9 +25,9 @@ const OperationStoreCouponServiceRedeemCoupon = "/zcard.api.storefront.v1.StoreC
 type StoreCouponServiceHTTPServer interface {
 	// ListFlashSales ListFlashSales 秒殺列表（upcoming=false 進行中 / true 即將開始）。
 	ListFlashSales(context.Context, *ListFlashSalesRequest) (*ListFlashSalesReply, error)
-	// ListMyCoupons ListMyCoupons 我的可用券（登錄用户）。
+	// ListMyCoupons ListMyCoupons 我的可用券（登錄用戶）。
 	ListMyCoupons(context.Context, *emptypb.Empty) (*ListMyCouponsReply, error)
-	// RedeemCoupon RedeemCoupon 兑換碼領券。
+	// RedeemCoupon RedeemCoupon 兌換碼領券。
 	RedeemCoupon(context.Context, *RedeemCouponRequest) (*emptypb.Empty, error)
 }
 
@@ -98,9 +98,9 @@ func _StoreCouponService_ListFlashSales0_HTTP_Handler(srv StoreCouponServiceHTTP
 type StoreCouponServiceHTTPClient interface {
 	// ListFlashSales ListFlashSales 秒殺列表（upcoming=false 進行中 / true 即將開始）。
 	ListFlashSales(ctx context.Context, req *ListFlashSalesRequest, opts ...http.CallOption) (rsp *ListFlashSalesReply, err error)
-	// ListMyCoupons ListMyCoupons 我的可用券（登錄用户）。
+	// ListMyCoupons ListMyCoupons 我的可用券（登錄用戶）。
 	ListMyCoupons(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListMyCouponsReply, err error)
-	// RedeemCoupon RedeemCoupon 兑換碼領券。
+	// RedeemCoupon RedeemCoupon 兌換碼領券。
 	RedeemCoupon(ctx context.Context, req *RedeemCouponRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
@@ -129,7 +129,7 @@ func (c *StoreCouponServiceHTTPClientImpl) ListFlashSales(ctx context.Context, i
 	return &out, nil
 }
 
-// ListMyCoupons ListMyCoupons 我的可用券（登錄用户）。
+// ListMyCoupons ListMyCoupons 我的可用券（登錄用戶）。
 func (c *StoreCouponServiceHTTPClientImpl) ListMyCoupons(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListMyCouponsReply, error) {
 	var out ListMyCouponsReply
 	pattern := "/api/v1/storefront/coupons/mine"
@@ -146,7 +146,7 @@ func (c *StoreCouponServiceHTTPClientImpl) ListMyCoupons(ctx context.Context, in
 	return &out, nil
 }
 
-// RedeemCoupon RedeemCoupon 兑換碼領券。
+// RedeemCoupon RedeemCoupon 兌換碼領券。
 func (c *StoreCouponServiceHTTPClientImpl) RedeemCoupon(ctx context.Context, in *RedeemCouponRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/storefront/coupons/redeem"

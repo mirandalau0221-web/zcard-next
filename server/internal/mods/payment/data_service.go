@@ -515,7 +515,7 @@ func (s *StorePaymentService) ListChannels(ctx context.Context, req *storefrontv
 	if err != nil {
 		return nil, err
 	}
-	// 遊客判定：無登錄 claims（餘額支付依賴錢包賬户）
+	// 遊客判定：無登錄 claims（餘額支付依賴錢包賬戶）
 	guest := identity.ClaimsFromContext(ctx) == nil
 	reply := &storefrontv1.ChannelListReply{}
 	for _, ch := range rows {
@@ -660,7 +660,7 @@ func (s *StorePaymentService) CreatePayment(ctx context.Context, req *storefront
 	snap := pricingOf(p).Charge
 	// 回跳/回調絕對化（易支付/Stripe/PayPal 等外部網關只認絕對地址）：
 	// notify 用 site/url 前綴（CallbackURL；未配置時請求 Host 兜底）；
-	// return 回支付頁（輪詢出結果並展示卡密）——曾傳空值，客户付完被
+	// return 回支付頁（輪詢出結果並展示卡密）——曾傳空值，客戶付完被
 	// 網關回跳到空地址彈 404
 	info, err := s.repo.dispatchPayment(ctx, p, provider, port.CreatePaymentRequest{
 		OrderNo: p.GatewayOrderRef, GatewayOrderRef: p.GatewayOrderRef,

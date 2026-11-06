@@ -96,7 +96,7 @@ func (m *Migrator) migrateCurrencies(ctx context.Context) error {
 
 // migrateUserGroups 1.x user_groups → member_levels + UserGroup 兼容表（雙寫）。
 // discount：1.x decimal 百分數（100.00=原價）→ 2.0 萬分比（10000）。
-// 用户顯式組不落列（2.0 等級由累計充值/消費閾值實時推導），交易域遷完後自動恢復。
+// 用戶顯式組不落列（2.0 等級由累計充值/消費閾值實時推導），交易域遷完後自動恢復。
 func (m *Migrator) migrateUserGroups(ctx context.Context) error {
 	var (
 		id, sort, status            int64

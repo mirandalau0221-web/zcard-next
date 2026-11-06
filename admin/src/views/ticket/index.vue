@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 工單工作台（）：urgent_paid 置頂由後端排序保證；前台篩選狀態/類型/訂單號。
-// 會話式詳情：用户左灰泡 / 客服右藍泡 / 內部備註左橙虛線（僅 ticket:read 可見）。
+// 會話式詳情：用戶左灰泡 / 客服右藍泡 / 內部備註左橙虛線（僅 ticket:read 可見）。
 import TablePager from "@/components/common/table-pager.vue";
 import FilterTabs from "@/components/common/filter-tabs.vue";
 import { ref, computed, onMounted, onActivated, onDeactivated, watch, h } from "vue";
@@ -74,7 +74,7 @@ function slaText(row: any) {
 }
 
 function contactText(row: any) {
-  if (row.user_id) return `用户 #${row.user_id}`;
+  if (row.user_id) return `用戶 #${row.user_id}`;
   return row.guest_contact || "遊客";
 }
 
@@ -107,7 +107,7 @@ const columns: DataTableColumns<any> = [
     width: 84,
     render: (row) => h(NTag, { size: "small", type: statusType(row.status) }, { default: () => statusTextMap[row.status] || row.status }),
   },
-  { title: "用户 / 聯繫方式", key: "contact", minWidth: 140, ellipsis: { tooltip: true }, render: (row) => contactText(row) },
+  { title: "用戶 / 聯繫方式", key: "contact", minWidth: 140, ellipsis: { tooltip: true }, render: (row) => contactText(row) },
   { title: "關聯訂單", key: "order_id", width: 110, render: (row) => (row.order_id ? `#${row.order_id}` : "-") },
   {
     title: "SLA",
@@ -232,7 +232,7 @@ async function handleClose() {
 }
 
 function senderName(m: any) {
-  if (m.sender_type === "user") return detail.value?.user_id ? `用户 #${detail.value.user_id}` : "用户";
+  if (m.sender_type === "user") return detail.value?.user_id ? `用戶 #${detail.value.user_id}` : "用戶";
   if (m.sender_type === "admin") return "客服";
   if (m.sender_type === "system") return "系統";
   return m.sender_type;
@@ -291,7 +291,7 @@ onActivated(() => {
         <NDescriptionsItem label="優先級">
           <NTag size="small" :type="priorityType(detail.priority)" :bordered="detail.priority === 'urgent_paid'">{{ priorityText(detail.priority) }}</NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem label="用户">{{ contactText(detail) }}</NDescriptionsItem>
+        <NDescriptionsItem label="用戶">{{ contactText(detail) }}</NDescriptionsItem>
         <NDescriptionsItem label="遊客聯繫">{{ detail.guest_contact || "-" }}</NDescriptionsItem>
         <NDescriptionsItem label="關聯訂單">{{ detail.order_id ? `#${detail.order_id}` : "-" }}</NDescriptionsItem>
         <NDescriptionsItem label="創建時間">{{ formatTime(detail.created_at) }}</NDescriptionsItem>
@@ -316,7 +316,7 @@ onActivated(() => {
 
       <!-- 回覆區（ticket:write；關閉後只讀） -->
       <div v-if="canWrite() && !ticketClosed" class="mt-12px flex flex-col gap-8px">
-        <NInput v-model:value="replyContent" type="textarea" :rows="3" :placeholder="replyInternal ? '內部備註內容（用户不可見）' : '輸入回覆內容…'" />
+        <NInput v-model:value="replyContent" type="textarea" :rows="3" :placeholder="replyInternal ? '內部備註內容（用戶不可見）' : '輸入回覆內容…'" />
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-6px text-13px">
             <NSwitch v-model:value="replyInternal" size="small" />
@@ -327,7 +327,7 @@ onActivated(() => {
               <template #trigger>
                 <NButton size="small" type="success" secondary :loading="acting">標記解決</NButton>
               </template>
-              確認已解決該工單？用户可繼續追加或重新開啓。
+              確認已解決該工單？用戶可繼續追加或重新開啓。
             </NPopconfirm>
             <NPopconfirm @positive-click="handleClose">
               <template #trigger>
@@ -347,7 +347,7 @@ onActivated(() => {
 </template>
 
 <style scoped>
-/* 會話氣泡（大廠客服工作台慣例）：用户左灰、客服右藍、內部備註橙虛線 */
+/* 會話氣泡（大廠客服工作台慣例）：用戶左灰、客服右藍、內部備註橙虛線 */
 .msg-row { display: flex; flex-direction: column; align-items: flex-start; }
 .msg-row.mine { align-items: flex-end; }
 .msg-meta { font-size: 11px; color: #9ca3af; margin-bottom: 3px; }

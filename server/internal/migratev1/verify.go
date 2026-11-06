@@ -84,9 +84,9 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 	}
 	rc := m.st.table("wallet_reconcile")
 	if rc.SkippedExists > 0 {
-		fail("錢包對賬", fmt.Sprintf("%d 個賬户流水與快照不一致（差異清單見 errors.jsonl）", rc.SkippedExists))
+		fail("錢包對賬", fmt.Sprintf("%d 個賬戶流水與快照不一致（差異清單見 errors.jsonl）", rc.SkippedExists))
 	} else {
-		pass("錢包對賬", fmt.Sprintf("全部 %d 個賬户流水與快照一致", rc.Migrated))
+		pass("錢包對賬", fmt.Sprintf("全部 %d 個賬戶流水與快照一致", rc.Migrated))
 	}
 
 	// 3. 分站餘額對賬
@@ -119,7 +119,7 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 		if acc != nil && acc.Available != int64(sum) {
 			subDiff++
 			m.RW.AddError("verify_reseller", p.ID,
-				fmt.Sprintf("ledger 合計 %d ≠ 賬户快照 %d", sum, acc.Available))
+				fmt.Sprintf("ledger 合計 %d ≠ 賬戶快照 %d", sum, acc.Available))
 		}
 	}
 	if subDiff > 0 {
@@ -206,7 +206,7 @@ func (m *Migrator) RunVerify(ctx context.Context, sample int) (*VerifyResult, er
 	if len(orderIDs) > 0 {
 		fail("引用完整性", fmt.Sprintf("%d 筆已遷訂單丟失 user 關聯（映射缺失）", len(orderIDs)))
 	} else {
-		pass("引用完整性", "已遷訂單的用户關聯完整")
+		pass("引用完整性", "已遷訂單的用戶關聯完整")
 	}
 
 	res.Passed = true

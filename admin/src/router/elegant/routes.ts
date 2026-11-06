@@ -201,7 +201,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     path: '/user',
     component: 'layout.base$view.user',
     meta: {
-      title: '用户管理',
+      title: '用戶管理',
       i18nKey: 'route.user',
       icon: 'mdi:account-group-outline',
       order: 1.5

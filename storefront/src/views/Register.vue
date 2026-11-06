@@ -24,8 +24,8 @@
       </div>
 
       <div class="field">
-        <label>{{ $t('用户名 *') }}</label>
-        <input class="input" v-model="username" type="text" :placeholder="$t('用户名')" />
+        <label>{{ $t('用戶名 *') }}</label>
+        <input class="input" v-model="username" type="text" :placeholder="$t('用戶名')" />
       </div>
       <div class="field">
         <label>{{ $t('密碼 *') }}</label>
@@ -152,7 +152,7 @@ watch(methods, (list) => {
 });
 
 function methodLabel(m: string) {
-  return m === 'email' ? $t("郵箱驗證") : m === 'phone' ? $t("手機驗證") : $t("用户名");
+  return m === 'email' ? $t("郵箱驗證") : m === 'phone' ? $t("手機驗證") : $t("用戶名");
 }
 
 // 驗證碼發送
@@ -210,7 +210,7 @@ onUnmounted(() => { if (cdTimer) clearInterval(cdTimer); clearTimeout(benefitTim
 
 async function submit() {
   if (!username.value || !password.value) {
-    error.value = $t("用户名和密碼必填");
+    error.value = $t("用戶名和密碼必填");
     return;
   }
   if (activeMethod.value === 'email' && !email.value.trim()) {

@@ -306,7 +306,7 @@ func (x *Security) GetDataKey() string {
 	return ""
 }
 
-// 多租户（開源版僅啓用 Row 行級隔離；Schema/Database 屬商業版，ADR-D15）
+// 多租戶（開源版僅啓用 Row 行級隔離；Schema/Database 屬商業版，ADR-D15）
 type Tenancy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// row（開源版唯一取值；schema/database 為商業版預留）

@@ -48,7 +48,7 @@ type PaymentRepoImpl struct {
 	outbox    events.Writer               // recharge.succeeded 等事件
 	currency  settingsport.CurrencyReader // 幣種快照換算（；nil = 同幣直收）
 	settings  settingsport.Provider       // site/url 等（ 回調地址拼接；nil = 相對路徑）
-	supplier  port.SupplierRecharger      // target=supply 充值入賬（供貨賬户餘額；nil = 未裝配跳過）
+	supplier  port.SupplierRecharger      // target=supply 充值入賬（供貨賬戶餘額；nil = 未裝配跳過）
 }
 
 // NewPaymentRepoImpl 構造。
@@ -973,14 +973,14 @@ func (r *PaymentRepoImpl) settleRecharge(ctx context.Context, p *ent.Payment, fa
 		return reviewOrReject()
 	}
 	// 入賬分支（target 由建單時定；金額全部取服務端落庫值，鐵律 16）：
-	// balance → 用户錢包餘額（本金+贈送）+ 贈送積分；
-	// supply → 對接賬户供貨餘額（本金；供貨預存無贈送）。
+	// balance → 用戶錢包餘額（本金+贈送）+ 贈送積分；
+	// supply → 對接賬戶供貨餘額（本金；供貨預存無贈送）。
 	total := ro.Amount + ro.GiftAmount
 	if ro.Target == rechargeorder.TargetSupply {
 		if ro.SupplierAccountID > 0 && r.supplier != nil {
 			if err := r.supplier.Recharge(ctx, ro.SupplierAccountID, total,
 				fmt.Sprintf("recharge:%d", p.ID),
-				fmt.Sprintf("對接賬户自助充值到賬（用户 #%d，本金 %d 分 + 贈送 %d 分）", ro.UserID, ro.Amount, ro.GiftAmount)); err != nil {
+				fmt.Sprintf("對接賬戶自助充值到賬（用戶 #%d，本金 %d 分 + 贈送 %d 分）", ro.UserID, ro.Amount, ro.GiftAmount)); err != nil {
 				return fmt.Errorf("payment.SUPPLY_RECHARGE_FAILED: %w", err)
 			}
 		}

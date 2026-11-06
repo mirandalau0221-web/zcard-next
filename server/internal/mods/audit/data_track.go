@@ -25,7 +25,7 @@ func NewTrackRepo(d *data.Data) *TrackRepo {
 	return &TrackRepo{data: d}
 }
 
-// RecordVisit 記一次訪問：PV 明細一行 + 登錄用户在線心跳 upsert。
+// RecordVisit 記一次訪問：PV 明細一行 + 登錄用戶在線心跳 upsert。
 // 失敗忽略（埋點不阻斷請求）。
 func (r *TrackRepo) RecordVisit(ctx context.Context, subsite uint64, path string, userID uint64, ip string) {
 	now := time.Now().UTC()
@@ -51,7 +51,7 @@ func (r *TrackRepo) RecordVisit(ctx context.Context, subsite uint64, path string
 		Exec(ctx)
 }
 
-// CountOnlineUsers 在線用户數（last_active_at ≥ since 且分站隔離）。
+// CountOnlineUsers 在線用戶數（last_active_at ≥ since 且分站隔離）。
 func (r *TrackRepo) CountOnlineUsers(ctx context.Context, subsite uint64, since time.Time) (int64, error) {
 	n, err := data.Client(ctx, r.data).UserSession.Query().
 		Where(usersession.LastActiveAtGTE(since), usersession.SubsiteID(subsite)).

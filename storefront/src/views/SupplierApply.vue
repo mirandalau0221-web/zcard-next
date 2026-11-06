@@ -6,7 +6,7 @@
         <div>{{ $t('對接申請（供貨）') }}</div>
         <span class="tag">{{ $t('審核通過後下發 app_id / app_key') }}</span>
       </div>
-      <div class="muted" style="margin-top: 6px; line-height: 1.7;"> {{ $t('申請通過後，你的第三方站點（acg-faka / dujiao-next / 另一套 ZCard）可把本站作為上游供貨方， 填本站地址 + 下方憑據即可對接，無需改動對方代碼。協議在申請時選定，一個賬户對應一種面板。 下游下單從賬户「供貨餘額」扣款，餘額不足請先充值。') }} </div>
+      <div class="muted" style="margin-top: 6px; line-height: 1.7;"> {{ $t('申請通過後，你的第三方站點（acg-faka / dujiao-next / 另一套 ZCard）可把本站作為上游供貨方， 填本站地址 + 下方憑據即可對接，無需改動對方代碼。協議在申請時選定，一個賬戶對應一種面板。 下游下單從賬戶「供貨餘額」扣款，餘額不足請先充值。') }} </div>
     </div>
 
     <!-- 申請表單 -->
@@ -54,9 +54,9 @@
       </div>
     </div>
 
-    <!-- 我的對接賬户 -->
+    <!-- 我的對接賬戶 -->
     <div class="card">
-      <div style="font-weight: 600; margin-bottom: 12px;">{{ $t('我的對接賬户（{0}）', [accounts.length]) }}</div>
+      <div style="font-weight: 600; margin-bottom: 12px;">{{ $t('我的對接賬戶（{0}）', [accounts.length]) }}</div>
       <div v-if="loading" class="muted">{{ $t('加載中…') }}</div>
       <div v-else-if="!accounts.length" class="muted">{{ $t('暫無申請，提交上方表單即可開始對接') }}</div>
       <div v-else class="account-list" style="display: flex; flex-direction: column; gap: 10px;">
@@ -105,7 +105,7 @@
                 <b style="font-size: 13px;">{{ $t('🔒 IP 白名單') }}</b>
                 <span class="muted" style="font-size: 12px;">{{ (a.ip_whitelist?.length || 0) ? $t('已限制 {0} 條', [a.ip_whitelist!.length]) : $t('未限制（所有 IP 可調用）') }}</span>
               </div>
-              <div class="muted" style="margin: 6px 0 8px; line-height: 1.7; font-size: 12px;"> {{ $t('出於安全考慮，可限制只有指定 IP 的服務器才能調用本賬户的對接接口。') }} <b>{{ $t('不填寫 = 默認所有 IP 都可以請求') }}</b>{{ $t('；填寫後僅白名單內 IP 可用（支持精確 IP 如 1.2.3.4，或網段如 10.0.0.0/24，最多 20 條）。服務器出口 IP 變更後請及時更新，否則接口將被拒絕。') }} </div>
+              <div class="muted" style="margin: 6px 0 8px; line-height: 1.7; font-size: 12px;"> {{ $t('出於安全考慮，可限制只有指定 IP 的服務器才能調用本賬戶的對接接口。') }} <b>{{ $t('不填寫 = 默認所有 IP 都可以請求') }}</b>{{ $t('；填寫後僅白名單內 IP 可用（支持精確 IP 如 1.2.3.4，或網段如 10.0.0.0/24，最多 20 條）。服務器出口 IP 變更後請及時更新，否則接口將被拒絕。') }} </div>
               <div v-if="(a.ip_whitelist || []).length" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
                 <span v-for="ip in a.ip_whitelist" :key="ip" class="ip-chip">
                   <code>{{ ip }}</code>
@@ -126,7 +126,7 @@
             </div>
             <div class="muted" style="margin-top: 10px; line-height: 1.8;">
               <b style="color: #1f2329;">{{ $t('對接方式') }}</b><br />
-              <template v-if="a.protocol === 'acg_faka'"> {{ $t('① 對方 acg-faka 後台 →「店鋪共享 / 共享店鋪」→ 新增店鋪') }}<br /> {{ $t('② 類型選「異次元(原生)」，地址填本站地址（') }}<code>{{ origin }}</code>）<br /> {{ $t('③ 商户ID 填上面的 app_id，密鑰填 app_key，保存前會自動連通測試') }} </template>
+              <template v-if="a.protocol === 'acg_faka'"> {{ $t('① 對方 acg-faka 後台 →「店鋪共享 / 共享店鋪」→ 新增店鋪') }}<br /> {{ $t('② 類型選「異次元(原生)」，地址填本站地址（') }}<code>{{ origin }}</code>）<br /> {{ $t('③ 商戶ID 填上面的 app_id，密鑰填 app_key，保存前會自動連通測試') }} </template>
               <template v-else-if="a.protocol === 'dujiao_next'"> {{ $t('① 對方 dujiao-next 後台 →「站點連接」→ 新增連接') }}<br /> {{ $t('② 協議選 dujiao-next，地址填本站地址（') }}<code>{{ origin }}</code>/api/v1/upstream）<br /> {{ $t('③ API Key 填上面的 app_id，API Secret 填 app_key') }} </template>
               <template v-else> {{ $t('① 對方 ZCard 後台 →「貨源渠道」→ 新增連接（協議選 zcard）') }}<br /> {{ $t('② 地址填本站地址（') }}<code>{{ origin }}</code>{{ $t('/api/supply），app_id 填上面的 api_key、密鑰填 api_secret') }} </template>
             </div>
@@ -255,7 +255,7 @@ const credentials = ref<SupplierCredentials | null>(null);
 const regeneratedSecret = ref('');
 const copied = ref('');
 
-// ── IP 白名單管理（審核通過後的賬户；空 = 所有 IP 放行）──
+// ── IP 白名單管理（審核通過後的賬戶；空 = 所有 IP 放行）──
 const whitelistInput = ref('');
 const whitelistSaving = ref(false);
 const whitelistError = ref('');
@@ -455,7 +455,7 @@ async function doRecharge() {
       rechargeError.value = $t("支付參數異常");
     }
   }
-  // 輪詢賬户餘額（支付完成後刷新）
+  // 輪詢賬戶餘額（支付完成後刷新）
   pollBalance(rechargeTarget.value.id);
 }
 

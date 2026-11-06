@@ -83,13 +83,13 @@ export function apiError(payload: unknown, status?: number): string {
   // The API localizes known reasons. Old servers may still return Chinese messages.
   if (message && active.value === 'en' && !/[\p{Script=Han}]/u.test(message)) return message;
   if (message && dictionary[message.trim().replace(/\s+/g, ' ')]) return t(message);
-  if (/CURRENCY_MISMATCH/.test(reason)) return t('賬户幣種與基礎貨幣不一致，請聯繫管理員遷移');
+  if (/CURRENCY_MISMATCH/.test(reason)) return t('賬戶幣種與基礎貨幣不一致，請聯繫管理員遷移');
   if (/STOCK|SOLD_OUT/.test(reason)) return t('庫存不足，請調整數量後重試');
   if (/BALANCE|FUNDS|POINTS_INSUFFICIENT/.test(reason)) return t('餘額或積分不足，請檢查後重試');
   if (/CAPTCHA|VERIFICATION|VERIFY_CODE/.test(reason)) return t('驗證碼錯誤或已過期，請重新獲取');
   if (/LOGIN_FAILED|PASSWORD_INVALID|INVALID_CREDENTIALS/.test(reason)) return t('賬號或密碼錯誤');
   if (status === 401) return t('登錄已過期，請重新登錄');
-  if (status === 403) return t('無法執行此操作，請檢查賬户權限');
+  if (status === 403) return t('無法執行此操作，請檢查賬戶權限');
   if (status === 404) return t('請求的內容不存在或已下架');
   if (status === 429) return t('請求過於頻繁，請稍後重試');
   if (status && status >= 500) return t('服務暫時不可用，請稍後重試');

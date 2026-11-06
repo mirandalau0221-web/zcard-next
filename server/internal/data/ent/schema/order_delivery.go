@@ -29,7 +29,7 @@ func (OrderDelivery) Fields() []ent.Field {
 		field.String("delivery_token_hash").MaxLen(64).Comment("一次性取貨令牌哈希"),
 		field.Bytes("service_content").Optional(),
 		field.Int32("delivered_quantity").Default(0),
-		field.Enum("delivered_mode").Values("status", "delete", "direct").Comment("標記/即刪/直髮（direct = 商品級直髮內容，無卡密）"),
+		field.Enum("delivered_mode").Values("status", "delete", "direct").Comment("標記/即刪/直發（direct = 商品級直發內容，無卡密）"),
 		field.Uint64("delivered_by").Default(0).Comment("人工發貨管理員（auto 為 0）"),
 		field.JSON("logistics", map[string]any{}).Optional().Comment("結構化交付信息（物流單號/追蹤鏈接）"),
 		field.Int32("fetch_count").Default(0).Comment("已取貨次數（默認 1 次後掩碼）"),

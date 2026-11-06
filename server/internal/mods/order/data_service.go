@@ -315,7 +315,7 @@ func (s *StoreOrderService) CancelMyOrder(ctx context.Context, req *storefrontv1
 	if o.UserID == 0 || o.UserID != claims.Subject {
 		return nil, errors.NotFound("order.NOT_FOUND", "訂單不存在") // 非本人不泄露存在性
 	}
-	if err := s.uc.CancelOrder(ctx, req.GetOrderNo(), "用户取消", "user", claims.Subject); err != nil {
+	if err := s.uc.CancelOrder(ctx, req.GetOrderNo(), "用戶取消", "user", claims.Subject); err != nil {
 		return nil, mapOrderErr(err)
 	}
 	return &emptypb.Empty{}, nil
@@ -577,9 +577,9 @@ func mapOrderErr(err error) error {
 	case contains(msg, "COUPON"):
 		return errors.BadRequest("order.COUPON_INVALID", "優惠券無效或不可用")
 	case contains(msg, "POINTS_LOGIN"):
-		return errors.Unauthorized("order.POINTS_LOGIN_REQUIRED", "積分兑換需登錄")
+		return errors.Unauthorized("order.POINTS_LOGIN_REQUIRED", "積分兌換需登錄")
 	case contains(msg, "POINTS_MIXED"):
-		return errors.BadRequest("order.POINTS_MIXED_CART", "積分兑換訂單須全部為積分商品")
+		return errors.BadRequest("order.POINTS_MIXED_CART", "積分兌換訂單須全部為積分商品")
 	case contains(msg, "POINTS"):
 		return errors.BadRequest("order.POINTS_INSUFFICIENT", "積分不足")
 	case contains(msg, "CANNOT_CANCEL"):

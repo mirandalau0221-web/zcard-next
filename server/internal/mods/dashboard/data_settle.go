@@ -18,14 +18,14 @@ import (
 // settleMetrics 日結指標集（dimension_key 空=總量行）。
 var settleMetrics = []string{"orders", "amount", "paid_orders"}
 
-// RunDailySettle 聚合指定日各租户指標並落 daily_stats（重跑覆蓋同維度行）。
+// RunDailySettle 聚合指定日各租戶指標並落 daily_stats（重跑覆蓋同維度行）。
 func (r *DashboardRepoImpl) RunDailySettle(ctx context.Context, day time.Time) error {
 	start := businessday.Start(day)
 	end := start.AddDate(0, 0, 1)
 	date := businessday.Date(start, "20060102")
 	client := data.Client(ctx, r.data)
 
-	// 全部租户（主站 0 + 訂單表中出現過的分站）
+	// 全部租戶（主站 0 + 訂單表中出現過的分站）
 	subsites := []uint64{0}
 	rows, err := client.Order.Query().Select("subsite_id").All(ctx)
 	if err != nil {

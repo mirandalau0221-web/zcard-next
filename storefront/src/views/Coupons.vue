@@ -1,10 +1,10 @@
 <template>
   <div>
-    <!-- 兑換碼領取 -->
+    <!-- 兌換碼領取 -->
     <div class="card" style="margin-bottom: 16px;">
       <h2 style="margin-bottom: 12px;">{{ $t('領取優惠券') }}</h2>
       <div class="actions">
-        <input class="input" v-model="code" type="text" :placeholder="$t('輸入兑換碼')" style="flex: 1; max-width: 320px;" @keyup.enter="doRedeem" />
+        <input class="input" v-model="code" type="text" :placeholder="$t('輸入兌換碼')" style="flex: 1; max-width: 320px;" @keyup.enter="doRedeem" />
         <button class="btn" :disabled="redeeming" @click="doRedeem">{{ redeeming ? $t('領取中…') : $t('領取') }}</button>
       </div>
       <div v-if="redeemError" class="error" style="margin-top: 8px;">{{ uiText(redeemError) }}</div>
@@ -65,7 +65,7 @@ async function load() {
 
 async function doRedeem() {
   if (!code.value.trim()) {
-    redeemError.value = $t("請輸入兑換碼");
+    redeemError.value = $t("請輸入兌換碼");
     return;
   }
   redeeming.value = true;

@@ -78,7 +78,7 @@ function pointsRuleText(json?: string) {
   }
 }
 
-// 啓用狀態快捷篩選（客户端過濾——等級全量加載，帶實時計數）
+// 啓用狀態快捷篩選（客戶端過濾——等級全量加載，帶實時計數）
 const enabledFilter = ref<"" | "on" | "off">("");
 const enabledTabs = [
   { label: "全部", value: "", type: "default" as const },

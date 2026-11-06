@@ -1,4 +1,4 @@
-// Package httpx 出站 HTTP 客户端（規劃 §5.7.3 貨源對接安全）。
+// Package httpx 出站 HTTP 客戶端（規劃 §5.7.3 貨源對接安全）。
 //
 // 統一強制（架構測試斷言，適配器無感知）：
 //  1. 僅允許 http/https；
@@ -153,7 +153,7 @@ func safeDialContext(ctx context.Context, network, addr string, lookup lookupIPA
 	return nil, firstErr
 }
 
-// NewSafeClient 構造安全出站客户端：超時 + 重定向逐跳校驗 + 連接期 IP 複核。
+// NewSafeClient 構造安全出站客戶端：超時 + 重定向逐跳校驗 + 連接期 IP 複核。
 func NewSafeClient(timeout time.Duration) *http.Client {
 	dialer := &net.Dialer{Timeout: 10 * time.Second, KeepAlive: 30 * time.Second}
 	transport := &http.Transport{

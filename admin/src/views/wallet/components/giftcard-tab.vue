@@ -30,7 +30,7 @@ const columns = computed<DataTableColumns<any>>(() => [
   { title: "名稱", key: "name", width: 140, ellipsis: { tooltip: true } },
   { title: "面值", key: "amount_cents", width: 90, render: (row) => formatMoney(row.amount_cents) },
   { title: "數量", key: "quantity", width: 70 },
-  { title: "已兑換", key: "redeemed", width: 70, render: (row) => row.redeemed ?? row.redeemed_count ?? "-" },
+  { title: "已兌換", key: "redeemed", width: 70, render: (row) => row.redeemed ?? row.redeemed_count ?? "-" },
   {
     title: "創建時間",
     key: "created_at",
@@ -50,7 +50,7 @@ async function handleDelete() {
     const { error } = await deleteGiftcardBatch(deleteTarget.value.id);
     if (error) return;
     deleteTarget.value = null;
-    window.$message?.success("批次已刪除，未兑換禮品卡已作廢");
+    window.$message?.success("批次已刪除，未兌換禮品卡已作廢");
     if (batches.value.length === 1 && page.value > 1) page.value--;
     await load();
   } finally {
@@ -105,7 +105,7 @@ onMounted(load);
   <div>
     <div class="mb-8px">
       <NButton v-if="checkAuth('giftcard:write')" size="small" type="primary" @click="showCreate = true">新建批次</NButton>
-      <span class="ml-8px text-12px text-gray-400">兑換碼明文僅創建時一次性展示，庫內無明文（安全鐵律）</span>
+      <span class="ml-8px text-12px text-gray-400">兌換碼明文僅創建時一次性展示，庫內無明文（安全鐵律）</span>
     </div>
     <NDataTable :columns="columns" :data="batches" :loading="loading" size="small"  :max-height="540" :scroll-x="790" :row-key="(row: any) => row.id" />
     <div class="mt-8px flex items-center justify-end gap-8px">
@@ -117,8 +117,8 @@ onMounted(load);
       style="width: min(460px, calc(100vw - 32px))" :mask-closable="!deleting" :close-on-esc="!deleting" :closable="!deleting"
       @update:show="(show) => { if (!show && !deleting) deleteTarget = null; }">
       <p style="overflow-wrap: anywhere">確定刪除批次「{{ deleteTarget?.name }}」（{{ deleteTarget?.batch_no }}）？</p>
-      <p>該批次會從列表移除，所有未兑換的禮品卡立即作廢，無法恢復。</p>
-      <p>已兑換的餘額和流水記錄保留，批次號不可重複使用。</p>
+      <p>該批次會從列表移除，所有未兌換的禮品卡立即作廢，無法恢復。</p>
+      <p>已兌換的餘額和流水記錄保留，批次號不可重複使用。</p>
       <template #action>
         <NButton :disabled="deleting" @click="deleteTarget = null">取消</NButton>
         <NButton type="error" :loading="deleting" @click="handleDelete">確認刪除</NButton>
@@ -147,7 +147,7 @@ onMounted(load);
     </NModal>
 
     <!-- 明文碼一次性展示 -->
-    <NModal :show="showCodes" preset="dialog" :title="`批次 ${codesBatch} 兑換碼（僅此一次展示）`" style="width: 480px" :mask-closable="false">
+    <NModal :show="showCodes" preset="dialog" :title="`批次 ${codesBatch} 兌換碼（僅此一次展示）`" style="width: 480px" :mask-closable="false">
       <NInput :value="plainCodes.join('\n')" type="textarea" :rows="8" readonly />
       <template #action>
         <NButton @click="copyCodes">複製全部</NButton>

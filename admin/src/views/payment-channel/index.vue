@@ -625,7 +625,7 @@ onMounted(() => {
               {{ ch.driver === "wallet" ? "無需憑據" : isConfigured(ch) ? "已配置" : "待配置" }}
             </NTag>
             <NTag v-if="(ch.fee || 0) > 0" size="small" type="info" :bordered="false">
-              {{ ch.fee_type === "percent" ? `費率 ${((ch.fee || 0) / 100).toFixed(2)}%` : `手續費 ${((ch.fee || 0) / 100).toFixed(2)} ${currencyUnit()}` }} · {{ ch.fee_bearer === 'user' ? '用户承擔' : '商家承擔' }}
+              {{ ch.fee_type === "percent" ? `費率 ${((ch.fee || 0) / 100).toFixed(2)}%` : `手續費 ${((ch.fee || 0) / 100).toFixed(2)} ${currencyUnit()}` }} · {{ ch.fee_bearer === 'user' ? '用戶承擔' : '商家承擔' }}
             </NTag>
           </div>
 
@@ -660,7 +660,7 @@ onMounted(() => {
 
     <!-- 添加渠道：勾選式批量接入 -->
     <NModal v-model:show="addVisible" preset="card" title="添加支付渠道" style="width: 560px; max-width: 94vw">
-      <div class="text-12px opacity-60 mb-12px">同一支付類型可添加多個渠道，分別配置不同上游的網關、商户號和密鑰。新渠道默認停用，請配置後啓用。</div>
+      <div class="text-12px opacity-60 mb-12px">同一支付類型可添加多個渠道，分別配置不同上游的網關、商戶號和密鑰。新渠道默認停用，請配置後啓用。</div>
       <NSpin :show="driversLoading">
         <div class="flex flex-col gap-8px max-h-360px overflow-auto pr-4px">
           <NCheckbox
@@ -806,7 +806,7 @@ onMounted(() => {
         <!-- 手續費 -->
         <NDivider title-placement="left" style="margin: 4px 0 16px">手續費</NDivider>
         <NFormItem label="承擔方">
-          <NRadioGroup v-model:value="form.fee_bearer" :disabled="current?.driver === 'wallet'"><NRadio value="merchant">商家承擔</NRadio><NRadio value="user">用户承擔</NRadio></NRadioGroup>
+          <NRadioGroup v-model:value="form.fee_bearer" :disabled="current?.driver === 'wallet'"><NRadio value="merchant">商家承擔</NRadio><NRadio value="user">用戶承擔</NRadio></NRadioGroup>
         </NFormItem>
         <p class="text-12px mb-12px opacity-70">{{ current?.driver === 'wallet' ? '餘額支付固定免手續費。' : form.fee_bearer === 'user' ? '在優惠後的訂單金額上加收，按分四捨五入；充值手續費不計入餘額。已創建支付沿用原費用。' : '不增加顧客實付金額，收銀台顯示免手續費。' }}</p>
         <NFormItem label="計費方式">

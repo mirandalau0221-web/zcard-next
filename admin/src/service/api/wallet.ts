@@ -22,7 +22,7 @@ export interface WalletTransaction {
   created_at: number;
 }
 
-/** 查詢指定用户餘額 */
+/** 查詢指定用戶餘額 */
 export function fetchWalletBalance(userId: number) {
   return request({
     url: `/api/v1/admin/wallet/${userId}`,
@@ -50,7 +50,7 @@ export function adjustWalletPoints(userId: number, points: number, reason: strin
   });
 }
 
-/** 查詢指定用户流水（分頁） */
+/** 查詢指定用戶流水（分頁） */
 export function fetchWalletTransactions(
   userId: number,
   params?: { page?: number; page_size?: number },

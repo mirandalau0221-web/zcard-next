@@ -27,7 +27,7 @@ type AdminUserRepoImpl struct {
 // NewAdminUserRepoImpl 構造。
 func NewAdminUserRepoImpl(d *data.Data) *AdminUserRepoImpl { return &AdminUserRepoImpl{data: d} }
 
-// FindByUsername 按用户名查找（登錄熱路徑，UNIQUE(username) 索引命中）。
+// FindByUsername 按用戶名查找（登錄熱路徑，UNIQUE(username) 索引命中）。
 func (r *AdminUserRepoImpl) FindByUsername(ctx context.Context, username string) (*AdminUser, error) {
 	row, err := data.Client(ctx, r.data).AdminUser.Query().
 		Where(adminuser.Username(username)).
@@ -66,7 +66,7 @@ func (r *AdminUserRepoImpl) TouchLogin(ctx context.Context, id uint64, ip string
 
 // ── 員工管理（port.AdminMutator 實現，authz API 面消費；）────────────
 
-// Admin 按 ID 取員工賬户（port.AdminReader 實現——admin 鑑權中間件每請求
+// Admin 按 ID 取員工賬戶（port.AdminReader 實現——admin 鑑權中間件每請求
 // 校驗 enabled 與當前 RoleID，禁用/換角色即時生效）。
 func (r *AdminUserRepoImpl) Admin(ctx context.Context, id uint64) (*port.AdminAccount, error) {
 	row, err := data.Client(ctx, r.data).AdminUser.Get(ctx, id)
@@ -98,7 +98,7 @@ func (r *AdminUserRepoImpl) List(ctx context.Context) ([]port.AdminAccount, erro
 	return out, nil
 }
 
-// Create 創建員工（用户名唯一；密碼 bcrypt）。
+// Create 創建員工（用戶名唯一；密碼 bcrypt）。
 func (r *AdminUserRepoImpl) Create(ctx context.Context, in port.AdminInput) (*port.AdminAccount, error) {
 	hash, err := crypto.HashPassword(in.Password)
 	if err != nil {

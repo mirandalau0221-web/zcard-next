@@ -1,6 +1,6 @@
 package coupon
 
-// 前台營銷 API（）：我的券/兑換/秒殺營銷位。
+// 前台營銷 API（）：我的券/兌換/秒殺營銷位。
 
 import (
 	"context"
@@ -53,7 +53,7 @@ func (s *StoreCouponService) ListMyCoupons(ctx context.Context, _ *emptypb.Empty
 	return reply, nil
 }
 
-// RedeemCoupon 兑換碼領券。
+// RedeemCoupon 兌換碼領券。
 func (s *StoreCouponService) RedeemCoupon(ctx context.Context, req *storefrontv1.RedeemCouponRequest) (*emptypb.Empty, error) {
 	userID := currentUserID(ctx)
 	if userID == 0 {

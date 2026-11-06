@@ -342,7 +342,7 @@ async function buy() {
     );
     if (!wallet) {
       busy.value = false;
-      error.value = channels.error || $t("本站尚未啓用免手續費會員餘額支付，請聯繫商户。");
+      error.value = channels.error || $t("本站尚未啓用免手續費會員餘額支付，請聯繫商戶。");
       return;
     }
     intent.channel = wallet.code;

@@ -1,7 +1,7 @@
 // Package authz 自建 RBAC（）：admin_roles + role_permissions，權限目錄自動生成。
 //
-// 髮卡系統權限模型簡單，自建 RBAC 比 Casbin 更輕可控（規劃 ）；
-// 「域內角色」（分站主只見自己分站）由 subsite_id 租户隔離實現，不做雙套權限源。
+// 發卡系統權限模型簡單，自建 RBAC 比 Casbin 更輕可控（規劃 ）；
+// 「域內角色」（分站主只見自己分站）由 subsite_id 租戶隔離實現，不做雙套權限源。
 package authz
 
 import (

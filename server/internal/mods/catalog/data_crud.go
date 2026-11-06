@@ -233,14 +233,14 @@ func (r *ProductRepoImpl) createProduct(ctx context.Context, in port.ProductInpu
 	return create.Save(ctx)
 }
 
-// SetDirectContent 回填直髮內容密文（創建後由 service 按真實 productID 加密調用）。
+// SetDirectContent 回填直發內容密文（創建後由 service 按真實 productID 加密調用）。
 func (r *ProductRepoImpl) SetDirectContent(ctx context.Context, id uint64, ciphered []byte) error {
 	p, e := data.Client(ctx, r.data).Product.Get(ctx, id)
 	if e != nil {
 		return e
 	}
 	if p.DeliveryKind == "social_service" {
-		return fmt.Errorf("社交服務使用綁定貨源交付，不能設置直髮內容")
+		return fmt.Errorf("社交服務使用綁定貨源交付，不能設置直發內容")
 	}
 	return data.Client(ctx, r.data).Product.UpdateOneID(id).
 		Where(product.GoodsTypeNEQ("physical")).
@@ -344,7 +344,7 @@ func (r *ProductRepoImpl) updateProduct(ctx context.Context, id uint64, in port.
 	}
 	if in.StockType != "" {
 		q.SetStockType(product.StockType(in.StockType))
-		// 保留舊直髮密文供歷史訂單取貨；新訂單按 stock_type 走卡池。
+		// 保留舊直發密文供歷史訂單取貨；新訂單按 stock_type 走卡池。
 	}
 	if err := validateServiceConfig(in.FulfillmentMode, in.ManualStock, false); err != nil {
 		return nil, err

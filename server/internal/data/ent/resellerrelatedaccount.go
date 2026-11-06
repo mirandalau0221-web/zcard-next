@@ -23,7 +23,7 @@ type ResellerRelatedAccount struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 分站 profile user_id
 	ResellerID uint64 `json:"reseller_id,omitempty"`
-	// 關聯用户
+	// 關聯用戶
 	UserID uint64 `json:"user_id,omitempty"`
 	// family/same_device/sub_account...
 	RelationType string `json:"relation_type,omitempty"`

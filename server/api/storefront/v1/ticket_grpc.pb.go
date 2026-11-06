@@ -32,10 +32,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreTicketService 用户工單：創建/列表/詳情/回覆/評價/付費加急。
-// 遊客可創建（guest_contact 必填）；內部備註用户側自動過濾。
+// StoreTicketService 用戶工單：創建/列表/詳情/回覆/評價/付費加急。
+// 遊客可創建（guest_contact 必填）；內部備註用戶側自動過濾。
 type StoreTicketServiceClient interface {
-	// CreateTicket 創建工單（登錄用户或遊客）。
+	// CreateTicket 創建工單（登錄用戶或遊客）。
 	CreateTicket(ctx context.Context, in *CreateTicketRequest, opts ...grpc.CallOption) (*Ticket, error)
 	// ListMyTickets 我的工單列表。
 	ListMyTickets(ctx context.Context, in *ListMyTicketsRequest, opts ...grpc.CallOption) (*ListMyTicketsReply, error)
@@ -121,10 +121,10 @@ func (c *storeTicketServiceClient) PayUrgent(ctx context.Context, in *PayUrgentR
 // All implementations must embed UnimplementedStoreTicketServiceServer
 // for forward compatibility.
 //
-// StoreTicketService 用户工單：創建/列表/詳情/回覆/評價/付費加急。
-// 遊客可創建（guest_contact 必填）；內部備註用户側自動過濾。
+// StoreTicketService 用戶工單：創建/列表/詳情/回覆/評價/付費加急。
+// 遊客可創建（guest_contact 必填）；內部備註用戶側自動過濾。
 type StoreTicketServiceServer interface {
-	// CreateTicket 創建工單（登錄用户或遊客）。
+	// CreateTicket 創建工單（登錄用戶或遊客）。
 	CreateTicket(context.Context, *CreateTicketRequest) (*Ticket, error)
 	// ListMyTickets 我的工單列表。
 	ListMyTickets(context.Context, *ListMyTicketsRequest) (*ListMyTicketsReply, error)

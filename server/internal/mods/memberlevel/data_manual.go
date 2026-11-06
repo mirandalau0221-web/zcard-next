@@ -54,7 +54,7 @@ func (r *MemberLevelRepoImpl) ensureUnassigned(ctx context.Context, id uint64) e
 		return err
 	}
 	if exists {
-		return fmt.Errorf("該等級仍被客户或推薦贈送配置引用，請先調整關聯用户")
+		return fmt.Errorf("該等級仍被客戶或推薦贈送配置引用，請先調整關聯用戶")
 	}
 	return nil
 }
@@ -64,7 +64,7 @@ func (s *AdminMemberLevelService) AssignUserLevel(ctx context.Context, req *admi
 		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "請登錄")
 	}
 	if req.UserId == 0 || len(strings.TrimSpace(req.Reason)) == 0 || len(req.Reason) > 500 || (req.ClearReferral && req.LevelId != 0) {
-		return nil, errors.BadRequest("memberlevel.INVALID_INPUT", "請選擇用户並填寫調整原因")
+		return nil, errors.BadRequest("memberlevel.INVALID_INPUT", "請選擇用戶並填寫調整原因")
 	}
 	err := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		c := data.Client(ctx, s.repo.data)
@@ -90,7 +90,7 @@ func (s *AdminMemberLevelService) AssignUserLevel(ctx context.Context, req *admi
 			return e
 		}
 		if n != 1 && (u.ManualLevelID != req.LevelId || (req.ClearReferral && u.ReferralLevelID != 0)) {
-			return fmt.Errorf("用户等級已變化，請刷新")
+			return fmt.Errorf("用戶等級已變化，請刷新")
 		}
 		return c.AuditLog.Create().SetOperatorType("admin").SetOperatorID(claims.Subject).SetPermissionPoint("memberlevel:assign").SetAction("PUT").SetRoute("/api/v1/admin/users/member-level").SetBefore(map[string]any{"user_id": u.ID, "level_id": u.ManualLevelID, "referral_level_id": u.ReferralLevelID}).SetAfter(map[string]any{"user_id": u.ID, "level_id": req.LevelId, "reason": req.Reason, "clear_referral": req.ClearReferral}).Exec(ctx)
 	})
@@ -147,7 +147,7 @@ func (s *AdminMemberLevelService) ConfigureInviteLevel(ctx context.Context, req 
 		return nil, errors.Unauthorized("identity.UNAUTHORIZED", "請登錄")
 	}
 	if req.UserId == 0 || strings.TrimSpace(req.Reason) == "" || len(req.Reason) > 500 {
-		return nil, errors.BadRequest("memberlevel.INVALID_INPUT", "請選擇用户並填寫調整原因")
+		return nil, errors.BadRequest("memberlevel.INVALID_INPUT", "請選擇用戶並填寫調整原因")
 	}
 	err := data.Tx(ctx, s.repo.data, func(ctx context.Context) error {
 		c := data.Client(ctx, s.repo.data)
@@ -164,7 +164,7 @@ func (s *AdminMemberLevelService) ConfigureInviteLevel(ctx context.Context, req 
 			return err
 		}
 		if req.LevelId > 0 && u.Status != user.StatusActive {
-			return fmt.Errorf("請先恢復該用户的正常狀態")
+			return fmt.Errorf("請先恢復該用戶的正常狀態")
 		}
 		if _, err = c.User.UpdateOneID(u.ID).SetInviteLevelID(req.LevelId).Save(ctx); err != nil {
 			return err

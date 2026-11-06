@@ -448,7 +448,7 @@ func (x *CreateRechargeReply) GetQuote() *PaymentQuote {
 	return nil
 }
 
-// RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破限流；餘額入賬冪等鍵 giftcard:<id>）。
+// RedeemGiftcard 禮品卡兌換（哈希檢索 + 防爆破限流；餘額入賬冪等鍵 giftcard:<id>）。
 type RedeemGiftcardRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`

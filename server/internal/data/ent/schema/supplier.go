@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// SupplierAccount 下游賬户（申請→審核→發 key；secret 只顯示一次）。
+// SupplierAccount 下游賬戶（申請→審核→發 key；secret 只顯示一次）。
 type SupplierAccount struct {
 	ent.Schema
 }
@@ -32,9 +32,9 @@ func (SupplierAccount) Fields() []ent.Field {
 		// app_id、secret=32 位 app_key（MD5 驗籤時解密參與）。
 		field.Enum("protocol").Values("zcard", "dujiao_next", "acg_faka").Default("zcard"),
 		field.String("display_name").MaxLen(100).Optional().Comment("connect/ping 回顯的店鋪名（shopName/site_name）"),
-		// 前台對接申請（P3-xx）：owner=前台用户 id（admin 手動建號恆 0）；
+		// 前台對接申請（P3-xx）：owner=前台用戶 id（admin 手動建號恆 0）；
 		// apply_reason 申請理由、review_note 審核意見（駁回時必填）。
-		field.Uint64("owner_user_id").Optional().Default(0).Comment("申請歸屬前台用户（0=admin 建號）"),
+		field.Uint64("owner_user_id").Optional().Default(0).Comment("申請歸屬前台用戶（0=admin 建號）"),
 		field.String("apply_reason").MaxLen(500).Optional().Comment("申請理由（審核用）"),
 		field.String("review_note").MaxLen(500).Optional().Comment("審核意見/駁回理由"),
 		// IP 白名單（申請通過後可配置）：空數組 = 所有 IP 放行；非空 = 僅命中（精確 IP
@@ -85,7 +85,7 @@ func (SupplyOrder) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.Uint64("account_id"),
-		field.String("downstream_order_no").MaxLen(64).Comment("下游單號（賬户內冪等錨點）"),
+		field.String("downstream_order_no").MaxLen(64).Comment("下游單號（賬戶內冪等錨點）"),
 		field.JSON("items", []map[string]any{}).Comment("商品行快照（上游商品/SKU/數量/單價）"),
 		field.Int64("amount").Comment("應付（分，供貨價口徑）"),
 		field.Enum("status").

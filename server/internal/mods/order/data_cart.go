@@ -286,7 +286,7 @@ func (s *StoreCartService) toItemPB(ctx context.Context, row *ent.CartItem) (*st
 			item.Stock = stock
 		}
 	} else {
-		item.Stock = -1 // 鏈接/兑換碼類不限
+		item.Stock = -1 // 鏈接/兌換碼類不限
 	}
 	return item, nil
 }

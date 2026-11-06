@@ -18,7 +18,7 @@ const showBanner = ref(false);
 const bannerSaving = ref(false);
 const bannerForm = ref({ name: "", position: "top", title_json: "", image: [] as string[], link_type: "url", link_value: "", is_active: true, sort: 0 });
 
-// 生效狀態快捷篩選（客户端過濾，帶實時計數）
+// 生效狀態快捷篩選（客戶端過濾，帶實時計數）
 const bannerFilter = ref<"" | "on" | "off">("");
 const bannerTabs = [
   { label: "全部", value: "", type: "default" as const },

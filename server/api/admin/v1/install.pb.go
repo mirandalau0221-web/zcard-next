@@ -269,7 +269,7 @@ func (x *TestInstallConnectionReply) GetMessage() string {
 
 type PerformInstallRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AdminUsername string                 `protobuf:"bytes,1,opt,name=admin_username,json=adminUsername,proto3" json:"admin_username,omitempty"` // 管理員用户名
+	AdminUsername string                 `protobuf:"bytes,1,opt,name=admin_username,json=adminUsername,proto3" json:"admin_username,omitempty"` // 管理員用戶名
 	AdminPassword string                 `protobuf:"bytes,2,opt,name=admin_password,json=adminPassword,proto3" json:"admin_password,omitempty"` // 管理員密碼（≥8 位）
 	SiteName      string                 `protobuf:"bytes,3,opt,name=site_name,json=siteName,proto3" json:"site_name,omitempty"`                // 站點名稱（默認 ZCard 商店）
 	SiteUrl       string                 `protobuf:"bytes,4,opt,name=site_url,json=siteUrl,proto3" json:"site_url,omitempty"`                   // 站點網址（可選）

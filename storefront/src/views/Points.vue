@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="progress" style="margin-top: 10px;"><div :style="{ width: `${level.progress?.percent ?? 100}%` }"></div></div>
-      <div class="muted" style="margin-top: 8px;">{{ $t('積分來源：充值贈送 / 消費累積（') }}{{ level.current?.points_rule_json || $t('規則待配置') }}{{ $t('）；登錄後可用積分兑換下方商品') }}</div>
+      <div class="muted" style="margin-top: 8px;">{{ $t('積分來源：充值贈送 / 消費累積（') }}{{ level.current?.points_rule_json || $t('規則待配置') }}{{ $t('）；登錄後可用積分兌換下方商品') }}</div>
     </div>
 
     <div class="grid">
@@ -32,7 +32,7 @@
           {{ p.points_required }} {{ $t('積分') }} </div>
         <div class="muted" style="margin-bottom: 8px;">{{ stockLabel(p) }}</div>
         <button class="btn" :disabled="exchanging === p.id || soldOut(p)" @click="exchange(p)">
-          {{ exchanging === p.id ? $t('兑換中…') : p.stock < -1 ? $t('庫存待確認') : soldOut(p) ? $t('已兑完') : $t('積分兑換') }}
+          {{ exchanging === p.id ? $t('兌換中…') : p.stock < -1 ? $t('庫存待確認') : soldOut(p) ? $t('已兌完') : $t('積分兌換') }}
         </button>
       </div>
     </div>
@@ -61,8 +61,8 @@ const exchanging = ref<number>(0);
 let exchangeRequest = 0;
 onUnmounted(() => { exchangeRequest++; });
 
-// 庫存口徑（與後端 DTO 對齊）：-1=不限（上游代發/直髮），>=0=有限庫存；
-// proto3 省略零值仍為缺貨；-2 待確認也暫停兑換。
+// 庫存口徑（與後端 DTO 對齊）：-1=不限（上游代發/直發），>=0=有限庫存；
+// proto3 省略零值仍為缺貨；-2 待確認也暫停兌換。
 function soldOut(p: Product): boolean {
   return (p.stock ?? 0) === 0 || (p.stock ?? 0) < -1;
 }
@@ -97,7 +97,7 @@ onMounted(async () => {
   }
 });
 
-// 積分兑換（：use_points 下單 → 服務端同事務扣積分 → 直落 paid → 取貨頁交付）
+// 積分兌換（：use_points 下單 → 服務端同事務扣積分 → 直落 paid → 取貨頁交付）
 async function exchange(p: Product) {
   if (!getToken()) {
     router.push({ path: '/login', query: { redirect: '/points' } });
@@ -113,13 +113,13 @@ async function exchange(p: Product) {
     alert(detail.error || $t("加載失敗，請檢查網絡後重試"));
     return;
   }
-  // 列表沒有規格明細；有規格時進入詳情選擇，沿用現有兑換與訂單校驗。
+  // 列表沒有規格明細；有規格時進入詳情選擇，沿用現有兌換與訂單校驗。
   if (detail.data.skus?.length) {
     router.push(`/product/${p.id}`);
     return;
   }
-  if (!confirm($t("確認用 {0} 積分兑換「{1}」？", [p.points_required, p.name]))) return;
-  // 與詳情頁對齊：積分兑換同樣需要查詢密碼（取貨驗證用，至少 4 位）
+  if (!confirm($t("確認用 {0} 積分兌換「{1}」？", [p.points_required, p.name]))) return;
+  // 與詳情頁對齊：積分兌換同樣需要查詢密碼（取貨驗證用，至少 4 位）
   const qp = prompt($t("請設置查詢密碼（至少 4 位，取貨時使用）"), '');
   if (!qp || qp.length < 4) {
     alert($t("查詢密碼至少 4 位"));
@@ -133,10 +133,10 @@ async function exchange(p: Product) {
   });
   exchanging.value = 0;
   if (err || !data) {
-    alert(err || $t("兑換失敗（積分不足？）"));
+    alert(err || $t("兌換失敗（積分不足？）"));
     return;
   }
-  alert($t("兑換成功，訂單已支付，請前往取貨頁領取卡密"));
+  alert($t("兌換成功，訂單已支付，請前往取貨頁領取卡密"));
   router.push({ path: '/fetch', query: { order_no: data.order_no } });
   // 刷新積分
   if (getToken()) {
@@ -147,7 +147,7 @@ async function exchange(p: Product) {
 </script>
 
 <style scoped>
-/* 移動端：兑換商品網格雙列（與首頁/列表頁一致） */
+/* 移動端：兌換商品網格雙列（與首頁/列表頁一致） */
 @media (max-width: 768px) {
   .grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
 }

@@ -80,7 +80,7 @@ async function purchase(){
  if(!current.data){busy.value=false;error.value=current.error || $t('無法讀取原訂單，請稍後重試');return}
  if(['canceled','expired'].includes(current.data.status)){saveIntent();quote.value=undefined;busy.value=false;error.value=$t('原訂單已取消或過期，請重新報價');return}
  if(current.data.status!=='pending_payment'){saveIntent();busy.value=false;await router.push(`/order/${encodeURIComponent(intent.order_no)}`);return}
- if(!intent.channel){const channels=await fetchPaymentChannels();if(!same(m))return;const wallet=channels.data?.channels?.find(c=>c.driver==='wallet' && !Number(c.fee || 0));if(!wallet){busy.value=false;error.value=channels.error || $t('請聯繫商户啓用免手續費餘額支付');return}intent.channel=wallet.code;saveIntent(intent)}
+ if(!intent.channel){const channels=await fetchPaymentChannels();if(!same(m))return;const wallet=channels.data?.channels?.find(c=>c.driver==='wallet' && !Number(c.fee || 0));if(!wallet){busy.value=false;error.value=channels.error || $t('請聯繫商戶啓用免手續費餘額支付');return}intent.channel=wallet.code;saveIntent(intent)}
  const paid=await createPayment(intent.order_no,intent.channel);if(!same(m))return;
  busy.value=false;if(paid.error){error.value=paid.error;return}
  saveIntent();await router.push(`/order/${encodeURIComponent(intent.order_no)}`);
@@ -102,7 +102,7 @@ onBeforeUnmount(()=>{closed=true;generation++;if(timer)clearInterval(timer)});
    <p v-else-if="loading" role="status">{{ $t('正在讀取服務規則…') }}</p>
    <template v-else-if="schema">
     <h2>{{ $t('填寫服務信息') }}</h2>
-    <p v-if="!supported || !schema.purchasable" class="social-unavailable" role="status">{{uiText(schema.unavailable_reason || $t('當前服務暫不可購買，請聯繫商户'))}}</p>
+    <p v-if="!supported || !schema.purchasable" class="social-unavailable" role="status">{{uiText(schema.unavailable_reason || $t('當前服務暫不可購買，請聯繫商戶'))}}</p>
     <form v-if="supported" @submit.prevent="confirmPrice">
      <fieldset :disabled="busy || !!pending || !schema.purchasable">
       <div v-for="field in schema.fields" :key="field.key" class="social-field">

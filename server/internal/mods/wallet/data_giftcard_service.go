@@ -1,6 +1,6 @@
 package wallet
 
-// 禮品卡服務面（）：admin 批次創建/列表 + storefront 兑換。
+// 禮品卡服務面（）：admin 批次創建/列表 + storefront 兌換。
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// 禮品卡方法掛在 AdminWalletService（批次管理）與 StoreWalletService（兑換）上，
+// 禮品卡方法掛在 AdminWalletService（批次管理）與 StoreWalletService（兌換）上，
 // 構造注入 *GiftcardRepo（wire）。// CreateGiftcardBatch 批次創建（面額/數量服務端邊界校驗——鐵律 16）。
 // 明文碼僅本響應一次性返回（此後不可取——庫內無明文，鐵律 11）。
 func (s *AdminWalletService) CreateGiftcardBatch(ctx context.Context, req *adminv1.CreateGiftcardBatchRequest) (*adminv1.CreateGiftcardBatchReply, error) {
@@ -67,7 +67,7 @@ func (s *AdminWalletService) DeleteGiftcardBatch(ctx context.Context, req *admin
 	return &emptypb.Empty{}, nil
 }
 
-// RedeemGiftcard 兑換（登錄用户；失敗統一「卡密無效」防枚舉）。
+// RedeemGiftcard 兌換（登錄用戶；失敗統一「卡密無效」防枚舉）。
 func (s *StoreWalletService) RedeemGiftcard(ctx context.Context, req *storefrontv1.RedeemGiftcardRequest) (*storefrontv1.RedeemGiftcardReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {

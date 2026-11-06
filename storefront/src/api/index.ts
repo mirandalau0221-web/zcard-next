@@ -161,8 +161,8 @@ export interface CreateOrderInput {
   contact?: string;
   coupon_code?: string;
   control_answers?: Record<string, string>;
-  use_points?: boolean; // 積分兑換（：全積分商品直落 paid）
-  ref_code?: string;    // 推廣歸因碼（遊客/無鏈用户下單實時歸因）
+  use_points?: boolean; // 積分兌換（：全積分商品直落 paid）
+  ref_code?: string;    // 推廣歸因碼（遊客/無鏈用戶下單實時歸因）
   captcha_id?: string;  // 圖形驗證碼（captcha_order 開啓時遊客必填）
   captcha_code?: string;
 }
@@ -211,7 +211,7 @@ export function getBalance() {
   return api.get<BalanceReply>('/wallet');
 }
 
-// ── 用户體系（：註冊即登錄 / 登錄 / 我的信息）──
+// ── 用戶體系（：註冊即登錄 / 登錄 / 我的信息）──
 
 export interface RegisterReply {
   user_id: number;
@@ -314,7 +314,7 @@ export function me() {
   return api.get<MeReply>('/user/me');
 }
 
-// ── 用户自服務（：找回/改密/改資料）──
+// ── 用戶自服務（：找回/改密/改資料）──
 
 export function forgotPassword(email: string, captcha?: { captcha_id: string; captcha_code: string }) {
   // 防枚舉：後端對任何輸入都成功（僅真實郵箱收碼）

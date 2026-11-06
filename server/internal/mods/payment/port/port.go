@@ -61,8 +61,8 @@ type RechargePayer interface {
 	CreateRechargePayment(ctx context.Context, rechargeOrderID uint64, channel, method string, amount money.Cents) (*RechargePaymentInfo, error)
 }
 
-// SupplierRecharger 供貨賬户餘額入賬端口（payment 回調消費；wire 綁定 supplier repo）：
-// target=supply 的充值單支付成功後，將本金入賬到對接賬户供貨餘額（冪等鍵由調用方保證）。
+// SupplierRecharger 供貨賬戶餘額入賬端口（payment 回調消費；wire 綁定 supplier repo）：
+// target=supply 的充值單支付成功後，將本金入賬到對接賬戶供貨餘額（冪等鍵由調用方保證）。
 type SupplierRecharger interface {
 	Recharge(ctx context.Context, accountID uint64, amount int64, reference, remark string) error
 }
@@ -101,7 +101,7 @@ type Capturer interface {
 	QueryPayment(ctx context.Context, gatewayOrderNo string, cfg json.RawMessage) (*CallbackFact, error)
 }
 
-// OrderCapturer 在未收到回調、尚無網關交易號時按商户訂單號查單。
+// OrderCapturer 在未收到回調、尚無網關交易號時按商戶訂單號查單。
 type OrderCapturer interface {
 	QueryPaymentByOrderNo(ctx context.Context, orderNo string, cfg json.RawMessage) (*CallbackFact, error)
 }
@@ -159,7 +159,7 @@ type MetaProvider interface {
 
 // OptionProvider 字段選項動態加載（ 修復）：epusdt network/token 的
 // 可選值以網關 GET /payments/gmpay/v1/config 的 supported_assets 為準（官方文檔
-// 明示——每個商户實例啓用的鏈/代幣不同）；實現方負責上游不可達回落靜態矩陣。
+// 明示——每個商戶實例啓用的鏈/代幣不同）；實現方負責上游不可達回落靜態矩陣。
 type OptionProvider interface {
 	FieldOptions(ctx context.Context, field string, partial json.RawMessage) (FieldOptionsResult, error)
 }

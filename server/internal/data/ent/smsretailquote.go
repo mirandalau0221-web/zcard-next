@@ -22,7 +22,7 @@ type SMSRetailQuote struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
+	// 租戶（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID uint64 `json:"user_id,omitempty"`

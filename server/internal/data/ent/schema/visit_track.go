@@ -24,8 +24,8 @@ func (PageView) Fields() []ent.Field {
 		field.Uint64("id"),
 		field.String("day").MaxLen(8).Comment("統計日 yyyymmdd（UTC）"),
 		field.String("path").MaxLen(255).Comment("請求路徑"),
-		field.Uint64("user_id").Optional().Comment("登錄用户（遊客為 0）"),
-		field.String("ip").MaxLen(64).Comment("客户端 IP"),
+		field.Uint64("user_id").Optional().Comment("登錄用戶（遊客為 0）"),
+		field.String("ip").MaxLen(64).Comment("客戶端 IP"),
 	}
 }
 
@@ -36,7 +36,7 @@ func (PageView) Indexes() []ent.Index {
 	}
 }
 
-// UserSession 在線會話心跳（每登錄用户一行，活躍即 upsert last_active_at）。
+// UserSession 在線會話心跳（每登錄用戶一行，活躍即 upsert last_active_at）。
 // 在線口徑 = last_active_at 距今 ≤ 5 分鐘；清理閾值 24 小時（cron）。
 type UserSession struct {
 	ent.Schema

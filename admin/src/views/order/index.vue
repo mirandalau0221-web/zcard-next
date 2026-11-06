@@ -205,7 +205,7 @@ function sortedEvents(evts: any[]) {
 function operatorText(op: string) {
   const map: Record<string, string> = {
     system: "系統",
-    user: "用户",
+    user: "用戶",
     admin: "管理員",
     worker: "工單處理",
   };
@@ -563,7 +563,7 @@ async function copyCard(content: string, idx: number) {
 }
 
 function deliverModeText(mode: string): string {
-  return { status: "標記模式", delete: "即刪模式", direct: "直髮" }[mode] || mode;
+  return { status: "標記模式", delete: "即刪模式", direct: "直發" }[mode] || mode;
 }
 
 // ── 訂單退款（order:refund 超管專屬；渠道錢包/網關/上游三路）──

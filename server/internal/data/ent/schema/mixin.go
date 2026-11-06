@@ -24,11 +24,11 @@ func (TimeMixin) Fields() []ent.Field {
 	}
 }
 
-// TenantMixin 租户列（Row 行級隔離，開源版唯一啓用的隔離模式，ADR-D15）。
+// TenantMixin 租戶列（Row 行級隔離，開源版唯一啓用的隔離模式，ADR-D15）。
 //
 // 三種隔離模式下統一保留該列（Schema/Database 模式恆為 0），Ent schema 定義不因模式而變。
 // M1 交付 Ent interceptor 讀寫自動注入（讀攔截器追加 subsite_id IN (ctx)、寫攔截器從父實體
-// 繼承填充），業務代碼不手寫租户條件（鐵律 14）。唯一索引必須含 subsite_id（§4.11.5）。
+// 繼承填充），業務代碼不手寫租戶條件（鐵律 14）。唯一索引必須含 subsite_id（§4.11.5）。
 type TenantMixin struct {
 	mixin.Schema
 }
@@ -37,7 +37,7 @@ func (TenantMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("subsite_id").
 			Default(0).
-			Comment("租户（0=主站；由 interceptor 自動注入，業務不手寫）"),
+			Comment("租戶（0=主站；由 interceptor 自動注入，業務不手寫）"),
 	}
 }
 

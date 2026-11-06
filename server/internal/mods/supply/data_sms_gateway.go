@@ -26,7 +26,7 @@ func (g *Gateway) PrepareSMS(ctx context.Context, id uint64, code string) (suppl
 		return quote, err
 	}
 	if !slices.Contains(p.Capabilities, supplyport.SMSCapability) || !slices.Contains(p.Capabilities, supplyport.SMSPolling) || p.Currency != "CNY" || p.Balance < 0 {
-		return quote, fmt.Errorf("貨源接碼能力或簽名賬户尚未就緒")
+		return quote, fmt.Errorf("貨源接碼能力或簽名賬戶尚未就緒")
 	}
 	reader, ok := a.(interface {
 		GetSMSProduct(context.Context, string) (int64, error)

@@ -16,7 +16,7 @@ const recoverSession = createSessionRecovery({
 });
 
 /**
- * Kratos 後端請求客户端：
+ * Kratos 後端請求客戶端：
  * - 成功：HTTP 2xx，響應體為 proto JSON（snake_case）
  * - 失敗：HTTP 4xx/5xx，響應體 { code, reason, message }
  * - 401：嘗試 refresh，失敗則登出

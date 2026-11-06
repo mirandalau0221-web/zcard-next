@@ -2,8 +2,8 @@ package wallet
 
 // 禮品卡（，表 建）：
 // 批次創建（面額/數量/有效期）→ 批量生成 code（CardCipher 同款 AES-GCM 密文
-// + keyed hash 唯一索引）→ 兑換 = 查 hash → 核銷 → CreditInTx(giftcard:<id>)。
-// 防爆破：兑換失敗計數（同用户 30s 窗口 5 次鎖定）；庫內無明文 code（鐵律 11）。
+// + keyed hash 唯一索引）→ 兌換 = 查 hash → 核銷 → CreditInTx(giftcard:<id>)。
+// 防爆破：兌換失敗計數（同用戶 30s 窗口 5 次鎖定）；庫內無明文 code（鐵律 11）。
 
 import (
 	"context"
@@ -19,12 +19,12 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/mods/inventory"
 )
 
-// GiftcardRepo 禮品卡倉儲（獨立構造——code 加密走 CardCipher，兑換入賬走 WalletRepoImpl）。
+// GiftcardRepo 禮品卡倉儲（獨立構造——code 加密走 CardCipher，兌換入賬走 WalletRepoImpl）。
 type GiftcardRepo struct {
 	data   *data.Data
 	cipher *inventory.CardCipher
 	wallet *WalletRepoImpl
-	// 防爆破限流（內存態：同用户失敗計數，30s 窗口 5 次鎖定）
+	// 防爆破限流（內存態：同用戶失敗計數，30s 窗口 5 次鎖定）
 	mu        sync.Mutex
 	failures  map[uint64]int
 	lockUntil map[uint64]time.Time
@@ -106,8 +106,8 @@ func (r *GiftcardRepo) ListBatches(ctx context.Context, page, size int) ([]*ent.
 	return rows, int64(total), err
 }
 
-// DeleteBatch 在同一事務中隱藏批次並作廢未兑換卡。已兑換卡和賬本保留。
-// 與 Redeem 的 unused CAS 競爭：先完成兑換的保留入賬，先作廢的不能兑換。
+// DeleteBatch 在同一事務中隱藏批次並作廢未兌換卡。已兌換卡和賬本保留。
+// 與 Redeem 的 unused CAS 競爭：先完成兌換的保留入賬，先作廢的不能兌換。
 func (r *GiftcardRepo) DeleteBatch(ctx context.Context, id uint64) error {
 	return data.Tx(ctx, r.data, func(txCtx context.Context) error {
 		client := data.Client(txCtx, r.data)
@@ -126,7 +126,7 @@ func (r *GiftcardRepo) DeleteBatch(ctx context.Context, id uint64) error {
 	})
 }
 
-// Redeem 兑換（登錄用户）：查 hash → 核銷 → 餘額入賬（冪等鍵 giftcard:<id>）。
+// Redeem 兌換（登錄用戶）：查 hash → 核銷 → 餘額入賬（冪等鍵 giftcard:<id>）。
 // 失敗（卡不存在/已用/過期）統一返回「卡密無效」（防枚舉）；連續失敗 5 次鎖 30s。
 func (r *GiftcardRepo) Redeem(ctx context.Context, code string, userID uint64) (int64, error) {
 	// 防爆破：鎖定窗口內直接拒絕
@@ -156,7 +156,7 @@ func (r *GiftcardRepo) Redeem(ctx context.Context, code string, userID uint64) (
 	var credited int64
 	err = data.Tx(ctx, r.data, func(txCtx context.Context) error {
 		client := data.Client(txCtx, r.data)
-		// 核銷（CAS：unused → used；防併發重複兑換）
+		// 核銷（CAS：unused → used；防併發重複兌換）
 		affected, err := client.Giftcard.Update().
 			Where(
 				giftcard.ID(g.ID),
@@ -176,7 +176,7 @@ func (r *GiftcardRepo) Redeem(ctx context.Context, code string, userID uint64) (
 		if err := r.wallet.CreditInTx(txCtx, Entry{
 			UserID: userID, Direction: "in", Type: "giftcard",
 			Amount: g.Amount, Reference: fmt.Sprintf("giftcard:%d", g.ID),
-			Remark: "禮品卡兑換",
+			Remark: "禮品卡兌換",
 		}); err != nil {
 			return err
 		}

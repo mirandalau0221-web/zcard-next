@@ -17,7 +17,7 @@ func validSMTPAuth(auth string) bool {
 
 func smtpAuthentication(client *smtp.Client, cfg *notifyport.SMTPConfig) (smtp.Auth, error) {
 	if cfg.Username == "" || cfg.Password == "" {
-		return nil, fmt.Errorf("SMTP 用户名或密碼為空；免認證中繼請選擇無需認證")
+		return nil, fmt.Errorf("SMTP 用戶名或密碼為空；免認證中繼請選擇無需認證")
 	}
 	ok, advertised := client.Extension("AUTH")
 	if !ok {

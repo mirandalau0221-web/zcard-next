@@ -108,7 +108,7 @@ func (s *StoreSMSChannelService) channel(ctx context.Context, id uint64, require
 		}
 	}
 	if ping.Currency != "CNY" || ping.Balance < 0 {
-		return nil, errors.BadRequest("sms.ACCOUNT_UNAVAILABLE", "供貨賬户尚未就緒")
+		return nil, errors.BadRequest("sms.ACCOUNT_UNAVAILABLE", "供貨賬戶尚未就緒")
 	}
 	client, ok := a.(supplyport.SMSChannelClient)
 	if !ok {

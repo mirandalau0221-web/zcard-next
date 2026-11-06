@@ -624,7 +624,7 @@ func (x *ExportCouponsReply) GetCsv() string {
 	return ""
 }
 
-// GrantCoupon 批次贈送指定用户（領取）。
+// GrantCoupon 批次贈送指定用戶（領取）。
 type GrantCouponRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	BatchId       string                 `protobuf:"bytes,1,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"`

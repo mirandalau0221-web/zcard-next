@@ -4,7 +4,7 @@ package migratev1
 // withdrawals、commissions → affiliate_commissions。
 // 映射規格《數據遷移工具開發計劃》§5.6。
 //
-// 對賬不變量（差異暴露而非修復）：每用户末條流水 balance_after ==
+// 對賬不變量（差異暴露而非修復）：每用戶末條流水 balance_after ==
 // wallet_accounts.available（P1 的 1.x users.balance 快照）；不等即進
 // 「資金差異清單」——1.x 賬實不符是歷史問題，遷移工具的職責是暴露它。
 
@@ -111,7 +111,7 @@ func (m *Migrator) migrateBills(ctx context.Context) error {
 	)
 }
 
-// ReconcileWallets 餘額三方對賬：每用户「末條流水 balance_after vs 錢包快照 available
+// ReconcileWallets 餘額三方對賬：每用戶「末條流水 balance_after vs 錢包快照 available
 // （=1.x users.balance）」。差異進清單（errors.jsonl + 報告），不修復——切換前人工核銷。
 // 必須在 bills 全量遷完後調用。
 func (m *Migrator) ReconcileWallets(ctx context.Context) error {
@@ -130,7 +130,7 @@ func (m *Migrator) ReconcileWallets(ctx context.Context) error {
 			Order(ent.Desc(wallettransaction.FieldCreatedAt), ent.Desc(wallettransaction.FieldID)).
 			First(ctx)
 		if ent.IsNotFound(err) {
-			continue // 無流水（空賬户）：快照即真相
+			continue // 無流水（空賬戶）：快照即真相
 		}
 		if err != nil {
 			return err

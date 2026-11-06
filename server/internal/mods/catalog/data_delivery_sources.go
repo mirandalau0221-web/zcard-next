@@ -233,7 +233,7 @@ func (s *AdminCatalogService) SetDeliverySource(ctx context.Context, req *adminv
 				return e
 			}
 			if controls > 0 {
-				return fmt.Errorf("包含客户填寫字段的商品不能自動複用，請先確認並移除專屬字段")
+				return fmt.Errorf("包含客戶填寫字段的商品不能自動複用，請先確認並移除專屬字段")
 			}
 			create := c.ProductDeliverySource.Create().SetProductID(p.ID).SetSkuID(req.SkuId).SetSubsiteID(p.SubsiteID).SetExpiresAt(req.ExpiresAt).SetMaxDeliveries(req.MaxDeliveries)
 			if req.FirstPurchase {

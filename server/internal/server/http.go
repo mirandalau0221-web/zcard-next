@@ -135,7 +135,7 @@ func NewHTTPServer(
 	updateSvc *update.AdminUpdateService,
 ) *khttp.Server {
 	// ⚠️ Kratos khttp.Filter 是整體替換（o.filters = filters）非追加——
-	// 多次調用只有最後一次生效（曾致 supplier HMAC/CORS/租户被 audit 靜默覆蓋）。
+	// 多次調用只有最後一次生效（曾致 supplier HMAC/CORS/租戶被 audit 靜默覆蓋）。
 	// 全部 Filter 必須合併為一次註冊。
 	requestTimeout := 30 * time.Second
 	if c != nil && c.Http != nil && c.Http.Timeout != nil {
@@ -146,7 +146,7 @@ func NewHTTPServer(
 			requestDeadlineFilter(requestTimeout),
 			privateOrderResponseFilter,
 			corsFilter,
-			// ：租户域名解析（Filter 層——中間件拿不到 Host；最外層確保全鏈路繼承）
+			// ：租戶域名解析（Filter 層——中間件拿不到 Host；最外層確保全鏈路繼承）
 			tenantFilter(tenancyMainDomain(c), resellerRepo),
 			settings.PreviewWriteGuard,
 			// 未安裝守門（在線安裝 Web 嚮導；Filter 層直寫 302）

@@ -325,11 +325,11 @@ type AdminProduct struct {
 	UpstreamProductCode string                 `protobuf:"bytes,18,opt,name=upstream_product_code,json=upstreamProductCode,proto3" json:"upstream_product_code,omitempty"`
 	CreatedAt           int64                  `protobuf:"varint,19,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt           int64                  `protobuf:"varint,20,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	// 積分兑換價（0=不參與積分商城；）
+	// 積分兌換價（0=不參與積分商城；）
 	PointsRequired int64 `protobuf:"varint,21,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
 	// 已售數量（paid 及之後狀態訂單的 quantity 聚合；列表計算字段）
 	SoldCount int64 `protobuf:"varint,22,opt,name=sold_count,json=soldCount,proto3" json:"sold_count,omitempty"`
-	// 直髮內容已設置（url/code 商品；明文永不回傳）
+	// 直發內容已設置（url/code 商品；明文永不回傳）
 	HasDirectContent bool `protobuf:"varint,23,opt,name=has_direct_content,json=hasDirectContent,proto3" json:"has_direct_content,omitempty"`
 	// 運營推薦（storefront 首頁推薦位）
 	IsRecommend          bool   `protobuf:"varint,24,opt,name=is_recommend,json=isRecommend,proto3" json:"is_recommend,omitempty"`
@@ -758,9 +758,9 @@ type CreateProductRequest struct {
 	Dedup             bool                   `protobuf:"varint,11,opt,name=dedup,proto3" json:"dedup,omitempty"`
 	Sort              int32                  `protobuf:"varint,12,opt,name=sort,proto3" json:"sort,omitempty"`
 	Status            int32                  `protobuf:"varint,13,opt,name=status,proto3" json:"status,omitempty"`
-	// 積分兑換價（0=不參與積分商城；）
+	// 積分兌換價（0=不參與積分商城；）
 	PointsRequired int64 `protobuf:"varint,14,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
-	// 直髮內容明文（url/code 商品：網盤鏈接/兑換碼，加密存儲；同一內容發給每個買家）
+	// 直發內容明文（url/code 商品：網盤鏈接/兌換碼，加密存儲；同一內容發給每個買家）
 	DirectContent string `protobuf:"bytes,15,opt,name=direct_content,json=directContent,proto3" json:"direct_content,omitempty"`
 	// 運營推薦（storefront 首頁推薦位）
 	IsRecommend   bool `protobuf:"varint,16,opt,name=is_recommend,json=isRecommend,proto3" json:"is_recommend,omitempty"`
@@ -1007,7 +1007,7 @@ type UpdateProductRequest struct {
 	Description *string  `protobuf:"bytes,4,opt,name=description,proto3,oneof" json:"description,omitempty"`
 	Cover       *string  `protobuf:"bytes,5,opt,name=cover,proto3,oneof" json:"cover,omitempty"`
 	Images      []string `protobuf:"bytes,6,rep,name=images,proto3" json:"images,omitempty"`
-	// true 時以 images 替換圖集（包括空數組）；省略且 images 非空時兼容舊客户端。
+	// true 時以 images 替換圖集（包括空數組）；省略且 images 非空時兼容舊客戶端。
 	ImagesSet         bool   `protobuf:"varint,19,opt,name=images_set,json=imagesSet,proto3" json:"images_set,omitempty"`
 	PriceCents        int64  `protobuf:"varint,7,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`
 	FactoryPriceCents int64  `protobuf:"varint,8,opt,name=factory_price_cents,json=factoryPriceCents,proto3" json:"factory_price_cents,omitempty"`
@@ -1015,9 +1015,9 @@ type UpdateProductRequest struct {
 	StockVisible      *bool  `protobuf:"varint,10,opt,name=stock_visible,json=stockVisible,proto3,oneof" json:"stock_visible,omitempty"`
 	Sort              int32  `protobuf:"varint,11,opt,name=sort,proto3" json:"sort,omitempty"`
 	Status            int32  `protobuf:"varint,12,opt,name=status,proto3" json:"status,omitempty"`
-	// 積分兑換價（0=不參與積分商城；）
+	// 積分兌換價（0=不參與積分商城；）
 	PointsRequired int64 `protobuf:"varint,13,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
-	// 直髮內容明文（空=保持不變；url/code 商品加密存儲）
+	// 直發內容明文（空=保持不變；url/code 商品加密存儲）
 	DirectContent string `protobuf:"bytes,14,opt,name=direct_content,json=directContent,proto3" json:"direct_content,omitempty"`
 	// 運營推薦（省略保留原值；false=取消推薦）。
 	IsRecommend *bool `protobuf:"varint,15,opt,name=is_recommend,json=isRecommend,proto3,oneof" json:"is_recommend,omitempty"`

@@ -258,7 +258,7 @@ func checkOrderItems(ctx context.Context, reader catalogport.ProductReader,
 			continue // 商品不可讀：交由訂單主流程判定（PRODUCT_NOT_FOUND）
 		}
 		if p.UpstreamSourceID == 0 {
-			continue // 非上游項：本地卡密走事務內鎖卡，直髮無庫存概念
+			continue // 非上游項：本地卡密走事務內鎖卡，直發無庫存概念
 		}
 		if p.UpstreamProductCode == "" {
 			return fmt.Errorf("supply.STOCK_UNAVAILABLE: 商品「%s」缺少上游商品標識", p.Name)

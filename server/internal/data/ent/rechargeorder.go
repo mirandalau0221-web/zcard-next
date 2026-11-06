@@ -31,7 +31,7 @@ type RechargeOrder struct {
 	GiftPoints int32 `json:"gift_points,omitempty"`
 	// 入賬方向（supply=供貨商預存，M2）
 	Target rechargeorder.Target `json:"target,omitempty"`
-	// target=supply 時的入賬目標對接賬户
+	// target=supply 時的入賬目標對接賬戶
 	SupplierAccountID uint64 `json:"supplier_account_id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status rechargeorder.Status `json:"status,omitempty"`

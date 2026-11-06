@@ -5,7 +5,7 @@ package supply
 // 我們作為下游時，上游（zcard / dujiao-next）交付後會主動 POST 回調：
 // zcard 四頭 X-Supply-*（雙口徑驗籤，與自家協議同源；supplier/signing.go）
 // dujiao 三頭 Dujiao-Next-*（簽名 path 固定為協議常量 /api/v1/upstream/callback，
-// 非實際接收路徑——dujiao-next downstreamcallback 客户端口徑）
+// 非實際接收路徑——dujiao-next downstreamcallback 客戶端口徑）
 // acg 協議無回調（同步交付），返回 ErrCallbackNotSupported
 //
 // 防重放：時間窗 + 「ts+簽名摘要」組合鍵進程內去重（短窗內同一簽名只接受一次；

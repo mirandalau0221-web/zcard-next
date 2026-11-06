@@ -140,7 +140,7 @@ func (x *CreateGiftcardBatchRequest) GetQuantity() int32 {
 type CreateGiftcardBatchReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Batch         *GiftcardBatchItem     `protobuf:"bytes,1,opt,name=batch,proto3" json:"batch,omitempty"`
-	Codes         []string               `protobuf:"bytes,2,rep,name=codes,proto3" json:"codes,omitempty"` // 明文兑換碼（當次響應後僅存於管理員側）
+	Codes         []string               `protobuf:"bytes,2,rep,name=codes,proto3" json:"codes,omitempty"` // 明文兌換碼（當次響應後僅存於管理員側）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -493,7 +493,7 @@ type WithdrawalItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Username      string                 `protobuf:"bytes,12,opt,name=username,proto3" json:"username,omitempty"` // 用户名（列表富化）
+	Username      string                 `protobuf:"bytes,12,opt,name=username,proto3" json:"username,omitempty"` // 用戶名（列表富化）
 	AmountCents   int64                  `protobuf:"varint,3,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
 	FeeCents      int64                  `protobuf:"varint,4,opt,name=fee_cents,json=feeCents,proto3" json:"fee_cents,omitempty"`
 	MethodType    string                 `protobuf:"bytes,5,opt,name=method_type,json=methodType,proto3" json:"method_type,omitempty"`
@@ -708,7 +708,7 @@ func (x *ReviewWithdrawalRequest) GetReason() string {
 type PayWithdrawalRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Receipt       string                 `protobuf:"bytes,2,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回執（交易流水號/憑證備註；客户可見）
+	Receipt       string                 `protobuf:"bytes,2,opt,name=receipt,proto3" json:"receipt,omitempty"` // 打款回執（交易流水號/憑證備註；客戶可見）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1043,7 +1043,7 @@ func (x *PointsBalance) GetPoints() int64 {
 
 type ListWalletTxRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// 指定用户流水；0 = 全站流水（賬單管理）。不能標 REQUIRED——proto3 零值 0 會被網關判缺失。
+	// 指定用戶流水；0 = 全站流水（賬單管理）。不能標 REQUIRED——proto3 零值 0 會被網關判缺失。
 	UserId        uint64 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Page          int32  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
@@ -1165,8 +1165,8 @@ type WalletTx struct {
 	Reference          string                 `protobuf:"bytes,7,opt,name=reference,proto3" json:"reference,omitempty"`
 	Remark             string                 `protobuf:"bytes,8,opt,name=remark,proto3" json:"remark,omitempty"`
 	CreatedAt          int64                  `protobuf:"varint,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UserId             uint64                 `protobuf:"varint,10,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                              // 歸屬用户（全站流水場景展示）
-	Username           string                 `protobuf:"bytes,11,opt,name=username,proto3" json:"username,omitempty"`                                         // 歸屬用户名（全站流水批量回填，可空）
+	UserId             uint64                 `protobuf:"varint,10,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                              // 歸屬用戶（全站流水場景展示）
+	Username           string                 `protobuf:"bytes,11,opt,name=username,proto3" json:"username,omitempty"`                                         // 歸屬用戶名（全站流水批量回填，可空）
 	DisplayReference   string                 `protobuf:"bytes,12,opt,name=display_reference,json=displayReference,proto3" json:"display_reference,omitempty"` // 展示用業務單號，reference 保留原始冪等鍵
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache

@@ -92,7 +92,7 @@ func (Payment) Fields() []ent.Field {
 			Comment("快照匯率（1 基礎貨幣=rate 渠道幣；0=未換算）"),
 		field.Int32("charged_precision").Default(-1).Comment("渠道金額單位精度快照；-1 為歷史未記錄，不能使用顯示精度推斷"),
 		field.Int64("charged_units").Default(0).Comment("渠道幣種應收最小單位（發適配器金額；回調精確核對）"),
-		field.Int64("fee").Default(0).Comment("用户支付手續費（分）"),
+		field.Int64("fee").Default(0).Comment("用戶支付手續費（分）"),
 		field.JSON("pricing_snapshot", json.RawMessage{}).Optional().Comment("支付本金、費率、承擔方及方式快照；空為歷史流水"),
 		field.Enum("status").Values("pending", "success", "failed").Default("pending"),
 		field.Time("paid_at").SchemaType(mysqlTime).Optional(),

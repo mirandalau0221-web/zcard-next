@@ -57,7 +57,7 @@ const columns: DataTableColumns<any> = [
     width: 100,
     render: (row) => formatMoney(row.amount_cents),
   },
-  { title: "用户手續費", key: "fee_cents", width: 110, render: (row) => formatMoney(row.fee_cents || 0) },
+  { title: "用戶手續費", key: "fee_cents", width: 110, render: (row) => formatMoney(row.fee_cents || 0) },
   { title: "實收", key: "charged_cents", width: 110, render: (row) => row.status === "success" ? formatMoney(row.charged_cents || 0) : "—" },
   {
     title: "狀態",

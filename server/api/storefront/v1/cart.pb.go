@@ -190,7 +190,7 @@ type CartItem struct {
 	PriceCents     int64       `protobuf:"varint,6,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`     // 現價（SKU 解析後）
 	MaxQuantity    int32       `protobuf:"varint,14,opt,name=max_quantity,json=maxQuantity,proto3" json:"max_quantity,omitempty"` // 單次購買上限，0 使用默認上限
 	Stock          int64       `protobuf:"varint,7,opt,name=stock,proto3" json:"stock,omitempty"`                                 // 可用庫存（-1 不限）
-	PointsOnly     bool        `protobuf:"varint,8,opt,name=points_only,json=pointsOnly,proto3" json:"points_only,omitempty"`     // 積分兑換商品（不可混合結算）
+	PointsOnly     bool        `protobuf:"varint,8,opt,name=points_only,json=pointsOnly,proto3" json:"points_only,omitempty"`     // 積分兌換商品（不可混合結算）
 	PointsRequired int64       `protobuf:"varint,9,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
 	Valid          bool        `protobuf:"varint,10,opt,name=valid,proto3" json:"valid,omitempty"` // false=已下架/隱藏（列表打標不可選）
 	FlashSale      *FlashOffer `protobuf:"bytes,13,opt,name=flash_sale,json=flashSale,proto3" json:"flash_sale,omitempty"`

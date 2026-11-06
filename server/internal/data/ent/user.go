@@ -25,15 +25,15 @@ type User struct {
 	ManualLevelID uint64 `json:"manual_level_id,omitempty"`
 	// 註冊時獲贈等級，獨立於邀請人的當前配置
 	ReferralLevelID uint64 `json:"referral_level_id,omitempty"`
-	// 邀請新客户註冊贈送的等級，0為關閉
+	// 邀請新客戶註冊贈送的等級，0為關閉
 	InviteLevelID uint64 `json:"invite_level_id,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
-	// 第三方登錄用户可無郵箱
+	// 第三方登錄用戶可無郵箱
 	Email string `json:"email,omitempty"`
 	// Phone holds the value of the "phone" field.
 	Phone string `json:"phone,omitempty"`
-	// 第三方登錄用户可無密碼
+	// 第三方登錄用戶可無密碼
 	PasswordHash string `json:"password_hash,omitempty"`
 	// Status holds the value of the "status" field.
 	Status user.Status `json:"status,omitempty"`

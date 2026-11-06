@@ -191,7 +191,7 @@ func HashFile(r io.Reader) (hexSum string, size int64, err error) {
 	return hex.EncodeToString(h.Sum(nil)), n, nil
 }
 
-// Client 更新客户端（三源統一；源字段見 Source* 常量，測試經 GHBase/APIBase 注入）。
+// Client 更新客戶端（三源統一；源字段見 Source* 常量，測試經 GHBase/APIBase 注入）。
 type Client struct {
 	Source     string // github | accel | static
 	Repo       string // "owner/repo"（github/accel）
@@ -203,7 +203,7 @@ type Client struct {
 	Token      string // 可選 GitHub Token（beta 通道限流緩解）
 }
 
-// NewClient 構造指定源的客户端（生產默認基址；測試可再覆寫 GHBase/APIBase）。
+// NewClient 構造指定源的客戶端（生產默認基址；測試可再覆寫 GHBase/APIBase）。
 func NewClient(source, repo, accel, staticBase string) *Client {
 	return &Client{
 		Source: source, Repo: repo, Accel: accel, StaticBase: staticBase,
@@ -218,7 +218,7 @@ func (c *Client) http() *http.Client {
 	return &http.Client{Timeout: 30 * time.Second}
 }
 
-// dlHTTP 產物下載客户端：124MB 級大文件經免費加速鏡像（限速 1-10MB/s 常見）
+// dlHTTP 產物下載客戶端：124MB 級大文件經免費加速鏡像（限速 1-10MB/s 常見）
 // 30s 整體超時必斷（context deadline exceeded while reading body）——默認 10 分鐘，
 // 與更新鏈 ctx（15min）匹配；顯式注入的 HTTP（測試/定製）尊重調用方。
 func (c *Client) dlHTTP() *http.Client {

@@ -1241,7 +1241,7 @@ func (s *SyncService) failAndMaybeRetry(ctx context.Context, taskID uint64, conn
 		}
 		runCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Minute)
 		defer cancel()
-		// 重跑前檢查取消意圖（等待期被用户取消則不再復活）
+		// 重跑前檢查取消意圖（等待期被用戶取消則不再復活）
 		if t, err := s.repo.GetSyncTask(runCtx, taskID); err != nil || !t.CancelRequestedAt.IsZero() {
 			return
 		}

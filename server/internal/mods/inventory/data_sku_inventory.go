@@ -55,7 +55,7 @@ func importEligibility(p *ent.Product, sku *ent.ProductSku) string {
 		return "實體商品不能導入卡密，請調整實物庫存"
 	}
 	if p.StockType != "card" {
-		return "鏈接或兑換碼商品無需導入卡密，請維護直髮內容"
+		return "鏈接或兌換碼商品無需導入卡密，請維護直發內容"
 	}
 	switch data.StockSource(p, sku) {
 	case "local":

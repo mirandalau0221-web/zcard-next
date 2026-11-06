@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 賬單流水（全站錢包流水：user_id=0 拉全部用户；歸屬用户列 + 類型篩選 + 金額彙總）。
+// 賬單流水（全站錢包流水：user_id=0 拉全部用戶；歸屬用戶列 + 類型篩選 + 金額彙總）。
 import { onMounted, ref, h } from "vue";
 import { NDataTable, NInput, NSelect, NTag } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
@@ -14,7 +14,7 @@ const bills = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
 const pageSize = ref(20);
-// 類型篩選（客户端過濾當前頁；服務端 type 篩選參數暫未開放）
+// 類型篩選（客戶端過濾當前頁；服務端 type 篩選參數暫未開放）
 const typeFilter = ref<string | null>(null);
 
 function directionText(d?: string) {
@@ -61,11 +61,11 @@ function formatTime(ts?: number) {
 const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 64 },
   {
-    title: "用户",
+    title: "用戶",
     key: "username",
     width: 140,
     render: (row) =>
-      h("span", { title: `用户 ID ${row.user_id}` }, row.username ? `${row.username}` : `#${row.user_id}`),
+      h("span", { title: `用戶 ID ${row.user_id}` }, row.username ? `${row.username}` : `#${row.user_id}`),
   },
   {
     title: "方向",

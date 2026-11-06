@@ -144,7 +144,7 @@ const credFields = computed(() => {
       ];
     case "acg_faka":
       return [
-        { key: "app_id", label: "商户ID（app_id）" },
+        { key: "app_id", label: "商戶ID（app_id）" },
         { key: "app_key", label: "對接密鑰（app_key）" },
       ];
     default:

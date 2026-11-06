@@ -1,9 +1,9 @@
 <script setup lang="ts">
-// 供貨賬號管理（supplier:read / supplier:write）：下游客户賬户 + 對接申請審核工作台。
+// 供貨賬號管理（supplier:read / supplier:write）：下游客戶賬戶 + 對接申請審核工作台。
 // protocol 三選一：ZCard 自有協議 / dujiao-next 兼容 / acg-faka 兼容（ B/C）——
 // 兼容賬號讓對應平台不改代碼即可對接本站；創建後展示「對接配置説明」。
 // 前台個人中心提交的申請（owner_user_id>0）在「待審核」篩選下集中處理：
-// 審核彈窗展示完整申請資料，「通過並開通」即生效（用户前台可查憑據），駁回須填意見。
+// 審核彈窗展示完整申請資料，「通過並開通」即生效（用戶前台可查憑據），駁回須填意見。
 import { h, computed, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import {
@@ -32,7 +32,7 @@ const statusFilter = ref<"" | "applying" | "approved" | "rejected" | "disabled">
   route.query.status === "applying" ? "applying" : "",
 );
 
-// 客户端過濾（全量 ≤200 拉取，內存篩選）
+// 客戶端過濾（全量 ≤200 拉取，內存篩選）
 const accounts = computed(() =>
   statusFilter.value === "" ? allAccounts.value : allAccounts.value.filter((r: any) => r.status === statusFilter.value),
 );
@@ -50,7 +50,7 @@ const statusTabs = [
 const protocolMeta: Record<string, { label: string; tag: "success" | "info" | "warning"; hint: string }> = {
   zcard: { label: "ZCard", tag: "success", hint: "對接另一套 ZCard：填本站地址 + api_key/api_secret（X-Supply-* 四頭簽名）" },
   dujiao_next: { label: "dujiao 兼容", tag: "info", hint: "對方 dujiao-next 後台「站點連接」填本站地址 + 下發的是 api_key/api_secret（Dujiao-Next-* 三頭）" },
-  acg_faka: { label: "acg 兼容", tag: "warning", hint: "對方 acg-faka 後台「共享店鋪(異次元)」填本站地址 + 商户ID=api_key、密鑰=api_secret" },
+  acg_faka: { label: "acg 兼容", tag: "warning", hint: "對方 acg-faka 後台「共享店鋪(異次元)」填本站地址 + 商戶ID=api_key、密鑰=api_secret" },
 };
 
 const canWrite = () => checkAuth("supplier:write");
@@ -155,7 +155,7 @@ async function handleToggle(row: any) {
   }
 }
 
-// ── 賬户詳情（對接信息查看 + IP 白名單管理；api_key 僅在此展示）──
+// ── 賬戶詳情（對接信息查看 + IP 白名單管理；api_key 僅在此展示）──
 const detailModal = ref(false);
 const detailTarget = ref<any>(null);
 const detailWhitelist = ref<string[]>([]);
@@ -456,7 +456,7 @@ onMounted(load);
     <NAlert v-if="applyingCount > 0 && statusFilter !== 'applying'" type="warning" :bordered="false" class="mb-12px">
       <template #default>
         <div class="flex items-center justify-between gap-8px">
-          <span>⏳ 有 <b>{{ applyingCount }}</b> 個對接申請待審核（前台用户提交）</span>
+          <span>⏳ 有 <b>{{ applyingCount }}</b> 個對接申請待審核（前台用戶提交）</span>
           <NButton size="tiny" type="warning" secondary @click="statusFilter = 'applying'">立即審核</NButton>
         </div>
       </template>
@@ -487,7 +487,7 @@ onMounted(load);
             {{ protocolMeta[reviewTarget.protocol]?.label || reviewTarget.protocol }}
           </NTag>
         </NDescriptionsItem>
-        <NDescriptionsItem label="申請人">用户 #{{ reviewTarget.owner_user_id || '—（後台建號）' }}</NDescriptionsItem>
+        <NDescriptionsItem label="申請人">用戶 #{{ reviewTarget.owner_user_id || '—（後台建號）' }}</NDescriptionsItem>
         <NDescriptionsItem label="聯繫方式">{{ reviewTarget.contact || '—' }}</NDescriptionsItem>
         <NDescriptionsItem label="申請時間">{{ fmtTime(reviewTarget.created_at) }}</NDescriptionsItem>
         <NDescriptionsItem label="申請理由" :span="2">{{ reviewTarget.apply_reason || '—（未填寫）' }}</NDescriptionsItem>
@@ -509,8 +509,8 @@ onMounted(load);
       </template>
     </NModal>
 
-    <!-- 賬户詳情：對接信息（api_key 僅在此展示）+ IP 白名單管理 -->
-    <NModal v-model:show="detailModal" preset="card" :title="`對接賬户詳情 #${detailTarget?.id || ''}`" style="width: 620px; max-width: 96vw">
+    <!-- 賬戶詳情：對接信息（api_key 僅在此展示）+ IP 白名單管理 -->
+    <NModal v-model:show="detailModal" preset="card" :title="`對接賬戶詳情 #${detailTarget?.id || ''}`" style="width: 620px; max-width: 96vw">
       <NDescriptions v-if="detailTarget" :column="2" size="small" bordered label-placement="left" class="mb-12px">
         <NDescriptionsItem label="站點名" :span="2">{{ detailTarget.display_name || detailTarget.name }}</NDescriptionsItem>
         <NDescriptionsItem label="對接協議">
@@ -529,7 +529,7 @@ onMounted(load);
         <NDescriptionsItem label="api_secret" :span="2">
           <span class="text-gray-400 text-13px">加密存儲，不可查看（僅創建/重置時明文下發一次）</span>
         </NDescriptionsItem>
-        <NDescriptionsItem label="申請人">用户 #{{ detailTarget.owner_user_id || '—（後台建號）' }}</NDescriptionsItem>
+        <NDescriptionsItem label="申請人">用戶 #{{ detailTarget.owner_user_id || '—（後台建號）' }}</NDescriptionsItem>
         <NDescriptionsItem label="聯繫方式">{{ detailTarget.contact || '—' }}</NDescriptionsItem>
         <NDescriptionsItem label="餘額">{{ detailTarget.balance_cache == null || detailTarget.balance_cache < 0 ? "—" : formatMoney(detailTarget.balance_cache) }}</NDescriptionsItem>
         <NDescriptionsItem label="創建時間">{{ fmtTime(detailTarget.created_at) }}</NDescriptionsItem>
@@ -540,7 +540,7 @@ onMounted(load);
 
       <!-- IP 白名單（空 = 所有 IP 放行；接口鑑權層強制） -->
       <NAlert type="info" :bordered="false" class="mb-8px">
-        IP 白名單：不填 = 所有 IP 都可以請求本賬户接口；填寫後僅白名單內 IP 可調用（精確 IP 或 CIDR 網段，最多 20 條）。
+        IP 白名單：不填 = 所有 IP 都可以請求本賬戶接口；填寫後僅白名單內 IP 可調用（精確 IP 或 CIDR 網段，最多 20 條）。
       </NAlert>
       <div v-if="detailWhitelist.length" class="flex flex-wrap gap-6px mb-8px">
         <NTag v-for="ip in detailWhitelist" :key="ip" closable size="small" @close="detailWhitelist = detailWhitelist.filter((x: string) => x !== ip)">
@@ -559,7 +559,7 @@ onMounted(load);
     <NModal v-model:show="showForm" preset="card" title="新增供貨賬號" style="width: 540px; max-width: 96vw">
       <NForm label-placement="left" label-width="110">
         <NFormItem label="名稱" required>
-          <NInput v-model:value="form.name" placeholder="下游客户標識" />
+          <NInput v-model:value="form.name" placeholder="下游客戶標識" />
         </NFormItem>
         <NFormItem label="對接協議" required>
           <NSelect
@@ -574,8 +574,8 @@ onMounted(load);
         <NAlert type="info" :bordered="false" class="mb-12px">
           {{ protocolMeta[form.protocol]?.hint }}
         </NAlert>
-        <NFormItem :label="form.protocol === 'acg_faka' ? '商户ID(app_id)' : 'api_key'" required>
-          <NInput v-model:value="form.api_key" :placeholder="form.protocol === 'acg_faka' ? '數字 ID（對方後台填的商户ID）' : '隨機字符串'" />
+        <NFormItem :label="form.protocol === 'acg_faka' ? '商戶ID(app_id)' : 'api_key'" required>
+          <NInput v-model:value="form.api_key" :placeholder="form.protocol === 'acg_faka' ? '數字 ID（對方後台填的商戶ID）' : '隨機字符串'" />
         </NFormItem>
         <NFormItem :label="form.protocol === 'acg_faka' ? '密鑰(app_key)' : 'api_secret'" required>
           <NInput v-model:value="form.api_secret" placeholder="簽名密鑰" />

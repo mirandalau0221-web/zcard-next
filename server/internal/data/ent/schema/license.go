@@ -21,7 +21,7 @@ func (LicenseOrder) Fields() []ent.Field {
 		field.Enum("plan").Values("monthly", "yearly").Comment("套餐檔位（3U/月、30U/年）"),
 		field.Int64("amount").Comment("實付（分）"),
 		field.Enum("status").Values("pending", "success", "canceled").Default("pending"),
-		field.Uint64("payer_user_id").Comment("購買人（發行側站點用户；錢包扣款對象）"),
+		field.Uint64("payer_user_id").Comment("購買人（發行側站點用戶；錢包扣款對象）"),
 		field.String("instance_id").MaxLen(64).Comment("目標實例 ID（許可證綁定；空=本實例）"),
 		field.String("domain").MaxLen(255).Optional().Comment("目標域名（許可證綁定；空=不限）"),
 		field.JSON("features", []string{}).Optional().Comment("授權特性快照"),

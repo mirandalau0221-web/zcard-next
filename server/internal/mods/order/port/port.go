@@ -37,7 +37,7 @@ type OrderLifecycle interface {
 	// MarkPaid 訂單置 paid：狀態機校驗 → 鎖卡轉售出預留 → 落 order_status_events
 	// → 寫 outbox(order.paid)。冪等：已 paid 直接返回成功。
 	MarkPaid(ctx context.Context, fact PaidFact) error
-	// Cancel 取消（用户/管理員/超時 TTL 任務）；paid 之後禁止回 canceled（）。
+	// Cancel 取消（用戶/管理員/超時 TTL 任務）；paid 之後禁止回 canceled（）。
 	Cancel(ctx context.Context, orderNo, reason string, operator Operator) error
 }
 

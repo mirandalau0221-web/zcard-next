@@ -93,7 +93,7 @@ function removeRow(i: number) {
       <span v-if="!supplier" class="text-11px text-gray-400">
         想按「累計充值」自動打折/升級？到 營銷管理 → 會員等級 設置升級閾值與折扣（與本檔位贈送可疊加）
       </span>
-      <span v-else class="text-11px text-gray-400">供貨賬户充值滿額贈送餘額，到賬 = 本金 + 贈送（採購提貨通用）</span>
+      <span v-else class="text-11px text-gray-400">供貨賬戶充值滿額贈送餘額，到賬 = 本金 + 贈送（採購提貨通用）</span>
     </div>
   </div>
 </template>

@@ -19,7 +19,7 @@ const Zero Cents = 0
 var ErrInvalidAmount = errors.New("money: invalid amount")
 
 // MaxCents 單筆金額上限（1 億元 = 10^10 分）。管理面提交金額的服務端邊界
-// 校驗口徑（鐵律 16）：客户端可提交的金額必須落在 [0, MaxCents]（有符號口徑
+// 校驗口徑（鐵律 16）：客戶端可提交的金額必須落在 [0, MaxCents]（有符號口徑
 // 為 ±MaxCents），超限即拒絕——抓包改金額只能在允許區間內取值。
 const MaxCents int64 = 10_000_000_00
 

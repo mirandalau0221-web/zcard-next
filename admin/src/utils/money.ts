@@ -107,7 +107,7 @@ export function initCurrency(force = false): Promise<void> {
 // 原始流水與賬務金額保持不變，其他人工備註原樣顯示。
 export function formatTransactionRemark(remark?: string): string {
   if (!remark) return '';
-  const match = /^(充值到賬|對接賬户自助充值到賬)（(?:用户 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*贈送\s*(\d+)\s*分）$/.exec(remark);
+  const match = /^(充值到賬|對接賬戶自助充值到賬)（(?:用戶 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*贈送\s*(\d+)\s*分）$/.exec(remark);
   if (!match) return remark;
   const principal = Number(match[3]);
   const gift = Number(match[4]);
@@ -116,15 +116,15 @@ export function formatTransactionRemark(remark?: string): string {
   const amount = gift > 0
     ? `${formatMoney(total)}（本金 ${formatMoney(principal)}＋贈送 ${formatMoney(gift)}）`
     : formatMoney(principal);
-  return `${match[1]} ${amount}${match[2] ? `（用户 #${match[2]}）` : ''}`;
+  return `${match[1]} ${amount}${match[2] ? `（用戶 #${match[2]}）` : ''}`;
 }
 
 export const TRANSACTION_TYPES: Record<string, string> = {
   adjust: '人工調賬', recharge: '餘額充值', order_pay: '訂單支付', payment: '訂單支付',
   order_refund: '訂單退款', refund: '訂單退款', ticket_urgent: '工單付費加急',
   commission: '分銷佣金入賬', commission_debt: '佣金欠款扣回', commission_reversal: '佣金退回',
-  withdraw: '提現', freeze: '餘額凍結', unfreeze: '餘額解凍', giftcard: '禮品卡兑換',
-  earn_recharge: '充值贈送積分', redeem: '積分兑換',
+  withdraw: '提現', freeze: '餘額凍結', unfreeze: '餘額解凍', giftcard: '禮品卡兌換',
+  earn_recharge: '充值贈送積分', redeem: '積分兌換',
 };
 export function transactionType(type?: string): string {
   return TRANSACTION_TYPES[type || ''] || '其他收支';

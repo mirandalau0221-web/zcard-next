@@ -48,7 +48,7 @@ func (r *NotifyRepo) CreateInbox(ctx context.Context, userID uint64, title, cont
 	return err
 }
 
-// ListInbox 用户站內信分頁。
+// ListInbox 用戶站內信分頁。
 func (r *NotifyRepo) ListInbox(ctx context.Context, userID uint64, unreadOnly bool, page, size int) ([]*ent.Notification, int, error) {
 	q := data.Client(ctx, r.data).Notification.Query().
 		Where(notification.UserID(userID)).
@@ -160,7 +160,7 @@ type LogInput struct {
 	Variables    map[string]string
 }
 
-// WriteLog 落髮送日誌（每發送一條一行）。
+// WriteLog 落發送日誌（每發送一條一行）。
 func (r *NotifyRepo) WriteLog(ctx context.Context, in LogInput) error {
 	create := data.Client(ctx, r.data).NotificationLog.Create().
 		SetEventType(in.EventType).
@@ -293,7 +293,7 @@ func (r *NotifyRepo) FinishBroadcast(ctx context.Context, id uint64, sent, faile
 		Save(ctx)
 }
 
-// CountBroadcastTargets 目標計數（all=全部用户；active=正常狀態；specified=ID 集合）。
+// CountBroadcastTargets 目標計數（all=全部用戶；active=正常狀態；specified=ID 集合）。
 func (r *NotifyRepo) CountBroadcastTargets(ctx context.Context, targetType string, targetIDs []uint64) (int64, error) {
 	q := data.Client(ctx, r.data).User.Query()
 	switch targetType {

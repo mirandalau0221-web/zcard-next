@@ -1,7 +1,7 @@
 package identity
 
 // 推廣碼（promo_code）：8 位隨機字符串邀請標識，替代裸 user_id（防枚舉）。
-// 存量用户懶生成（登錄/查詢時補）；註冊自動生成。
+// 存量用戶懶生成（登錄/查詢時補）；註冊自動生成。
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func genPromoCode() string {
 	return string(buf)
 }
 
-// EnsurePromoCode 用户推廣碼懶生成（空則補；唯一衝突重試 8 次）。
+// EnsurePromoCode 用戶推廣碼懶生成（空則補；唯一衝突重試 8 次）。
 // 返回有效推廣碼（已有直接返回）。Me/Login/推廣中心等入口調用。
 func (r *UserRepo) EnsurePromoCode(ctx context.Context, userID uint64) string {
 	client := data.Client(ctx, r.data)

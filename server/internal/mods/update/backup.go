@@ -108,7 +108,7 @@ func dumpMysql(ctx context.Context, dest, dsn string) error {
 
 // dumpCommand mysqldump/pg_dump 落盤（外部工具缺失給明確指引；執行失敗
 // 捕獲 stderr 回傳——pg_dump 的版本不匹配/認證失敗等原因必須直達面板，
-// 不能只留一個 exit status 1 讓用户猜）。
+// 不能只留一個 exit status 1 讓用戶猜）。
 func dumpCommand(ctx context.Context, dest, tool, dsn string) error {
 	bin, err := exec.LookPath(tool)
 	if err != nil {
@@ -128,9 +128,9 @@ func dumpCommand(ctx context.Context, dest, tool, dsn string) error {
 	cmd.Stderr = io.MultiWriter(os.Stderr, &errBuf) // 服務日誌留全量，面板收摘要
 	if err := cmd.Run(); err != nil {
 		msg := strings.TrimSpace(errBuf.String())
-		// 常見分類:服務器版本較新——客户端必須同大版本
+		// 常見分類:服務器版本較新——客戶端必須同大版本
 		if strings.Contains(msg, "server version mismatch") || strings.Contains(msg, "server version") && strings.Contains(msg, "incompatible") {
-			return fmt.Errorf("%s 失敗: 服務器 PostgreSQL 版本較新，需安裝同大版本客户端（如 apt install postgresql-client-16 / postgresql-client-17）: %s", tool, tail(msg, 400))
+			return fmt.Errorf("%s 失敗: 服務器 PostgreSQL 版本較新，需安裝同大版本客戶端（如 apt install postgresql-client-16 / postgresql-client-17）: %s", tool, tail(msg, 400))
 		}
 		if strings.Contains(msg, "password authentication") || strings.Contains(msg, "no password supplied") {
 			return fmt.Errorf("%s 失敗: 數據庫認證失敗（檢查 config.yaml 的 data.database 連接信息）: %s", tool, tail(msg, 300))

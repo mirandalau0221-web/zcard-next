@@ -24,7 +24,7 @@ type AdminDashboardService struct {
 	reconciler *Reconciler                    // 貨源對賬（job/item 四態）
 	commission affiliateport.CommissionReader // 佣金列表（通道 A）
 	settings   dashboardport.SettingsReader   // 低庫存閾值等（通道 A；nil = 默認值）
-	traffic    auditport.TrafficReader        // 訪問統計（在線用户/PV/UV，通道 A）
+	traffic    auditport.TrafficReader        // 訪問統計（在線用戶/PV/UV，通道 A）
 }
 
 // NewAdminDashboardService 構造。
@@ -156,7 +156,7 @@ func (s *AdminDashboardService) GetDashboard(ctx context.Context, req *adminv1.G
 	return reply, nil
 }
 
-// onlineUsers 在線用户數（5 分鐘活躍窗口；失敗回落 0 不阻斷主統計）。
+// onlineUsers 在線用戶數（5 分鐘活躍窗口；失敗回落 0 不阻斷主統計）。
 func (s *AdminDashboardService) onlineUsers(ctx context.Context) int64 {
 	if s.traffic == nil {
 		return 0

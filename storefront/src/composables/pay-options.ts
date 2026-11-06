@@ -48,7 +48,7 @@ export function flattenPayOptions(channels: ChannelItem[]): PayOption[] {
         channel: c.code, method: '', name: c.name,
         feeText: feeText(c), recommended: !!c.recommended, recommendLabel: c.recommend_label || $t("推薦"), recommendDescription: c.recommend_description || '',
         icon: c.icon || undefined, emoji: emojiOf(c.code, c.driver),
-        sub: c.driver === 'wallet' ? $t("使用賬户餘額") : $t("在線支付"),
+        sub: c.driver === 'wallet' ? $t("使用賬戶餘額") : $t("在線支付"),
       });
     }
   }

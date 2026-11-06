@@ -152,7 +152,7 @@ func (s *AdminUserService) CreateAdmin(ctx context.Context, req *adminv1.CreateA
 		Nickname: req.GetNickname(), RoleID: req.GetRoleId(), Remark: req.GetRemark(),
 	})
 	if err != nil {
-		return nil, errors.InternalServer("identity.CREATE_FAILED", "創建員工失敗（用户名可能重複）")
+		return nil, errors.InternalServer("identity.CREATE_FAILED", "創建員工失敗（用戶名可能重複）")
 	}
 	return &adminv1.Admin{Id: a.ID, Username: a.Username, Nickname: a.Nickname, RoleId: a.RoleID, Enabled: true}, nil
 }

@@ -105,7 +105,7 @@ async function loadCaptchaImage() {
       captchaCode.value = "";
     }
   } catch {
-    // 拉取失敗保留原圖——用户點擊可重試
+    // 拉取失敗保留原圖——用戶點擊可重試
   }
 }
 

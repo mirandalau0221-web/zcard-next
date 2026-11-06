@@ -10,5 +10,5 @@
 //
 // 表：supplier_accounts / supplier_ledger_entries / supply_orders / supply_nonces /
 // supplier_product_prices / downstream_callbacks。
-// 協議對偶： zcard 適配器即本協議的客户端（eat your own dog food）。
+// 協議對偶： zcard 適配器即本協議的客戶端（eat your own dog food）。
 package supplier

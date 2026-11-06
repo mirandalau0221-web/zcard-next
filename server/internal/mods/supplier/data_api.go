@@ -229,7 +229,7 @@ type fulfillOutcome struct {
 // 回調登記。items 快照帶 card_ids（兼容層查單重建 payload 用）。
 func (s *SupplyAPIService) fulfillOrder(ctx context.Context, accountID, productID uint64, quantity int32, downstreamOrderNo, callbackURL, traceID string) (*fulfillOutcome, error) {
 	if accountID == 0 {
-		return nil, kerrors.Unauthorized("supply.UNAUTHORIZED", "未認證下游賬户")
+		return nil, kerrors.Unauthorized("supply.UNAUTHORIZED", "未認證下游賬戶")
 	}
 	if quantity < 1 || productID == 0 || downstreamOrderNo == "" || utf8.RuneCountInString(downstreamOrderNo) > 64 {
 		return nil, kerrors.BadRequest("supply.INVALID_ORDER", "訂單號、商品或數量非法")
@@ -243,7 +243,7 @@ func (s *SupplyAPIService) fulfillOrder(ctx context.Context, accountID, productI
 			return err
 		}
 		if account.Status != supplieraccount.StatusApproved {
-			return kerrors.Forbidden("supply.ACCOUNT_DISABLED", "賬户未獲準供貨")
+			return kerrors.Forbidden("supply.ACCOUNT_DISABLED", "賬戶未獲準供貨")
 		}
 		out, notify, err = s.fulfillOrderTx(txctx, accountID, productID, quantity, downstreamOrderNo, callbackURL, traceID)
 		if err == nil && out.rejected {
@@ -372,7 +372,7 @@ func (s *SupplyAPIService) ListOrders(ctx context.Context, req *supplyv1.ListSup
 		return nil, kerrors.BadRequest("supply.RANGE_INVALID", "時間窗非法（或超過 31 天）")
 	}
 	if SupplyAccountID(ctx) == 0 {
-		return nil, kerrors.Unauthorized("supply.UNAUTHORIZED", "未認證下游賬户")
+		return nil, kerrors.Unauthorized("supply.UNAUTHORIZED", "未認證下游賬戶")
 	}
 	rows, err := s.repo.ListAccountSupplyOrders(ctx, SupplyAccountID(ctx), start, end)
 	if err != nil {
@@ -415,10 +415,10 @@ func (s *SupplyAPIService) GetOrder(ctx context.Context, req *supplyv1.GetSupply
 	return reply, nil
 }
 
-// accountOrder 對外接口不允許缺省賬户，也不區分外部訂單與不存在的訂單。
+// accountOrder 對外接口不允許缺省賬戶，也不區分外部訂單與不存在的訂單。
 func (s *SupplyAPIService) accountOrder(ctx context.Context, orderID uint64) (*ent.SupplyOrder, error) {
 	if SupplyAccountID(ctx) == 0 {
-		return nil, kerrors.Unauthorized("supply.UNAUTHORIZED", "未認證下游賬户")
+		return nil, kerrors.Unauthorized("supply.UNAUTHORIZED", "未認證下游賬戶")
 	}
 	o, err := s.repo.GetAccountSupplyOrder(ctx, SupplyAccountID(ctx), orderID)
 	if errors.Is(err, ErrNotFound) {

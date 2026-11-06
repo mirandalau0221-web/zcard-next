@@ -129,7 +129,7 @@ func (c *EmailChannel) Deliver(ctx context.Context, msg notifyport.Message) (res
 		return fmt.Errorf("SMTP 端口須為 1–65535")
 	}
 	if !validMailbox(cfg.From) {
-		return fmt.Errorf("發件郵箱無效，請填寫發件郵箱或使用完整郵箱作為 SMTP 用户名")
+		return fmt.Errorf("發件郵箱無效，請填寫發件郵箱或使用完整郵箱作為 SMTP 用戶名")
 	}
 	if !validMailbox(msg.Recipient) {
 		return fmt.Errorf("收件郵箱無效")

@@ -39,7 +39,7 @@ const (
 //
 // AdminCouponService 優惠券管理(基礎版：批量生成/列表/作廢）。
 type AdminCouponServiceClient interface {
-	// GrantCoupon 批次贈送指定用户。
+	// GrantCoupon 批次贈送指定用戶。
 	GrantCoupon(ctx context.Context, in *GrantCouponRequest, opts ...grpc.CallOption) (*GrantCouponReply, error)
 	// CreateFlashSale 創建秒殺。
 	CreateFlashSale(ctx context.Context, in *CreateFlashSaleRequest, opts ...grpc.CallOption) (*FlashSaleItem, error)
@@ -184,7 +184,7 @@ func (c *adminCouponServiceClient) ExportCoupons(ctx context.Context, in *Export
 //
 // AdminCouponService 優惠券管理(基礎版：批量生成/列表/作廢）。
 type AdminCouponServiceServer interface {
-	// GrantCoupon 批次贈送指定用户。
+	// GrantCoupon 批次贈送指定用戶。
 	GrantCoupon(context.Context, *GrantCouponRequest) (*GrantCouponReply, error)
 	// CreateFlashSale 創建秒殺。
 	CreateFlashSale(context.Context, *CreateFlashSaleRequest) (*FlashSaleItem, error)

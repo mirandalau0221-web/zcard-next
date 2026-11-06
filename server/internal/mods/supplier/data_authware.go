@@ -2,8 +2,8 @@ package supplier
 
 // HMAC 四頭鑑權中間件（）：
 // X-Supply-Key / X-Supply-Timestamp / X-Supply-Nonce / X-Supply-Signature
-// 流程：四頭解析 → key 查賬户 → 狀態 approved → ±300s 時間窗 → nonce 防重放
-// （DB supply_nonces UNIQUE(key,nonce)）→ 雙口徑驗籤（常數時間）→ 賬户注入 context。
+// 流程：四頭解析 → key 查賬戶 → 狀態 approved → ±300s 時間窗 → nonce 防重放
+// （DB supply_nonces UNIQUE(key,nonce)）→ 雙口徑驗籤（常數時間）→ 賬戶注入 context。
 // 掛載：僅 /api/supply/* 路由組（不掛 JWT；匿名 Ping 免簽名）。
 //
 // 簽名字節不變式：簽名哈希的字節 === 實際發出的字節——直接讀 *http.Request
@@ -35,10 +35,10 @@ const (
 // 默認時間窗（秒）。
 const defaultTimestampSkew = 300
 
-// accountCtxKey 鑑權賬户上下文鍵。
+// accountCtxKey 鑑權賬戶上下文鍵。
 type accountCtxKey struct{}
 
-// SupplyAccountID 從 context 取鑑權賬户（服務實現消費）。
+// SupplyAccountID 從 context 取鑑權賬戶（服務實現消費）。
 func SupplyAccountID(ctx context.Context) uint64 {
 	id, _ := ctx.Value(accountCtxKey{}).(uint64)
 	return id
@@ -46,7 +46,7 @@ func SupplyAccountID(ctx context.Context) uint64 {
 
 // AuthStore 鑑權數據訪問（中間件依賴；由 SupplierRepoImpl 實現）。
 type AuthStore interface {
-	// AccountByKey 按 api_key 查賬户（返回解密後的 secret）。
+	// AccountByKey 按 api_key 查賬戶（返回解密後的 secret）。
 	AccountByKey(ctx context.Context, key string) (*ent.SupplierAccount, string, error)
 	// ConsumeNonce 消費 nonce（UNIQUE 約束衝突 = 重放）。
 	ConsumeNonce(ctx context.Context, key, nonce string, expiresAt time.Time) error
@@ -54,7 +54,7 @@ type AuthStore interface {
 
 // SupplyAuthFilter HMAC 四頭鑑權過濾器（http.Handler 級，能拿到原始 *http.Request
 // ——Kratos v3 Transporter 不暴露 method/path/body，簽名不變式要求原始字節）。
-// 僅匹配 /api/supply/*（匿名 Ping 免簽名）；賬户注入 request context（Handler 內讀取）。
+// 僅匹配 /api/supply/*（匿名 Ping 免簽名）；賬戶注入 request context（Handler 內讀取）。
 func SupplyAuthFilter(store AuthStore, skew int64) func(http.Handler) http.Handler {
 	if skew <= 0 {
 		skew = defaultTimestampSkew
@@ -103,7 +103,7 @@ func authenticate(r *http.Request, store AuthStore, skew int64) (context.Context
 		return nil, newAuthError(errUnknownKey, "未知 api_key")
 	}
 	if string(account.Status) != "approved" {
-		return nil, newAuthError(errAccountDisabled, "賬户未審核或已禁用")
+		return nil, newAuthError(errAccountDisabled, "賬戶未審核或已禁用")
 	}
 	// IP 白名單（空名單放行；非空須命中——精確 IP 或 CIDR）
 	if !ipAllowed(account.IPWhitelist, r) {

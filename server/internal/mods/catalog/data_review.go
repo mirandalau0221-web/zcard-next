@@ -124,7 +124,7 @@ func (r *ProductRepoImpl) ListProductReviews(ctx context.Context, productID uint
 	for _, v := range realRows {
 		out = append(out, port.ReviewItem{
 			ID:        v.ID,
-			Nickname:  "", // 真實評價無暱稱列；前台用「匿名用户」兜底
+			Nickname:  "", // 真實評價無暱稱列；前台用「匿名用戶」兜底
 			Content:   v.Content,
 			Rating:    int32(v.Rating),
 			IsVirtual: false,

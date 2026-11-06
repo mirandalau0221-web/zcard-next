@@ -46,7 +46,7 @@ func (SupplyConnection) Fields() []ent.Field {
 		field.Enum("price_rounding_mode").Values("none", "ceil_int", "ceil_tenth").Default("none"),
 		field.Bool("auto_sync_price").Default(true).Comment("同步時自動更新本地價（manual 改價保護）"),
 		field.Enum("stock_mode").Values("real", "plenty").Default("real"),
-		field.JSON("settings", map[string]any{}).Optional().Comment("其餘開關（髮卡模式/失敗策略等）"),
+		field.JSON("settings", map[string]any{}).Optional().Comment("其餘開關（發卡模式/失敗策略等）"),
 		field.Time("last_ping_at").SchemaType(mysqlTime).Optional(),
 		field.Bool("last_ping_ok").Default(false),
 		field.Time("last_synced_at").SchemaType(mysqlTime).Optional(),

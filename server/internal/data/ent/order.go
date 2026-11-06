@@ -22,7 +22,7 @@ type Order struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
+	// 租戶（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// 樂觀鎖版本號
 	Version int32 `json:"version,omitempty"`
@@ -34,7 +34,7 @@ type Order struct {
 	SubsiteProfit int64 `json:"subsite_profit,omitempty"`
 	// 是否產生分站利潤（自購/上級鏈命中則 false）
 	ProfitEligible bool `json:"profit_eligible,omitempty"`
-	// 下單用户（NULL=遊客）
+	// 下單用戶（NULL=遊客）
 	UserID uint64 `json:"user_id,omitempty"`
 	// 遊客聯繫方式
 	GuestContact string `json:"guest_contact,omitempty"`

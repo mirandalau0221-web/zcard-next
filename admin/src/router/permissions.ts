@@ -27,7 +27,7 @@ export const ROUTE_PERMISSIONS: Record<string, string[]> = {
  * 判定路由對當前權限點集是否可見
  *
  * @param routeName 路由名（elegant-router name）
- * @param buttons 當前用户權限點集（profile.permissions，超管含 "*"）
+ * @param buttons 當前用戶權限點集（profile.permissions，超管含 "*"）
  */
 export function hasRoutePermission(routeName: string, buttons: string[]): boolean {
   const required = ROUTE_PERMISSIONS[routeName];

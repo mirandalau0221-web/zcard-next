@@ -4,10 +4,10 @@ package order
 //
 // 發佈：
 //   - order.created    創建成功（鎖卡完成）後
-//   - order.paid       支付成功（payment 回調事務內或餘額支付直髮）
+//   - order.paid       支付成功（payment 回調事務內或餘額支付直發）
 //   - order.delivered  全部交付
 //   - order.completed  買家確認/查詢完成
-//   - order.canceled   取消（用户/管理員/超時）
+//   - order.canceled   取消（用戶/管理員/超時）
 //   - order.refunded   退款成功
 //
 // 訂閲（M1）：payment.succeeded → MarkPaid + 觸發履約。

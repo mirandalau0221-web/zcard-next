@@ -1,6 +1,6 @@
 package supplier
 
-// 供貨倉儲（）：下游賬户（secret AES-GCM）、供貨賬本（冪等鍵 append-only）、
+// 供貨倉儲（）：下游賬戶（secret AES-GCM）、供貨賬本（冪等鍵 append-only）、
 // 供貨訂單、nonce 防重放、差異化定價、回調記錄。
 
 import (
@@ -30,7 +30,7 @@ var (
 	ErrDuplicateLedger     = errors.New("supplier: 賬本冪等鍵已存在")
 )
 
-// secretAAD api_secret 加密 AAD（按賬户 api_key 綁定）。
+// secretAAD api_secret 加密 AAD（按賬戶 api_key 綁定）。
 func secretAAD(apiKey string) []byte { return []byte("supplier_account:" + apiKey) }
 
 // SupplierRepoImpl 供貨倉儲。
@@ -44,7 +44,7 @@ func NewSupplierRepoImpl(d *data.Data, box *crypto.Box) *SupplierRepoImpl {
 	return &SupplierRepoImpl{data: d, box: box}
 }
 
-// ── 賬户 ──────────────────────────────────────────────────
+// ── 賬戶 ──────────────────────────────────────────────────
 
 // CreateAccount 下游申請（secret 加密入庫；只顯示一次的語義由 service 層處理）。
 func (r *SupplierRepoImpl) createAccount(ctx context.Context, name, apiKey, apiSecret, contact, protocol, displayName string) (*ent.SupplierAccount, error) {
@@ -66,7 +66,7 @@ func (r *SupplierRepoImpl) createAccount(ctx context.Context, name, apiKey, apiS
 	return create.Save(ctx)
 }
 
-// CreateApplication 前台對接申請（owner=用户 id；憑據由 service 生成後傳入）。
+// CreateApplication 前台對接申請（owner=用戶 id；憑據由 service 生成後傳入）。
 func (r *SupplierRepoImpl) createApplication(ctx context.Context, ownerUserID uint64, protocol, displayName, contact, applyReason, notifyURL, apiKey, apiSecret string) (*ent.SupplierAccount, error) {
 	enc, err := r.box.Seal([]byte(apiSecret), secretAAD(apiKey))
 	if err != nil {
@@ -90,7 +90,7 @@ func (r *SupplierRepoImpl) createApplication(ctx context.Context, ownerUserID ui
 	return create.Save(ctx)
 }
 
-// ListMyAccounts 前台用户的賬户列表（按創建倒序）。
+// ListMyAccounts 前台用戶的賬戶列表（按創建倒序）。
 func (r *SupplierRepoImpl) ListMyAccounts(ctx context.Context, ownerUserID uint64) ([]*ent.SupplierAccount, error) {
 	return data.Client(ctx, r.data).SupplierAccount.Query().
 		Where(supplieraccount.OwnerUserID(ownerUserID)).
@@ -98,7 +98,7 @@ func (r *SupplierRepoImpl) ListMyAccounts(ctx context.Context, ownerUserID uint6
 		All(ctx)
 }
 
-// CountMyApplying 用户申請中數量（防刷護欄）。
+// CountMyApplying 用戶申請中數量（防刷護欄）。
 func (r *SupplierRepoImpl) CountMyApplying(ctx context.Context, ownerUserID uint64) (int, error) {
 	return data.Client(ctx, r.data).SupplierAccount.Query().
 		Where(
@@ -108,7 +108,7 @@ func (r *SupplierRepoImpl) CountMyApplying(ctx context.Context, ownerUserID uint
 		Count(ctx)
 }
 
-// CountMyAccounts 用户賬户總數（防刷護欄）。
+// CountMyAccounts 用戶賬戶總數（防刷護欄）。
 func (r *SupplierRepoImpl) CountMyAccounts(ctx context.Context, ownerUserID uint64) (int, error) {
 	return data.Client(ctx, r.data).SupplierAccount.Query().
 		Where(supplieraccount.OwnerUserID(ownerUserID)).
@@ -127,7 +127,7 @@ func (r *SupplierRepoImpl) CancelApplication(ctx context.Context, id uint64) err
 		return err
 	}
 	if n == 0 {
-		return fmt.Errorf("supplier: 僅申請中的賬户可撤銷")
+		return fmt.Errorf("supplier: 僅申請中的賬戶可撤銷")
 	}
 	return nil
 }
@@ -157,7 +157,7 @@ func (r *SupplierRepoImpl) createSupplyRechargeOrder(ctx context.Context, userID
 		Save(ctx)
 }
 
-// AccountByKey 按 key 查賬户（AuthStore 實現；返回解密 secret）。
+// AccountByKey 按 key 查賬戶（AuthStore 實現；返回解密 secret）。
 func (r *SupplierRepoImpl) AccountByKey(ctx context.Context, key string) (*ent.SupplierAccount, string, error) {
 	acc, err := data.Client(ctx, r.data).SupplierAccount.Query().
 		Where(supplieraccount.APIKey(key)).
@@ -172,7 +172,7 @@ func (r *SupplierRepoImpl) AccountByKey(ctx context.Context, key string) (*ent.S
 	return acc, string(plain), nil
 }
 
-// GetAccount 賬户詳情（不含 secret）。
+// GetAccount 賬戶詳情（不含 secret）。
 func (r *SupplierRepoImpl) GetAccount(ctx context.Context, id uint64) (*ent.SupplierAccount, error) {
 	acc, err := data.Client(ctx, r.data).SupplierAccount.Get(ctx, id)
 	if err != nil {
@@ -184,7 +184,7 @@ func (r *SupplierRepoImpl) GetAccount(ctx context.Context, id uint64) (*ent.Supp
 	return acc, nil
 }
 
-// ListAccounts 賬户列表。
+// ListAccounts 賬戶列表。
 func (r *SupplierRepoImpl) ListAccounts(ctx context.Context, page, pageSize int) ([]*ent.SupplierAccount, int, error) {
 	q := data.Client(ctx, r.data).SupplierAccount.Query().Order(ent.Desc(supplieraccount.FieldID))
 	total, err := q.Count(ctx)
@@ -279,7 +279,7 @@ func (r *SupplierRepoImpl) LedgerEntry(ctx context.Context, accountID, supplyOrd
 	})
 }
 
-// lockAccount 必須在 data.Tx 內調用；所有餘額及供貨訂單寫入按賬户串行。
+// lockAccount 必須在 data.Tx 內調用；所有餘額及供貨訂單寫入按賬戶串行。
 func (r *SupplierRepoImpl) lockAccount(ctx context.Context, accountID uint64) (*ent.SupplierAccount, error) {
 	if accountID == 0 {
 		return nil, ErrNotFound
@@ -297,7 +297,7 @@ func (r *SupplierRepoImpl) lockAccount(ctx context.Context, accountID uint64) (*
 	return q.Only(ctx)
 }
 
-// BalanceOf 賬户餘額（balance_cache 快照；對賬由流水重算）。
+// BalanceOf 賬戶餘額（balance_cache 快照；對賬由流水重算）。
 func (r *SupplierRepoImpl) BalanceOf(ctx context.Context, accountID uint64) (int64, error) {
 	acc, err := r.GetAccount(ctx, accountID)
 	if err != nil {
@@ -400,7 +400,7 @@ func (r *SupplierRepoImpl) GetSupplyOrderByNo(ctx context.Context, accountID uin
 	return o, nil
 }
 
-// ListAccountSupplyOrders 對外查詢必須顯式限制賬户；內部全量查詢另用 ListSupplyOrders。
+// ListAccountSupplyOrders 對外查詢必須顯式限制賬戶；內部全量查詢另用 ListSupplyOrders。
 func (r *SupplierRepoImpl) ListAccountSupplyOrders(ctx context.Context, accountID uint64, start, end time.Time) ([]*ent.SupplyOrder, error) {
 	if accountID == 0 {
 		return nil, ErrNotFound
@@ -421,7 +421,7 @@ func (r *SupplierRepoImpl) GetAccountSupplyOrder(ctx context.Context, accountID,
 	return o, err
 }
 
-// RefundUndelivered 原子取消/退款；只退本賬户、本訂單實際扣款的未退餘額。
+// RefundUndelivered 原子取消/退款；只退本賬戶、本訂單實際扣款的未退餘額。
 // 歷史 cancel/refund 兩種流水均計入，不能靠換接口或換冪等鍵重複入賬。
 func (r *SupplierRepoImpl) RefundUndelivered(ctx context.Context, accountID, orderID uint64) (bool, error) {
 	ok := false
@@ -439,7 +439,7 @@ func (r *SupplierRepoImpl) RefundUndelivered(ctx context.Context, accountID, ord
 			return nil // 已交付或交付中須人工處理，卡密不能撤回。
 		}
 		// 舊版曾忽略交付狀態寫入失敗；已有卡密快照的訂單即使仍是 paid，
-		// 也不能自動退款，否則會讓已拿到卡密的客户再次取回貨款。
+		// 也不能自動退款，否則會讓已拿到卡密的客戶再次取回貨款。
 		for _, item := range o.Items {
 			if _, delivered := item["card_ids"]; delivered {
 				return nil
@@ -472,7 +472,7 @@ func (r *SupplierRepoImpl) RefundUndelivered(ctx context.Context, accountID, ord
 	return ok && err == nil, err
 }
 
-// orderPayments 只彙總指定賬户與訂單的實付/實退流水（包括舊版冪等鍵）。
+// orderPayments 只彙總指定賬戶與訂單的實付/實退流水（包括舊版冪等鍵）。
 func (r *SupplierRepoImpl) orderPayments(ctx context.Context, accountID, orderID uint64) (int64, int64, error) {
 	if accountID == 0 {
 		return 0, 0, ErrNotFound
@@ -680,7 +680,7 @@ func (r *SupplierRepoImpl) ResetCallback(ctx context.Context, id uint64) (*ent.D
 		Save(ctx)
 }
 
-// CredentialsOf 按賬户取憑據（api_key 明文 + 解密 secret；回調轉發簽名用）。
+// CredentialsOf 按賬戶取憑據（api_key 明文 + 解密 secret；回調轉發簽名用）。
 func (r *SupplierRepoImpl) CredentialsOf(ctx context.Context, accountID uint64) (apiKey, apiSecret string, err error) {
 	key, secret, _, err := r.CredentialsWithProtocolOf(ctx, accountID)
 	return key, secret, err

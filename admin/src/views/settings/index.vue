@@ -109,7 +109,7 @@ const groups = [
   { key: "affiliate", label: "分銷設置" },
   { key: "supply", label: "貨源" },
   { key: "notify", label: "郵件短信" },
-  { key: "service", label: "客户代碼" },
+  { key: "service", label: "客戶代碼" },
   { key: "i18n", label: "語言貨幣" },
 ];
 
@@ -145,13 +145,13 @@ const INPUT_PLACEHOLDERS: Record<string, Record<string, string>> = {
     sms_template_code: "阿里雲/騰訊雲/七牛均需填寫",
     smtp_host: "如 smtp.example.com（不含 https:// 或端口）",
     smtp_user: "郵件服務器的登錄賬號，通常為完整郵箱地址",
-    smtp_from: "如 hello@example.com；留空使用 SMTP 用户名",
+    smtp_from: "如 hello@example.com；留空使用 SMTP 用戶名",
   },
   footer: {
     about: "頁腳關於我們文案（留空不顯示該欄）",
     contact: "如 郵箱 support@example.com · QQ 羣 123456",
     icp: "如 京ICP備2026000000號-1（留空不顯示）",
-    agreement: "用户協議內容或指向文章的 slug",
+    agreement: "用戶協議內容或指向文章的 slug",
   },
 };
 
@@ -265,7 +265,7 @@ function setImageValue(item: any, urls: string[]) {
   setVal(item, isCarouselKey(item) ? urls : urls[0] ?? "");
 }
 
-// 這些外觀項統一由主題自定義編輯；舊設置保留給未發佈主題和歷史客户端兼容。
+// 這些外觀項統一由主題自定義編輯；舊設置保留給未發佈主題和歷史客戶端兼容。
 const THEME_APPEARANCE_KEYS = new Set([
   "bg_image", "bg_image_mobile", "category_nav_style", "default_view",
   "per_row", "per_page", "sort_by", "show_stock", "show_sales",
@@ -461,7 +461,7 @@ onMounted(() => {
                 <span>· <b>頁腳關於 / 社交鏈接</b> → 品牌欄（Logo 下方文案與圖標）</span>
                 <span>· <b>頁腳導航</b> → 快速導航欄（未配置時顯示默認鏈接）</span>
                 <span>· <b>聯繫方式</b> → 「聯繫我們」欄（留空整欄隱藏）</span>
-                <span>· <b>用户協議 / ICP 備案號</b> → 底部版權行</span>
+                <span>· <b>用戶協議 / ICP 備案號</b> → 底部版權行</span>
                 <span class="sm:col-span-2 text-gray-400">· 「幫助中心」「會員服務」兩欄為系統內置導航，暫不支持自定義</span>
               </div>
             </div>

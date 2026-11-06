@@ -75,7 +75,7 @@ func (s *SupplyAPIService) DeliverCallback(ctx context.Context, supplyOrderID ui
 		return err
 	}
 	if cb.AccountID != o.AccountID || cb.DownstreamOrderNo != o.DownstreamOrderNo {
-		return errors.New("supplier.callback: 訂單與回調賬户不匹配")
+		return errors.New("supplier.callback: 訂單與回調賬戶不匹配")
 	}
 	// CallbackUrlGuard：http/https 均放行（下游可按環境選擇）+ 私網拒絕
 	// （SSRF 校驗不變；配置錯誤不入死信重試，提示重配）

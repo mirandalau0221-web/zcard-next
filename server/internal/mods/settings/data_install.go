@@ -122,7 +122,7 @@ func RunInstallCLI(ctx context.Context, d *data.Data) error {
 	}
 	r := bufio.NewReader(os.Stdin)
 	in := InstallInput{}
-	in.AdminUsername = prompt(r, "管理員用户名")
+	in.AdminUsername = prompt(r, "管理員用戶名")
 	for {
 		in.AdminPassword = prompt(r, "管理員密碼（≥8 位）")
 		if len(in.AdminPassword) >= 8 {

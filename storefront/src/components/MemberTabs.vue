@@ -56,7 +56,7 @@ const tabs = [
   { key: 'promo', get label() { return $t("推廣營銷"); } },
   { key: 'supplier', get label() { return $t("對接申請"); } },
   { key: 'withdraw', get label() { return $t("提現"); } },
-  { key: 'security', get label() { return $t("賬户安全"); } },
+  { key: 'security', get label() { return $t("賬戶安全"); } },
   { key: 'tickets', get label() { return $t("提交工單"); } },
   { key: 'prizes', get label() { return $t("我的獎品"); } },
 ];

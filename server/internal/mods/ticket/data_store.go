@@ -34,7 +34,7 @@ const (
 	normalSLAHours = 48
 )
 
-// StoreTicketService 用户工單服務。
+// StoreTicketService 用戶工單服務。
 type StoreTicketService struct {
 	storefrontv1.UnimplementedStoreTicketServiceServer
 	repo     *TicketRepo
@@ -126,7 +126,7 @@ func (s *StoreTicketService) GetTicket(ctx context.Context, req *storefrontv1.Ge
 	return reply, nil
 }
 
-// ReplyTicket 用户回覆。
+// ReplyTicket 用戶回覆。
 func (s *StoreTicketService) ReplyTicket(ctx context.Context, req *storefrontv1.ReplyTicketRequest) (*emptypb.Empty, error) {
 	t, err := s.assertAccess(ctx, req.GetTicketNo())
 	if err != nil {
@@ -171,7 +171,7 @@ func (s *StoreTicketService) PayUrgent(ctx context.Context, req *storefrontv1.Pa
 		}
 		userID := currentUserID(ctx)
 		if userID == 0 || t.UserID != userID {
-			return errors.New("ticket.UNAUTHORIZED: 請使用工單所屬賬户登錄")
+			return errors.New("ticket.UNAUTHORIZED: 請使用工單所屬賬戶登錄")
 		}
 		client := data.Client(ctx, s.repo.data)
 		reference := "ticket_urgent:" + t.TicketNo
@@ -271,7 +271,7 @@ func (s *StoreTicketService) assertAccess(ctx context.Context, ticketNo string) 
 	return t, nil
 }
 
-// publish 工單事件（notify 消費：用户通知/客服告警）。
+// publish 工單事件（notify 消費：用戶通知/客服告警）。
 func (s *StoreTicketService) publish(ctx context.Context, typ string, t *ent.Ticket, extra map[string]any) {
 	if s.outbox == nil {
 		return

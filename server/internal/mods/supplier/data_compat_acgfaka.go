@@ -64,7 +64,7 @@ type acgCompat struct {
 	svc *SupplyAPIService
 }
 
-// wrap body MD5 驗籤（app_id → 賬户 → protocol 校驗 → 解密 app_key 重算比對）。
+// wrap body MD5 驗籤（app_id → 賬戶 → protocol 校驗 → 解密 app_key 重算比對）。
 func (h *acgCompat) wrap(fn func(w http.ResponseWriter, r *http.Request, account *ent.SupplierAccount, form map[string]string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -84,16 +84,16 @@ func (h *acgCompat) wrap(fn func(w http.ResponseWriter, r *http.Request, account
 		appID := form["app_id"]
 		sign := form["sign"]
 		if appID == "" || sign == "" {
-			writeAcgErr(w, "商户ID不存在")
+			writeAcgErr(w, "商戶ID不存在")
 			return
 		}
 		account, secret, err := h.svc.repo.AccountByKey(r.Context(), appID)
 		if err != nil {
-			writeAcgErr(w, "商户ID不存在")
+			writeAcgErr(w, "商戶ID不存在")
 			return
 		}
 		if string(account.Status) != "approved" {
-			writeAcgErr(w, "商户被禁用")
+			writeAcgErr(w, "商戶被禁用")
 			return
 		}
 		// IP 白名單（空名單放行；非空須命中）
@@ -102,7 +102,7 @@ func (h *acgCompat) wrap(fn func(w http.ResponseWriter, r *http.Request, account
 			return
 		}
 		if string(account.Protocol) != "acg_faka" {
-			writeAcgErr(w, "商户ID不存在") // 非 acg 賬號不暴露
+			writeAcgErr(w, "商戶ID不存在") // 非 acg 賬號不暴露
 			return
 		}
 		if !acgFakaSignVerify(form, secret, sign) {
@@ -302,7 +302,7 @@ func (h *acgCompat) supplyProduct(r *http.Request, account *ent.SupplierAccount,
 }
 
 // acgProduct 商品行（字段對齊 acg commodity 語義；金額元字符串）。
-// 字段集合覆蓋 acg 3.5.7+ 客户端 sync() 的讀取全集——draft/seckill/contact
+// 字段集合覆蓋 acg 3.5.7+ 客戶端 sync() 的讀取全集——draft/seckill/contact
 // 為常量語義：本站不支持預選卡與秒殺，與 draft_status/seckill_status=0 一致；
 // contact_type=0（任意）避免對接站把 null 寫進 NOT NULL 列而同步失敗。
 func (h *acgCompat) acgProduct(ctx context.Context, account *ent.SupplierAccount, p catalogport.SupplierProduct, pricing *supplierPricing) map[string]any {

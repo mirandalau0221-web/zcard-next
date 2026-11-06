@@ -65,7 +65,7 @@ func RunMigrateV1(args []string) error {
 	if bc.Data != nil && bc.Data.Database != nil {
 		source := bc.Data.Database.Source
 		if i := strings.Index(source, "@"); i > 0 {
-			source = source[i:] // 粗脱敏：截掉用户名密碼段
+			source = source[i:] // 粗脱敏：截掉用戶名密碼段
 		}
 		if len(source) > 60 {
 			source = source[:60] + "…"
@@ -108,14 +108,14 @@ func RunMigrateV1(args []string) error {
 	if kerr != nil {
 		return fmt.Errorf("ZCARD_DATA_KEY 不可用（supply 憑據重加密必需）: %w", kerr)
 	}
-	// 2.0 卡密密鑰（直髮內容/卡密重加密）：env > conf.security.card_key
+	// 2.0 卡密密鑰（直發內容/卡密重加密）：env > conf.security.card_key
 	cardKeyNewRaw := os.Getenv("ZCARD_CARD_KEY")
 	if cardKeyNewRaw == "" && bc.Security != nil {
 		cardKeyNewRaw = bc.Security.CardKey
 	}
 	cardKeyNew, ckerr := crypto.ParseHexKey(cardKeyNewRaw)
 	if ckerr != nil {
-		return fmt.Errorf("ZCARD_CARD_KEY 不可用（直髮內容重加密必需）: %w", ckerr)
+		return fmt.Errorf("ZCARD_CARD_KEY 不可用（直發內容重加密必需）: %w", ckerr)
 	}
 
 	return migratev1.Run(context.Background(), client, migratev1.Options{

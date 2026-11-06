@@ -16,7 +16,7 @@
       </div>
       <div class="field">
         <label>{{ $t('聯繫方式（遊客必填）') }}</label>
-        <input class="input" v-model="newContact" type="text" :placeholder="$t('郵箱或 QQ（登錄用户可留空）')" />
+        <input class="input" v-model="newContact" type="text" :placeholder="$t('郵箱或 QQ（登錄用戶可留空）')" />
       </div>
       <div v-if="newError" class="error" style="margin-bottom: 8px;">{{ uiText(newError) }}</div>
       <button class="btn" :disabled="creating" @click="doCreate">{{ creating ? $t('提交中…') : $t('提交工單') }}</button>

@@ -239,7 +239,7 @@ function validate() {
     return "獎品概率合計須大於 0 且不超過 100%";
   for (const p of form.value.prizes) {
     if (!p.name.trim()) return "請填寫每種獎品的名稱";
-    if (p.mode === "card" && !p.product_id) return "自動髮卡需要選擇商品";
+    if (p.mode === "card" && !p.product_id) return "自動發卡需要選擇商品";
     if (
       p.mode === "card" &&
       (skuOptions[p.product_id]?.length || 0) > 0 &&
@@ -663,7 +663,7 @@ onMounted(load);
 <template>
   <div class="lottery-admin">
     <NAlert type="info" class="mb-16px"
-      >免費抽獎按賬號記錄次數。系統髮卡共用商品庫存；人工獎品在中獎記錄中確認發放。</NAlert
+      >免費抽獎按賬號記錄次數。系統發卡共用商品庫存；人工獎品在中獎記錄中確認發放。</NAlert
     >
     <NTabs
       v-model:value="tab"
@@ -719,7 +719,7 @@ onMounted(load);
             style="width: 210px"
           /><NInput
             v-model:value="recordKeyword"
-            placeholder="用户名或完整中獎編號"
+            placeholder="用戶名或完整中獎編號"
             style="max-width: 240px"
             clearable
           /><NSelect
@@ -851,7 +851,7 @@ onMounted(load);
               /></NFormItem>
             </div>
             <template v-if="p.mode === 'card'"
-              ><NFormItem label="自動髮卡商品" required
+              ><NFormItem label="自動發卡商品" required
                 ><NSelect
                   :value="p.product_id || null"
                   :options="productOptions"
@@ -891,7 +891,7 @@ onMounted(load);
                 :placeholder="
                   p.mode === 'manual'
                     ? '例如：請聯繫客服，提供中獎編號領取。'
-                    : '每位中獎者獲得同一份內容；不同卡密請選擇系統髮卡。'
+                    : '每位中獎者獲得同一份內容；不同卡密請選擇系統發卡。'
                 "
             /></NFormItem>
             <div class="lottery-form-grid">
@@ -1020,13 +1020,13 @@ onMounted(load);
         }}
       </p>
       <NForm label-placement="top"
-        ><NFormItem label="用户賬號" required
+        ><NFormItem label="用戶賬號" required
           ><NSelect
             v-model:value="grantUser"
             :options="userOptions"
             filterable
             remote
-            placeholder="搜索用户名"
+            placeholder="搜索用戶名"
             @search="searchUsers" /></NFormItem
         ><NFormItem label="補發次數" required
           ><NInputNumber
@@ -1083,7 +1083,7 @@ onMounted(load);
           ><NDescriptionsItem label="中獎編號">{{
             selectedDraw.draw_no
           }}</NDescriptionsItem
-          ><NDescriptionsItem label="用户"
+          ><NDescriptionsItem label="用戶"
             >{{ selectedDraw.username }} #{{
               selectedDraw.user_id
             }}</NDescriptionsItem
@@ -1124,7 +1124,7 @@ onMounted(load);
             checkAuth('lottery:deliver')
           "
           ><NAlert type="warning" class="mt-16px mb-12px"
-            >請實際交付獎品後再確認，此操作不會自動給用户發送商品。</NAlert
+            >請實際交付獎品後再確認，此操作不會自動給用戶發送商品。</NAlert
           ><NInput
             v-model:value="deliveryRemark"
             placeholder="發放備註（可選）"
@@ -1134,7 +1134,7 @@ onMounted(load);
               ><NButton type="primary" class="mt-12px" :loading="saving"
                 >確認已發放</NButton
               ></template
-            >確認已經把獎品交付給此用户？</NPopconfirm
+            >確認已經把獎品交付給此用戶？</NPopconfirm
           ></template
         ></template
       ></NModal

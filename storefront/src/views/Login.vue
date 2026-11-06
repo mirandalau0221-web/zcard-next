@@ -3,7 +3,7 @@
     <h2 style="margin-bottom: 16px;">{{ $t('登錄') }}</h2>
     <div class="field">
       <label>{{ $t('賬號') }}</label>
-      <input class="input" v-model="username" type="text" :placeholder="$t('用户名 / 郵箱 / 手機號')" @keyup.enter="submit" />
+      <input class="input" v-model="username" type="text" :placeholder="$t('用戶名 / 郵箱 / 手機號')" @keyup.enter="submit" />
     </div>
     <div class="field">
       <label>{{ $t('密碼') }}</label>

@@ -19,14 +19,14 @@ var telegramChatPattern = regexp.MustCompile(`^(-?[0-9]+|@[A-Za-z0-9_]{5,})$`)
 func NormalizeTelegramTarget(t TelegramTarget) (TelegramTarget, error) {
 	t.ChatID = strings.TrimSpace(t.ChatID)
 	if len(t.ChatID) > 64 || !telegramChatPattern.MatchString(t.ChatID) {
-		return t, fmt.Errorf("Chat ID 須為非零整數或 @用户名")
+		return t, fmt.Errorf("Chat ID 須為非零整數或 @用戶名")
 	}
 	if strings.HasPrefix(t.ChatID, "@") {
 		t.ChatID = strings.ToLower(t.ChatID)
 	} else {
 		id, err := strconv.ParseInt(t.ChatID, 10, 64)
 		if err != nil || id == 0 {
-			return t, fmt.Errorf("Chat ID 須為非零整數或 @用户名")
+			return t, fmt.Errorf("Chat ID 須為非零整數或 @用戶名")
 		}
 		t.ChatID = strconv.FormatInt(id, 10)
 	}

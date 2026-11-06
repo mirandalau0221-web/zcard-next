@@ -299,7 +299,7 @@ func NewStoreMediaService(repo *MediaRepo) *StoreMediaService {
 	return &StoreMediaService{repo: repo}
 }
 
-// Upload base64 上傳（用户登錄態；收款碼場景限 2MB——小於 admin 10MB）。
+// Upload base64 上傳（用戶登錄態；收款碼場景限 2MB——小於 admin 10MB）。
 func (s *StoreMediaService) Upload(ctx context.Context, req *storefrontv1.StoreUploadRequest) (*storefrontv1.StoreUploadReply, error) {
 	claims := identity.ClaimsFromContext(ctx)
 	if claims == nil {

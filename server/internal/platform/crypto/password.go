@@ -20,7 +20,7 @@ func HashPassword(plain string) (string, error) {
 	return string(b), nil
 }
 
-// VerifyPassword constant-time 校驗。錯誤信息不區分「用户不存在」與「密碼錯誤」（防枚舉）。
+// VerifyPassword constant-time 校驗。錯誤信息不區分「用戶不存在」與「密碼錯誤」（防枚舉）。
 func VerifyPassword(hash, plain string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(plain)) == nil
 }

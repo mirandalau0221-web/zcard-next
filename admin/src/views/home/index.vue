@@ -495,7 +495,7 @@ onUnmounted(stopRefresh);
           >
         </div>
       </NAlert>
-      <!-- 頭部：標題 + 在線用户 + KPI 時間窗 -->
+      <!-- 頭部：標題 + 在線用戶 + KPI 時間窗 -->
       <div class="flex flex-wrap gap-12px items-center justify-between">
         <span class="flex items-center gap-8px">
           <span class="text-16px font-semibold">工作台</span>
@@ -512,7 +512,7 @@ onUnmounted(stopRefresh);
       </div>
 
       <div class="text-12px text-gray-500">
-        北京時間 · {{ data?.subsite_id ? "當前分站" : "主站" }}訂單 · 全站新增用户
+        北京時間 · {{ data?.subsite_id ? "當前分站" : "主站" }}訂單 · 全站新增用戶
         {{ data ? cur.new_users : "—" }} 人<span v-if="data?.generated_at">
           · 更新於
           {{

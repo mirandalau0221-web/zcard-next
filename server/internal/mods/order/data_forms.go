@@ -202,7 +202,7 @@ func validateAnswer(f *ent.ProductControl, v string) error {
 		}
 	case "username":
 		if !regexp.MustCompile(`^@?[A-Za-z0-9_\.\-]{1,64}$`).MatchString(v) {
-			return fmt.Errorf("請輸入有效用户名")
+			return fmt.Errorf("請輸入有效用戶名")
 		}
 	case "tron":
 		if !validTronAddress(v) {

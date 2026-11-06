@@ -88,7 +88,7 @@ func (r *ProductRepoImpl) createSku(ctx context.Context, in SkuInput) (*ent.Prod
 		}
 	}
 	if parent.FulfillmentMode == "reuse" || parent.FulfillmentMode == "local" {
-		return nil, errors.Conflict("catalog.SKU_DELIVERY_CONFLICT", "默認規格已配置本地發貨，請先切換髮貨來源，再新增規格")
+		return nil, errors.Conflict("catalog.SKU_DELIVERY_CONFLICT", "默認規格已配置本地發貨，請先切換發貨來源，再新增規格")
 	}
 	if in.FulfillmentMode == "local" || in.FulfillmentMode == "reuse" {
 		return nil, errors.BadRequest("catalog.SKU_INVALID", "請先保存規格，再在發貨設置中配置內容來源")

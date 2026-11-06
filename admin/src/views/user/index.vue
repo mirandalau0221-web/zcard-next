@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 前台用户管理（storefront 註冊用户）：列表 / 關鍵詞搜索 / 狀態篩選 / 封禁解封。
+// 前台用戶管理（storefront 註冊用戶）：列表 / 關鍵詞搜索 / 狀態篩選 / 封禁解封。
 // 權限：identity:user_read（查看）、identity:user_status（封禁/解封，超管專屬）。
 import { ref, reactive, onMounted, h } from "vue";
 import { NButton, NInput, NInputNumber, NTag, NPopconfirm, NDataTable, NCard, NSpace, NModal, NDescriptions, NDescriptionsItem, NForm, NFormItem, NCheckbox, NSwitch, NTabs, NTabPane, NEmpty, NSelect } from "naive-ui";
@@ -47,7 +47,7 @@ async function openLevel(invite = false) {
     if (error) return;
     editingInvite.value = invite;
     levelOptions.value = [
-      { label: invite ? '關閉贈送（已獲贈客户不受影響）' : '取消人工指定（保留推薦資格，恢復自動計算）', value: 0 },
+      { label: invite ? '關閉贈送（已獲贈客戶不受影響）' : '取消人工指定（保留推薦資格，恢復自動計算）', value: 0 },
       ...(!invite && Number(detailUser.value.user.referral_level_id) > 0 ? [{ label: '撤銷推薦資格並恢復自動計算', value: -1 }] : []),
       ...((data as any)?.levels || []).filter((l: any) => l.enabled).map((l: any) => ({
         label: l.name + (checkAuth('memberlevel:view_discount') ? ` · ${l.discount > 0 && l.discount < 10000 ? `${Number((l.discount / 1000).toFixed(2))} 折` : '原價'}` : ''),
@@ -71,7 +71,7 @@ async function saveLevel() {
       showLevel.value = false;
       await openDetail({ id });
       await load();
-      window.$message?.success(editingInvite.value ? '推薦贈送配置已保存，僅影響之後註冊的客户' : '客户等級已修改，已有訂單金額不變');
+      window.$message?.success(editingInvite.value ? '推薦贈送配置已保存，僅影響之後註冊的客戶' : '客戶等級已修改，已有訂單金額不變');
     }
   } finally { levelSaving.value = false; }
 }
@@ -90,7 +90,7 @@ async function openDetail(row: any) {
   }
 }
 
-// ── 新增用户 ──
+// ── 新增用戶 ──
 const showCreate = ref(false);
 const createLoading = ref(false);
 const createForm = reactive({ username: "", password: "", email: "" });
@@ -102,7 +102,7 @@ function openCreate() {
 }
 async function submitCreate() {
   if (!createForm.username.trim() || !createForm.password) {
-    window.$message?.warning("用户名與密碼必填（密碼≥6位）");
+    window.$message?.warning("用戶名與密碼必填（密碼≥6位）");
     return;
   }
   createLoading.value = true;
@@ -113,7 +113,7 @@ async function submitCreate() {
       email: createForm.email.trim() || undefined
     });
     if (!error) {
-      window.$message?.success(`已創建用户 ${createForm.username}`);
+      window.$message?.success(`已創建用戶 ${createForm.username}`);
       showCreate.value = false;
       page.value = 1;
       load();
@@ -257,7 +257,7 @@ function fmtTime(ts?: number) {
 
 const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 64 },
-  { title: "用户名", key: "username", width: 130, ellipsis: true, render: (row) => h("div", null, [h("div", null, row.username), row.is_supplier ? h(NTag, { size: "tiny", type: "info", bordered: false, class: "mt-2px" }, { default: () => `供貨·${supplierStatusText(row.supplier_status)}` }) : null]) },
+  { title: "用戶名", key: "username", width: 130, ellipsis: true, render: (row) => h("div", null, [h("div", null, row.username), row.is_supplier ? h(NTag, { size: "tiny", type: "info", bordered: false, class: "mt-2px" }, { default: () => `供貨·${supplierStatusText(row.supplier_status)}` }) : null]) },
   { title: "郵箱", key: "email", width: 150, ellipsis: { tooltip: true }, render: (row) => row.email || "-" },
   { title: "等級", key: "level_name", width: 80, render: (row) => (row.level_id ? h(NTag, { size: "small", type: "warning", bordered: false }, { default: () => row.level_name || `#${row.level_id}` }) : "-") },
   { title: "餘額", key: "balance_cents", width: 90, align: "right", render: (row) => (row.balance_cents ?? 0) === 0 ? "0" : h("b", null, fenToYuan(row.balance_cents ?? 0)) },
@@ -298,7 +298,7 @@ const columns: DataTableColumns<any> = [
               { onPositiveClick: () => handleBan(row) },
               {
                 trigger: () => h(NButton, { size: "tiny", type: "error", quaternary: true }, { default: () => "封禁" }),
-                default: () => "封禁後該用户將無法登錄，確定？",
+                default: () => "封禁後該用戶將無法登錄，確定？",
               },
             )
           : null,
@@ -354,11 +354,11 @@ onMounted(load);
 
 <template>
   <div class="min-h-500px">
-    <NCard title="用户管理">
+    <NCard title="用戶管理">
       <NSpace class="mb-12px" align="center">
         <NInput
           v-model:value="query.keyword"
-          placeholder="搜索用户名 / 郵箱"
+          placeholder="搜索用戶名 / 郵箱"
           clearable
           class="w-240px"
           @keyup.enter="onSearch"
@@ -366,7 +366,7 @@ onMounted(load);
         <NButton type="primary" size="small" @click="onSearch">搜索</NButton>
         <NCheckbox v-model:checked="query.isSupplier" class="ml-8px" @update:checked="onSearch">僅供貨商</NCheckbox>
         <div class="flex-1"></div>
-        <NButton v-if="canCreate()" type="primary" size="small" @click="openCreate">新增用户</NButton>
+        <NButton v-if="canCreate()" type="primary" size="small" @click="openCreate">新增用戶</NButton>
       </NSpace>
 
       <FilterTabs v-model:value="query.status" :options="statusTabs" class="mb-12px" @change="onSearch" />
@@ -378,25 +378,25 @@ onMounted(load);
       </div>
     </NCard>
 
-    <NModal v-model:show="showLevel" preset="dialog" style="width: 520px; max-width: calc(100vw - 32px)" :title="editingInvite ? '推薦註冊贈送等級' : '修改客户等級'" :mask-closable="!levelSaving" :closable="!levelSaving">
+    <NModal v-model:show="showLevel" preset="dialog" style="width: 520px; max-width: calc(100vw - 32px)" :title="editingInvite ? '推薦註冊贈送等級' : '修改客戶等級'" :mask-closable="!levelSaving" :closable="!levelSaving">
       <NForm label-placement="top">
-        <NFormItem :label="editingInvite ? '該客户邀請新人時贈送的等級' : '該客户的會員等級'">
+        <NFormItem :label="editingInvite ? '該客戶邀請新人時贈送的等級' : '該客戶的會員等級'">
           <NSelect v-model:value="selectedLevel" :options="levelOptions" :disabled="levelSaving" />
         </NFormItem>
         <NFormItem label="調整原因" required>
           <NInput v-model:value="levelReason" :maxlength="160" placeholder="請輸入本次調整原因" :disabled="levelSaving" />
         </NFormItem>
-        <p v-if="editingInvite">新客户通過此用户的推薦碼註冊後，立即獲得所選等級。修改或關閉贈送不會改變已註冊客户的等級，也不會改變此用户自己的等級。</p>
+        <p v-if="editingInvite">新客戶通過此用戶的推薦碼註冊後，立即獲得所選等級。修改或關閉贈送不會改變已註冊客戶的等級，也不會改變此用戶自己的等級。</p>
         <p v-else>後台指定優先於推薦等級和自動升級。取消人工指定會恢復正常計算，並不一定降為普通會員。已有訂單金額不變。</p>
       </NForm>
       <template #action><NButton :loading="levelSaving" :disabled="!levelReason.trim()" type="primary" @click="saveLevel">保存</NButton></template>
     </NModal>
-    <NModal v-model:show="showDetail" preset="card" title="用户詳情" style="width: 960px; max-width: 96vw">
+    <NModal v-model:show="showDetail" preset="card" title="用戶詳情" style="width: 960px; max-width: 96vw">
       <div v-if="detailLoading" class="py-40px text-center">加載中…</div>
       <template v-else-if="detailUser">
         <NDescriptions :column="3" bordered size="small">
           <NDescriptionsItem label="ID">{{ detailUser.user.id }}</NDescriptionsItem>
-          <NDescriptionsItem label="用户名" :span="2">{{ detailUser.user.username }}</NDescriptionsItem>
+          <NDescriptionsItem label="用戶名" :span="2">{{ detailUser.user.username }}</NDescriptionsItem>
           <NDescriptionsItem label="郵箱" :span="2">{{ detailUser.user.email || "-" }}</NDescriptionsItem>
           <NDescriptionsItem label="狀態">
             <NTag size="small" :type="detailUser.user.status === 'active' ? 'success' : 'error'" :bordered="false">
@@ -421,7 +421,7 @@ onMounted(load);
           <NDescriptionsItem label="積分"><b>{{ detailUser.user.points ?? 0 }}</b></NDescriptionsItem>
           <NDescriptionsItem label="訂單數">{{ detailUser.user.order_count ?? 0 }}</NDescriptionsItem>
           <NDescriptionsItem label="累計消費"><b>{{ fenToYuan(detailUser.user.spent_cents ?? 0) }}</b></NDescriptionsItem>
-          <NDescriptionsItem label="供貨賬户">
+          <NDescriptionsItem label="供貨賬戶">
             <NTag v-if="detailUser.user.is_supplier" size="small" type="info" :bordered="false">{{ supplierStatusText(detailUser.user.supplier_status) }}</NTag>
             <template v-else>未開通</template>
           </NDescriptionsItem>
@@ -460,10 +460,10 @@ onMounted(load);
       </template>
     </NModal>
 
-    <!-- 新增用户 -->
-    <NModal v-model:show="showCreate" preset="card" title="新增用户" style="width: 420px">
+    <!-- 新增用戶 -->
+    <NModal v-model:show="showCreate" preset="card" title="新增用戶" style="width: 420px">
       <NForm label-placement="left" label-width="80">
-        <NFormItem label="用户名" required>
+        <NFormItem label="用戶名" required>
           <NInput v-model:value="createForm.username" placeholder="3-30 字符" />
         </NFormItem>
         <NFormItem label="初始密碼" required>
@@ -509,7 +509,7 @@ onMounted(load);
     <NModal v-model:show="showAdjust" preset="card" title="調整餘額" style="width: 460px">
       <template v-if="adjustUser && balance">
         <div class="mb-16px rounded-6px bg-gray-50 p-12px text-13px dark:bg-gray-800">
-          <div class="mb-4px">用户：<b>{{ adjustUser.username }}</b></div>
+          <div class="mb-4px">用戶：<b>{{ adjustUser.username }}</b></div>
           <div class="flex gap-24px text-gray-600 dark:text-gray-300">
             <span>可用：<b class="text-primary">{{ fenToYuan(balance.available_cents) }}</b></span>
             <span>鎖定：<b>{{ fenToYuan(balance.locked_cents) }}</b></span>

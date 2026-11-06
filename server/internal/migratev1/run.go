@@ -41,13 +41,13 @@ type Options struct {
 	TargetDesc string
 	// DataKey 2.0 業務數據密鑰（ZCARD_DATA_KEY 原始 32 字節；憑據重加密必需）。
 	DataKey []byte
-	// NewCardKey 2.0 卡密密鑰（ZCARD_CARD_KEY 原始 32 字節；直髮內容/卡密重加密用）。
+	// NewCardKey 2.0 卡密密鑰（ZCARD_CARD_KEY 原始 32 字節；直發內容/卡密重加密用）。
 	NewCardKey []byte
 	// OldStorageRoot 1.x 部署根（媒體文件源：<root>/storage/app/public）。
 	OldStorageRoot string
 }
 
-// Run 遷移入口內核（client = 2.0 目標庫 ent 客户端）。
+// Run 遷移入口內核（client = 2.0 目標庫 ent 客戶端）。
 func Run(ctx context.Context, client *ent.Client, opts Options) error {
 	if opts.Batch <= 0 {
 		opts.Batch = 1000

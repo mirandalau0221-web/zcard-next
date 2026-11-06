@@ -80,7 +80,7 @@
     </template>
 
     <main class="main" :class="{ 'install-main': isInstall, 'home-main': route.path === '/' }">
-      <!-- Suspense：路由組件 async setup（SSG 預取）在客户端水合時也能正常等待 -->
+      <!-- Suspense：路由組件 async setup（SSG 預取）在客戶端水合時也能正常等待 -->
       <router-view v-if="shellReady || isInstall" v-slot="{ Component, route: viewRoute }">
         <!-- 保留目錄瀏覽狀態；會員頁內切換複用表單，其餘詳情和支付頁按導航重新創建。 -->
         <KeepAlive include="Home" :max="8">
@@ -165,7 +165,7 @@
           <router-link to="/member">{{ $t('會員中心') }}</router-link>
           <router-link to="/member?tab=orders">{{ $t('我的訂單') }}</router-link>
           <router-link to="/member?tab=recharge">{{ $t('餘額充值') }}</router-link>
-          <router-link to="/member?tab=giftcard">{{ $t('禮品卡兑換') }}</router-link>
+          <router-link to="/member?tab=giftcard">{{ $t('禮品卡兌換') }}</router-link>
         </div>
         <div v-if="footerContact" class="footer-col">
           <h4>{{ $t('聯繫我們') }}</h4>
@@ -174,7 +174,7 @@
       </div>
       <div class="footer-copy">
         <span class="footer-copyright">© {{ year }} {{ siteName }}<span class="footer-rights"> {{ $t('· 保留所有權利') }}</span></span>
-        <a v-if="agreementHref" :href="agreementHref" :target="agreementHref.startsWith('http') ? '_blank' : undefined" rel="noopener noreferrer" class="footer-copy-link">{{ $t('用户協議') }}</a>
+        <a v-if="agreementHref" :href="agreementHref" :target="agreementHref.startsWith('http') ? '_blank' : undefined" rel="noopener noreferrer" class="footer-copy-link">{{ $t('用戶協議') }}</a>
         <a v-if="footerIcp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="footer-copy-link">{{ footerIcp }}</a>
       </div>
     </footer>
@@ -227,11 +227,11 @@ watch([siteLogo, brandReady], () => {
   if (icon) { icon.removeAttribute('type'); icon.href = siteLogo.value || '/zcard-icon.png'; }
 }, { immediate: true });
 
-// SEO 默認 head 由 main.ts 處理（客户端拉取後更新；SSR 渲染後輸出到靜態 HTML）
+// SEO 默認 head 由 main.ts 處理（客戶端拉取後更新；SSR 渲染後輸出到靜態 HTML）
 
 // 啓動加載默認貨幣（i18n.base_currency → 符號/小數位；失敗回退默認符號）
 if (!import.meta.env.SSR) initCurrency();
-// 登錄態恢復（token 存在則拉用户名；失敗靜默——401 層統一處理）
+// 登錄態恢復（token 存在則拉用戶名；失敗靜默——401 層統一處理）
 if (!import.meta.env.SSR) refreshAuth();
 
 const year = new Date().getFullYear();

@@ -24,7 +24,7 @@ export function filterAuthRoutesByRoles(routes: ElegantConstRoute[], roles: stri
  * Filter auth routes by permission codes（後端 authz 權限點；按 route.name 查 ROUTE_PERMISSIONS）
  *
  * @param routes Auth routes
- * @param buttons 當前用户權限點集（profile.permissions）
+ * @param buttons 當前用戶權限點集（profile.permissions）
  */
 export function filterAuthRoutesByPermissions(routes: ElegantConstRoute[], buttons: string[]) {
   return routes.flatMap((route) => filterAuthRouteByPermissions(route, buttons));

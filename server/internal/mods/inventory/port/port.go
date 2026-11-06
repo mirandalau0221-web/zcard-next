@@ -57,6 +57,6 @@ type CardReleaser interface {
 
 // StockBatcher 批量可用庫存（管理列表展示消費，通道 A——單商品 N+1 防護）。
 type StockBatcher interface {
-	// StockBatch 各商品可用卡密數（一條 GROUP BY；鏈接/兑換碼類不入卡池=無條目）。
+	// StockBatch 各商品可用卡密數（一條 GROUP BY；鏈接/兌換碼類不入卡池=無條目）。
 	StockBatch(ctx context.Context, productIDs []uint64) (map[uint64]int64, error)
 }

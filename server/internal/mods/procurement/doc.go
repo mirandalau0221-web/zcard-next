@@ -4,7 +4,7 @@
 // - 三通道結果獲取：指數退避輪詢（30s×2/1m×2/2m×2/5m×2/10m，耗盡移交巡檢）
 // - cron 巡檢（30min，24h 卡死轉人工）+ 上游回調（ 自家協議）
 // - 到手即加密（鐵律 11 採購側）：上游卡密內存態 → CardCipher.Seal（AAD 綁定
-// 本地商品/租户）→ 密文落 procurement_items；交付出口複用 fulfillment
+// 本地商品/租戶）→ 密文落 procurement_items；交付出口複用 fulfillment
 // AttachUpstreamDelivery（寫 cards(used) + order_deliveries，與本地卡密同一出口）
 // - 失敗策略：auto_refund（payment.OrderRefunder 創建退款單）| manual（人工終態）
 // - 事件：procurement.fulfilled / procurement.failed（outbox 發佈）

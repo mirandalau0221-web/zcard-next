@@ -38,7 +38,7 @@ type AdminSupplierServiceHTTPServer interface {
 	CreateAccount(context.Context, *CreateSupplierAccountRequest) (*SupplierAccountReply, error)
 	// DeletePrice DeletePrice 刪除專屬價（恢復基礎供貨價）。
 	DeletePrice(context.Context, *DeleteSupplierPriceRequest) (*emptypb.Empty, error)
-	// ListAccounts ListAccounts 賬户列表（secret 零回顯）。
+	// ListAccounts ListAccounts 賬戶列表（secret 零回顯）。
 	ListAccounts(context.Context, *ListSupplierAccountsRequest) (*ListSupplierAccountsReply, error)
 	// ListCallbacks ListCallbacks 回調記錄（含死信）。
 	ListCallbacks(context.Context, *ListSupplierCallbacksRequest) (*ListSupplierCallbacksReply, error)
@@ -46,7 +46,7 @@ type AdminSupplierServiceHTTPServer interface {
 	ListLedger(context.Context, *ListSupplierLedgerRequest) (*ListSupplierLedgerReply, error)
 	// ListPrices ListPrices 賬號的專屬價列表(補齊：瀏覽/管理覆蓋價）。
 	ListPrices(context.Context, *ListSupplierPricesRequest) (*ListSupplierPricesReply, error)
-	// Recharge Recharge 賬户充值（賬本入賬）。
+	// Recharge Recharge 賬戶充值（賬本入賬）。
 	Recharge(context.Context, *RechargeSupplierRequest) (*emptypb.Empty, error)
 	// ResendCallback ResendCallback 手動重發回調（死信恢復）。
 	ResendCallback(context.Context, *ResendSupplierCallbackRequest) (*emptypb.Empty, error)
@@ -377,7 +377,7 @@ type AdminSupplierServiceHTTPClient interface {
 	CreateAccount(ctx context.Context, req *CreateSupplierAccountRequest, opts ...http.CallOption) (rsp *SupplierAccountReply, err error)
 	// DeletePrice DeletePrice 刪除專屬價（恢復基礎供貨價）。
 	DeletePrice(ctx context.Context, req *DeleteSupplierPriceRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// ListAccounts ListAccounts 賬户列表（secret 零回顯）。
+	// ListAccounts ListAccounts 賬戶列表（secret 零回顯）。
 	ListAccounts(ctx context.Context, req *ListSupplierAccountsRequest, opts ...http.CallOption) (rsp *ListSupplierAccountsReply, err error)
 	// ListCallbacks ListCallbacks 回調記錄（含死信）。
 	ListCallbacks(ctx context.Context, req *ListSupplierCallbacksRequest, opts ...http.CallOption) (rsp *ListSupplierCallbacksReply, err error)
@@ -385,7 +385,7 @@ type AdminSupplierServiceHTTPClient interface {
 	ListLedger(ctx context.Context, req *ListSupplierLedgerRequest, opts ...http.CallOption) (rsp *ListSupplierLedgerReply, err error)
 	// ListPrices ListPrices 賬號的專屬價列表(補齊：瀏覽/管理覆蓋價）。
 	ListPrices(ctx context.Context, req *ListSupplierPricesRequest, opts ...http.CallOption) (rsp *ListSupplierPricesReply, err error)
-	// Recharge Recharge 賬户充值（賬本入賬）。
+	// Recharge Recharge 賬戶充值（賬本入賬）。
 	Recharge(ctx context.Context, req *RechargeSupplierRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	// ResendCallback ResendCallback 手動重發回調（死信恢復）。
 	ResendCallback(ctx context.Context, req *ResendSupplierCallbackRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
@@ -446,7 +446,7 @@ func (c *AdminSupplierServiceHTTPClientImpl) DeletePrice(ctx context.Context, in
 	return &out, nil
 }
 
-// ListAccounts ListAccounts 賬户列表（secret 零回顯）。
+// ListAccounts ListAccounts 賬戶列表（secret 零回顯）。
 func (c *AdminSupplierServiceHTTPClientImpl) ListAccounts(ctx context.Context, in *ListSupplierAccountsRequest, opts ...http.CallOption) (*ListSupplierAccountsReply, error) {
 	var out ListSupplierAccountsReply
 	pattern := "/api/v1/admin/supplier/accounts"
@@ -514,7 +514,7 @@ func (c *AdminSupplierServiceHTTPClientImpl) ListPrices(ctx context.Context, in 
 	return &out, nil
 }
 
-// Recharge Recharge 賬户充值（賬本入賬）。
+// Recharge Recharge 賬戶充值（賬本入賬）。
 func (c *AdminSupplierServiceHTTPClientImpl) Recharge(ctx context.Context, in *RechargeSupplierRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/supplier/accounts/{id}/recharge"

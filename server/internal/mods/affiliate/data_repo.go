@@ -123,7 +123,7 @@ func (r *CommissionRepo) InsertDebt(ctx context.Context, orderID, referrerID uin
 	return err
 }
 
-// ListByUser 用户佣金流水（正 + 負債）。
+// ListByUser 用戶佣金流水（正 + 負債）。
 func (r *CommissionRepo) ListByUser(ctx context.Context, userID uint64, page, size int) ([]*ent.AffiliateCommission, int, error) {
 	q := data.Client(ctx, r.data).AffiliateCommission.Query().
 		Where(affiliatecommission.ReferrerID(userID)).
@@ -136,7 +136,7 @@ func (r *CommissionRepo) ListByUser(ctx context.Context, userID uint64, page, si
 	return rows, total, err
 }
 
-// StatsByUser 用户統計（port.CommissionReader 實現）。
+// StatsByUser 用戶統計（port.CommissionReader 實現）。
 func (r *CommissionRepo) StatsByUser(ctx context.Context, userID uint64) (*port.CommissionStats, error) {
 	rows, err := data.Client(ctx, r.data).AffiliateCommission.Query().
 		Where(affiliatecommission.ReferrerID(userID)).

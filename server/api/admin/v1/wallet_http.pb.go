@@ -36,13 +36,13 @@ type AdminWalletServiceHTTPServer interface {
 	AdjustPoints(context.Context, *AdjustPointsRequest) (*PointsBalance, error)
 	// CreateGiftcardBatch CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
 	CreateGiftcardBatch(context.Context, *CreateGiftcardBatchRequest) (*CreateGiftcardBatchReply, error)
-	// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
+	// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兌換卡，保留已兌換記錄。
 	DeleteGiftcardBatch(context.Context, *DeleteGiftcardBatchRequest) (*emptypb.Empty, error)
-	// GetBalance GetBalance 指定用户餘額。
+	// GetBalance GetBalance 指定用戶餘額。
 	GetBalance(context.Context, *GetBalanceRequest) (*Balance, error)
 	// ListGiftcardBatches ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(context.Context, *ListGiftcardBatchesRequest) (*ListGiftcardBatchesReply, error)
-	// ListTransactions ListTransactions 指定用户流水。
+	// ListTransactions ListTransactions 指定用戶流水。
 	ListTransactions(context.Context, *ListWalletTxRequest) (*ListWalletTxReply, error)
 	// ListWithdrawals ListWithdrawals 提現單列表（狀態篩選）。
 	ListWithdrawals(context.Context, *ListWithdrawalsRequest) (*ListWithdrawalsReply, error)
@@ -284,13 +284,13 @@ type AdminWalletServiceHTTPClient interface {
 	AdjustPoints(ctx context.Context, req *AdjustPointsRequest, opts ...http.CallOption) (rsp *PointsBalance, err error)
 	// CreateGiftcardBatch CreateGiftcardBatch 禮品卡批次創建（批量生成密文 code；giftcard:write）。
 	CreateGiftcardBatch(ctx context.Context, req *CreateGiftcardBatchRequest, opts ...http.CallOption) (rsp *CreateGiftcardBatchReply, err error)
-	// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
+	// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兌換卡，保留已兌換記錄。
 	DeleteGiftcardBatch(ctx context.Context, req *DeleteGiftcardBatchRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// GetBalance GetBalance 指定用户餘額。
+	// GetBalance GetBalance 指定用戶餘額。
 	GetBalance(ctx context.Context, req *GetBalanceRequest, opts ...http.CallOption) (rsp *Balance, err error)
 	// ListGiftcardBatches ListGiftcardBatches 批次列表。
 	ListGiftcardBatches(ctx context.Context, req *ListGiftcardBatchesRequest, opts ...http.CallOption) (rsp *ListGiftcardBatchesReply, err error)
-	// ListTransactions ListTransactions 指定用户流水。
+	// ListTransactions ListTransactions 指定用戶流水。
 	ListTransactions(ctx context.Context, req *ListWalletTxRequest, opts ...http.CallOption) (rsp *ListWalletTxReply, err error)
 	// ListWithdrawals ListWithdrawals 提現單列表（狀態篩選）。
 	ListWithdrawals(ctx context.Context, req *ListWithdrawalsRequest, opts ...http.CallOption) (rsp *ListWithdrawalsReply, err error)
@@ -362,7 +362,7 @@ func (c *AdminWalletServiceHTTPClientImpl) CreateGiftcardBatch(ctx context.Conte
 	return &out, nil
 }
 
-// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兑換卡，保留已兑換記錄。
+// DeleteGiftcardBatch DeleteGiftcardBatch 刪除批次並作廢未兌換卡，保留已兌換記錄。
 func (c *AdminWalletServiceHTTPClientImpl) DeleteGiftcardBatch(ctx context.Context, in *DeleteGiftcardBatchRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
 	var out emptypb.Empty
 	pattern := "/api/v1/admin/wallet/giftcard-batches/{id}"
@@ -379,7 +379,7 @@ func (c *AdminWalletServiceHTTPClientImpl) DeleteGiftcardBatch(ctx context.Conte
 	return &out, nil
 }
 
-// GetBalance GetBalance 指定用户餘額。
+// GetBalance GetBalance 指定用戶餘額。
 func (c *AdminWalletServiceHTTPClientImpl) GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...http.CallOption) (*Balance, error) {
 	var out Balance
 	pattern := "/api/v1/admin/wallet/{user_id}"
@@ -413,7 +413,7 @@ func (c *AdminWalletServiceHTTPClientImpl) ListGiftcardBatches(ctx context.Conte
 	return &out, nil
 }
 
-// ListTransactions ListTransactions 指定用户流水。
+// ListTransactions ListTransactions 指定用戶流水。
 func (c *AdminWalletServiceHTTPClientImpl) ListTransactions(ctx context.Context, in *ListWalletTxRequest, opts ...http.CallOption) (*ListWalletTxReply, error) {
 	var out ListWalletTxReply
 	pattern := "/api/v1/admin/wallet/{user_id}/transactions"

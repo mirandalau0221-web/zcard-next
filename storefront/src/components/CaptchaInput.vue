@@ -76,7 +76,7 @@ async function refresh() {
       emit('update:captchaId', data.captcha_id);
       emit('update:code', '');
     }
-  } catch { /* 拉取失敗保留佔位——用户點擊可重試 */ }
+  } catch { /* 拉取失敗保留佔位——用戶點擊可重試 */ }
 }
 
 function onInput(e: Event) {

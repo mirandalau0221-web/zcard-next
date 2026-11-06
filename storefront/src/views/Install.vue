@@ -58,7 +58,7 @@
                 <b>PostgreSQL</b>
                 <span class="rec-badge">{{ $t('推薦') }}</span>
               </div>
-              <div class="dialect-desc">{{ $t('完整高級能力：分站多租户 / Schema 隔離 / 高併發穩定，適合正式運營。') }}</div>
+              <div class="dialect-desc">{{ $t('完整高級能力：分站多租戶 / Schema 隔離 / 高併發穩定，適合正式運營。') }}</div>
             </div>
             <div class="dialect-card" :class="{ active: form.dialect === 'mysql' }" @click="pickDialect('mysql')">
               <div class="dialect-head"><b>MySQL</b></div>
@@ -71,7 +71,7 @@
           </div>
 
           <!-- SQLite 警告 -->
-          <div v-if="form.dialect === 'sqlite'" class="warn-box"> {{ $t('⚠️ SQLite 僅適用於') }}<b>{{ $t('本地測試 / 功能體驗') }}</b>{{ $t('：不支持分站多租户等高級功能，高併發與多進程場景受限。 正式運營請選擇') }} <b>{{ $t('PostgreSQL（推薦）') }}</b>。
+          <div v-if="form.dialect === 'sqlite'" class="warn-box"> {{ $t('⚠️ SQLite 僅適用於') }}<b>{{ $t('本地測試 / 功能體驗') }}</b>{{ $t('：不支持分站多租戶等高級功能，高併發與多進程場景受限。 正式運營請選擇') }} <b>{{ $t('PostgreSQL（推薦）') }}</b>。
           </div>
 
           <!-- MySQL / PG 連接表單 -->
@@ -86,7 +86,7 @@
                 <input v-model.number="form.db_port" class="input" type="number" :placeholder="form.dialect === 'mysql' ? '3306' : '5432'" />
               </div>
               <div class="form-row">
-                <label>{{ $t('用户名') }}</label>
+                <label>{{ $t('用戶名') }}</label>
                 <input v-model="form.db_user" class="input" placeholder="root / postgres" />
               </div>
               <div class="form-row">
@@ -125,7 +125,7 @@
         <div v-else class="section">
           <div class="section-title">{{ $t('設置管理員') }}</div>
           <div class="form-row">
-            <label>{{ $t('管理員用户名') }}</label>
+            <label>{{ $t('管理員用戶名') }}</label>
             <input v-model="form.admin_username" class="input" placeholder="admin" maxlength="32" />
           </div>
           <div class="form-row">

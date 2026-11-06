@@ -32,7 +32,7 @@ type StoreUserServiceHTTPServer interface {
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordReply, error)
 	// ForgotPassword ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordReply, error)
-	// Login Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
+	// Login Login 登錄（返回 user realm JWT；username 混輸：用戶名/郵箱/手機號）。
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	// Me Me 我的信息（需登錄）。
 	Me(context.Context, *emptypb.Empty) (*MeReply, error)
@@ -215,7 +215,7 @@ type StoreUserServiceHTTPClient interface {
 	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *ChangePasswordReply, err error)
 	// ForgotPassword ForgotPassword 發送找回密碼驗證碼（：郵箱不存在同樣成功——防枚舉）。
 	ForgotPassword(ctx context.Context, req *ForgotPasswordRequest, opts ...http.CallOption) (rsp *ForgotPasswordReply, err error)
-	// Login Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
+	// Login Login 登錄（返回 user realm JWT；username 混輸：用戶名/郵箱/手機號）。
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	// Me Me 我的信息（需登錄）。
 	Me(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *MeReply, err error)
@@ -273,7 +273,7 @@ func (c *StoreUserServiceHTTPClientImpl) ForgotPassword(ctx context.Context, in 
 	return &out, nil
 }
 
-// Login Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
+// Login Login 登錄（返回 user realm JWT；username 混輸：用戶名/郵箱/手機號）。
 func (c *StoreUserServiceHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opts ...http.CallOption) (*LoginReply, error) {
 	var out LoginReply
 	pattern := "/api/v1/storefront/user/login"

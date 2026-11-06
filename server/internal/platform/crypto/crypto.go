@@ -69,7 +69,7 @@ func (b *Box) Open(ciphertext, aad []byte) ([]byte, error) {
 }
 
 // KeyedHash keyed hash 去重（鐵律 11）：HMAC-SHA256(key, plaintext)。
-// 相比裸 sha256 防低熵卡密（短兑換碼）的彩虹表反推。
+// 相比裸 sha256 防低熵卡密（短兌換碼）的彩虹表反推。
 // 注意：密鑰輪換（zcard reencrypt-cards）時須與密文重加密同事務重算。
 func KeyedHash(key []byte, plaintext []byte) string {
 	mac := hmac.New(sha256.New, key)

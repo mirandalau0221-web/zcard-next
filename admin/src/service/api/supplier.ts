@@ -1,4 +1,4 @@
-// 供貨賬號 API（supplier:read / supplier:write）：下游賬户（含 B/C 兼容賬號）、
+// 供貨賬號 API（supplier:read / supplier:write）：下游賬戶（含 B/C 兼容賬號）、
 // 審核/啓停/充值、賬本、回調記錄。
 
 import { request } from "../request";

@@ -33,14 +33,14 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreSupplierService 前台對接申請（個人中心）：申請成為供貨商户 →
+// StoreSupplierService 前台對接申請（個人中心）：申請成為供貨商戶 →
 // 後台審核 → 憑據管理（app_id + api_secret）。
 // 通過後憑據可直接填入 acg-faka/dujiao-next/zcard 三面板（協議由申請時選定）。
 type StoreSupplierServiceClient interface {
 	// SubmitSupplierApplication 提交對接申請（服務端生成 api_key/api_secret；
 	// api_secret 不在本響應返回——審核通過後在憑據接口查看）。
 	SubmitSupplierApplication(ctx context.Context, in *SubmitSupplierApplicationRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
-	// ListMySupplierAccounts 我的對接賬户（申請中/已通過/已駁回/已禁用全量）。
+	// ListMySupplierAccounts 我的對接賬戶（申請中/已通過/已駁回/已禁用全量）。
 	ListMySupplierAccounts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListSupplierAccountsReply, error)
 	// GetSupplierCredentials 查看憑據（僅 approved 且歸屬本人；返回明文 api_secret）。
 	GetSupplierCredentials(ctx context.Context, in *GetSupplierCredentialsRequest, opts ...grpc.CallOption) (*SupplierCredentialsReply, error)
@@ -48,7 +48,7 @@ type StoreSupplierServiceClient interface {
 	RegenerateSupplierSecret(ctx context.Context, in *RegenerateSupplierSecretRequest, opts ...grpc.CallOption) (*SupplierCredentialsReply, error)
 	// CancelSupplierApplication 撤銷申請（僅 applying 狀態可撤銷）。
 	CancelSupplierApplication(ctx context.Context, in *CancelSupplierApplicationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；
+	// CreateSupplierRecharge 對接賬戶自助充值（金額服務端檔位裁決；
 	// 支付確認前不入賬——回調成功後入賬到供貨餘額，reference 冪等）。
 	CreateSupplierRecharge(ctx context.Context, in *CreateSupplierRechargeRequest, opts ...grpc.CallOption) (*CreateSupplierRechargeReply, error)
 	// SetSupplierIPWhitelist 設置 IP 白名單（僅 approved 且歸屬本人；空 = 所有 IP 放行）。
@@ -137,14 +137,14 @@ func (c *storeSupplierServiceClient) SetSupplierIPWhitelist(ctx context.Context,
 // All implementations must embed UnimplementedStoreSupplierServiceServer
 // for forward compatibility.
 //
-// StoreSupplierService 前台對接申請（個人中心）：申請成為供貨商户 →
+// StoreSupplierService 前台對接申請（個人中心）：申請成為供貨商戶 →
 // 後台審核 → 憑據管理（app_id + api_secret）。
 // 通過後憑據可直接填入 acg-faka/dujiao-next/zcard 三面板（協議由申請時選定）。
 type StoreSupplierServiceServer interface {
 	// SubmitSupplierApplication 提交對接申請（服務端生成 api_key/api_secret；
 	// api_secret 不在本響應返回——審核通過後在憑據接口查看）。
 	SubmitSupplierApplication(context.Context, *SubmitSupplierApplicationRequest) (*SupplierAccountReply, error)
-	// ListMySupplierAccounts 我的對接賬户（申請中/已通過/已駁回/已禁用全量）。
+	// ListMySupplierAccounts 我的對接賬戶（申請中/已通過/已駁回/已禁用全量）。
 	ListMySupplierAccounts(context.Context, *emptypb.Empty) (*ListSupplierAccountsReply, error)
 	// GetSupplierCredentials 查看憑據（僅 approved 且歸屬本人；返回明文 api_secret）。
 	GetSupplierCredentials(context.Context, *GetSupplierCredentialsRequest) (*SupplierCredentialsReply, error)
@@ -152,7 +152,7 @@ type StoreSupplierServiceServer interface {
 	RegenerateSupplierSecret(context.Context, *RegenerateSupplierSecretRequest) (*SupplierCredentialsReply, error)
 	// CancelSupplierApplication 撤銷申請（僅 applying 狀態可撤銷）。
 	CancelSupplierApplication(context.Context, *CancelSupplierApplicationRequest) (*emptypb.Empty, error)
-	// CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；
+	// CreateSupplierRecharge 對接賬戶自助充值（金額服務端檔位裁決；
 	// 支付確認前不入賬——回調成功後入賬到供貨餘額，reference 冪等）。
 	CreateSupplierRecharge(context.Context, *CreateSupplierRechargeRequest) (*CreateSupplierRechargeReply, error)
 	// SetSupplierIPWhitelist 設置 IP 白名單（僅 approved 且歸屬本人；空 = 所有 IP 放行）。

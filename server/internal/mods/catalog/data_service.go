@@ -30,7 +30,7 @@ type AdminCatalogService struct {
 	repo     *ProductRepoImpl
 	sold     orderport.SoldCounter // 批量已售數量（nil 容錯降級 0）
 	settings port.SettingsReader   // 低庫存閾值等（通道 A；nil = 默認值）
-	cipher   *inventory.CardCipher // 直髮內容加密（url/code 商品；nil = 直髮不可用）
+	cipher   *inventory.CardCipher // 直發內容加密（url/code 商品；nil = 直發不可用）
 	authz    authzport.Authorizer
 }
 
@@ -39,7 +39,7 @@ func NewAdminCatalogService(repo *ProductRepoImpl, sold orderport.SoldCounter, s
 	return &AdminCatalogService{repo: repo, sold: sold, settings: settings, cipher: cipher, authz: authz}
 }
 
-// sealDirect 直髮內容加密（AAD 綁定 product+subsite）。
+// sealDirect 直發內容加密（AAD 綁定 product+subsite）。
 func (s *AdminCatalogService) sealDirect(ctx context.Context, plain string, productID uint64) ([]byte, error) {
 	tc := tenancy.FromContext(ctx)
 	return s.cipher.Seal(plain, productID, tc.SubsiteID)
@@ -240,7 +240,7 @@ func (s *AdminCatalogService) CreateProduct(ctx context.Context, req *adminv1.Cr
 		return nil, errors.BadRequest("catalog.INVALID_INPUT", err.Error())
 	}
 	if *in.GoodsType == "physical" && req.GetDirectContent() != "" {
-		return nil, errors.BadRequest("catalog.INVALID_INPUT", "實體商品不能配置虛擬直髮內容")
+		return nil, errors.BadRequest("catalog.INVALID_INPUT", "實體商品不能配置虛擬直發內容")
 	}
 	copyFrom := req.GetCopyFromProductId()
 	var copySKUs, copyControls bool
@@ -271,17 +271,17 @@ func (s *AdminCatalogService) CreateProduct(ctx context.Context, req *adminv1.Cr
 				return errors.InternalServer("catalog.COPY_CONFIGURATION_FAILED", "複製規格或下單控件失敗，請重試")
 			}
 		}
-		// 直髮內容使用新商品 ID 加密，與商品及複製的配置一起提交。
+		// 直發內容使用新商品 ID 加密，與商品及複製的配置一起提交。
 		if req.GetStockType() != "card" && req.GetDirectContent() != "" {
 			if s.cipher == nil {
-				return errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直髮加密不可用")
+				return errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直發加密不可用")
 			}
 			ciphered, err := s.sealDirect(ctx, req.GetDirectContent(), p.ID)
 			if err != nil {
-				return errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直髮內容加密失敗")
+				return errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直發內容加密失敗")
 			}
 			if err := s.repo.SetDirectContent(ctx, p.ID, ciphered); err != nil {
-				return errors.InternalServer("catalog.DIRECT_SAVE_FAILED", "直髮內容保存失敗")
+				return errors.InternalServer("catalog.DIRECT_SAVE_FAILED", "直發內容保存失敗")
 			}
 			p.DirectContent = ciphered
 		}
@@ -331,7 +331,7 @@ func (s *AdminCatalogService) UpdateProduct(ctx context.Context, req *adminv1.Up
 		return nil, errors.BadRequest("catalog.INVALID_INPUT", err.Error())
 	}
 	if *in.GoodsType == "physical" && req.GetDirectContent() != "" {
-		return nil, errors.BadRequest("catalog.INVALID_INPUT", "實體商品不能配置虛擬直髮內容")
+		return nil, errors.BadRequest("catalog.INVALID_INPUT", "實體商品不能配置虛擬直發內容")
 	}
 	stockType := in.StockType
 	if stockType == "" {
@@ -340,18 +340,18 @@ func (s *AdminCatalogService) UpdateProduct(ctx context.Context, req *adminv1.Up
 	if stockType != "card" && stockType != "url" && stockType != "code" {
 		return nil, errors.BadRequest("catalog.INVALID_STOCK_TYPE", "請選擇有效的發貨類型")
 	}
-	// 切換直髮類型時必須重新提供內容，防止舊鏈接被當作新兑換碼發送。
+	// 切換直發類型時必須重新提供內容，防止舊鏈接被當作新兌換碼發送。
 	if stockType != "card" && stockType != string(old.StockType) && strings.TrimSpace(req.GetDirectContent()) == "" {
-		return nil, errors.BadRequest("catalog.DIRECT_CONTENT_REQUIRED", "切換為鏈接或兑換碼時，請填寫對應的直髮內容")
+		return nil, errors.BadRequest("catalog.DIRECT_CONTENT_REQUIRED", "切換為鏈接或兌換碼時，請填寫對應的直發內容")
 	}
-	// 直髮內容（url/code）：空=保持不變；非空且商品非卡密類 → 加密更新
+	// 直發內容（url/code）：空=保持不變；非空且商品非卡密類 → 加密更新
 	if stockType != "card" && req.GetDirectContent() != "" {
 		if s.cipher == nil {
-			return nil, errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直髮加密不可用")
+			return nil, errors.InternalServer("catalog.CIPHER_UNAVAILABLE", "直發加密不可用")
 		}
 		ciphered, serr := s.sealDirect(ctx, req.GetDirectContent(), req.GetId())
 		if serr != nil {
-			return nil, errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直髮內容加密失敗")
+			return nil, errors.InternalServer("catalog.DIRECT_SEAL_FAILED", "直發內容加密失敗")
 		}
 		in.DirectContent = ciphered
 	}

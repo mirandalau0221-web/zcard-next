@@ -148,7 +148,7 @@ func runList(args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%-4s %-20s %-12s %-8s %-10s\n", "ID", "用户名", "暱稱", "啓用", "最近登錄")
+	fmt.Printf("%-4s %-20s %-12s %-8s %-10s\n", "ID", "用戶名", "暱稱", "啓用", "最近登錄")
 	for _, r := range rows {
 		last := "-"
 		if !r.LastLoginAt.IsZero() {

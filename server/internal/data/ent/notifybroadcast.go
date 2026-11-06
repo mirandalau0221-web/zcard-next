@@ -30,7 +30,7 @@ type NotifyBroadcast struct {
 	Channels []string `json:"channels,omitempty"`
 	// 目標篩選
 	TargetType notifybroadcast.TargetType `json:"target_type,omitempty"`
-	// specified 時的用户 ID 集合
+	// specified 時的用戶 ID 集合
 	TargetIds []uint64 `json:"target_ids,omitempty"`
 	// 定時發送（空=立即）
 	ScheduledAt time.Time `json:"scheduled_at,omitempty"`

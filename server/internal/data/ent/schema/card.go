@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// Card 卡密/鏈接/兑換碼（最高頻、最可能破千萬的表，《數據庫架構設計.md》§4.2）。
+// Card 卡密/鏈接/兌換碼（最高頻、最可能破千萬的表，《數據庫架構設計.md》§4.2）。
 //
 // 安全要點（鐵律 11/§5.20.2）：
 //   - content 強制 AES-256-GCM（隨機 nonce + AAD 綁定 product_id/tenant），無關閉開關；

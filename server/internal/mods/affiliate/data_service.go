@@ -50,7 +50,7 @@ func (s *StoreAffiliateService) MyAffiliate(ctx context.Context, _ *emptypb.Empt
 	if cfg.Levels < 2 {
 		l2 = 0
 	}
-	// 推廣碼（懶生成——存量用户首次訪問推廣中心即補）
+	// 推廣碼（懶生成——存量用戶首次訪問推廣中心即補）
 	promoCode := s.users.EnsurePromoCode(ctx, userID)
 	// 推廣鏈接：請求 Host 拼絕對 URL（複製即可分享；無 Host 回退相對路徑）。
 	// scheme 判定：本地開發 host 回退 http，其餘一律 https（生產標準）。
@@ -96,7 +96,7 @@ func isLocalHost(host string) bool {
 		len(host) > 6 && host[len(host)-6:] == ".local"
 }
 
-// ListTeam 下級列表（用户名脱敏）。
+// ListTeam 下級列表（用戶名脱敏）。
 func (s *StoreAffiliateService) ListTeam(ctx context.Context, req *storefrontv1.ListTeamRequest) (*storefrontv1.ListTeamReply, error) {
 	userID := currentUID(ctx)
 	if userID == 0 {
@@ -150,7 +150,7 @@ func (s *StoreAffiliateService) ListCommissions(ctx context.Context, req *storef
 	return reply, nil
 }
 
-// maskName 用户名脱敏（首尾保留，中間 ***；≤2 位全掩）。
+// maskName 用戶名脱敏（首尾保留，中間 ***；≤2 位全掩）。
 func maskName(name string) string {
 	runes := []rune(name)
 	if len(runes) <= 2 {

@@ -19,7 +19,7 @@ const props = withDefaults(
   defineProps<{
     value: string | number;
     options: FilterTabOption[];
-    /** value 字符串鍵 → 條數（客户端篩選場景可傳，服務端無計數接口省略） */
+    /** value 字符串鍵 → 條數（客戶端篩選場景可傳，服務端無計數接口省略） */
     counts?: Record<string, number>;
     size?: "small" | "medium";
   }>(),

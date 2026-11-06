@@ -16,8 +16,8 @@ export const createApp = ViteSSG(
   ({ app, head, router, isClient }) => {
     setActiveHead(head);
     if (isClient) {
-      // 客户端用完整 router（含登錄守衞/尾斜槓規範化）；SSR 用 vite-ssg 內置 router 渲染。
-      // 注意：默認 SEO 不在客户端全局 push（會與水合中的頁面級 SEO 競爭覆蓋）——
+      // 客戶端用完整 router（含登錄守衞/尾斜槓規範化）；SSR 用 vite-ssg 內置 router 渲染。
+      // 注意：默認 SEO 不在客戶端全局 push（會與水合中的頁面級 SEO 競爭覆蓋）——
       // 首頁由 Home.vue 負責默認 SEO；頁面級 SEO 由各頁面組件負責。
       // 守衞直接註冊到 vite-ssg 的 router（不創建第二個 router——雙 history 會互相干擾）
       installRouterGuards(router);

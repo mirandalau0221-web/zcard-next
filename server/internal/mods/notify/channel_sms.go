@@ -50,7 +50,7 @@ type SMSConfig struct {
 // SMSChannel 短信通道（provider 分發）。
 type SMSChannel struct {
 	settings notifyport.SettingsReader
-	client   *http.Client // httpx 安全客户端（SSRF 防護）
+	client   *http.Client // httpx 安全客戶端（SSRF 防護）
 }
 
 // NewSMSChannel 構造。

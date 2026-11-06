@@ -58,7 +58,7 @@ var defaultChannels = map[string][]string{
 	"payment.failed":       {"inbox"},
 	"recharge.succeeded":   {"email", "inbox"},
 	"user.registered":      {"email", "inbox"},
-	// ：工單通知（用户側新回覆；客服側新工單經 telegram 管理員通道）
+	// ：工單通知（用戶側新回覆；客服側新工單經 telegram 管理員通道）
 	"ticket.created": {"inbox"},
 	"ticket.replied": {"email", "inbox"},
 }
@@ -262,7 +262,7 @@ func trimFloat(f float64) string {
 // Send 顯式發送（管理員告警等業務直調；實現 notifyport.Sender）。
 // ChannelReady 通道是否就緒（配置齊全）。驗證碼等「必須送達」的場景應在發送前
 // 調用並 fail-fast——Send 對未配置通道按降級語義返回成功（營銷通知不阻斷業務），
-// 驗證碼靜默 skipped = 用户點了發送卻永遠收不到（實測踩坑）。
+// 驗證碼靜默 skipped = 用戶點了發送卻永遠收不到（實測踩坑）。
 func (d *Dispatcher) ChannelReady(ctx context.Context, channel string) bool {
 	c, ok := d.channels[channel]
 	if !ok {

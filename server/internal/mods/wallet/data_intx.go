@@ -4,7 +4,7 @@ package wallet
 //
 // 一切餘額變動必須經 InTx：
 // 1. 按 reference 查流水——存在直接返回成功（冪等重入，跨模塊冪等）
-// 2. ensureAccountForUpdate（FOR UPDATE 鎖賬户，不存在則建——併發競態處理）
+// 2. ensureAccountForUpdate（FOR UPDATE 鎖賬戶，不存在則建——併發競態處理）
 // 3. 非負校驗（Debit 時 available-amount ≥ 0）
 // 4. 更新餘額（樂觀鎖 version 兜底重試 ≤3 次）
 // 5. 寫流水（balance_before/after 快照 + reference 唯一索引兜底）
@@ -73,7 +73,7 @@ func (r *WalletRepoImpl) creditInTx(ctx context.Context, e Entry) error {
 		return nil // 已入賬，冪等返回
 	}
 
-	// 2) 鎖賬户（不存在則建）
+	// 2) 鎖賬戶（不存在則建）
 	acc, err := r.ensureAccount(ctx, e.UserID)
 	if err != nil {
 		return err
@@ -140,7 +140,7 @@ func (r *WalletRepoImpl) debitInTx(ctx context.Context, e Entry) error {
 		return nil
 	}
 
-	// 2) 鎖賬户
+	// 2) 鎖賬戶
 	acc, err := r.ensureAccount(ctx, e.UserID)
 	if err != nil {
 		return err
@@ -195,7 +195,7 @@ func (r *WalletRepoImpl) debitInTx(ctx context.Context, e Entry) error {
 	return err
 }
 
-// ensureAccount 鎖賬户（不存在則建——併發建號競態處理）。
+// ensureAccount 鎖賬戶（不存在則建——併發建號競態處理）。
 func (r *WalletRepoImpl) ensureAccount(ctx context.Context, userID uint64) (*ent.WalletAccount, error) {
 	client := data.Client(ctx, r.data)
 	var lockedCurrency string
@@ -225,7 +225,7 @@ func (r *WalletRepoImpl) ensureAccount(ctx context.Context, userID uint64) (*ent
 		}
 	}
 	if err != nil {
-		return nil, fmt.Errorf("wallet: 獲取賬户失敗: %w", err)
+		return nil, fmt.Errorf("wallet: 獲取賬戶失敗: %w", err)
 	}
 	code := lockedCurrency
 	if code == "" {
@@ -245,7 +245,7 @@ func (r *WalletRepoImpl) GetBalance(ctx context.Context, userID uint64) (availab
 	acc, err := data.Client(ctx, r.data).WalletAccount.Query().
 		Where(walletaccount.UserID(userID)).Only(ctx)
 	if ent.IsNotFound(err) {
-		return 0, 0, nil // 未開户 = 零餘額
+		return 0, 0, nil // 未開戶 = 零餘額
 	}
 	if err != nil {
 		return 0, 0, err
@@ -255,7 +255,7 @@ func (r *WalletRepoImpl) GetBalance(ctx context.Context, userID uint64) (availab
 		return 0, 0, err
 	}
 	if acc.Currency != base {
-		return 0, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "賬户幣種與基礎貨幣不一致，請聯繫管理員遷移")
+		return 0, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "賬戶幣種與基礎貨幣不一致，請聯繫管理員遷移")
 	}
 	return acc.Available, acc.Locked, nil
 }
@@ -282,13 +282,13 @@ func (r *WalletRepoImpl) ListTransactions(ctx context.Context, userID uint64, pa
 	}
 	for _, row := range rows {
 		if row.Currency != base {
-			return nil, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "賬户幣種與基礎貨幣不一致，請聯繫管理員遷移")
+			return nil, 0, kerrors.Conflict("wallet.CURRENCY_MISMATCH", "賬戶幣種與基礎貨幣不一致，請聯繫管理員遷移")
 		}
 	}
 	return rows, int64(total), err
 }
 
-// UsernamesByIDs 批量取用户名（全站流水回填歸屬人；缺失的 id 不出現在結果裏）。
+// UsernamesByIDs 批量取用戶名（全站流水回填歸屬人；缺失的 id 不出現在結果裏）。
 func (r *WalletRepoImpl) UsernamesByIDs(ctx context.Context, ids []uint64) (map[uint64]string, error) {
 	if len(ids) == 0 {
 		return map[uint64]string{}, nil

@@ -51,10 +51,10 @@ const local: App.I18n.Schema = {
     },
   },
   request: {
-    logout: "請求失敗後登出用户",
-    logoutMsg: "用户狀態失效，請重新登錄",
-    logoutWithModal: "請求失敗後彈出模態框再登出用户",
-    logoutWithModalMsg: "用户狀態失效，請重新登錄",
+    logout: "請求失敗後登出用戶",
+    logoutMsg: "用戶狀態失效，請重新登錄",
+    logoutWithModal: "請求失敗後彈出模態框再登出用戶",
+    logoutWithModalMsg: "用戶狀態失效，請重新登錄",
     refreshToken: "請求的token已過期，刷新token",
     tokenExpired: "token已過期",
   },
@@ -199,7 +199,7 @@ const local: App.I18n.Schema = {
         title: "水印設置",
         visible: "顯示全屏水印",
         text: "自定義水印文本",
-        enableUserName: "啓用用户名水印",
+        enableUserName: "啓用用戶名水印",
         enableTime: "顯示當前時間",
         timeFormat: "時間格式",
       },
@@ -236,7 +236,7 @@ const local: App.I18n.Schema = {
     channel: "渠道管理",
     staff: "員工管理",
     settings: "系統設置",
-    user: "用户管理",
+    user: "用戶管理",
     wallet: "錢包管理",
     ticket: "工單管理",
   },
@@ -244,7 +244,7 @@ const local: App.I18n.Schema = {
     login: {
       common: {
         loginOrRegister: "登錄 / 註冊",
-        userNamePlaceholder: "請輸入用户名",
+        userNamePlaceholder: "請輸入用戶名",
         phonePlaceholder: "請輸入手機號",
         codePlaceholder: "請輸入驗證碼",
         passwordPlaceholder: "請輸入密碼",
@@ -265,7 +265,7 @@ const local: App.I18n.Schema = {
         otherLoginMode: "其他登錄方式",
         superAdmin: "超級管理員",
         admin: "管理員",
-        user: "普通用户",
+        user: "普通用戶",
       },
       codeLogin: {
         title: "驗證碼登錄",
@@ -277,7 +277,7 @@ const local: App.I18n.Schema = {
       register: {
         title: "註冊賬號",
         agreement: "我已經仔細閲讀並接受",
-        protocol: "《用户協議》",
+        protocol: "《用戶協議》",
         policy: "《隱私權政策》",
       },
       resetPwd: {
@@ -320,8 +320,8 @@ const local: App.I18n.Schema = {
   form: {
     required: "不能為空",
     userName: {
-      required: "請輸入用户名",
-      invalid: "用户名格式不正確",
+      required: "請輸入用戶名",
+      invalid: "用戶名格式不正確",
     },
     phone: {
       required: "請輸入手機號",
@@ -400,7 +400,7 @@ const local: App.I18n.Schema = {
     footer: {
       about: "頁腳關於",
       nav: "頁腳導航",
-      agreement: "用户協議",
+      agreement: "用戶協議",
       contact: "聯繫方式",
       social: "社交鏈接",
       icp: "ICP 備案號",
@@ -427,7 +427,7 @@ const local: App.I18n.Schema = {
       captcha_admin_login: "後台登錄驗證碼",
       captcha_length: "驗證碼位數",
       captcha_charset: "驗證碼字符類型",
-      username_min_len: "用户名最小長度",
+      username_min_len: "用戶名最小長度",
       max_pending_per_ip: "單 IP 待付款訂單上限",
       risk_enabled: "風控攔截",
     },
@@ -487,7 +487,7 @@ const local: App.I18n.Schema = {
       smtp_tls_verify: "校驗 SMTP 服務器證書",
       smtp_host: "SMTP 服務器",
       smtp_port: "SMTP 端口",
-      smtp_user: "SMTP 用户名",
+      smtp_user: "SMTP 用戶名",
       smtp_password: "SMTP 密碼",
       smtp_from: "發件郵箱",
       smtp_name: "發件人名稱",

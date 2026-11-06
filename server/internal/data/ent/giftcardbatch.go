@@ -23,7 +23,7 @@ type GiftcardBatch struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// BatchNo holds the value of the "batch_no" field.
 	BatchNo string `json:"batch_no,omitempty"`
-	// 批次刪除時間，保留兑換審計
+	// 批次刪除時間，保留兌換審計
 	DeletedAt time.Time `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`

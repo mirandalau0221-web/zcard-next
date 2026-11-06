@@ -1,6 +1,6 @@
 package supplier
 
-// 管理面 API：下游賬户（申請/審核/啓停/重置密鑰）、定價、賬本、回調管理。
+// 管理面 API：下游賬戶（申請/審核/啓停/重置密鑰）、定價、賬本、回調管理。
 // secret 紀律：僅創建/重置時回顯一次，其餘響應零泄漏。
 
 import (
@@ -131,7 +131,7 @@ func (s *AdminSupplierService) Recharge(ctx context.Context, req *adminv1.Rechar
 	if len(key) > 80 {
 		return nil, kerrors.BadRequest("supplier.INVALID_REFERENCE", "充值冪等鍵不能超過 80 字節")
 	}
-	if key == "" { // 兼容尚未發送冪等鍵的客户端；金額不能充當充值標識。
+	if key == "" { // 兼容尚未發送冪等鍵的客戶端；金額不能充當充值標識。
 		key = uuid.NewString()
 	}
 	ref := fmt.Sprintf("recharge:manual:%d:%s", req.GetId(), key)

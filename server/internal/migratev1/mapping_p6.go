@@ -53,7 +53,7 @@ func (m *Migrator) migrateMerchantProfiles(ctx context.Context) error {
 		func() []any { return []any{&id, &userID, &name, &slug, &status} },
 		func(int64) error {
 			if id == 1 {
-				m.st.Record("merchants", "skip") // 主站商户不遷（產物落 subsite 0）
+				m.st.Record("merchants", "skip") // 主站商戶不遷（產物落 subsite 0）
 				return nil
 			}
 			if _, ok := m.IDs.Get(ctx, "merchants", uint64(id)); ok {
@@ -66,7 +66,7 @@ func (m *Migrator) migrateMerchantProfiles(ctx context.Context) error {
 			}
 			newOwner, ok := m.IDs.Get(ctx, "users", owner)
 			if !ok {
-				return fmt.Errorf("分站 %d owner 用户 %d 未遷移", id, owner)
+				return fmt.Errorf("分站 %d owner 用戶 %d 未遷移", id, owner)
 			}
 			st := resellerprofile.StatusApproved
 			if status == 0 {
@@ -309,7 +309,7 @@ func (m *Migrator) migrateSubsiteLedger(ctx context.Context) error {
 	); err != nil {
 		return err
 	}
-	// 賬户快照：available = SUM(status=available 的正負行)；與 2.0 賬户差異在 P5 對賬報告同視圖暴露
+	// 賬戶快照：available = SUM(status=available 的正負行)；與 2.0 賬戶差異在 P5 對賬報告同視圖暴露
 	if m.dry {
 		return nil
 	}

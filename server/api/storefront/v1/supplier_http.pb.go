@@ -29,12 +29,12 @@ const OperationStoreSupplierServiceSubmitSupplierApplication = "/zcard.api.store
 type StoreSupplierServiceHTTPServer interface {
 	// CancelSupplierApplication CancelSupplierApplication 撤銷申請（僅 applying 狀態可撤銷）。
 	CancelSupplierApplication(context.Context, *CancelSupplierApplicationRequest) (*emptypb.Empty, error)
-	// CreateSupplierRecharge CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；
+	// CreateSupplierRecharge CreateSupplierRecharge 對接賬戶自助充值（金額服務端檔位裁決；
 	// 支付確認前不入賬——回調成功後入賬到供貨餘額，reference 冪等）。
 	CreateSupplierRecharge(context.Context, *CreateSupplierRechargeRequest) (*CreateSupplierRechargeReply, error)
 	// GetSupplierCredentials GetSupplierCredentials 查看憑據（僅 approved 且歸屬本人；返回明文 api_secret）。
 	GetSupplierCredentials(context.Context, *GetSupplierCredentialsRequest) (*SupplierCredentialsReply, error)
-	// ListMySupplierAccounts ListMySupplierAccounts 我的對接賬户（申請中/已通過/已駁回/已禁用全量）。
+	// ListMySupplierAccounts ListMySupplierAccounts 我的對接賬戶（申請中/已通過/已駁回/已禁用全量）。
 	ListMySupplierAccounts(context.Context, *emptypb.Empty) (*ListSupplierAccountsReply, error)
 	// RegenerateSupplierSecret RegenerateSupplierSecret 重置密鑰（舊 secret 立即失效；新明文僅此一次返回）。
 	RegenerateSupplierSecret(context.Context, *RegenerateSupplierSecretRequest) (*SupplierCredentialsReply, error)
@@ -207,12 +207,12 @@ func _StoreSupplierService_SetSupplierIPWhitelist0_HTTP_Handler(srv StoreSupplie
 type StoreSupplierServiceHTTPClient interface {
 	// CancelSupplierApplication CancelSupplierApplication 撤銷申請（僅 applying 狀態可撤銷）。
 	CancelSupplierApplication(ctx context.Context, req *CancelSupplierApplicationRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
-	// CreateSupplierRecharge CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；
+	// CreateSupplierRecharge CreateSupplierRecharge 對接賬戶自助充值（金額服務端檔位裁決；
 	// 支付確認前不入賬——回調成功後入賬到供貨餘額，reference 冪等）。
 	CreateSupplierRecharge(ctx context.Context, req *CreateSupplierRechargeRequest, opts ...http.CallOption) (rsp *CreateSupplierRechargeReply, err error)
 	// GetSupplierCredentials GetSupplierCredentials 查看憑據（僅 approved 且歸屬本人；返回明文 api_secret）。
 	GetSupplierCredentials(ctx context.Context, req *GetSupplierCredentialsRequest, opts ...http.CallOption) (rsp *SupplierCredentialsReply, err error)
-	// ListMySupplierAccounts ListMySupplierAccounts 我的對接賬户（申請中/已通過/已駁回/已禁用全量）。
+	// ListMySupplierAccounts ListMySupplierAccounts 我的對接賬戶（申請中/已通過/已駁回/已禁用全量）。
 	ListMySupplierAccounts(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListSupplierAccountsReply, err error)
 	// RegenerateSupplierSecret RegenerateSupplierSecret 重置密鑰（舊 secret 立即失效；新明文僅此一次返回）。
 	RegenerateSupplierSecret(ctx context.Context, req *RegenerateSupplierSecretRequest, opts ...http.CallOption) (rsp *SupplierCredentialsReply, err error)
@@ -248,7 +248,7 @@ func (c *StoreSupplierServiceHTTPClientImpl) CancelSupplierApplication(ctx conte
 	return &out, nil
 }
 
-// CreateSupplierRecharge CreateSupplierRecharge 對接賬户自助充值（金額服務端檔位裁決；
+// CreateSupplierRecharge CreateSupplierRecharge 對接賬戶自助充值（金額服務端檔位裁決；
 // 支付確認前不入賬——回調成功後入賬到供貨餘額，reference 冪等）。
 func (c *StoreSupplierServiceHTTPClientImpl) CreateSupplierRecharge(ctx context.Context, in *CreateSupplierRechargeRequest, opts ...http.CallOption) (*CreateSupplierRechargeReply, error) {
 	var out CreateSupplierRechargeReply
@@ -284,7 +284,7 @@ func (c *StoreSupplierServiceHTTPClientImpl) GetSupplierCredentials(ctx context.
 	return &out, nil
 }
 
-// ListMySupplierAccounts ListMySupplierAccounts 我的對接賬户（申請中/已通過/已駁回/已禁用全量）。
+// ListMySupplierAccounts ListMySupplierAccounts 我的對接賬戶（申請中/已通過/已駁回/已禁用全量）。
 func (c *StoreSupplierServiceHTTPClientImpl) ListMySupplierAccounts(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*ListSupplierAccountsReply, error) {
 	var out ListSupplierAccountsReply
 	pattern := "/api/v1/storefront/supplier/accounts"

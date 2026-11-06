@@ -26,7 +26,7 @@ const opColumns: DataTableColumns<any> = [
     ellipsis: true,
     render: (row) =>
       row.operator_name ||
-      (row.operator_id ? `${row.operator_type === "admin" ? "員工" : "用户"}#${row.operator_id}` : "未知"),
+      (row.operator_id ? `${row.operator_type === "admin" ? "員工" : "用戶"}#${row.operator_id}` : "未知"),
   },
   { title: "權限點", key: "permission_point", width: 170, ellipsis: true },
   { title: "動作", key: "action", width: 70 },
@@ -81,7 +81,7 @@ const operatorOptions = computed(() => {
   for (const r of opLogs.value as any[]) {
     const id = r.operator_id;
     if (!id || map.has(id)) continue;
-    const name = r.operator_name || `${r.operator_type === "admin" ? "員工" : "用户"}#${id}`;
+    const name = r.operator_name || `${r.operator_type === "admin" ? "員工" : "用戶"}#${id}`;
     map.set(id, { label: `${name}（#${id}）`, value: id });
   }
   return [...map.values()];

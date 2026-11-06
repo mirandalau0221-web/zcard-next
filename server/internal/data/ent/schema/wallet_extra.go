@@ -8,7 +8,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// PointAccount 積分賬户（與 WalletAccount 同構紀律：行鎖+非負+流水重算）。
+// PointAccount 積分賬戶（與 WalletAccount 同構紀律：行鎖+非負+流水重算）。
 type PointAccount struct {
 	ent.Schema
 }
@@ -66,7 +66,7 @@ func (RechargeOrder) Fields() []ent.Field {
 		field.Int64("gift_amount").Default(0).Comment("贈送餘額（分）"),
 		field.Int32("gift_points").Default(0).Comment("贈送積分"),
 		field.Enum("target").Values("balance", "supply").Default("balance").Comment("入賬方向（supply=供貨商預存，M2）"),
-		field.Uint64("supplier_account_id").Optional().Comment("target=supply 時的入賬目標對接賬户"),
+		field.Uint64("supplier_account_id").Optional().Comment("target=supply 時的入賬目標對接賬戶"),
 		field.Enum("status").Values("pending", "success", "failed", "expired").Default("pending"),
 		field.Uint64("payment_id").Optional(),
 		field.Time("paid_at").SchemaType(mysqlTime).Optional(),
@@ -99,7 +99,7 @@ func (Withdrawal) Fields() []ent.Field {
 		field.String("reject_reason").MaxLen(255).Optional(),
 		field.Time("paid_at").SchemaType(mysqlTime).Optional(),
 		field.Time("reviewed_at").SchemaType(mysqlTime).Optional(),
-		// 打款回執（交易流水號/憑證備註；打款時填寫，客户記錄展示）
+		// 打款回執（交易流水號/憑證備註；打款時填寫，客戶記錄展示）
 		field.String("receipt").MaxLen(255).Optional(),
 	}
 }
@@ -122,7 +122,7 @@ func (GiftcardBatch) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.String("batch_no").MaxLen(40).Unique(),
-		field.Time("deleted_at").SchemaType(mysqlTime).Optional().Comment("批次刪除時間，保留兑換審計"),
+		field.Time("deleted_at").SchemaType(mysqlTime).Optional().Comment("批次刪除時間，保留兌換審計"),
 		field.String("name").MaxLen(100),
 		field.Int64("amount").Comment("面額（分）"),
 		field.Int32("quantity").Comment("發行數量"),
@@ -142,11 +142,11 @@ func (Giftcard) Fields() []ent.Field {
 		field.Uint64("id"),
 		field.Uint64("batch_id"),
 		field.Bytes("code").Comment("AES-256-GCM 密文（ZCARD_CARD_KEY）"),
-		field.String("code_hash").MaxLen(64).Unique().Comment("keyed hash（兑換檢索，防爆破限流配套）"),
+		field.String("code_hash").MaxLen(64).Unique().Comment("keyed hash（兌換檢索，防爆破限流配套）"),
 		field.Int64("amount").Comment("面額（分）"),
 		field.String("currency").MaxLen(3).Default("CNY"),
 		field.Enum("status").Values("unused", "used", "disabled").Default("unused"),
-		field.Uint64("used_by").Optional().Comment("兑換用户"),
+		field.Uint64("used_by").Optional().Comment("兌換用戶"),
 		field.Time("used_at").SchemaType(mysqlTime).Optional(),
 		field.Time("expires_at").SchemaType(mysqlTime).Optional(),
 	}

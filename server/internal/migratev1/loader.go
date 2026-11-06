@@ -24,7 +24,7 @@ type Migrator struct {
 
 	// 1.x 密鑰（preflight 解析產物）
 	AppKey, CardKey []byte
-	// 2.0 新密鑰（憑據重加密 DataBox / 卡密與直髮內容 CardCipher 用）
+	// 2.0 新密鑰（憑據重加密 DataBox / 卡密與直發內容 CardCipher 用）
 	DataKey    []byte
 	NewCardKey []byte
 

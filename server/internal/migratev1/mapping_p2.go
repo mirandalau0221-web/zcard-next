@@ -91,7 +91,7 @@ func (m *Migrator) migrateCategories(ctx context.Context) error {
 }
 
 // migrateProducts 1.x products → products。
-// 關鍵變換：member_price JSON 的 key 由 1.x 用户組 ID 重寫為 member_level 新 ID；
+// 關鍵變換：member_price JSON 的 key 由 1.x 用戶組 ID 重寫為 member_level 新 ID；
 // fulfillment_type=fixed 的 delivery_message → direct_content（2.0 卡密鑰匙 GCM，
 // AAD=product/subsite，與 catalog 讀取端口徑一致）；軟刪 → 下架。
 // 丟棄列（2.0 無 extra 列，統一報告）：seo_*/price_manual/upstream_price/stock_cache/
@@ -238,7 +238,7 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			// 直髮內容（fulfillment_type=fixed）：明文 → 2.0 卡密鑰匙 GCM（AAD=product/subsite）
+			// 直發內容（fulfillment_type=fixed）：明文 → 2.0 卡密鑰匙 GCM（AAD=product/subsite）
 			if nullStr(fulfillmentType) == "fixed" {
 				msg := nullStr(deliveryMessage)
 				if msg == "" {
@@ -246,7 +246,7 @@ func (m *Migrator) migrateProducts(ctx context.Context) error {
 				} else {
 					cipher, err := inventory.NewCardCipher(m.NewCardKey)
 					if err != nil {
-						return fmt.Errorf("ZCARD_CARD_KEY 不可用（直髮內容重加密必需）: %w", err)
+						return fmt.Errorf("ZCARD_CARD_KEY 不可用（直發內容重加密必需）: %w", err)
 					}
 					sealed, err := cipher.Seal(msg, p.ID, p.SubsiteID)
 					if err != nil {
@@ -287,7 +287,7 @@ func (m *Migrator) rewriteMemberPrice(raw string) (map[string]int64, error) {
 		}
 		newID, ok := m.IDs.Get(context.Background(), "user_groups", uint64(oldID))
 		if !ok {
-			m.RW.AddError("products", 0, fmt.Sprintf("member_price 引用未遷移用户組 %s，已跳過", k))
+			m.RW.AddError("products", 0, fmt.Sprintf("member_price 引用未遷移用戶組 %s，已跳過", k))
 			continue
 		}
 		out[fmt.Sprintf("%d", newID)] = cents

@@ -22,7 +22,7 @@ import (
 	"github.com/NovaWorks/zcard-next/server/internal/platform/httpx"
 )
 
-// maxCoverBytes 封面大小上限（2MB——髮卡商品圖足夠；Content-Length 不可信時 LimitReader 兜底）。
+// maxCoverBytes 封面大小上限（2MB——發卡商品圖足夠；Content-Length 不可信時 LimitReader 兜底）。
 const maxCoverBytes = 2 << 20
 
 var coverClient = httpx.NewSafeClient(10 * time.Second)

@@ -24,7 +24,7 @@ func NewOutboxWriter(d *Data) *OutboxWriter { return &OutboxWriter{data: d} }
 
 // Write 寫入 outbox 事件（同事務約束見文件頭註釋）。
 // dedupe_key 衝突（同事件重複發佈，如訂單重複回調）冪等返回 nil。
-// 租户信息由各模塊事件載荷自帶（outbox_events 表無 subsite_id 列，數據庫架構 ）。
+// 租戶信息由各模塊事件載荷自帶（outbox_events 表無 subsite_id 列，數據庫架構 ）。
 func (w *OutboxWriter) Write(ctx context.Context, module, typ, aggregateID, dedupeKey string, payload json.RawMessage) error {
 	return Client(ctx, w.data).OutboxEvent.Create().
 		SetModule(module).

@@ -146,7 +146,7 @@ type ListProductsRequest struct {
 	// 扁平分頁（query 綁定：?page=1&page_size=20）
 	Page     int32 `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize int32 `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	// 積分商城視圖（true=僅積分兑換商品 points_required>0；）
+	// 積分商城視圖（true=僅積分兌換商品 points_required>0；）
 	PointsOnly bool `protobuf:"varint,5,opt,name=points_only,json=pointsOnly,proto3" json:"points_only,omitempty"`
 	// 排序：newest（默認）| price_asc | price_desc | sales
 	Sort string `protobuf:"bytes,6,opt,name=sort,proto3" json:"sort,omitempty"`
@@ -454,7 +454,7 @@ type Product struct {
 	Reviews []*ReviewItem `protobuf:"bytes,13,rep,name=reviews,proto3" json:"reviews,omitempty"`
 	// 多規格 SKU（下單可選；Sku.price_cents > 商品價時下單按 SKU 價）
 	Skus []*Sku `protobuf:"bytes,14,rep,name=skus,proto3" json:"skus,omitempty"`
-	// 積分兑換價（0=常規商品；>0=積分商城商品，下單走積分兑換分支；）
+	// 積分兌換價（0=常規商品；>0=積分商城商品，下單走積分兌換分支；）
 	PointsRequired int64 `protobuf:"varint,15,opt,name=points_required,json=pointsRequired,proto3" json:"points_required,omitempty"`
 	// 運營推薦（首頁推薦位標記）
 	IsRecommend       bool             `protobuf:"varint,16,opt,name=is_recommend,json=isRecommend,proto3" json:"is_recommend,omitempty"`

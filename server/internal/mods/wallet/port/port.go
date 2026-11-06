@@ -44,7 +44,7 @@ type Points interface {
 	PointCreditInTx(ctx context.Context, e PointEntry) error
 }
 
-// PointsDebiter 積分扣減（order 積分兑換下單消費，通道 B 同事務）。
+// PointsDebiter 積分扣減（order 積分兌換下單消費，通道 B 同事務）。
 type PointsDebiter interface {
 	PointDebitInTx(ctx context.Context, e PointEntry) error
 }

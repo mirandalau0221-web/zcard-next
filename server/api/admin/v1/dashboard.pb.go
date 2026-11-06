@@ -237,7 +237,7 @@ type DashboardStat struct {
 	PaidOrders        int64                  `protobuf:"varint,3,opt,name=paid_orders,json=paidOrders,proto3" json:"paid_orders,omitempty"`
 	Cost              int64                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`                                                      // 已支付訂單成本（分）
 	Profit            int64                  `protobuf:"varint,5,opt,name=profit,proto3" json:"profit,omitempty"`                                                  // 預估毛利 = net_revenue - cost（分）；成本不完整時不可用
-	NewUsers          int64                  `protobuf:"varint,6,opt,name=new_users,json=newUsers,proto3" json:"new_users,omitempty"`                              // 全站新增註冊用户
+	NewUsers          int64                  `protobuf:"varint,6,opt,name=new_users,json=newUsers,proto3" json:"new_users,omitempty"`                              // 全站新增註冊用戶
 	Refunds           int64                  `protobuf:"varint,7,opt,name=refunds,proto3" json:"refunds,omitempty"`                                                // 時段內成功退款
 	NetRevenue        int64                  `protobuf:"varint,8,opt,name=net_revenue,json=netRevenue,proto3" json:"net_revenue,omitempty"`                        // 支付金額減成功退款
 	UnknownCostOrders int64                  `protobuf:"varint,9,opt,name=unknown_cost_orders,json=unknownCostOrders,proto3" json:"unknown_cost_orders,omitempty"` // 成本不完整時不展示利潤
@@ -878,7 +878,7 @@ type DashboardReply struct {
 	RangeEnd      int64                  `protobuf:"varint,13,opt,name=range_end,json=rangeEnd,proto3" json:"range_end,omitempty"`
 	GeneratedAt   int64                  `protobuf:"varint,14,opt,name=generated_at,json=generatedAt,proto3" json:"generated_at,omitempty"`
 	SubsiteId     uint64                 `protobuf:"varint,15,opt,name=subsite_id,json=subsiteId,proto3" json:"subsite_id,omitempty"`
-	OnlineUsers   int64                  `protobuf:"varint,11,opt,name=online_users,json=onlineUsers,proto3" json:"online_users,omitempty"` // 當前在線用户數（5 分鐘活躍窗口）
+	OnlineUsers   int64                  `protobuf:"varint,11,opt,name=online_users,json=onlineUsers,proto3" json:"online_users,omitempty"` // 當前在線用戶數（5 分鐘活躍窗口）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

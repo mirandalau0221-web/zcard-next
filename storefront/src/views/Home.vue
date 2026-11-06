@@ -333,7 +333,7 @@ function stopHero() {
 }
 
 function bannerImg(b: Banner): string {
-  // SSR 構建期無 window：PC 圖（移動端圖由客户端水合後按視口切換）
+  // SSR 構建期無 window：PC 圖（移動端圖由客戶端水合後按視口切換）
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
   return (isMobile && b.mobile_image) ? b.mobile_image : b.image;
 }
@@ -512,7 +512,7 @@ async function loadMore() {
     if (sequence === loadSequence) loadingMore.value = false;
   }
 }
-// 只保留一個觀察器；請求失敗後停止自動重試，由用户點擊重試繼續。
+// 只保留一個觀察器；請求失敗後停止自動重試，由用戶點擊重試繼續。
 watch([loadMoreTarget, mobileCatalog, hasMore, loading, loadingMore, loadMoreError, error, catalogActive], ([target], _old, onCleanup) => {
   if (!target || !mobileCatalog.value || !hasMore.value || loading.value || loadingMore.value || loadMoreError.value || error.value || !catalogActive.value || typeof IntersectionObserver === 'undefined') return;
   const observer = new IntersectionObserver(entries => {

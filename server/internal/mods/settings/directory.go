@@ -91,7 +91,7 @@ var groups = map[string]*GroupDef{
 	"footer": {
 		Name: "footer", Desc: "頁腳",
 		Labels: map[string]string{
-			"about": "頁腳關於", "nav": "頁腳導航", "agreement": "用户協議",
+			"about": "頁腳關於", "nav": "頁腳導航", "agreement": "用戶協議",
 			"contact": "聯繫方式", "social": "社交鏈接", "icp": "ICP 備案號",
 		},
 		Defaults: map[string]any{
@@ -113,7 +113,7 @@ var groups = map[string]*GroupDef{
 		},
 		PublicKeys: map[string]bool{"top_banner_enabled": true, "nav_recommend": true},
 	},
-	// 客户代碼（service）：第三方 JS 嵌入——客服代碼（懸浮球）與統計代碼（頁面底部）
+	// 客戶代碼（service）：第三方 JS 嵌入——客服代碼（懸浮球）與統計代碼（頁面底部）
 	"service": {
 		Name: "service", Desc: "客服與統計代碼",
 		Labels: map[string]string{
@@ -131,7 +131,7 @@ var groups = map[string]*GroupDef{
 	"trade": {
 		Name: "trade", Desc: "交易",
 		Labels: map[string]string{
-			"guest_checkout": "遊客下單", "contact_required": "聯繫方式要求", "contact_scope": "聯繫方式適用買家（積分兑換除外）", "query_password": "訂單查詢密碼",
+			"guest_checkout": "遊客下單", "contact_required": "聯繫方式要求", "contact_scope": "聯繫方式適用買家（積分兌換除外）", "query_password": "訂單查詢密碼",
 			"order_ttl_minutes": "訂單超時（分鐘）", "cart_enabled": "購物車功能", "api_order_enabled": "API 下單",
 		},
 		Options: map[string]map[string]string{
@@ -155,12 +155,12 @@ var groups = map[string]*GroupDef{
 			"captcha_register": "註冊驗證碼", "captcha_login": "登錄驗證碼", "captcha_order": "下單驗證碼（僅遊客）",
 			"captcha_reset": "重置密碼驗證碼", "captcha_admin_login": "後台登錄驗證碼",
 			"captcha_length": "驗證碼位數", "captcha_charset": "驗證碼字符類型",
-			"username_min_len":   "用户名最小長度",
+			"username_min_len":   "用戶名最小長度",
 			"max_pending_per_ip": "單 IP 待付款訂單上限", "risk_enabled": "風控攔截",
 		},
 		Options: map[string]map[string]string{
 			// 多選（數組）：勾選的通道全部可用；至少含 username 才能免驗證註冊
-			"register_method": {"username": "用户名", "email": "郵箱驗證", "phone": "手機驗證"},
+			"register_method": {"username": "用戶名", "email": "郵箱驗證", "phone": "手機驗證"},
 			"captcha_charset": {"digit": "純數字", "letter": "純字母", "mixed": "數字字母混合"},
 		},
 		Defaults: map[string]any{
@@ -233,7 +233,7 @@ var groups = map[string]*GroupDef{
 			"max_amount": 500000,
 			"gift_tiers": nil, // [{amount,gift_balance}] 充滿 amount 分贈 gift_balance 分供貨餘額
 		},
-		// 前台公開：對接賬户充值彈窗限額與贈送檔位展示（金額裁決仍在服務端）
+		// 前台公開：對接賬戶充值彈窗限額與贈送檔位展示（金額裁決仍在服務端）
 		PublicKeys: map[string]bool{"enabled": true, "min_amount": true, "max_amount": true, "gift_tiers": true},
 	},
 	"license": {
@@ -329,7 +329,7 @@ var groups = map[string]*GroupDef{
 			"telegram_bot_token": "Telegram Bot Token", "telegram_chat_ids": "Telegram 接收 Chat ID",
 			"telegram_events": "Telegram 訂單通知事件", "telegram_targets": "Telegram 接收位置",
 			"smtp_security": "SMTP 連接方式", "smtp_auth": "SMTP 認證方式", "smtp_tls_verify": "校驗 SMTP 服務器證書",
-			"smtp_host": "SMTP 服務器", "smtp_port": "SMTP 端口", "smtp_user": "SMTP 用户名",
+			"smtp_host": "SMTP 服務器", "smtp_port": "SMTP 端口", "smtp_user": "SMTP 用戶名",
 			"smtp_password": "SMTP 密碼", "smtp_from": "發件郵箱", "smtp_name": "發件人名稱",
 			"sms_provider": "短信服務商", "sms_key": "短信 AccessKey",
 			"sms_secret":            "短信 SecretKey",

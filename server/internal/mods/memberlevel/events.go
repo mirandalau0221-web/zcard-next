@@ -1,8 +1,8 @@
 package memberlevel
 
-// 積分產生：訂閲 order.paid → 按用户當前等級 points_rule（消費 X 分產 Y 分）
+// 積分產生：訂閲 order.paid → 按用戶當前等級 points_rule（消費 X 分產 Y 分）
 // 入積分賬本（wallet.Points 端口，通道 A）；冪等鍵 points:<orderID>（重複投遞直接 ACK）。
-// 口徑：積分兑換單 total=0 不產生；取消/未支付訂單不觸發（事件只在 paid 後發佈）。
+// 口徑：積分兌換單 total=0 不產生；取消/未支付訂單不觸發（事件只在 paid 後發佈）。
 
 import (
 	"context"
@@ -42,7 +42,7 @@ func (s *PointsService) onOrderPaid(ctx context.Context, env events.Envelope) er
 		return nil
 	}
 	if payload.UserID == 0 || payload.TotalCents <= 0 {
-		return nil // 遊客/積分兑換單（total=0）不產生積分
+		return nil // 遊客/積分兌換單（total=0）不產生積分
 	}
 	lv, err := s.repo.EffectiveLevelOf(ctx, payload.UserID)
 	if err != nil || lv == nil {

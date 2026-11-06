@@ -76,7 +76,7 @@ func (m *Migrator) migrateCardImports(ctx context.Context) error {
 			}
 			b := m.Client.CardImport.Create().
 				SetProductID(newPID).
-				SetOperatorID(0). // 1.x operator 是普通用户表；2.0 語義為管理員，不直遷
+				SetOperatorID(0). // 1.x operator 是普通用戶表；2.0 語義為管理員，不直遷
 				SetFilename(orString(nullStr(source), "v1-import-"+fmt.Sprint(id))).
 				SetTotal(int32(total)).
 				SetImported(int32(success)).

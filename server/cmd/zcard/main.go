@@ -411,7 +411,7 @@ func runDBTest(args []string) error {
 	dialect := fs.String("dialect", "", "postgres | mysql")
 	host := fs.String("host", "127.0.0.1", "數據庫主機")
 	port := fs.Int("port", 0, "數據庫端口（0=按方言默認 5432/3306）")
-	user := fs.String("user", "", "數據庫用户")
+	user := fs.String("user", "", "數據庫用戶")
 	password := fs.String("password", "", "數據庫密碼")
 	name := fs.String("name", "", "數據庫名")
 	redisAddr := fs.String("redis", "", "Redis 地址（mysql/postgres 必填）")

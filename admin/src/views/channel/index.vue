@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 渠道管理：上游貨源連接 / 供貨賬號（下游客户，含 dujiao/acg 兼容賬號）/ 採購單。
+// 渠道管理：上游貨源連接 / 供貨賬號（下游客戶，含 dujiao/acg 兼容賬號）/ 採購單。
 // 權限：supply:read（貨源）、supplier:read（供貨賬號）、procurement:read（採購單）。
 // 支持 ?tab= 深鏈（首頁待辦「待審對接申請」直達審核視圖）。
 import { ref, defineAsyncComponent, watch } from "vue";

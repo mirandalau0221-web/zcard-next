@@ -37,7 +37,7 @@ type SupplierAccountReply struct {
 	CreatedAt     int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	Protocol      string                 `protobuf:"bytes,11,opt,name=protocol,proto3" json:"protocol,omitempty"`                             // zcard | dujiao_next | acg_faka（對外供貨協議； B/C）
 	DisplayName   string                 `protobuf:"bytes,12,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`    // connect/ping 回顯店鋪名
-	OwnerUserId   uint64                 `protobuf:"varint,13,opt,name=owner_user_id,json=ownerUserId,proto3" json:"owner_user_id,omitempty"` // 前台申請歸屬用户（0=admin 手動建號）
+	OwnerUserId   uint64                 `protobuf:"varint,13,opt,name=owner_user_id,json=ownerUserId,proto3" json:"owner_user_id,omitempty"` // 前台申請歸屬用戶（0=admin 手動建號）
 	ApplyReason   string                 `protobuf:"bytes,14,opt,name=apply_reason,json=applyReason,proto3" json:"apply_reason,omitempty"`    // 申請理由（前台申請時填）
 	ReviewNote    string                 `protobuf:"bytes,15,opt,name=review_note,json=reviewNote,proto3" json:"review_note,omitempty"`       // 審核意見/駁回理由
 	IpWhitelist   []string               `protobuf:"bytes,16,rep,name=ip_whitelist,json=ipWhitelist,proto3" json:"ip_whitelist,omitempty"`    // IP 白名單（空=所有 IP 放行；精確 IP 或 CIDR）

@@ -34,7 +34,7 @@ func (Product) Fields() []ent.Field {
 				return fmt.Errorf("商品屬性無效")
 			}
 			return nil
-		}).Comment("商品屬性；goods_type 為舊客户端兼容鏡像"),
+		}).Comment("商品屬性；goods_type 為舊客戶端兼容鏡像"),
 		field.Bool("track_inventory").Default(true).Comment("實體商品是否管理數量庫存；規格繼承"),
 		field.Bool("sales_visible").Default(true).Comment("是否向買家顯示已售數量"),
 		field.String("shipping_mode").Default("free"),
@@ -52,9 +52,9 @@ func (Product) Fields() []ent.Field {
 		field.Int64("factory_price").Default(0).Comment("成本價（分，上游/自營成本快照）"),
 		field.Int64("draft_premium").Default(0).Comment("預選卡密默認加價（分）"),
 		field.JSON("member_price", map[string]int64{}).Optional().Comment("按會員等級價 {level_id: 分}"),
-		field.Int64("points_required").Default(0).Comment("積分兑換價（分單位積分；0=不參與積分商城，P3-01）"),
-		field.Enum("stock_type").Values("card", "url", "code").Default("card").Comment("卡密/鏈接/兑換碼"),
-		field.Bytes("direct_content").Optional().Comment("直髮內容密文（url/code 商品：網盤鏈接/兑換碼，AES-GCM AAD=product/subsite；同一內容發給每個買家"),
+		field.Int64("points_required").Default(0).Comment("積分兌換價（分單位積分；0=不參與積分商城，P3-01）"),
+		field.Enum("stock_type").Values("card", "url", "code").Default("card").Comment("卡密/鏈接/兌換碼"),
+		field.Bytes("direct_content").Optional().Comment("直發內容密文（url/code 商品：網盤鏈接/兌換碼，AES-GCM AAD=product/subsite；同一內容發給每個買家"),
 		field.Bool("stock_visible").Default(true).Comment("是否顯示庫存"),
 		field.String("fulfillment_mode").Default("auto"),
 		field.Int64("manual_stock").Default(-1).Comment("人工共享總額度（含已售及預佔），-1不限"),

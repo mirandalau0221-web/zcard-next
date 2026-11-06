@@ -58,7 +58,7 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 				// 顯式組對照關係（供對賬/客服追溯；等級權益本身由閾值推導）
 				if _, ok := m.IDs.Get(ctx, "user_groups", uint64(gid)); !ok {
 					m.RW.AddError("users", uint64(id),
-						fmt.Sprintf("顯式用户組 %d 無對應 member_level（等級將按閾值推導）", gid))
+						fmt.Sprintf("顯式用戶組 %d 無對應 member_level（等級將按閾值推導）", gid))
 				}
 			}
 			st := user.StatusActive
@@ -81,7 +81,7 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 				return err
 			}
 			if exists {
-				return fmt.Errorf("用户名 %q 已存在於目標庫（重複遷移或與 2.0 存量衝突）", username)
+				return fmt.Errorf("用戶名 %q 已存在於目標庫（重複遷移或與 2.0 存量衝突）", username)
 			}
 			var lastLoginAt *time.Time
 			if t, ok, err := mustTime(nullStr(lastLogin), m.TZ); err != nil {
@@ -131,7 +131,7 @@ func (m *Migrator) migrateUsers(ctx context.Context) error {
 }
 
 // migrateAdmins 1.x spatie 角色提取 → admin_users（username/password bcrypt 直遷）。
-// 1.x admin 與普通用户分屬兩表，無命名衝突；2.0 需先種內置角色再掛超管。
+// 1.x admin 與普通用戶分屬兩表，無命名衝突；2.0 需先種內置角色再掛超管。
 func (m *Migrator) migrateAdmins(ctx context.Context) error {
 	if m.dry {
 		return m.dryCount(ctx,
@@ -200,7 +200,7 @@ func (m *Migrator) migrateAdmins(ctx context.Context) error {
 	return rows.Err()
 }
 
-// migrateInviteChain pid 鏈 → invite_l1/l2/l3（二次遍歷：全部用户落庫後再解析依賴）。
+// migrateInviteChain pid 鏈 → invite_l1/l2/l3（二次遍歷：全部用戶落庫後再解析依賴）。
 // 環防護：上溯鏈遇已見節點即止（自身天然在 seen 中）；冪等：已填 invite_l1 的行跳過。
 func (m *Migrator) migrateInviteChain(ctx context.Context) error {
 	if m.dry {

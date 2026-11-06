@@ -42,7 +42,7 @@ type SupplierAccount struct {
 	Protocol supplieraccount.Protocol `json:"protocol,omitempty"`
 	// connect/ping 回顯的店鋪名（shopName/site_name）
 	DisplayName string `json:"display_name,omitempty"`
-	// 申請歸屬前台用户（0=admin 建號）
+	// 申請歸屬前台用戶（0=admin 建號）
 	OwnerUserID uint64 `json:"owner_user_id,omitempty"`
 	// 申請理由（審核用）
 	ApplyReason string `json:"apply_reason,omitempty"`

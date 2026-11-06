@@ -22,7 +22,7 @@ type Product struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
+	// 租戶（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// ProductKind holds the value of the "product_kind" field.
 	ProductKind string `json:"product_kind,omitempty"`
@@ -40,7 +40,7 @@ type Product struct {
 	Name string `json:"name,omitempty"`
 	// GoodsType holds the value of the "goods_type" field.
 	GoodsType string `json:"goods_type,omitempty"`
-	// 商品屬性；goods_type 為舊客户端兼容鏡像
+	// 商品屬性；goods_type 為舊客戶端兼容鏡像
 	ProductProperty string `json:"product_property,omitempty"`
 	// 實體商品是否管理數量庫存；規格繼承
 	TrackInventory bool `json:"track_inventory,omitempty"`
@@ -74,11 +74,11 @@ type Product struct {
 	DraftPremium int64 `json:"draft_premium,omitempty"`
 	// 按會員等級價 {level_id: 分}
 	MemberPrice map[string]int64 `json:"member_price,omitempty"`
-	// 積分兑換價（分單位積分；0=不參與積分商城，P3-01）
+	// 積分兌換價（分單位積分；0=不參與積分商城，P3-01）
 	PointsRequired int64 `json:"points_required,omitempty"`
-	// 卡密/鏈接/兑換碼
+	// 卡密/鏈接/兌換碼
 	StockType product.StockType `json:"stock_type,omitempty"`
-	// 直髮內容密文（url/code 商品：網盤鏈接/兑換碼，AES-GCM AAD=product/subsite；同一內容發給每個買家
+	// 直發內容密文（url/code 商品：網盤鏈接/兌換碼，AES-GCM AAD=product/subsite；同一內容發給每個買家
 	DirectContent []byte `json:"direct_content,omitempty"`
 	// 是否顯示庫存
 	StockVisible bool `json:"stock_visible,omitempty"`

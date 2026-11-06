@@ -249,13 +249,13 @@ onMounted(load);
       </template>
     </NModal>
 
-    <!-- 贈送指定用户 -->
+    <!-- 贈送指定用戶 -->
     <NModal v-model:show="showGrant" preset="dialog" title="贈送優惠券" style="width: 420px">
       <NForm :model="grantForm" label-placement="left" label-width="72">
         <NFormItem label="批次">
           <NInput :value="grantForm.batch_id" disabled />
         </NFormItem>
-        <NFormItem label="用户ID" required>
+        <NFormItem label="用戶ID" required>
           <NInputNumber v-model:value="grantForm.user_id" :min="1" class="w-full" placeholder="users 表 ID" />
         </NFormItem>
         <NFormItem label="數量" required>

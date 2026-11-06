@@ -59,7 +59,7 @@ const writable = computed(() => checkAuth("settings:update"));
 const chatError = (t: Target) => {
   const v = t.chat_id.trim();
   if (!/^(-?\d+|@[A-Za-z0-9_]{5,})$/.test(v) || v.length > 64)
-    return "填寫 Chat ID（可為負數）或 @用户名";
+    return "填寫 Chat ID（可為負數）或 @用戶名";
   if (!v.startsWith("@")) {
     try {
       const n = BigInt(v);

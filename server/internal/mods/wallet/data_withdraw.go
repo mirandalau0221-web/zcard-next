@@ -4,7 +4,7 @@ package wallet
 // 申請：available→locked（Lock）+ 手續費 + 收款方式白名單快照 → withdrawals(pending)
 // 審核：通過→approved（鎖定保持）；駁回→rejected（Unlock 回餘額）
 // 打款：人工打款模式 approved→paid（locked 扣減 + 流水 type=withdraw）
-// 紀律：金額服務端裁決（鐵律 16）；鎖定/解鎖/扣減全部走賬户 CAS + 流水，可重算。
+// 紀律：金額服務端裁決（鐵律 16）；鎖定/解鎖/扣減全部走賬戶 CAS + 流水，可重算。
 
 import (
 	"context"
@@ -108,7 +108,7 @@ func (r *WalletRepoImpl) ReviewWithdrawal(ctx context.Context, id uint64, approv
 }
 
 // PayWithdrawal 打款（人工打款模式）：approved→paid + 佣金 FIFO 消耗
-// （available→withdrawn，末行拆分；線下人工轉賬不動錢包賬户）。
+// （available→withdrawn，末行拆分；線下人工轉賬不動錢包賬戶）。
 func (r *WalletRepoImpl) PayWithdrawal(ctx context.Context, id uint64, receipt string) (*ent.Withdrawal, error) {
 	var w *ent.Withdrawal
 	err := data.Tx(ctx, r.data, func(txCtx context.Context) error {

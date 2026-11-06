@@ -239,7 +239,7 @@ func (s *AffiliateService) OnOrderRefunded(ctx context.Context, env events.Envel
 
 func centsOf(v int64) money.Cents { return money.Cents(v) }
 
-// PublishConfirmed 到賬通知事件（notify 消費；輕量直髮）。
+// PublishConfirmed 到賬通知事件（notify 消費；輕量直發）。
 func (s *AffiliateService) PublishConfirmed(ctx context.Context, c *ent.AffiliateCommission) {
 	if s.outbox == nil {
 		return

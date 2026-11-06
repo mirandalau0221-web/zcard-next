@@ -99,7 +99,7 @@ const loading = ref(true);
 const error = ref('');
 const chipsExpanded = ref(false); // 移動端 grid 膠囊：單行橫滑 → 展開多行
 
-// ── 模板設置（後台 系統設置 → 模板；公開配置下發，客户端生效）──
+// ── 模板設置（後台 系統設置 → 模板；公開配置下發，客戶端生效）──
 const viewMode = ref<'grid' | 'list'>('grid'); // template.default_view（big 歸入網格+更寬卡片）
 const bigGrid = ref(false); // default_view=big：大圖卡片（更寬的列）
 const navStyle = ref('list'); // template.category_nav_style：list=左側樹 | grid=頂部膠囊

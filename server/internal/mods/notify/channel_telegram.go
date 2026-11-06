@@ -5,7 +5,7 @@ package notify
 //
 // 端點：POST https://api.telegram.org/bot{token}/sendMessage
 // 載荷：{"chat_id": "...", "text": "...", "parse_mode": "HTML"}
-// 出站經 httpx 安全客户端（SSRF 防護）；未配置 → skipped 降級。
+// 出站經 httpx 安全客戶端（SSRF 防護）；未配置 → skipped 降級。
 
 import (
 	"bytes"

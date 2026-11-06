@@ -20,7 +20,7 @@ const saving = ref(false);
 const editing = ref<string | null>(null);
 const form = ref({ code: "", symbol: "", position: "prefix", precision: 2, rate_json: "1" });
 
-// 啓用狀態快捷篩選（客户端過濾——貨幣全量加載，帶實時計數）
+// 啓用狀態快捷篩選（客戶端過濾——貨幣全量加載，帶實時計數）
 const enabledFilter = ref<"" | "on" | "off">("");
 const enabledTabs = [
   { label: "全部", value: "", type: "default" as const },
@@ -46,7 +46,7 @@ const rateHint = computed(() =>
     ? form.value.code === "CNY"
       ? "全站統一按人民幣（CNY）結算，基礎貨幣匯率固定為 1"
       : `全站統一按基礎貨幣 ${form.value.code} 結算，匯率固定為 1`
-    : `匯率 = 1 ${baseCurrency.value || "基礎貨幣"} 可兑換的本幣數量`,
+    : `匯率 = 1 ${baseCurrency.value || "基礎貨幣"} 可兌換的本幣數量`,
 );
 
 // 展示效果預覽（符號 + 位置 + 小數位實時聯動，以 10 元為例）
@@ -223,7 +223,7 @@ onMounted(() => {
       <NButton v-if="canWrite()" size="small" type="primary" @click="openCreate">新增貨幣</NButton>
     </div>
     <div class="mb-8px rounded-4px bg-gray-50 px-10px py-6px text-12px text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-      <template v-if="baseCurrency">默認結算貨幣：<b>{{ baseCurrency }}</b>（基礎匯率為 1）。其他貨幣的匯率表示「1 {{ baseCurrency }} 可兑換的本幣數量」。已有商品或資金記錄時不能直接切換基礎貨幣。</template>
+      <template v-if="baseCurrency">默認結算貨幣：<b>{{ baseCurrency }}</b>（基礎匯率為 1）。其他貨幣的匯率表示「1 {{ baseCurrency }} 可兌換的本幣數量」。已有商品或資金記錄時不能直接切換基礎貨幣。</template>
       <div v-else-if="baseLoadError" role="alert" class="flex items-center gap-8px text-red-600">默認結算貨幣讀取失敗<NButton size="tiny" @click="loadBaseCurrency">重試</NButton></div>
       <span v-else>正在讀取默認結算貨幣…</span>
     </div>

@@ -2,7 +2,7 @@ import { t as $t, localeTag } from '@/i18n';
 import { loadPublicConfig } from '@/config';
 /**
  * SEO 工具：站點級配置消費（/api/v1/storefront/config 公開下發）+ 頁面級 head 聲明。
- * 基於 @unhead/vue（vite-ssg 內置）：SSG 構建時輸出到靜態 HTML，客户端水合後動態更新。
+ * 基於 @unhead/vue（vite-ssg 內置）：SSG 構建時輸出到靜態 HTML，客戶端水合後動態更新。
  * 通過 vite-ssg 注入的 head 實例操作（head.push 不依賴組件 setup 上下文——
  * async setup 的 await 之後 useHead/inject 不可用）。
  * SSR 安全：不依賴 window/document（canonical 基準用 site.url）。
@@ -48,7 +48,7 @@ function parseStr(raw: string | undefined, dflt = ""): string {
   }
 }
 
-/** 站點 SEO 配置（失敗回退默認值；SSR 構建期經 VITE_SSG_API 訪問，客户端同源） */
+/** 站點 SEO 配置（失敗回退默認值；SSR 構建期經 VITE_SSG_API 訪問，客戶端同源） */
 export async function fetchSiteSeo(): Promise<SiteSeoConfig> {
 
   const def: SiteSeoConfig = { get name() { return $t("商店"); }, url: "", logo: "", seoTitle: "", seoKeywords: "", seoDesc: "", verificationGoogle: "", verificationBing: "" };
@@ -89,7 +89,7 @@ function absUrl(u: string, base: string): string {
   return /^https?:\/\//i.test(u) ? u : base + u;
 }
 
-/** 站點 URL 基準（SSR 無 window：site.url 優先，空則客户端 origin） */
+/** 站點 URL 基準（SSR 無 window：site.url 優先，空則客戶端 origin） */
 function siteBase(site: SiteSeoConfig): string {
   if (site.url) return site.url;
   return typeof window !== "undefined" ? window.location.origin : "";
@@ -124,7 +124,7 @@ export function applyDefaultSeo(site: SiteSeoConfig) {
   const base = siteBase(site);
   applySeo(
     {
-      title: site.seoTitle || $t("{0} - 自動髮卡商城", [site.name]),
+      title: site.seoTitle || $t("{0} - 自動發卡商城", [site.name]),
       description: site.seoDesc,
       keywords: site.seoKeywords,
       ogType: "website",

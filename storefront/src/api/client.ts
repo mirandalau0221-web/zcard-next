@@ -4,12 +4,12 @@ import { t as $t } from '@/i18n';
 import { displayPrecision, formatCents, fromCents, toCents } from '../../../packages/money/index';
 import { loadPublicConfig } from '../config';
 import { readJSON } from './read';
-// 前台 API 客户端：fetch 封裝，金額一律「分」int64。
+// 前台 API 客戶端：fetch 封裝，金額一律「分」int64。
 // 認證（）：user realm JWT 存 localStorage，請求自動帶 Bearer；
 // 401 且本地有 token → 判定過期，清 token 跳登錄（遊客端點 401 不誤傷）。
 
 // SSG 構建（vite-ssg）時服務端無同源 API：經 VITE_SSG_API 指向構建機可達的 API
-// （如 http://127.0.0.1:8000）；客户端恆用同源相對路徑。
+// （如 http://127.0.0.1:8000）；客戶端恆用同源相對路徑。
 const BASE = import.meta.env.SSR
   ? `${import.meta.env.VITE_SSG_API || 'http://127.0.0.1:8000'}/api/v1/storefront`
   : '/api/v1/storefront';
@@ -182,7 +182,7 @@ export function formatSignedMoney(cents: number): string {
 }
 
 // initCurrency 啓動加載貨幣（公開配置 i18n.base_currency + i18n.display_currency + 啓用貨幣表；
-// 用户本地選擇 zcard_currency 優先，其次站點顯示貨幣，再基礎貨幣——多幣種展示換算，結算恆基準幣；
+// 用戶本地選擇 zcard_currency 優先，其次站點顯示貨幣，再基礎貨幣——多幣種展示換算，結算恆基準幣；
 // 失敗回退 ¥）。選擇集 listCurrencies() 供頂部切換器渲染；selectCurrency 切換後刷新生效。
 let initPromise: Promise<void> | null = null;
 let currencyList: (CurrencyMeta & { code: string })[] = [];
@@ -247,7 +247,7 @@ export function initCurrency(): Promise<void> {
 // 原始流水與賬務金額保持不變，其他人工備註原樣顯示。
 export function formatTransactionRemark(remark?: string): string {
   if (!remark) return '';
-  const match = /^(充值到賬|對接賬户自助充值到賬)（(?:用户 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*贈送\s*(\d+)\s*分）$/.exec(remark);
+  const match = /^(充值到賬|對接賬戶自助充值到賬)（(?:用戶 #(\d+)，)?本金\s*(\d+)\s*分\s*[+＋]\s*贈送\s*(\d+)\s*分）$/.exec(remark);
   if (!match) return remark;
   const principal = Number(match[3]);
   const gift = Number(match[4]);
@@ -256,15 +256,15 @@ export function formatTransactionRemark(remark?: string): string {
   const amount = gift > 0
     ? $t("{0}（本金 {1}＋贈送 {2}）", [formatMoney(total), formatMoney(principal), formatMoney(gift)])
     : formatMoney(principal);
-  return `${$t(match[1])} ${amount}${match[2] ? $t("（用户 #{0}）", [match[2]]) : ''}`;
+  return `${$t(match[1])} ${amount}${match[2] ? $t("（用戶 #{0}）", [match[2]]) : ''}`;
 }
 
 export const TRANSACTION_TYPES: Record<string, string> = {
   get adjust() { return $t("人工調賬"); }, get recharge() { return $t("餘額充值"); }, get order_pay() { return $t("訂單支付"); }, get payment() { return $t("訂單支付"); },
   get order_refund() { return $t("訂單退款"); }, get refund() { return $t("訂單退款"); }, get ticket_urgent() { return $t("工單付費加急"); },
   get commission() { return $t("分銷佣金入賬"); }, get commission_debt() { return $t("佣金欠款扣回"); }, get commission_reversal() { return $t("佣金退回"); },
-  get withdraw() { return $t("提現"); }, get freeze() { return $t("餘額凍結"); }, get unfreeze() { return $t("餘額解凍"); }, get giftcard() { return $t("禮品卡兑換"); },
-  get earn_recharge() { return $t("充值贈送積分"); }, get redeem() { return $t("積分兑換"); },
+  get withdraw() { return $t("提現"); }, get freeze() { return $t("餘額凍結"); }, get unfreeze() { return $t("餘額解凍"); }, get giftcard() { return $t("禮品卡兌換"); },
+  get earn_recharge() { return $t("充值贈送積分"); }, get redeem() { return $t("積分兌換"); },
 };
 export function transactionType(type?: string): string {
   return TRANSACTION_TYPES[type || ''] || $t("其他收支");

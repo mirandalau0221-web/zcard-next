@@ -90,7 +90,7 @@ func (r *TicketRepo) Create(ctx context.Context, ticketNo string, in CreateInput
 }
 
 // CreateMessage 追加消息（append-only；客服回覆觸發狀態機；content sanitize）。
-// senderType: user/admin/system；isInternal 內部備註（用户側過濾）。
+// senderType: user/admin/system；isInternal 內部備註（用戶側過濾）。
 // 返回（工單是否首次客服回覆——用於狀態遷移，調用方決定）。
 func (r *TicketRepo) CreateMessage(ctx context.Context, ticketID uint64, senderType string, senderID uint64, content string, attachments []uint64, isInternal bool) (*ent.TicketMessage, error) {
 	if attachments == nil {
@@ -155,7 +155,7 @@ func (r *TicketRepo) GetByNo(ctx context.Context, ticketNo string) (*ent.Ticket,
 	return t, nil
 }
 
-// MessagesUserVisible 用户側消息流（內部備註過濾——防泄漏雙過濾之一）。
+// MessagesUserVisible 用戶側消息流（內部備註過濾——防泄漏雙過濾之一）。
 func (r *TicketRepo) MessagesUserVisible(ctx context.Context, ticketID uint64) ([]*ent.TicketMessage, error) {
 	return data.Client(ctx, r.data).TicketMessage.Query().
 		Where(ticketmessage.TicketID(ticketID), ticketmessage.IsInternal(false)).
@@ -171,7 +171,7 @@ func (r *TicketRepo) MessagesAll(ctx context.Context, ticketID uint64) ([]*ent.T
 		All(ctx)
 }
 
-// ListByUser 用户工單列表。
+// ListByUser 用戶工單列表。
 func (r *TicketRepo) ListByUser(ctx context.Context, userID uint64, page, size int) ([]*ent.Ticket, int, error) {
 	q := data.Client(ctx, r.data).Ticket.Query().
 		Where(ticket.UserID(userID)).

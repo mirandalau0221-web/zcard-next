@@ -53,7 +53,7 @@ function statusTag(s: string) {
 const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 60 },
   { title: "商品ID", key: "product_id", width: 76 },
-  { title: "用户ID", key: "user_id", width: 76 },
+  { title: "用戶ID", key: "user_id", width: 76 },
   {
     title: "評分",
     key: "rating",

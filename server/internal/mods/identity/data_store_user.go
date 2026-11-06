@@ -1,6 +1,6 @@
 package identity
 
-// StoreUserService 用户中心（ 前置）：註冊/登錄/Me（user realm JWT）。
+// StoreUserService 用戶中心（ 前置）：註冊/登錄/Me（user realm JWT）。
 // 歸因鏈：invite_code=<user_id> → l1=邀請人 l2=邀請人.l1 l3=邀請人.l2（環狀拒絕）。
 
 import (
@@ -25,7 +25,7 @@ import (
 
 // stdErr 便捷別名（本文件 stdErrors 與 kratos errors 雙包共存）
 
-// StoreUserService 用户中心服務。
+// StoreUserService 用戶中心服務。
 type StoreUserService struct {
 	storefrontv1.UnimplementedStoreUserServiceServer
 	repo    *UserRepo
@@ -42,13 +42,13 @@ func NewStoreUserService(repo *UserRepo, signer *authn.Signer, d *data.Data, pwd
 	return &StoreUserService{repo: repo, signer: signer, data: d, pwd: pwd, regCode: regCode, regCfg: regCfg, captcha: cap}
 }
 
-// UserRepo 用户倉儲。
+// UserRepo 用戶倉儲。
 type UserRepo struct{ data *data.Data }
 
 // NewUserRepo 構造。
 func NewUserRepo(d *data.Data) *UserRepo { return &UserRepo{data: d} }
 
-// Username 按 ID 取用户名（port.UserReader 實現；audit 安全日誌主體富化用）。
+// Username 按 ID 取用戶名（port.UserReader 實現；audit 安全日誌主體富化用）。
 func (r *UserRepo) Username(ctx context.Context, id uint64) (string, error) {
 	u, err := data.Client(ctx, r.data).User.Get(ctx, id)
 	if err != nil {
@@ -161,10 +161,10 @@ func (r *UserRepo) Register(ctx context.Context, in RegisterInput) (*ent.User, e
 			return result, err
 		}
 	}
-	return nil, errors.BadRequest("identity.USERNAME_TAKEN", "用户名、郵箱或手機號已被註冊")
+	return nil, errors.BadRequest("identity.USERNAME_TAKEN", "用戶名、郵箱或手機號已被註冊")
 }
 
-// FindByUsername 按用户名查。
+// FindByUsername 按用戶名查。
 func (r *UserRepo) FindByUsername(ctx context.Context, username string) (*ent.User, error) {
 	u, err := data.Client(ctx, r.data).User.Query().
 		Where(user.Username(username)).Only(ctx)
@@ -177,7 +177,7 @@ func (r *UserRepo) FindByUsername(ctx context.Context, username string) (*ent.Us
 	return u, nil
 }
 
-// FindByLoginIdentifier 登錄混輸（用户名/郵箱/手機號三標識一次查詢——
+// FindByLoginIdentifier 登錄混輸（用戶名/郵箱/手機號三標識一次查詢——
 // acg-faka 同款體驗：單輸入框自動識別）。唯一索引三選一，無歧義。
 func (r *UserRepo) FindByLoginIdentifier(ctx context.Context, identifier string) (*ent.User, error) {
 	u, err := data.Client(ctx, r.data).User.Query().
@@ -262,11 +262,11 @@ func mapStoreAuthErr(err error) error {
 	msg := err.Error()
 	switch {
 	case msg == "identity.BAD_CREDENTIALS":
-		return errors.Unauthorized("identity.BAD_CREDENTIALS", "用户名或密碼錯誤")
+		return errors.Unauthorized("identity.BAD_CREDENTIALS", "用戶名或密碼錯誤")
 	case msg == "identity.USER_DISABLED":
 		return errors.Forbidden("identity.USER_DISABLED", "賬號已被禁用，請聯繫管理員")
 	case msg == "identity.USERNAME_TAKEN":
-		return errors.BadRequest("identity.USERNAME_TAKEN", "用户名已被註冊")
+		return errors.BadRequest("identity.USERNAME_TAKEN", "用戶名已被註冊")
 	case msg == "identity.PASSWORD_TOO_SHORT" || strings.HasPrefix(msg, "identity.PASSWORD_TOO_SHORT"):
 		return errors.BadRequest("identity.PASSWORD_TOO_SHORT", "密碼至少 6 位")
 	case msg == "identity.UNAUTHORIZED" || msg == "identity.SESSION_INVALID":
@@ -284,7 +284,7 @@ func mapStoreAuthErr(err error) error {
 	}
 }
 
-// Login API（username 字段混輸：用户名/郵箱/手機號）。
+// Login API（username 字段混輸：用戶名/郵箱/手機號）。
 func (s *StoreUserService) Login(ctx context.Context, req *storefrontv1.LoginRequest) (*storefrontv1.LoginReply, error) {
 	// 圖形驗證碼（captcha_login 開啓時前置；未啓用直接放行）
 	if s.captcha != nil {
@@ -311,7 +311,7 @@ func (s *StoreUserService) Login(ctx context.Context, req *storefrontv1.LoginReq
 	}, nil
 }
 
-// Me API（登錄態；推廣碼懶生成——存量用户首次訪問即補）。
+// Me API（登錄態；推廣碼懶生成——存量用戶首次訪問即補）。
 func (s *StoreUserService) Me(ctx context.Context, _ *emptypb.Empty) (*storefrontv1.MeReply, error) {
 	claims := ClaimsFromContext(ctx)
 	if claims == nil {

@@ -108,7 +108,7 @@ const columns: DataTableColumns<any> = [
   { title: "時間", key: "created_at", width: 160, render: (row) => formatTime(row.created_at) },
 ];
 
-/** 遠程搜索用户（用户名/註冊郵箱模糊匹配），選中後以用户 ID 查餘額/流水/調賬 */
+/** 遠程搜索用戶（用戶名/註冊郵箱模糊匹配），選中後以用戶 ID 查餘額/流水/調賬 */
 async function onUserSearch(keyword: string) {
   if (!keyword.trim()) {
     userOptions.value = [];
@@ -135,7 +135,7 @@ function onUserChange(_value: number | null, option: any) {
 
 async function loadBalance() {
   if (!userId.value) {
-    window.$message?.warning("請搜索並選擇用户（用户名或郵箱）");
+    window.$message?.warning("請搜索並選擇用戶（用戶名或郵箱）");
     return;
   }
   balanceLoading.value = true;
@@ -286,7 +286,7 @@ async function handleAdjust() {
           filterable
           remote
           clearable
-          placeholder="搜索用户名或註冊郵箱"
+          placeholder="搜索用戶名或註冊郵箱"
           class="w-300px"
           @search="onUserSearch"
           @update:value="onUserChange"
@@ -294,7 +294,7 @@ async function handleAdjust() {
         <NButton type="primary" :loading="balanceLoading" @click="loadBalance">查詢餘額</NButton>
         <NButton v-auth="'wallet:adjust'" :disabled="!balance" @click="openAdjust">調整（餘額/積分/券）</NButton>
         <span v-if="selectedUser" class="text-13px text-gray-500">
-          當前用户：#{{ selectedUser.id }} {{ selectedUser.username }}<template v-if="selectedUser.email">（{{ selectedUser.email }}）</template>
+          當前用戶：#{{ selectedUser.id }} {{ selectedUser.username }}<template v-if="selectedUser.email">（{{ selectedUser.email }}）</template>
         </span>
       </div>
 
@@ -347,7 +347,7 @@ async function handleAdjust() {
     </NCard>
 
     <!-- 調整彈窗：餘額 / 積分 / 優惠券（增扣單選，免手輸正負號） -->
-    <NModal v-model:show="showAdjust" preset="dialog" title="賬户調整" style="width: 520px">
+    <NModal v-model:show="showAdjust" preset="dialog" title="賬戶調整" style="width: 520px">
       <NRadioGroup v-model:value="adjustTab" size="small" class="mb-16px">
         <NRadioButton value="balance">餘額</NRadioButton>
         <NRadioButton value="points">積分</NRadioButton>

@@ -28,7 +28,7 @@ type LicenseOrder struct {
 	Amount int64 `json:"amount,omitempty"`
 	// Status holds the value of the "status" field.
 	Status licenseorder.Status `json:"status,omitempty"`
-	// 購買人（發行側站點用户；錢包扣款對象）
+	// 購買人（發行側站點用戶；錢包扣款對象）
 	PayerUserID uint64 `json:"payer_user_id,omitempty"`
 	// 目標實例 ID（許可證綁定；空=本實例）
 	InstanceID string `json:"instance_id,omitempty"`

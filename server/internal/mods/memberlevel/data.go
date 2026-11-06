@@ -291,7 +291,7 @@ func (r *MemberLevelRepoImpl) resolveProgress(ctx context.Context, userID uint64
 			p.Current, p.Source = granted, "referral"
 		}
 	}
-	// 保留普通用户原有升級階梯；獲贈用户只展示確實能改善會員折扣的下一檔。
+	// 保留普通用戶原有升級階梯；獲贈用戶只展示確實能改善會員折扣的下一檔。
 	for i := lastMatched + 1; i < len(levels); i++ {
 		if !p.HasReferral || payableRate(levels[i]) < payableRate(p.Current) {
 			p.Next = levels[i]

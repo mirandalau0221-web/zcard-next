@@ -164,7 +164,7 @@ func (r *Repo) eligibleCard(ctx context.Context, pid, sku uint64, currentRead ..
 		return nil, bad(e.Error())
 	}
 	if p.UpstreamSourceID != 0 || string(p.StockType) != "card" || string(p.DeliveryMode) != "status" {
-		return nil, bad("自動髮卡僅支持普通自營卡密和保留卡密模式")
+		return nil, bad("自動發卡僅支持普通自營卡密和保留卡密模式")
 	}
 	seen := map[uint64]bool{}
 	cid := p.CategoryID
@@ -328,7 +328,7 @@ func (r *Repo) Grant(ctx context.Context, id, uid uint64, count int32, remark, k
 			return e
 		}
 		if !ok {
-			return bad("用户不存在或已禁用")
+			return bad("用戶不存在或已禁用")
 		}
 		acc, e := r.account(ctx, a, uid, r.now())
 		if e != nil {

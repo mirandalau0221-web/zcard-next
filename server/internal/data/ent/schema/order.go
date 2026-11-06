@@ -28,7 +28,7 @@ func (Order) Fields() []ent.Field {
 		field.String("subsite_domain").MaxLen(255).Optional().Comment("分站域名快照"),
 		field.Int64("subsite_profit").Default(0).Comment("分站利潤快照（分）"),
 		field.Bool("profit_eligible").Default(true).Comment("是否產生分站利潤（自購/上級鏈命中則 false）"),
-		field.Uint64("user_id").Optional().Comment("下單用户（NULL=遊客）"),
+		field.Uint64("user_id").Optional().Comment("下單用戶（NULL=遊客）"),
 		field.String("guest_contact").MaxLen(150).Optional().Comment("遊客聯繫方式"),
 		// 查詢密碼（argon2 哈希；默認強制開啓，constant-time 比對，鐵律 12）
 		field.String("query_password_hash").MaxLen(128).Optional(),

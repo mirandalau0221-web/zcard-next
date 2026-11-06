@@ -23,7 +23,7 @@ type Payment struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 租户（0=主站；由 interceptor 自動注入，業務不手寫）
+	// 租戶（0=主站；由 interceptor 自動注入，業務不手寫）
 	SubsiteID uint64 `json:"subsite_id,omitempty"`
 	// 關聯訂單（訂單支付單；充值支付單為空）
 	OrderID uint64 `json:"order_id,omitempty"`
@@ -57,7 +57,7 @@ type Payment struct {
 	ChargedPrecision int32 `json:"charged_precision,omitempty"`
 	// 渠道幣種應收最小單位（發適配器金額；回調精確核對）
 	ChargedUnits int64 `json:"charged_units,omitempty"`
-	// 用户支付手續費（分）
+	// 用戶支付手續費（分）
 	Fee int64 `json:"fee,omitempty"`
 	// 支付本金、費率、承擔方及方式快照；空為歷史流水
 	PricingSnapshot json.RawMessage `json:"pricing_snapshot,omitempty"`

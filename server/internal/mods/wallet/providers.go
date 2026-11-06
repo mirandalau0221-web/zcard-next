@@ -21,7 +21,7 @@ var ProviderSet = wire.NewSet(
 	ProvidePortWallet,
 	// ：積分賬本端口（payment 充值贈送消費）
 	ProvidePortPoints,
-	// ：積分扣減/讀取 + 累計充值口徑端口（order 兑換下單、memberlevel 等級進度消費）
+	// ：積分扣減/讀取 + 累計充值口徑端口（order 兌換下單、memberlevel 等級進度消費）
 	ProvidePortPointsDebiter,
 	ProvidePortPointsReader,
 	ProvidePortRechargeReader,
@@ -78,7 +78,7 @@ func ProvidePortPoints(repo *WalletRepoImpl) port.Points {
 	return portPointsAdapter{repo: repo}
 }
 
-// ProvidePortPointsDebiter 積分扣減端口（ order 積分兑換下單消費）。
+// ProvidePortPointsDebiter 積分扣減端口（ order 積分兌換下單消費）。
 func ProvidePortPointsDebiter(repo *WalletRepoImpl) port.PointsDebiter {
 	return portPointsAdapter{repo: repo}
 }

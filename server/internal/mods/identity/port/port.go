@@ -5,7 +5,7 @@ package port
 
 import "context"
 
-// AdminAccount 員工賬户 DTO（供 audit 等模塊取操作者信息；不含密碼哈希等敏感字段）。
+// AdminAccount 員工賬戶 DTO（供 audit 等模塊取操作者信息；不含密碼哈希等敏感字段）。
 type AdminAccount struct {
 	AuthVersion int
 	ID          uint64
@@ -23,7 +23,7 @@ type AdminReader interface {
 	Admin(ctx context.Context, id uint64) (*AdminAccount, error)
 }
 
-// UserReader 其他模塊讀取前台用户賬號的窄接口（audit 安全日誌主體名稱富化）。
+// UserReader 其他模塊讀取前台用戶賬號的窄接口（audit 安全日誌主體名稱富化）。
 type UserReader interface {
 	Username(ctx context.Context, id uint64) (string, error)
 }

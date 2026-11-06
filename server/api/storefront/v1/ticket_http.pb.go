@@ -26,7 +26,7 @@ const OperationStoreTicketServiceRateTicket = "/zcard.api.storefront.v1.StoreTic
 const OperationStoreTicketServiceReplyTicket = "/zcard.api.storefront.v1.StoreTicketService/ReplyTicket"
 
 type StoreTicketServiceHTTPServer interface {
-	// CreateTicket CreateTicket 創建工單（登錄用户或遊客）。
+	// CreateTicket CreateTicket 創建工單（登錄用戶或遊客）。
 	CreateTicket(context.Context, *CreateTicketRequest) (*Ticket, error)
 	// GetTicket GetTicket 工單詳情（消息流；內部備註過濾）。
 	GetTicket(context.Context, *GetTicketRequest) (*GetTicketReply, error)
@@ -177,7 +177,7 @@ func _StoreTicketService_PayUrgent0_HTTP_Handler(srv StoreTicketServiceHTTPServe
 }
 
 type StoreTicketServiceHTTPClient interface {
-	// CreateTicket CreateTicket 創建工單（登錄用户或遊客）。
+	// CreateTicket CreateTicket 創建工單（登錄用戶或遊客）。
 	CreateTicket(ctx context.Context, req *CreateTicketRequest, opts ...http.CallOption) (rsp *Ticket, err error)
 	// GetTicket GetTicket 工單詳情（消息流；內部備註過濾）。
 	GetTicket(ctx context.Context, req *GetTicketRequest, opts ...http.CallOption) (rsp *GetTicketReply, err error)
@@ -199,7 +199,7 @@ func NewStoreTicketServiceHTTPClient(client *http.Client) StoreTicketServiceHTTP
 	return &StoreTicketServiceHTTPClientImpl{client}
 }
 
-// CreateTicket CreateTicket 創建工單（登錄用户或遊客）。
+// CreateTicket CreateTicket 創建工單（登錄用戶或遊客）。
 func (c *StoreTicketServiceHTTPClientImpl) CreateTicket(ctx context.Context, in *CreateTicketRequest, opts ...http.CallOption) (*Ticket, error) {
 	var out Ticket
 	pattern := "/api/v1/storefront/tickets"

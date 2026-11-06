@@ -46,7 +46,7 @@ func (s *AdminAuditService) enrichAdminNames(ctx context.Context, ids ...uint64)
 	return out
 }
 
-// enrichUserNames 前台用户 ID → 賬號名（同上）。
+// enrichUserNames 前台用戶 ID → 賬號名（同上）。
 func (s *AdminAuditService) enrichUserNames(ctx context.Context, ids ...uint64) map[uint64]string {
 	out := make(map[uint64]string, len(ids))
 	if s.users == nil {

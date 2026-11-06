@@ -62,7 +62,7 @@ func validConfig(v *adminv1.LotteryActivity) error {
 		}
 		if p.Mode == "card" {
 			if p.ProductId == 0 {
-				return bad("自動髮卡需要選擇商品")
+				return bad("自動發卡需要選擇商品")
 			}
 		} else {
 			if strings.TrimSpace(p.Content) == "" || len([]rune(p.Content)) > 10000 {

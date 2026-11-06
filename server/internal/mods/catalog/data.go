@@ -1,6 +1,6 @@
 package catalog
 
-// 商品倉儲 Ent 實現（租户過濾經 tenancy.Context； 交付 Ent interceptor 後
+// 商品倉儲 Ent 實現（租戶過濾經 tenancy.Context； 交付 Ent interceptor 後
 // 本處顯式條件作為雙保險保留——interceptor 負責注入，業務不依賴「忘了寫」）。
 
 import (
@@ -88,7 +88,7 @@ func (r *ProductRepoImpl) ListVisible(ctx context.Context, f port.VisibleFilter)
 		q = q.Where(product.CategoryIDIn(ids...))
 	}
 	if f.Keyword != "" {
-		// 商品名搜索用包含匹配（用户預期：名稱中段詞也要能命中； 禁 %xx% 針對的是
+		// 商品名搜索用包含匹配（用戶預期：名稱中段詞也要能命中； 禁 %xx% 針對的是
 		// order_no/username 等等值索引列，商品名模糊檢索不在此列，當前量級 LIKE 可接受）
 		q = q.Where(product.NameContains(f.Keyword))
 	}
@@ -191,7 +191,7 @@ func toPortProduct(row *ent.Product) port.Product {
 		DeliveryMode: string(row.DeliveryMode),
 		Status:       row.Status,
 		StockVisible: row.StockVisible,
-		// ：積分兑換價（積分商城商品判定）
+		// ：積分兌換價（積分商城商品判定）
 		PointsRequired: row.PointsRequired,
 		// ：貨源信息（procurement 判定上游項）
 		UpstreamSourceID:    row.UpstreamSourceID,

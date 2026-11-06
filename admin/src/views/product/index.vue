@@ -545,7 +545,7 @@ function priceCell(row: any) {
 function statsCell(row: any) {
  if(row.product_kind === "sms_channel")return h("span",{},"按選項庫存");
   const stock =
-    row.stock ?? (row.stock_status === "unknown" || row.stock_status === "stale" ? -2 : 0); // -1 = 不限（鏈接/兑換碼類不入卡池；代發上遊無限）
+    row.stock ?? (row.stock_status === "unknown" || row.stock_status === "stale" ? -2 : 0); // -1 = 不限（鏈接/兌換碼類不入卡池；代發上遊無限）
   const sold = row.sold_count ?? 0;
   const line = (label: string, value: any) =>
     h("div", { class: "flex items-center gap-6px leading-20px" }, [
@@ -629,7 +629,7 @@ const formData = reactive({
 });
 const isSocialProduct = computed(() => formData.product_kind === "social_service");
 const isDynamicProduct = computed(() => isSocialProduct.value || formData.product_kind === "sms_channel");
-const directContentSet = ref(false); // 編輯時已配置直髮內容（不回顯明文，留空=不變）
+const directContentSet = ref(false); // 編輯時已配置直發內容（不回顯明文，留空=不變）
 const savedInventoryTracked = computed(() => editingProduct.value?.track_inventory !== false);
 const inventoryModePending = computed(() =>
   !!editingId.value && formData.product_property === "physical" &&
@@ -639,8 +639,8 @@ watch(stepCount, (count) => { if (step.value > count) step.value = count; });
 
 const stockTypeOptions = [
   { label: "卡密（一卡一賣，導入卡池發貨）", value: "card" },
-  { label: "鏈接（直髮 · 同一鏈接反覆賣，如網盤資源）", value: "url" },
-  { label: "兑換碼（直髮 · 同一碼反覆賣，如口令/激活指引）", value: "code" },
+  { label: "鏈接（直發 · 同一鏈接反覆賣，如網盤資源）", value: "url" },
+  { label: "兌換碼（直發 · 同一碼反覆賣，如口令/激活指引）", value: "code" },
 ];
 const deliveryModeOptions = [
   { label: "標記發貨（卡密保留）", value: "status" },
@@ -777,7 +777,7 @@ const columns: DataTableColumns<any> = [
     render: (row) => priceCell(row),
   },
   {
-    // 庫存/已售塊（與價格塊同風格）：卡密類=可用數（0 紅）；鏈接/兑換碼類=不限
+    // 庫存/已售塊（與價格塊同風格）：卡密類=可用數（0 紅）；鏈接/兌換碼類=不限
     title: "庫存 / 已售",
     key: "stats",
     width: 112,
@@ -837,7 +837,7 @@ const columns: DataTableColumns<any> = [
       if ((row.product_property || row.goods_type) === "physical") return "實體";
       if (row.product_kind === "sms_channel") return "接碼";
       if (row.fulfillment_mode === "manual") return "人工服務";
-      const map: Record<string, string> = { card: "卡密", url: "鏈接", code: "兑換碼" };
+      const map: Record<string, string> = { card: "卡密", url: "鏈接", code: "兌換碼" };
       return map[row.stock_type] || row.stock_type;
     },
   },
@@ -1859,7 +1859,7 @@ onMounted(() => {
           <template v-if="copySKUs && copyControls">SKU 規格和下單控件會隨商品保存。</template>
           <template v-else-if="copySKUs">SKU 規格會隨商品保存。</template>
           <template v-else-if="copyControls">下單控件會隨商品保存。</template>
-          庫存、貨源和直髮內容需單獨配置。
+          庫存、貨源和直發內容需單獨配置。
         </NAlert>
         <NAlert v-if="independentlySaved" type="info" class="mb-12px"
           >已有內容單獨保存並生效；關閉只放棄尚未保存的輸入。</NAlert
@@ -2012,7 +2012,7 @@ onMounted(() => {
                 formData.fulfillment_mode !== 'manual' &&
                 formData.stock_type !== 'card'
               "
-              label="直髮內容"
+              label="直發內容"
             >
               <div class="w-full">
                 <NInput
@@ -2022,11 +2022,11 @@ onMounted(() => {
                   :placeholder="
                     directContentSet
                       ? '已設置（加密存儲不回顯）——留空保持不變，填寫則覆蓋'
-                      : '買家支付後直接收到的內容，例如網盤鏈接、兑換碼、資源口令等。同一內容會發給每個買家，可反覆售賣。'
+                      : '買家支付後直接收到的內容，例如網盤鏈接、兌換碼、資源口令等。同一內容會發給每個買家，可反覆售賣。'
                   "
                 />
                 <div class="mt-4px text-11px text-gray-400">
-                  鏈接/兑換碼商品無需導入卡密，買家付款後系統自動把該內容直接交付（庫存顯示「不限」）
+                  鏈接/兌換碼商品無需導入卡密，買家付款後系統自動把該內容直接交付（庫存顯示「不限」）
                 </div>
               </div>
             </NFormItem>
@@ -2049,7 +2049,7 @@ onMounted(() => {
             label-placement="left"
             label-width="100"
           >
-            <NAlert v-if="formData.product_kind==='sms_channel'" type="info" class="mb-12px">接碼渠道商品按用户選擇實時定價。加價沿用貨源導入/映射中保存的比例或固定加價規則；修改規則後立即用於新報價。</NAlert>
+            <NAlert v-if="formData.product_kind==='sms_channel'" type="info" class="mb-12px">接碼渠道商品按用戶選擇實時定價。加價沿用貨源導入/映射中保存的比例或固定加價規則；修改規則後立即用於新報價。</NAlert>
             <NAlert v-if="isSocialProduct" type="info" class="mb-12px">社交服務按貨源購買規則動態報價；可編輯商品名稱、分類、推薦和圖片詳情。</NAlert>
             <NFormItem v-if="!isDynamicProduct" :label="`售價（${currencyUnit()}）`" path="price_yuan" :rule="{ required: true }">
               <NInputNumber

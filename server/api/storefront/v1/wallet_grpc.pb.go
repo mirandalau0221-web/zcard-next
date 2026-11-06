@@ -40,7 +40,7 @@ type StoreWalletServiceClient interface {
 	ListTransactions(ctx context.Context, in *ListTxRequest, opts ...grpc.CallOption) (*ListTxReply, error)
 	// CreateRecharge 充值（走支付管線）。
 	CreateRecharge(ctx context.Context, in *CreateRechargeRequest, opts ...grpc.CallOption) (*CreateRechargeReply, error)
-	// RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
+	// RedeemGiftcard 禮品卡兌換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(ctx context.Context, in *RedeemGiftcardRequest, opts ...grpc.CallOption) (*RedeemGiftcardReply, error)
 	// ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 	ListMyWithdrawals(ctx context.Context, in *ListMyWithdrawalsRequest, opts ...grpc.CallOption) (*ListMyWithdrawalsReply, error)
@@ -128,7 +128,7 @@ type StoreWalletServiceServer interface {
 	ListTransactions(context.Context, *ListTxRequest) (*ListTxReply, error)
 	// CreateRecharge 充值（走支付管線）。
 	CreateRecharge(context.Context, *CreateRechargeRequest) (*CreateRechargeReply, error)
-	// RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
+	// RedeemGiftcard 禮品卡兌換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(context.Context, *RedeemGiftcardRequest) (*RedeemGiftcardReply, error)
 	// ListMyWithdrawals 本人提現記錄（狀態/駁回原因/時間）。
 	ListMyWithdrawals(context.Context, *ListMyWithdrawalsRequest) (*ListMyWithdrawalsReply, error)

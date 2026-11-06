@@ -3,7 +3,7 @@ package supplier
 // 簽名原語（對外供貨協議， 口徑釘死）：
 // 簽名串 = METHOD\nPATH(不含query)\ntimestamp\nnonce\nmd5(body) —— 舊口徑
 // 簽名串 = ...\nmd5(body)\nmd5(rawQuery) —— 新口徑（v1.12.90+）
-// 服務端雙口徑驗籤（先舊後新）；客户端一律新口徑。
+// 服務端雙口徑驗籤（先舊後新）；客戶端一律新口徑。
 // hex_lower(HMAC_SHA256(api_secret, 簽名串))；常數時間比較（hash_equals 語義）。
 
 import (

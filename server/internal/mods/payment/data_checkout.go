@@ -44,7 +44,7 @@ type paymentPricing struct {
 
 func validateFee(fee int64, kind, bearer string) error {
 	if fee < 0 || (kind != "fixed" && kind != "percent") || (bearer != "merchant" && bearer != "user") || (kind == "percent" && fee > 10000) || (kind == "fixed" && fee > 100000000) {
-		return errors.BadRequest("payment.INVALID_FEE", "手續費須為 0–100% 或 0–1000000 元，承擔方須為商家或用户")
+		return errors.BadRequest("payment.INVALID_FEE", "手續費須為 0–100% 或 0–1000000 元，承擔方須為商家或用戶")
 	}
 	return nil
 }
@@ -168,10 +168,10 @@ func (s *StorePaymentService) paymentOrder(ctx context.Context, no, password str
 
 func authorizeWalletPayment(ctx context.Context, o *ent.Order) error {
 	if identity.ClaimsFromContext(ctx) == nil {
-		return errors.Unauthorized("identity.UNAUTHORIZED", "餘額支付需登錄訂單所屬賬户")
+		return errors.Unauthorized("identity.UNAUTHORIZED", "餘額支付需登錄訂單所屬賬戶")
 	}
 	if !paymentOrderOwner(ctx, o) {
-		return errors.Forbidden("payment.ORDER_OWNER_REQUIRED", "餘額支付只能由訂單所屬賬户操作")
+		return errors.Forbidden("payment.ORDER_OWNER_REQUIRED", "餘額支付只能由訂單所屬賬戶操作")
 	}
 	return nil
 }

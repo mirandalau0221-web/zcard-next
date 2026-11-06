@@ -129,7 +129,7 @@ func (r *CouponRepoImpl) ReturnByOrder(ctx context.Context, orderID uint64) erro
 	return err
 }
 
-// Redeem 兑換碼領券（用户憑 code 領取：未指派券回填 user_id）。
+// Redeem 兌換碼領券（用戶憑 code 領取：未指派券回填 user_id）。
 func (r *CouponRepoImpl) Redeem(ctx context.Context, code string, userID uint64) error {
 	client := data.Client(ctx, r.data)
 	c, err := client.Coupon.Query().Where(coupon.Code(code)).Only(ctx)
@@ -174,7 +174,7 @@ func (r *CouponRepoImpl) GrantToUser(ctx context.Context, batchID string, userID
 	return int32(len(rows)), nil
 }
 
-// ListMyCoupons 用户可用券（未用未過期）。
+// ListMyCoupons 用戶可用券（未用未過期）。
 func (r *CouponRepoImpl) ListMyCoupons(ctx context.Context, userID uint64) ([]*ent.Coupon, error) {
 	return data.Client(ctx, r.data).Coupon.Query().
 		Where(coupon.UserID(userID), coupon.StatusEQ(coupon.StatusUnused), unexpiredCoupon(time.Now().UTC())).
@@ -244,7 +244,7 @@ func (r *CouponRepoImpl) Consume(ctx context.Context, flashID uint64, qty int32)
 // UserPurchasedCount 秒殺窗口內已購（paid+pending 累計；order_items×orders 聯查）。
 func (r *CouponRepoImpl) UserPurchasedCount(ctx context.Context, productID, userID uint64, since time.Time) (int32, error) {
 	client := data.Client(ctx, r.data)
-	// 聯查口徑：該用户窗口內 paid/pending 單中命中商品的數量合計。
+	// 聯查口徑：該用戶窗口內 paid/pending 單中命中商品的數量合計。
 	// ent 無跨表 join 表達式——經 order_items 反查（product × order 歸屬過濾）。
 	itemRows, err := client.OrderItem.Query().
 		Where(

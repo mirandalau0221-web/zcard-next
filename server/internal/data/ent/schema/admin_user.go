@@ -8,7 +8,7 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// AdminUser 員工賬户（§5.14：頭像/暱稱/賬號/密碼/權限組/備註/啓用/TOTP/最近登錄）。
+// AdminUser 員工賬戶（§5.14：頭像/暱稱/賬號/密碼/權限組/備註/啓用/TOTP/最近登錄）。
 // 分站主登錄分站後台 = AdminUser + subsite 隔離（M3），與顧客 User 嚴格分離。
 type AdminUser struct {
 	ent.Schema

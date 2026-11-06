@@ -40,12 +40,12 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AdminSupplierService 對外供貨管理：下游賬户申請/審核/啓停/重置密鑰、
+// AdminSupplierService 對外供貨管理：下游賬戶申請/審核/啓停/重置密鑰、
 // 供貨定價 CRUD、賬本流水、回調記錄查詢與手動重發。
 type AdminSupplierServiceClient interface {
 	// CreateAccount 下游申請（secret 明文只在此響應出現一次）。
 	CreateAccount(ctx context.Context, in *CreateSupplierAccountRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
-	// ListAccounts 賬户列表（secret 零回顯）。
+	// ListAccounts 賬戶列表（secret 零回顯）。
 	ListAccounts(ctx context.Context, in *ListSupplierAccountsRequest, opts ...grpc.CallOption) (*ListSupplierAccountsReply, error)
 	// ReviewAccount 審核（applying → approved/rejected；駁回可帶意見）。
 	ReviewAccount(ctx context.Context, in *ReviewSupplierAccountRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
@@ -55,7 +55,7 @@ type AdminSupplierServiceClient interface {
 	ResetSecret(ctx context.Context, in *ResetSupplierSecretRequest, opts ...grpc.CallOption) (*ResetSupplierSecretReply, error)
 	// SetNotifyURL 配置回調地址。
 	SetNotifyURL(ctx context.Context, in *SetSupplierNotifyURLRequest, opts ...grpc.CallOption) (*SupplierAccountReply, error)
-	// Recharge 賬户充值（賬本入賬）。
+	// Recharge 賬戶充值（賬本入賬）。
 	Recharge(ctx context.Context, in *RechargeSupplierRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// ListLedger 賬本流水（下游自助對賬數據源）。
 	ListLedger(ctx context.Context, in *ListSupplierLedgerRequest, opts ...grpc.CallOption) (*ListSupplierLedgerReply, error)
@@ -225,12 +225,12 @@ func (c *adminSupplierServiceClient) SetSupplierIPWhitelist(ctx context.Context,
 // All implementations must embed UnimplementedAdminSupplierServiceServer
 // for forward compatibility.
 //
-// AdminSupplierService 對外供貨管理：下游賬户申請/審核/啓停/重置密鑰、
+// AdminSupplierService 對外供貨管理：下游賬戶申請/審核/啓停/重置密鑰、
 // 供貨定價 CRUD、賬本流水、回調記錄查詢與手動重發。
 type AdminSupplierServiceServer interface {
 	// CreateAccount 下游申請（secret 明文只在此響應出現一次）。
 	CreateAccount(context.Context, *CreateSupplierAccountRequest) (*SupplierAccountReply, error)
-	// ListAccounts 賬户列表（secret 零回顯）。
+	// ListAccounts 賬戶列表（secret 零回顯）。
 	ListAccounts(context.Context, *ListSupplierAccountsRequest) (*ListSupplierAccountsReply, error)
 	// ReviewAccount 審核（applying → approved/rejected；駁回可帶意見）。
 	ReviewAccount(context.Context, *ReviewSupplierAccountRequest) (*SupplierAccountReply, error)
@@ -240,7 +240,7 @@ type AdminSupplierServiceServer interface {
 	ResetSecret(context.Context, *ResetSupplierSecretRequest) (*ResetSupplierSecretReply, error)
 	// SetNotifyURL 配置回調地址。
 	SetNotifyURL(context.Context, *SetSupplierNotifyURLRequest) (*SupplierAccountReply, error)
-	// Recharge 賬户充值（賬本入賬）。
+	// Recharge 賬戶充值（賬本入賬）。
 	Recharge(context.Context, *RechargeSupplierRequest) (*emptypb.Empty, error)
 	// ListLedger 賬本流水（下游自助對賬數據源）。
 	ListLedger(context.Context, *ListSupplierLedgerRequest) (*ListSupplierLedgerReply, error)

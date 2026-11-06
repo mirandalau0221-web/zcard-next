@@ -29,11 +29,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreCouponService 前台營銷：我的券/兑換碼領券/秒殺營銷位。
+// StoreCouponService 前台營銷：我的券/兌換碼領券/秒殺營銷位。
 type StoreCouponServiceClient interface {
-	// ListMyCoupons 我的可用券（登錄用户）。
+	// ListMyCoupons 我的可用券（登錄用戶）。
 	ListMyCoupons(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListMyCouponsReply, error)
-	// RedeemCoupon 兑換碼領券。
+	// RedeemCoupon 兌換碼領券。
 	RedeemCoupon(ctx context.Context, in *RedeemCouponRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// ListFlashSales 秒殺列表（upcoming=false 進行中 / true 即將開始）。
 	ListFlashSales(ctx context.Context, in *ListFlashSalesRequest, opts ...grpc.CallOption) (*ListFlashSalesReply, error)
@@ -81,11 +81,11 @@ func (c *storeCouponServiceClient) ListFlashSales(ctx context.Context, in *ListF
 // All implementations must embed UnimplementedStoreCouponServiceServer
 // for forward compatibility.
 //
-// StoreCouponService 前台營銷：我的券/兑換碼領券/秒殺營銷位。
+// StoreCouponService 前台營銷：我的券/兌換碼領券/秒殺營銷位。
 type StoreCouponServiceServer interface {
-	// ListMyCoupons 我的可用券（登錄用户）。
+	// ListMyCoupons 我的可用券（登錄用戶）。
 	ListMyCoupons(context.Context, *emptypb.Empty) (*ListMyCouponsReply, error)
-	// RedeemCoupon 兑換碼領券。
+	// RedeemCoupon 兌換碼領券。
 	RedeemCoupon(context.Context, *RedeemCouponRequest) (*emptypb.Empty, error)
 	// ListFlashSales 秒殺列表（upcoming=false 進行中 / true 即將開始）。
 	ListFlashSales(context.Context, *ListFlashSalesRequest) (*ListFlashSalesReply, error)

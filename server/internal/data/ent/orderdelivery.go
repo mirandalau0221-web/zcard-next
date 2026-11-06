@@ -35,7 +35,7 @@ type OrderDelivery struct {
 	ServiceContent []byte `json:"service_content,omitempty"`
 	// DeliveredQuantity holds the value of the "delivered_quantity" field.
 	DeliveredQuantity int32 `json:"delivered_quantity,omitempty"`
-	// 標記/即刪/直髮（direct = 商品級直髮內容，無卡密）
+	// 標記/即刪/直發（direct = 商品級直發內容，無卡密）
 	DeliveredMode orderdelivery.DeliveredMode `json:"delivered_mode,omitempty"`
 	// 人工發貨管理員（auto 為 0）
 	DeliveredBy uint64 `json:"delivered_by,omitempty"`

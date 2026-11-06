@@ -39,7 +39,7 @@ func installGuard(isInstalled func() bool) func(http.Handler) http.Handler {
 				}
 				// 非 API：靜態資源放行（安裝頁要加載 JS/CSS/字體）；
 				// 其餘（/ 首頁、SPA 路由、/admin/ 後台等）一律 302 /install——
-				// 客户訪問首頁即見安裝入口，無需知道 /install 路徑
+				// 客戶訪問首頁即見安裝入口，無需知道 /install 路徑
 				if isStaticAsset(p) {
 					next.ServeHTTP(w, r)
 					return
@@ -104,7 +104,7 @@ const installedPage = `<!doctype html>
     </div>
     <details>
       <summary>如何重新安裝？</summary>
-      <p class="warn">⚠️ 重新安裝會清空當前全部數據（商品/訂單/用户），請先備份數據庫！</p>
+      <p class="warn">⚠️ 重新安裝會清空當前全部數據（商品/訂單/用戶），請先備份數據庫！</p>
       <ol>
         <li><b>SQLite</b>：刪除數據庫文件 <code>data/zcard.db</code></li>
         <li><b>PostgreSQL / MySQL</b>：清空數據庫（重建或執行 <code>DROP DATABASE</code>；安裝標記在庫內，僅刪配置不會回到未安裝）</li>

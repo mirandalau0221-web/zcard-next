@@ -34,14 +34,14 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// StoreUserService 用户中心(前置）：註冊/登錄（user realm JWT）/我的信息。
+// StoreUserService 用戶中心(前置）：註冊/登錄（user realm JWT）/我的信息。
 // 註冊可帶邀請碼（ref=<user_id>）——三級分銷歸因鏈寫入（環狀拒絕）。
 type StoreUserServiceClient interface {
 	// Register 註冊（username+password；invite_code 可選=上級 user_id）。
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterReply, error)
 	// SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
 	SendRegisterCode(ctx context.Context, in *SendRegisterCodeRequest, opts ...grpc.CallOption) (*SendRegisterCodeReply, error)
-	// Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
+	// Login 登錄（返回 user realm JWT；username 混輸：用戶名/郵箱/手機號）。
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
 	// Me 我的信息（需登錄）。
 	Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MeReply, error)
@@ -147,14 +147,14 @@ func (c *storeUserServiceClient) UpdateProfile(ctx context.Context, in *UpdatePr
 // All implementations must embed UnimplementedStoreUserServiceServer
 // for forward compatibility.
 //
-// StoreUserService 用户中心(前置）：註冊/登錄（user realm JWT）/我的信息。
+// StoreUserService 用戶中心(前置）：註冊/登錄（user realm JWT）/我的信息。
 // 註冊可帶邀請碼（ref=<user_id>）——三級分銷歸因鏈寫入（環狀拒絕）。
 type StoreUserServiceServer interface {
 	// Register 註冊（username+password；invite_code 可選=上級 user_id）。
 	Register(context.Context, *RegisterRequest) (*RegisterReply, error)
 	// SendRegisterCode 發送註冊驗證碼（通道：email|phone——按 security.register_method 校驗）。
 	SendRegisterCode(context.Context, *SendRegisterCodeRequest) (*SendRegisterCodeReply, error)
-	// Login 登錄（返回 user realm JWT；username 混輸：用户名/郵箱/手機號）。
+	// Login 登錄（返回 user realm JWT；username 混輸：用戶名/郵箱/手機號）。
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
 	// Me 我的信息（需登錄）。
 	Me(context.Context, *emptypb.Empty) (*MeReply, error)

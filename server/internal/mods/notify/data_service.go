@@ -232,7 +232,7 @@ func notifyPageParams(page, pageSize int32) (int, int) {
 	return p, ps
 }
 
-// identityClaimsUserID 從上下文取用户 ID（storefront user realm JWT；未登錄 0）。
+// identityClaimsUserID 從上下文取用戶 ID（storefront user realm JWT；未登錄 0）。
 func identityClaimsUserID(ctx context.Context) uint64 {
 	if claims := identity.ClaimsFromContext(ctx); claims != nil {
 		return claims.Subject

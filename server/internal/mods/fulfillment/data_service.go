@@ -60,9 +60,9 @@ func (s *StoreDeliveryService) FetchDelivery(ctx context.Context, req *storefron
 	return reply, nil
 }
 
-// MaskedDeliveries 我的訂單掩碼列表（登錄用户）。
+// MaskedDeliveries 我的訂單掩碼列表（登錄用戶）。
 func (s *StoreDeliveryService) MaskedDeliveries(ctx context.Context, req *storefrontv1.MaskedDeliveriesRequest) (*storefrontv1.MaskedDeliveriesReply, error) {
-	return &storefrontv1.MaskedDeliveriesReply{}, nil // ：接用户訂單列表
+	return &storefrontv1.MaskedDeliveriesReply{}, nil // ：接用戶訂單列表
 }
 
 // ── Admin ──
@@ -196,7 +196,7 @@ func (s *AdminFulfillmentService) ListDeliveries(ctx context.Context, req *admin
 	return reply, nil
 }
 
-// decryptDelivery 交付記錄明文（卡密現場解密；直髮取商品 direct_content；
+// decryptDelivery 交付記錄明文（卡密現場解密；直發取商品 direct_content；
 // 即刪模式卡密已物理刪除）。
 func (s *AdminFulfillmentService) decryptDelivery(ctx context.Context, d *ent.OrderDelivery) string {
 	client := data.Client(ctx, s.data)
@@ -226,7 +226,7 @@ func (s *AdminFulfillmentService) decryptDelivery(ctx context.Context, d *ent.Or
 		}
 		p, err := client.Product.Get(ctx, productID)
 		if err != nil || len(p.DirectContent) == 0 {
-			return "（直髮內容未配置）"
+			return "（直發內容未配置）"
 		}
 		plain, err := s.repo.cipher.Open(p.DirectContent, p.ID, p.SubsiteID)
 		if err != nil {

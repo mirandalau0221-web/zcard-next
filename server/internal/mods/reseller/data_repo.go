@@ -3,7 +3,7 @@ package reseller
 // 分站核心（/// 核心，主站 admin 面先行）：
 // 申請/審核（等級+加價率區間）、定價引擎（4 模式 × 三級優先級 + 上下限）、
 // 分賬賬本（冪等/雙階段/水位緩存/重算）、防自購三查快照。
-// 域名驗證與租户上下文貫穿、分站後台完整 API 面隨 storefront 用户登錄體系接續。
+// 域名驗證與租戶上下文貫穿、分站後台完整 API 面隨 storefront 用戶登錄體系接續。
 
 import (
 	"context"
@@ -118,7 +118,7 @@ func (r *ResellerRepo) ListProfiles(ctx context.Context, status string, page, si
 	return rows, total, err
 }
 
-// ProfileByUser 按用户查（分站主身份判定）。
+// ProfileByUser 按用戶查（分站主身份判定）。
 func (r *ResellerRepo) ProfileByUser(ctx context.Context, userID uint64) (*ent.ResellerProfile, error) {
 	p, err := data.Client(ctx, r.data).ResellerProfile.Query().
 		Where(resellerprofile.UserID(userID)).Only(ctx)
@@ -417,7 +417,7 @@ func (r *ResellerRepo) Ledger(ctx context.Context, subsiteID uint64, status stri
 	return rows, total, err
 }
 
-// GetBalance 餘額緩存賬户（缺失返回零值賬户語義）。
+// GetBalance 餘額緩存賬戶（缺失返回零值賬戶語義）。
 func (r *ResellerRepo) GetBalance(ctx context.Context, subsiteID uint64) (*ent.ResellerBalanceAccount, error) {
 	acc, err := data.Client(ctx, r.data).ResellerBalanceAccount.Query().
 		Where(resellerbalanceaccount.SubsiteIDEQ(subsiteID)).Only(ctx)

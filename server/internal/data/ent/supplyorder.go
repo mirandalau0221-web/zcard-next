@@ -24,7 +24,7 @@ type SupplyOrder struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID uint64 `json:"account_id,omitempty"`
-	// 下游單號（賬户內冪等錨點）
+	// 下游單號（賬戶內冪等錨點）
 	DownstreamOrderNo string `json:"downstream_order_no,omitempty"`
 	// 商品行快照（上游商品/SKU/數量/單價）
 	Items []map[string]interface{} `json:"items,omitempty"`

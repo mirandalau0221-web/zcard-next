@@ -56,7 +56,7 @@
             "name": "card_cjk",
             "kind": "card",
             "payload": "eyJpdiI6InpieU9wOGdYVkZ0Rmh3bWZFTDJubEE9PSIsInZhbHVlIjoiQzNOa2owQ3BDRUV4bG1EWk91NkJDQTBzY0dWT0VRZnl0VVp4Y3c0ZGUrYnJaNk9uVnpTRkF5ZDVTbHRCdGM3LyIsIm1hYyI6IjAxMWVlMjU1ZDQwOGNkODcwMWEyODM4NmNhYzJlNjA3N2ZmZWEwOWM4NTQ1OWRlYzJmYzlhZjg2NGRiMzE1YzUiLCJ0YWciOiIifQ==",
-            "expect": "月卡兑换码：优享会员30天"
+            "expect": "月卡兌换码：优享会员30天"
         },
         {
             "name": "card_json",
@@ -74,13 +74,13 @@
             "name": "payment_config",
             "kind": "payment_config",
             "payload": "\"eyJpdiI6IktTSW1qMUlpalBQbngyVkphRlBPN0E9PSIsInZhbHVlIjoiODdTTURVQUVaQ21EVjR4QjBTTml5V203NHdlYVR3d1BXbFBnVXBZaEljUW9mOGF6Q2hQWTV4Z3dJaHV5MGhjMDE1Y3JRMk1CUUJrS3J0VmJZemFlcFNrKzZocTUrS2liK0tXUUdIR2prSm0xeXN4ODdOVTF1alJ4TzdRSy9HQ2wiLCJtYWMiOiIzODZhN2FhOTVhYzNmZjljYjY3NzI4ZDQzYTE0YWRhMDVlN2Y0ZTdkZTdiMzEyNjZjZGYzNTVmZjFhMDc5NjIxIiwidGFnIjoiIn0=\"",
-            "expect": "{\"app_id\":\"10086\",\"key\":\"商户秘钥ABC\",\"gateway\":\"https:\\/\\/api.epay.example\\/submit\"}"
+            "expect": "{\"app_id\":\"10086\",\"key\":\"商戶秘钥ABC\",\"gateway\":\"https:\\/\\/api.epay.example\\/submit\"}"
         },
         {
             "name": "payment_config_legacy_plain",
             "kind": "payment_config",
-            "payload": "{\"app_id\":\"10086\",\"key\":\"商户秘钥ABC\",\"gateway\":\"https:\\/\\/api.epay.example\\/submit\"}",
-            "expect": "{\"app_id\":\"10086\",\"key\":\"商户秘钥ABC\",\"gateway\":\"https:\\/\\/api.epay.example\\/submit\"}"
+            "payload": "{\"app_id\":\"10086\",\"key\":\"商戶秘钥ABC\",\"gateway\":\"https:\\/\\/api.epay.example\\/submit\"}",
+            "expect": "{\"app_id\":\"10086\",\"key\":\"商戶秘钥ABC\",\"gateway\":\"https:\\/\\/api.epay.example\\/submit\"}"
         },
         {
             "name": "setting_secret",

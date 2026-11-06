@@ -150,7 +150,7 @@ func (s *ProcureService) processItem(ctx context.Context, payload orderPaidPaylo
 	traceID := fmt.Sprintf("po-%d-%s", po.ID, payload.OrderNo)
 	_ = s.repo.EnsureTraceID(ctx, po.ID, traceID)
 
-	// 規格選擇：客户所選本地 SKU 的上游標識（acg=race|k=v 編碼 / dujiao=sku_id）
+	// 規格選擇：客戶所選本地 SKU 的上游標識（acg=race|k=v 編碼 / dujiao=sku_id）
 	upstreamSKU := ""
 	if skuID > 0 {
 		upstreamSKU = s.reader.SkuUpstreamCode(ctx, payload.SubsiteID, skuID)
@@ -222,7 +222,7 @@ func (s *ProcureService) finalizeDelivered(ctx context.Context, poID, orderID, o
 // handleSubmitError 提交失敗分流：永久錯誤 → rejected → 失敗策略；其餘 → 退避重試。
 func (s *ProcureService) handleSubmitError(ctx context.Context, poID uint64, err error) error {
 	// 防重鍵衝突（acg request_no 重複即報錯）：上游可能已受理首請求（響應丟失
-	// 場景），重試永遠撞牆、自動退款可能造成上游已成交卻退客户款 → 立即轉人工核對
+	// 場景），重試永遠撞牆、自動退款可能造成上游已成交卻退客戶款 → 立即轉人工核對
 	if errors.Is(err, supplyport.ErrUpstreamDuplicate) {
 		reason := "採購請求編號被上游判定重複，無法確認本單是否成交；請核實原上游訂單後處理，系統不會重新採購"
 		if merr := s.repo.MarkManual(ctx, poID, reason); merr != nil {
@@ -235,10 +235,10 @@ func (s *ProcureService) handleSubmitError(ctx context.Context, poID uint64, err
 		return nil
 	}
 	if errors.Is(err, supplyport.ErrUpstreamBalance) {
-		if e := s.repo.MarkManual(ctx, poID, "上游賬户餘額不足，等待管理員補卡或核實後退款"); e != nil {
+		if e := s.repo.MarkManual(ctx, poID, "上游賬戶餘額不足，等待管理員補卡或核實後退款"); e != nil {
 			return e
 		}
-		s.publish(ctx, events.ProcurementFailed, poID, map[string]any{"procurement_id": poID, "reason": "上游賬户餘額不足", "strategy": "manual_balance"})
+		s.publish(ctx, events.ProcurementFailed, poID, map[string]any{"procurement_id": poID, "reason": "上游賬戶餘額不足", "strategy": "manual_balance"})
 		return nil
 	}
 	permanent := errors.Is(err, supplyport.ErrUpstreamDeleted) ||

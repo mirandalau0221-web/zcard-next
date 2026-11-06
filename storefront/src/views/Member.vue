@@ -248,7 +248,7 @@
       </div>
     </div>
 
-    <!-- 禮品卡兑換：全寬餘額條，桌面表單與説明並排 -->
+    <!-- 禮品卡兌換：全寬餘額條，桌面表單與説明並排 -->
     <div v-if="tab === 'giftcard'" class="recharge-page">
       <div class="card rc-balance">
         <div>
@@ -262,22 +262,22 @@
       </div>
       <div class="gc-layout">
         <div class="card gc-card">
-          <div class="gc-title">{{ $t('禮品卡兑換') }}</div>
+          <div class="gc-title">{{ $t('禮品卡兌換') }}</div>
           <div class="field">
-            <label>{{ $t('禮品卡兑換碼') }}</label>
-            <input class="input gc-input" v-model="giftCode" type="text" :placeholder="$t('輸入卡密兑換碼')" @keyup.enter="doRedeem" />
-            <div class="muted">{{ $t('兑換後餘額即時到賬；連續失敗將臨時鎖定（防爆破）') }}</div>
+            <label>{{ $t('禮品卡兌換碼') }}</label>
+            <input class="input gc-input" v-model="giftCode" type="text" :placeholder="$t('輸入卡密兌換碼')" @keyup.enter="doRedeem" />
+            <div class="muted">{{ $t('兌換後餘額即時到賬；連續失敗將臨時鎖定（防爆破）') }}</div>
           </div>
           <div v-if="giftError" class="error" style="margin-bottom: 8px;">{{ uiText(giftError) }}</div>
-          <div v-if="giftOk" class="success" style="margin-bottom: 8px;">{{ $t('兑換成功：到賬') }} {{ formatMoney(giftOk.amount_cents) }}{{ $t('，當前餘額') }} {{ formatMoney(giftOk.balance_after_cents) }}</div>
-          <button class="btn gc-submit" :disabled="redeeming" @click="doRedeem">{{ redeeming ? $t('兑換中…') : $t('立即兑換') }}</button>
+          <div v-if="giftOk" class="success" style="margin-bottom: 8px;">{{ $t('兌換成功：到賬') }} {{ formatMoney(giftOk.amount_cents) }}{{ $t('，當前餘額') }} {{ formatMoney(giftOk.balance_after_cents) }}</div>
+          <button class="btn gc-submit" :disabled="redeeming" @click="doRedeem">{{ redeeming ? $t('兌換中…') : $t('立即兌換') }}</button>
         </div>
         <div class="card gc-tips">
-          <div class="rc-title">{{ $t('兑換説明') }}</div>
+          <div class="rc-title">{{ $t('兌換説明') }}</div>
           <ul class="gc-tips-list">
-            <li>{{ $t('在「禮品卡/卡密」渠道購買後獲得兑換碼，粘貼到上方輸入框即可兑換') }}</li>
-            <li>{{ $t('兑換金額即時進入賬户餘額，可用於下單與充值') }}</li>
-            <li>{{ $t('兑換碼連續輸錯將臨時鎖定；遇到問題請聯繫在線客服處理') }}</li>
+            <li>{{ $t('在「禮品卡/卡密」渠道購買後獲得兌換碼，粘貼到上方輸入框即可兌換') }}</li>
+            <li>{{ $t('兌換金額即時進入賬戶餘額，可用於下單與充值') }}</li>
+            <li>{{ $t('兌換碼連續輸錯將臨時鎖定；遇到問題請聯繫在線客服處理') }}</li>
           </ul>
         </div>
       </div>
@@ -293,7 +293,7 @@
       <SupplierApply />
     </div>
 
-    <!-- 賬户安全（：改密吊銷全部會話、新 token 保當前；改郵箱唯一校驗） -->
+    <!-- 賬戶安全（：改密吊銷全部會話、新 token 保當前；改郵箱唯一校驗） -->
     <div v-if="tab === 'security'" class="security-layout">
       <div class="card">
         <h3 style="margin-bottom: 12px;">{{ $t('修改密碼') }}</h3>
@@ -617,7 +617,7 @@ async function copyLink() {
 
 async function doRedeem() {
   if (!giftCode.value.trim()) {
-    giftError.value = $t("請輸入兑換碼");
+    giftError.value = $t("請輸入兌換碼");
     return;
   }
   redeeming.value = true;
@@ -842,7 +842,7 @@ function fmtTime(ts: number): string {
 .rc-redirect-icon { font-size: 40px; margin-bottom: 10px; }
 .rc-btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
 
-/* ── 禮品卡兑換（主操作與説明同一行，手機端順序排列）── */
+/* ── 禮品卡兌換（主操作與説明同一行，手機端順序排列）── */
 .gc-card, .gc-tips { padding: 24px; }
 .gc-title { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 16px; }
 .gc-input { height: 48px; font-size: 16px; letter-spacing: 1px; }

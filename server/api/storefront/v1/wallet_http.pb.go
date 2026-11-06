@@ -36,7 +36,7 @@ type StoreWalletServiceHTTPServer interface {
 	ListMyWithdrawals(context.Context, *ListMyWithdrawalsRequest) (*ListMyWithdrawalsReply, error)
 	// ListTransactions ListTransactions 流水（餘額）。
 	ListTransactions(context.Context, *ListTxRequest) (*ListTxReply, error)
-	// RedeemGiftcard RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
+	// RedeemGiftcard RedeemGiftcard 禮品卡兌換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(context.Context, *RedeemGiftcardRequest) (*RedeemGiftcardReply, error)
 }
 
@@ -175,7 +175,7 @@ type StoreWalletServiceHTTPClient interface {
 	ListMyWithdrawals(ctx context.Context, req *ListMyWithdrawalsRequest, opts ...http.CallOption) (rsp *ListMyWithdrawalsReply, err error)
 	// ListTransactions ListTransactions 流水（餘額）。
 	ListTransactions(ctx context.Context, req *ListTxRequest, opts ...http.CallOption) (rsp *ListTxReply, err error)
-	// RedeemGiftcard RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
+	// RedeemGiftcard RedeemGiftcard 禮品卡兌換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 	RedeemGiftcard(ctx context.Context, req *RedeemGiftcardRequest, opts ...http.CallOption) (rsp *RedeemGiftcardReply, err error)
 }
 
@@ -274,7 +274,7 @@ func (c *StoreWalletServiceHTTPClientImpl) ListTransactions(ctx context.Context,
 	return &out, nil
 }
 
-// RedeemGiftcard RedeemGiftcard 禮品卡兑換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
+// RedeemGiftcard RedeemGiftcard 禮品卡兌換（哈希檢索 + 防爆破；餘額入賬冪等鍵 giftcard:<id>）。
 func (c *StoreWalletServiceHTTPClientImpl) RedeemGiftcard(ctx context.Context, in *RedeemGiftcardRequest, opts ...http.CallOption) (*RedeemGiftcardReply, error) {
 	var out RedeemGiftcardReply
 	pattern := "/api/v1/storefront/wallet/giftcards/redeem"

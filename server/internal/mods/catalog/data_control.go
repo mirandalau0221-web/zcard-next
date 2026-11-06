@@ -36,7 +36,7 @@ func (r *ProductRepoImpl) createProductControl(ctx context.Context, productID, s
 		return nil, e
 	}
 	if p.FulfillmentMode == "reuse" || reuse {
-		return nil, fmt.Errorf("商品正在重複發貨，不能添加客户專屬填寫字段；請先更改發貨來源")
+		return nil, fmt.Errorf("商品正在重複發貨，不能添加客戶專屬填寫字段；請先更改發貨來源")
 	}
 
 	if subsiteID == 0 {

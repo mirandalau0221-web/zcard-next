@@ -499,7 +499,7 @@ type AdminReplyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TicketNo      string                 `protobuf:"bytes,1,opt,name=ticket_no,json=ticketNo,proto3" json:"ticket_no,omitempty"`
 	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	IsInternal    bool                   `protobuf:"varint,3,opt,name=is_internal,json=isInternal,proto3" json:"is_internal,omitempty"` // 內部備註（用户不可見）
+	IsInternal    bool                   `protobuf:"varint,3,opt,name=is_internal,json=isInternal,proto3" json:"is_internal,omitempty"` // 內部備註（用戶不可見）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

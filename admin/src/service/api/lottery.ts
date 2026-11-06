@@ -107,7 +107,7 @@ export const lotteryState: Record<string, string> = {
   missed: "未中獎",
 };
 export const lotteryMode: Record<string, string> = {
-  card: "系統髮卡",
+  card: "系統發卡",
   text: "系統發文字/鏈接",
   manual: "平台人工領取",
 };

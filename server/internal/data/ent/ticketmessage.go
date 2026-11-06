@@ -28,7 +28,7 @@ type TicketMessage struct {
 	Content string `json:"content,omitempty"`
 	// media ids
 	Attachments []uint64 `json:"attachments,omitempty"`
-	// 內部備註（用户不可見）
+	// 內部備註（用戶不可見）
 	IsInternal bool `json:"is_internal,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt    time.Time `json:"created_at,omitempty"`

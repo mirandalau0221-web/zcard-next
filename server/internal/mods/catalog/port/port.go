@@ -41,7 +41,7 @@ type Product struct {
 	DeliveryMode                 string      // status / delete
 	Status                       int8        // 1=上架 0=下架 2=隱藏
 	StockVisible                 bool
-	// 積分兑換價（0=常規商品；>0=積分商城商品——order 兑換分支判定，）
+	// 積分兌換價（0=常規商品；>0=積分商城商品——order 兌換分支判定，）
 	PointsRequired int64
 	// 貨源信息（ procurement 消費：判定上游項與提交採購）
 	UpstreamSourceID    uint64 // 0 = 自營
@@ -185,13 +185,13 @@ type ProductInput struct {
 	Dedup                        bool
 	Sort                         int32
 	Status                       int8
-	// 積分兑換價（分單位積分；0=不參與積分商城——PUT 全量語義，）
+	// 積分兌換價（分單位積分；0=不參與積分商城——PUT 全量語義，）
 	PointsRequired    int64
 	PointsRequiredSet bool // true = 寫入該值（含 0=移出積分商城）
 	// 運營推薦（省略保留原值；false=取消推薦）。
 	IsRecommend    bool
 	IsRecommendSet bool
-	// 直髮內容密文（url/code 商品；nil=不動。service 層已用 CardCipher 加密，
+	// 直發內容密文（url/code 商品；nil=不動。service 層已用 CardCipher 加密，
 	// AAD=product_id+subsite_id——創建時商品尚無 ID，由 repo 建後回填）
 	DirectContent []byte
 }

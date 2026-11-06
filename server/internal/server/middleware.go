@@ -1,6 +1,6 @@
 package server
 
-// 中間件：租户解析（Host → tenancy.Context）與 admin realm JWT 鑑權（雙 realm 防串用）。
+// 中間件：租戶解析（Host → tenancy.Context）與 admin realm JWT 鑑權（雙 realm 防串用）。
 //
 // 權限判定經 authz.Directory（模塊聲明式目錄，）——本文件不再手工維護映射；
 // 目錄 miss = fail-closed：403 + 錯誤日誌（新增路由漏聲明會在啓動對賬時直接失敗，
@@ -34,7 +34,7 @@ import (
 	khttp "github.com/go-kratos/kratos/v3/transport/http"
 )
 
-// DomainResolver 域名→租户解析端口（reseller 模塊實現；server 不依賴業務實現）。
+// DomainResolver 域名→租戶解析端口（reseller 模塊實現；server 不依賴業務實現）。
 type DomainResolver interface {
 	ResolveDomain(ctx context.Context, host string) (subsiteID uint64, siteName string, err error)
 }
@@ -73,7 +73,7 @@ func (c *domainCache) put(host string, subsiteID uint64, siteName string) {
 // http.Filter 層實現（Kratos 中間件的 Transporter 是內部 *khttp.Transport——
 // 拿不到 Host 字段，恆主站；與 audit/supplier 同款 Filter 模式）。
 // Host → verified 分站域名 → 分站上下文；未匹配/未驗證 → 主站兜底（fail-open 絕不 5xx）。
-// req.WithContext 後續中間件與業務 handler 自動繼承租户上下文。
+// req.WithContext 後續中間件與業務 handler 自動繼承租戶上下文。
 func tenantFilter(mainDomain string, resolver DomainResolver) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +94,7 @@ func tenantFilter(mainDomain string, resolver DomainResolver) func(http.Handler)
 	}
 }
 
-// userAuthMiddleware storefront 用户 realm JWT（storefront 面需要登錄態的端點：
+// userAuthMiddleware storefront 用戶 realm JWT（storefront 面需要登錄態的端點：
 // wallet/ticket/affiliate/user.me）。解析失敗放行（claims 為 nil，業務端自行 401——
 // 避免遊客可訪問的列表端點被一刀切）。
 func userAuthMiddleware(signer *authn.Signer) middleware.Middleware {
@@ -141,13 +141,13 @@ func isAdminOperation(operation string, dir *authz.Directory) bool {
 	return strings.HasPrefix(operation, adminPathPrefix)
 }
 
-// adminAuthMiddleware admin realm 鑑權：JWT 校驗 → 賬户實時狀態（enabled + 當前
+// adminAuthMiddleware admin realm 鑑權：JWT 校驗 → 賬戶實時狀態（enabled + 當前
 // RoleID，禁用/換角色即時生效）→ 權限點校驗（RBAC）→ 注入 claims。
 // 超管角色（*）通配放行（authz 模塊）。
 //
 // 每請求按主鍵回查 admin_users 一次（管理面低頻、PK get 代價可忽略）——JWT 內的
 // RoleID 是簽發時快照，換角色後舊 token 若沿用快照將保留舊權限直至過期，此處
-// 以庫中當前值為準（fail-closed：賬户不存在/查詢失敗一律 401）。
+// 以庫中當前值為準（fail-closed：賬戶不存在/查詢失敗一律 401）。
 func adminAuthMiddleware(signer *authn.Signer, az port.Authorizer, dir *authz.Directory, admins identityport.AdminReader) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
@@ -165,7 +165,7 @@ func adminAuthMiddleware(signer *authn.Signer, az port.Authorizer, dir *authz.Di
 			}
 			acc, err := admins.Admin(ctx, claims.Subject)
 			if err != nil || acc == nil {
-				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "賬户不存在")
+				return nil, errors.Unauthorized("identity.UNAUTHORIZED", "賬戶不存在")
 			}
 			if claims.AuthVersion != acc.AuthVersion {
 				return nil, errors.Unauthorized("identity.SESSION_INVALID", "安全設置已變更，請重新登錄")
@@ -182,7 +182,7 @@ func adminAuthMiddleware(signer *authn.Signer, az port.Authorizer, dir *authz.Di
 	}
 }
 
-// storefrontVisitMiddleware storefront 訪問埋點（）：PV/UV 明細 + 登錄用户在線心跳。
+// storefrontVisitMiddleware storefront 訪問埋點（）：PV/UV 明細 + 登錄用戶在線心跳。
 // 註冊在 userAuthMiddleware 之後（需已解析 claims）；僅 selector 匹配 storefront
 // operation；埋點寫失敗忽略——統計性質絕不阻斷業務請求。
 func storefrontVisitMiddleware(tracker *audit.TrackRepo) middleware.Middleware {

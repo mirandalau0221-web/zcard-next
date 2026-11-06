@@ -40,7 +40,7 @@
           <div class="pd-price-row">
             <span class="pd-price">{{ formatMoney(displayPrice) }}</span>
             <del v-if="selectedFlash && displayPrice < basePrice" class="muted">{{ formatMoney(basePrice) }}</del>
-            <span v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="pd-price-points">{{ $t('或') }} {{ p.points_required }} {{ $t('積分兑換') }}</span>
+            <span v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="pd-price-points">{{ $t('或') }} {{ p.points_required }} {{ $t('積分兌換') }}</span>
           </div>
           <p v-if="selectedFlash" class="pd-flash-info">{{ flashSoldOut ? $t('本場秒殺已搶完') : $t('限時秒殺') }} · {{ new Date(selectedFlash.end_at * 1000).toLocaleString(localeTag) }} {{ $t('結束') }}<span v-if="!flashSoldOut"> {{ $t('· 剩餘') }} {{ selectedFlash.remaining }} {{ $t('件') }}<span v-if="selectedFlash.per_user_limit > 0"> {{ $t('· 每人限購') }} {{ selectedFlash.per_user_limit }} {{ $t('件') }}</span></span></p>
         </div>
@@ -154,7 +154,7 @@
             <template v-else><ThemeIcon name="cart" />{{ $t('加入購物車') }}</template>
           </button>
           <button v-if="!physicalProduct && !smsProduct && p.points_required && p.points_required > 0" class="pd-btn-points" :disabled="submitting || soldOut || stockUnknown || flashSoldOut" @click="exchangePoints">
-            {{ stockUnknown ? $t('庫存待確認') : soldOut ? $t('已兑完') : $t('積分兑換（{0} 分）', [p.points_required]) }}
+            {{ stockUnknown ? $t('庫存待確認') : soldOut ? $t('已兌完') : $t('積分兌換（{0} 分）', [p.points_required]) }}
           </button>
         </div>
       </div>
@@ -168,14 +168,14 @@
 
     <!-- 評價區（template.show_reviews 開關控制；默認展示 3 條可展開） -->
     <div v-if="showReviews" id="pd-reviews" class="pd-section">
-      <h3 class="pd-section-title">{{ $t('用户評價（{0}）', [p.reviews?.length || 0]) }}</h3>
+      <h3 class="pd-section-title">{{ $t('用戶評價（{0}）', [p.reviews?.length || 0]) }}</h3>
       <p v-if="!p.reviews?.length" class="muted">{{ $t('暫無評價，歡迎購買後分享使用體驗。') }}</p>
       <p class="muted"><router-link to="/member?tab=orders">{{ $t('前往我的訂單評價') }}</router-link> {{ $t('· 發貨完成後可提交，審核通過後展示。') }}</p>
       <div v-for="r in visibleReviews" :key="`${r.is_virtual}-${r.id}`" class="pd-review">
         <span class="pd-avatar">{{ (r.nickname || $t('匿'))[0] }}</span>
         <div class="pd-review-body">
           <div class="pd-review-head">
-            <b>{{ r.nickname || $t('匿名用户') }}</b>
+            <b>{{ r.nickname || $t('匿名用戶') }}</b>
             <span class="pd-stars">{{ '★'.repeat(Math.min(5, r.rating)) }}</span>
           </div>
           <div class="pd-review-content">{{ r.content }}</div>
@@ -323,7 +323,7 @@ async function refreshStock() {
     const fresh = await getProduct(productID);
     if (p.value?.id !== productID) return;
     if (fresh.data) {
-      // 只更新庫存，保留用户已填寫的規格、數量和取貨信息。
+      // 只更新庫存，保留用戶已填寫的規格、數量和取貨信息。
       p.value.stock = fresh.data.stock ?? 0;
       p.value.stock_status = fresh.data.stock_status;
       p.value.stock_reference = fresh.data.stock_reference;
@@ -369,7 +369,7 @@ const stockPct = computed(() => {
   return `${Math.min(100, Math.round((s / 600) * 100))}%`;
 });
 
-// 購物車：積分商品不可加購（積分單走兑換按鈕）；遊客加購進本地購物車（老項目同款）
+// 購物車：積分商品不可加購（積分單走兌換按鈕）；遊客加購進本地購物車（老項目同款）
 
 async function addToCart() {
   if (!p.value || soldOut.value || stockUnknown.value) return;
@@ -397,7 +397,7 @@ async function removeFromCart() {
 }
 
 function stockTypeLabel(t: string) {
-  return ({ get card() { return $t("卡密"); }, get url() { return $t("鏈接"); }, get code() { return $t("兑換碼"); } } as Record<string, string>)[t] || t;
+  return ({ get card() { return $t("卡密"); }, get url() { return $t("鏈接"); }, get code() { return $t("兌換碼"); } } as Record<string, string>)[t] || t;
 }
 
 // 手機端吸底操作欄點擊後，表單校驗失敗要能看到錯誤提示：滾動到購買卡內的 error
@@ -436,7 +436,7 @@ if (productResp.error) {
 }
 
 onMounted(async () => {
-  // 交易配置/驗證碼（客户端交互能力；SSG 不需要）+ 評價/銷量/庫存顯示開關
+  // 交易配置/驗證碼（客戶端交互能力；SSG 不需要）+ 評價/銷量/庫存顯示開關
   const [cfg, capCfg, tplResp] = await Promise.all([
     fetchTradeConfig(),
     fetchCaptchaConfig(),
@@ -559,7 +559,7 @@ async function buy() {
   router.push(`/payment/${data!.order_no}`);
 }
 
-// 積分兑換（：use_points → 服務端同事務扣積分 → 訂單直落 paid → 取貨頁交付）
+// 積分兌換（：use_points → 服務端同事務扣積分 → 訂單直落 paid → 取貨頁交付）
 async function exchangePoints() {
   if (!p.value || soldOut.value || stockUnknown.value) return;
   if (!getToken()) {
@@ -568,10 +568,10 @@ async function exchangePoints() {
   }
   if (!validateTradeFields(false)) return;
   if (!queryPassword.value || queryPassword.value.length < 4) {
-    error.value = $t("積分兑換同樣需要設置查詢密碼（取貨用，至少 4 位）");
+    error.value = $t("積分兌換同樣需要設置查詢密碼（取貨用，至少 4 位）");
     return;
   }
-  if (!confirm($t("確認用 {0} 積分兑換本商品？", [p.value.points_required]))) return;
+  if (!confirm($t("確認用 {0} 積分兌換本商品？", [p.value.points_required]))) return;
   submitting.value = true;
   error.value = '';
   const { data, error: err } = await createOrder({
@@ -581,7 +581,7 @@ async function exchangePoints() {
   });
   submitting.value = false;
   if (err) { error.value = err; return; }
-  alert($t("兑換成功，訂單已支付，請前往取貨頁領取"));
+  alert($t("兌換成功，訂單已支付，請前往取貨頁領取"));
   router.push('/fetch');
 }
 </script>

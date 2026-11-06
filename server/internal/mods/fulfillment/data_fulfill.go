@@ -186,7 +186,7 @@ func (r *DeliveryRepoImpl) fulfillOrder(ctx context.Context, orderNo string) err
 		}
 	}
 
-	// 直髮商品（url/code）：同一鏈接/兑換碼反覆發貨——寫直髮交付記錄
+	// 直發商品（url/code）：同一鏈接/兌換碼反覆發貨——寫直發交付記錄
 	// （CardID=0，取貨時從商品 direct_content 現場解密）。每訂單項一條。
 	for _, it := range items {
 		if it.GoodsType == "physical" || it.CanceledQuantity >= it.Quantity {
@@ -249,7 +249,7 @@ type FetchItem struct {
 }
 
 // FetchDelivery 取貨（三重門：單號+密碼+限流；憑正確密碼始終返回明文——
-// 2026-09-03 修訂，原「首次明文、後續掩碼」致支付頁自動取貨消耗首次後客户
+// 2026-09-03 修訂，原「首次明文、後續掩碼」致支付頁自動取貨消耗首次後客戶
 // 再查只見尾 4 位掩碼，客訴率高）。
 func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPassword, clientIP string, accessToken ...string) (*FetchResult, error) {
 	client := data.Client(ctx, r.data)
@@ -320,7 +320,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 			continue
 		}
 
-		// 直髮交付（url/code 商品）：內容在商品 direct_content（CardID=0 無卡）
+		// 直發交付（url/code 商品）：內容在商品 direct_content（CardID=0 無卡）
 		if d.DeliveredMode == orderdelivery.DeliveredModeDirect {
 			oi, e := client.OrderItem.Get(ctx, d.ItemID)
 			if e == nil && oi.FulfillmentType == orderitem.FulfillmentTypeReuse {
@@ -343,7 +343,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 			}
 			p, perr := client.Product.Get(ctx, productID)
 			if perr != nil || len(p.DirectContent) == 0 {
-				result.Items = append(result.Items, FetchItem{CardID: 0, Content: "****（直髮內容未配置）", Masked: true})
+				result.Items = append(result.Items, FetchItem{CardID: 0, Content: "****（直發內容未配置）", Masked: true})
 				continue
 			}
 			plain, derr := r.cipher.Open(p.DirectContent, p.ID, p.SubsiteID)
@@ -352,8 +352,8 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 				continue
 			}
 			// 明文規則（2026-09-03 修訂）：單號+查詢密碼取貨始終明文——密碼即門。
-			// 曾「首次明文、後續掩碼」：支付成功頁的自動取貨即消耗首次，客户
-			// 再查只見尾 4 位，客訴率高（髮卡平台通行做法均為憑密碼可反覆查看）。
+			// 曾「首次明文、後續掩碼」：支付成功頁的自動取貨即消耗首次，客戶
+			// 再查只見尾 4 位，客訴率高（發卡平台通行做法均為憑密碼可反覆查看）。
 			result.Items = append(result.Items, FetchItem{CardID: 0, Content: string(plain), Masked: false})
 			continue
 		}
@@ -375,7 +375,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 			return nil, err
 		}
 
-		// 現場解密（不落庫明文）；憑密碼取貨始終明文（同直髮分支註釋）
+		// 現場解密（不落庫明文）；憑密碼取貨始終明文（同直發分支註釋）
 		plain, err := r.cipher.Open(c.Content, c.ProductID, c.SubsiteID)
 		if err != nil {
 			result.Items = append(result.Items, FetchItem{

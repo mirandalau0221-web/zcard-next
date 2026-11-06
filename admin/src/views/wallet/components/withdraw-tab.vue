@@ -54,7 +54,7 @@ function statusTag(s: string) {
 const columns: DataTableColumns<any> = [
   { title: "ID", key: "id", width: 60 },
   {
-    title: "用户",
+    title: "用戶",
     key: "user_id",
     width: 110,
     render: (row) => row.username ? `#${row.user_id} ${row.username}` : `#${row.user_id}`,
@@ -150,7 +150,7 @@ async function handlePay() {
   try {
     const { error } = await payWithdrawal(payTarget.value.id, payReceipt.value.trim() || undefined);
     if (!error) {
-      window.$message?.success("已確認打款，回執已記錄（客户可見）");
+      window.$message?.success("已確認打款，回執已記錄（客戶可見）");
       showPay.value = false;
       load();
     }
@@ -197,8 +197,8 @@ onMounted(load);
 
     <NModal v-model:show="showReject" preset="dialog" :title="`駁回提現 #${rejectTarget?.id || ''}`" style="width: 420px">
       <NForm label-placement="top">
-        <NFormItem label="駁回原因（必填，用户可見）" required>
-          <NInput v-model:value="rejectReason" type="textarea" :rows="2" placeholder="如：賬户信息有誤" />
+        <NFormItem label="駁回原因（必填，用戶可見）" required>
+          <NInput v-model:value="rejectReason" type="textarea" :rows="2" placeholder="如：賬戶信息有誤" />
         </NFormItem>
       </NForm>
       <template #action>
@@ -222,7 +222,7 @@ onMounted(load);
       <div class="mt-4px text-#d03050">請核對已線下轉賬完成後再確認</div>
     </div>
     <NFormItem label="打款回執" label-placement="top" :show-feedback="false">
-      <NInput v-model:value="payReceipt" placeholder="交易流水號 / 轉賬備註（客户在提現記錄可見）" maxlength="100" />
+      <NInput v-model:value="payReceipt" placeholder="交易流水號 / 轉賬備註（客戶在提現記錄可見）" maxlength="100" />
     </NFormItem>
   </div>
   <template #action>
@@ -251,7 +251,7 @@ onMounted(load);
       <div class="mt-4px text-#d03050">請核對已線下轉賬完成後再確認</div>
     </div>
     <NFormItem label="打款回執" label-placement="top" :show-feedback="false">
-      <NInput v-model:value="payReceipt" placeholder="交易流水號 / 轉賬備註（客户在提現記錄可見）" maxlength="100" />
+      <NInput v-model:value="payReceipt" placeholder="交易流水號 / 轉賬備註（客戶在提現記錄可見）" maxlength="100" />
     </NFormItem>
   </div>
   <template #action>

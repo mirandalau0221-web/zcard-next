@@ -64,7 +64,7 @@ type SupplyConnection struct {
 	AutoSyncPrice bool `json:"auto_sync_price,omitempty"`
 	// StockMode holds the value of the "stock_mode" field.
 	StockMode supplyconnection.StockMode `json:"stock_mode,omitempty"`
-	// 其餘開關（髮卡模式/失敗策略等）
+	// 其餘開關（發卡模式/失敗策略等）
 	Settings map[string]interface{} `json:"settings,omitempty"`
 	// LastPingAt holds the value of the "last_ping_at" field.
 	LastPingAt time.Time `json:"last_ping_at,omitempty"`

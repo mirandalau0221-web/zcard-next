@@ -54,7 +54,7 @@ func (Coupon) Fields() []ent.Field {
 		field.Time("expire_at").SchemaType(mysqlTime).Optional(),
 		field.Int32("per_user_limit").Default(1).Comment("單碼次數（多次碼放開）"),
 		field.Enum("status").Values("unused", "used", "disabled").Default("unused"),
-		field.Uint64("user_id").Optional().Comment("領取人（兑換碼/後台贈送回填）"),
+		field.Uint64("user_id").Optional().Comment("領取人（兌換碼/後台贈送回填）"),
 		field.Time("used_at").SchemaType(mysqlTime).Optional(),
 		field.Uint64("used_order_id").Optional(),
 	}
@@ -274,7 +274,7 @@ func (ResellerBalanceAccount) Fields() []ent.Field {
 	}
 }
 
-// ResellerRelatedAccount 分站關聯賬户（自買風控數據源）。
+// ResellerRelatedAccount 分站關聯賬戶（自買風控數據源）。
 type ResellerRelatedAccount struct {
 	ent.Schema
 }
@@ -285,7 +285,7 @@ func (ResellerRelatedAccount) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id"),
 		field.Uint64("reseller_id").Comment("分站 profile user_id"),
-		field.Uint64("user_id").Comment("關聯用户"),
+		field.Uint64("user_id").Comment("關聯用戶"),
 		field.String("relation_type").MaxLen(40).Comment("family/same_device/sub_account..."),
 		field.String("source").MaxLen(120).Optional().Comment("判定依據"),
 		field.Enum("status").Values("active", "ignored").Default("active"),
@@ -329,7 +329,7 @@ func (Ticket) Indexes() []ent.Index {
 	}
 }
 
-// TicketMessage 工單消息（會話式；is_internal 內部備註用户側雙過濾）。
+// TicketMessage 工單消息（會話式；is_internal 內部備註用戶側雙過濾）。
 type TicketMessage struct {
 	ent.Schema
 }
@@ -342,7 +342,7 @@ func (TicketMessage) Fields() []ent.Field {
 		field.Uint64("sender_id").Optional(),
 		field.Text("content").Comment("sanitize 後"),
 		field.JSON("attachments", []uint64{}).Optional().Comment("media ids"),
-		field.Bool("is_internal").Default(false).Comment("內部備註（用户不可見）"),
+		field.Bool("is_internal").Default(false).Comment("內部備註（用戶不可見）"),
 		field.Time("created_at").SchemaType(mysqlTime).Immutable().Default(nowUTC),
 	}
 }

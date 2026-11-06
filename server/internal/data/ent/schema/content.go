@@ -85,7 +85,7 @@ func (Post) Indexes() []ent.Index {
 	}
 }
 
-// Notification 站內信（用户鈴鐺）。
+// Notification 站內信（用戶鈴鐺）。
 type Notification struct {
 	ent.Schema
 }
@@ -275,7 +275,7 @@ func (NotifyBroadcast) Fields() []ent.Field {
 		field.Text("content").Comment("正文（羣發渠道適配：inbox 原文/email HTML）"),
 		field.JSON("channels", []string{}).Comment("投放通道集合（inbox/email/sms/telegram）"),
 		field.Enum("target_type").Values("all", "active", "specified").Default("all").Comment("目標篩選"),
-		field.JSON("target_ids", []uint64{}).Optional().Comment("specified 時的用户 ID 集合"),
+		field.JSON("target_ids", []uint64{}).Optional().Comment("specified 時的用戶 ID 集合"),
 		field.Time("scheduled_at").SchemaType(mysqlTime).Optional().Comment("定時發送（空=立即）"),
 		field.Enum("status").Values("pending", "sending", "done", "canceled").Default("pending"),
 		field.Uint64("created_by").Comment("創建管理員"),

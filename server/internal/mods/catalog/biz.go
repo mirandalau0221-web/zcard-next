@@ -1,6 +1,6 @@
 // Package catalog 商品目錄模塊（M1）：商品/SKU/分類/標籤/控件/虛擬數據/會員商品組。
 //
-// M0 骨架打通「租户上下文 → Ent 查詢 → 薄 service」鏈路；價格計算管線
+// M0 骨架打通「租戶上下文 → Ent 查詢 → 薄 service」鏈路；價格計算管線
 // （PriceCalculator，§5.2）屬 order 模塊，catalog 只提供基礎價與庫存類型。
 package catalog
 
@@ -32,7 +32,7 @@ type CatalogUsecase struct {
 // NewCatalogUsecase 構造。
 func NewCatalogUsecase(repo ProductRepo) *CatalogUsecase { return &CatalogUsecase{repo: repo} }
 
-// ListVisible 顧客可見商品列表（上架 + 租户過濾）。
+// ListVisible 顧客可見商品列表（上架 + 租戶過濾）。
 func (uc *CatalogUsecase) ListVisible(ctx context.Context, f port.VisibleFilter) ([]port.Product, int64, error) {
 	if f.Page <= 0 {
 		f.Page = 1

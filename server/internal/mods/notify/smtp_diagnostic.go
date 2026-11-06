@@ -27,7 +27,7 @@ var smtpStageHints = map[string]string{
 	"greeting":      "檢查該端口是否為 SMTP 服務；SSL/TLS 通常使用 465，STARTTLS 通常使用 587，普通 SMTP 通常使用 25。",
 	"tls":           "核對 SSL/TLS 方式和端口，並檢查郵件服務器證書及其完整證書鏈。",
 	"starttls":      "確認服務器及端口支持 STARTTLS；此方式要求升級成功，請勿使用只支持隱式 TLS 的端口。",
-	"auth":          "核對 SMTP 用户名、密碼或授權碼、認證方式，以及服務器是否已開啓 SMTP 登錄。",
+	"auth":          "核對 SMTP 用戶名、密碼或授權碼、認證方式，以及服務器是否已開啓 SMTP 登錄。",
 	"from":          "核對發件郵箱是否屬於當前賬號、發件域名是否獲准，以及中繼發信權限。",
 	"recipient":     "核對收件地址、服務器中繼策略和收件限制；部分服務商要求測試收件人已驗證。",
 	"data":          "檢查服務器發信權限、限額和郵件大小限制，並查看郵件服務日誌。",
@@ -75,7 +75,7 @@ func smtpFailure(stage string, err error, cfg *notifyport.SMTPConfig) *SMTPDiagn
 	case errors.As(err, &record):
 		d.Hint = "此端口返回的不是 TLS 握手；核對連接方式，隱式 SSL/TLS 與 STARTTLS 不能混用。"
 	case d.Code == 530 || d.Code == 538:
-		d.Hint = "服務器要求認證或加密；檢查用户名和密碼，並選擇 STARTTLS 或 SSL/TLS。"
+		d.Hint = "服務器要求認證或加密；檢查用戶名和密碼，並選擇 STARTTLS 或 SSL/TLS。"
 	case stage == "auth" && d.Code == 535:
 		d.Hint = "服務器拒絕登錄；檢查賬號、密碼或 SMTP 專用授權碼，以及是否啓用了 SMTP 登錄。"
 	case d.Code == 421 || d.Code == 450 || d.Code == 451 || d.Code == 452:

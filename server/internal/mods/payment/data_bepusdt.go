@@ -213,7 +213,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 		// A process may have died before recording the request failure. Persist
 		// the review flag outside the rolled-back creation transaction.
 		if unknown && p != nil {
-			if e := data.Client(ctx, r.data).Payment.Update().Where(payment.ID(p.ID), payment.StatusEQ(payment.StatusPending), payment.ReviewReasonEQ("")).SetReviewReason(fmt.Sprintf("UPAY PRO 下單結果待核對，網關商户單號 %s；請勿重複付款", p.GatewayOrderRef)).Exec(ctx); e != nil {
+			if e := data.Client(ctx, r.data).Payment.Update().Where(payment.ID(p.ID), payment.StatusEQ(payment.StatusPending), payment.ReviewReasonEQ("")).SetReviewReason(fmt.Sprintf("UPAY PRO 下單結果待核對，網關商戶單號 %s；請勿重複付款", p.GatewayOrderRef)).Exec(ctx); e != nil {
 				return nil, e
 			}
 		}
@@ -248,7 +248,7 @@ func (r *PaymentRepoImpl) createBepusdtPayment(ctx context.Context, chID, orderI
 		state.LeaseUntil = time.Time{}
 		update := c.Payment.UpdateOneID(p.ID)
 		if createErr != nil && p.DriverSnapshot == "upay" && current.Status == payment.StatusPending {
-			update.SetReviewReason(fmt.Sprintf("UPAY PRO 下單結果待核對，網關商户單號 %s；請勿重複付款", p.GatewayOrderRef))
+			update.SetReviewReason(fmt.Sprintf("UPAY PRO 下單結果待核對，網關商戶單號 %s；請勿重複付款", p.GatewayOrderRef))
 		}
 		if createErr == nil {
 			if current.ChannelOrderNo != "" && current.ChannelOrderNo != info.ChannelOrderNo {

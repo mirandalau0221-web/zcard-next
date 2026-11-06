@@ -101,7 +101,7 @@ func defaultOrderTemplate(eventType, channel, locale string) (*ent.NotifyTemplat
 			subject = "訂單 {{.order_no}} 已完成交付"
 			body = "<p>您的訂單 {{.order_no}} 已完成交付。</p>"
 		}
-		body += "<p><a href=\"{{.fetch_url}}\">查看訂單與交付結果</a></p><p>請使用下單郵箱驗證、查詢密碼或訂單所屬賬户查看。卡密僅在授權後的店鋪頁面顯示。</p>"
+		body += "<p><a href=\"{{.fetch_url}}\">查看訂單與交付結果</a></p><p>請使用下單郵箱驗證、查詢密碼或訂單所屬賬戶查看。卡密僅在授權後的店鋪頁面顯示。</p>"
 		if locale == "en" {
 			subject = "Order {{.order_no}} payment received"
 			body = "<p>Payment for order {{.order_no}} has been received. Order amount: {{.amount}}.</p>"
