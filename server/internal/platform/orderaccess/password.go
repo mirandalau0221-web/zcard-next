@@ -51,7 +51,7 @@ func PublicError(err error) error {
 	return errors.InternalServer("order.QUERY_FAILED", "訂單查詢暫時失敗，請稍後重試")
 }
 
-func Verify(ctx context.Context, gate Gate, no, hash, password, ip string) error {
+func Verify(ctx context.Context, gate Gate, no, hash, password, ip, contactEmail string) error {
 	if host, _, err := net.SplitHostPort(ip); err == nil {
 		ip = host
 	}
@@ -76,6 +76,16 @@ func Verify(ctx context.Context, gate Gate, no, hash, password, ip string) error
 	if password == "" {
 		return errors.BadRequest("order.QUERY_PASSWORD_REQUIRED", "請輸入下單時設置的查詢密碼")
 	}
+	// Guest orders: the contact email entered at checkout is accepted as the
+	// access credential, so buyers can view delivery with just their email —
+	// no query password and no emailed verification code needed. The order
+	// number itself is unguessable, and a wrong email still counts as a
+	// failed attempt below. contactEmail is only supplied for guest orders.
+	if contactEmail != "" {
+		if email, err := EmailAddress(password); err == nil && email == contactEmail {
+			return verifySuccess(ctx, gate, key)
+		}
+	}
 	if hash == "" || !crypto.VerifyPassword(hash, password) {
 		state := State{Failures: 1}
 		if gate != nil {
@@ -87,6 +97,12 @@ func Verify(ctx context.Context, gate Gate, no, hash, password, ip string) error
 		}
 		return passwordError(state)
 	}
+	return verifySuccess(ctx, gate, key)
+}
+
+// verifySuccess clears the failure counter after a valid credential, mirroring
+// the original password path (a concurrent fifth failure still locks).
+func verifySuccess(ctx context.Context, gate Gate, key string) error {
 	if gate != nil {
 		if err := gate.ResetFetchFailures(ctx, key); err != nil {
 			return err

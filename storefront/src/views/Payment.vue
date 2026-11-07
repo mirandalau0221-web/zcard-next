@@ -9,11 +9,10 @@
     <div v-else-if="phase === 'error'" class="pay-center-card">
       <div class="pay-state-title">{{ $t('暫時無法查詢訂單') }}</div>
       <div class="muted" role="alert">{{ uiText(error) }}</div>
-      <p class="muted">{{ $t('已付款請勿重複支付。可通過下單郵箱驗證恢復訂單訪問。') }}</p>
-      <OrderAccessRecovery :order-no="orderNo" @recovered="retryOrder" />
-      <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼') }}</summary>
+      <p class="muted">{{ $t('已付款請勿重複支付。輸入下單郵箱或查詢密碼即可查看訂單。') }}</p>
+      <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼或下單郵箱') }}</summary>
       <form @submit.prevent="retryOrder">
-        <label for="order-query-password">{{ $t('查詢密碼（遊客訂單）') }}</label>
+        <label for="order-query-password">{{ $t('查詢密碼或下單郵箱（遊客訂單）') }}</label>
         <input id="order-query-password" v-model="queryPassword" class="input" type="password" autocomplete="off" />
         <div class="pay-btn-row">
           <button class="btn btn-primary" type="submit" :disabled="retrying">{{ retrying ? $t('查詢中…') : $t('重新查詢') }}</button>
@@ -45,14 +44,14 @@
       <DeliveryResults v-if="!order?.items.some(i=>['sms_activation','social_service'].includes(i.delivery_kind || '')) && delivery?.items.length" :items="delivery.items" />
       <p v-if="Number(order?.commerce_version)===1" class="muted">{{ $t('實體商品已進入配送流程，請在訂單詳情查看包裹並確認收貨。') }}</p>
       <div v-if="order?.items.some(i=>i.goods_type!=='physical' && !['sms_activation','social_service'].includes(i.delivery_kind || ''))" class="pay-fetch-hint">
-        <span>{{ ['delivered', 'completed'].includes(order?.status || '') ? $t('交付已完成，憑訂單號與查詢密碼查看結果') : $t('已付款，正在安排交付。人工服務請在訂單詳情查看進度，請勿重複付款。') }}</span>
+        <span>{{ ['delivered', 'completed'].includes(order?.status || '') ? $t('交付已完成，憑訂單號與查詢密碼或下單郵箱查看結果') : $t('已付款，正在安排交付。人工服務請在訂單詳情查看進度，請勿重複付款。') }}</span>
         <router-link class="btn btn-primary" :to="`/fetch?order_no=${orderNo}`">{{ $t('前往取貨') }}</router-link>
       </div>
 
       <p v-if="order?.items.some(i=>i.delivery_kind==='social_service')" class="muted">{{ $t('付款已確認，請前往訂單詳情查看服務進度與退款狀態。') }}</p>
       <p v-if="order?.items.some(i=>i.delivery_kind==='sms_activation')" class="muted">{{ $t('正在獲取號碼，請前往訂單詳情查看短信和取消/完成狀態。') }}</p>
-      <p v-if="physicalOnly" class="muted">{{ $t('請保存訂單訪問鏈接，換設備可通過郵箱驗證找回') }}</p>
-      <p v-else class="muted">{{ $t('請保存訂單號和下單時的查詢密碼，遊客也可隨時查詢、取貨，無需註冊。') }}</p>
+      <p v-if="physicalOnly" class="muted">{{ $t('請保存訂單訪問鏈接，換設備可用下單郵箱查看訂單') }}</p>
+      <p v-else class="muted">{{ $t('請保存訂單號和下單時的查詢密碼或郵箱，遊客也可隨時查詢、取貨，無需註冊。') }}</p>
       <div class="pay-btn-row">
         <button class="btn btn-primary" @click="checkOnce(true)">{{ physicalOnly ? $t('刷新訂單狀態') : $t('刷新發貨結果') }}</button>
         <button v-if="physicalOnly && getOrderAccessToken(orderNo)" class="btn btn-outline" @click="saveAccessLink">{{ copiedAccessLink ? $t('已複製') : $t('複製訂單訪問鏈接') }}</button>
@@ -168,7 +167,6 @@ import { submitPaymentForm as submitForm } from "@/utils/payment-form";
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QRCode from 'qrcode';
-import OrderAccessRecovery from '@/components/OrderAccessRecovery.vue';
 import { getOrderAccessToken, orderAccessLink, getBalance, createPayment, fetchPaymentChannels, getOrder, fetchDelivery, getOrderPassword, rememberOrderPassword, type ChannelItem, type OrderDetail, type FetchDeliveryReply } from '@/api';
 import { getToken, formatMoney, formatBaseMoney, formatPaymentAmount } from '@/api/client';
 import { flattenPayOptions, emojiOf } from '@/composables/pay-options';

@@ -264,7 +264,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 		if token != "" {
 			return nil, orderaccess.Required(ctx)
 		}
-		return nil, orderaccess.Verify(ctx, r.gate, orderNo, "", queryPassword, clientIP)
+		return nil, orderaccess.Verify(ctx, r.gate, orderNo, "", queryPassword, clientIP, "")
 	}
 	if err != nil {
 		return nil, err
@@ -273,7 +273,7 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 		if token != "" {
 			return nil, orderaccess.Required(ctx)
 		}
-		return nil, orderaccess.Verify(ctx, r.gate, orderNo, "", queryPassword, clientIP)
+		return nil, orderaccess.Verify(ctx, r.gate, orderNo, "", queryPassword, clientIP, "")
 	}
 	claims := identity.ClaimsFromContext(ctx)
 	owner := claims != nil && o.UserID != 0 && claims.Subject == o.UserID
@@ -281,9 +281,10 @@ func (r *DeliveryRepoImpl) FetchDelivery(ctx context.Context, orderNo, queryPass
 	if !owner && !tokenAuthorized && (o.OrderAccessTokenHash != "" || token != "") && queryPassword == "" {
 		return nil, orderaccess.Required(ctx)
 	}
-	// Email-verified access and the original password remain valid alternatives.
+	// Email-verified access, the order's contact email, and the original password
+	// remain valid alternatives (guest orders accept the checkout email directly).
 	if !owner && !tokenAuthorized && (o.QueryPasswordHash != "" || o.CommerceVersion > 0 || o.OrderAccessTokenHash != "") {
-		if err := orderaccess.Verify(ctx, r.gate, o.OrderNo, o.QueryPasswordHash, queryPassword, clientIP); err != nil {
+		if err := orderaccess.Verify(ctx, r.gate, o.OrderNo, o.QueryPasswordHash, queryPassword, clientIP, orderaccess.GuestContactEmail(o.UserID, o.Contact, o.GuestContact)); err != nil {
 			return nil, err
 		}
 	}

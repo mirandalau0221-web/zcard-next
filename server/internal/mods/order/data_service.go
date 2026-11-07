@@ -126,7 +126,7 @@ func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetO
 		if token != "" {
 			return nil, orderaccess.Required(ctx)
 		}
-		return nil, orderaccess.PublicError(orderaccess.Verify(ctx, s.uc.Gate, req.GetOrderNo(), "", req.GetQueryPassword(), orderClientIP(ctx)))
+		return nil, orderaccess.PublicError(orderaccess.Verify(ctx, s.uc.Gate, req.GetOrderNo(), "", req.GetQueryPassword(), orderClientIP(ctx), ""))
 	}
 	if err != nil {
 		return nil, errors.InternalServer("order.GET_FAILED", "查詢失敗")
@@ -135,7 +135,7 @@ func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetO
 		if token != "" {
 			return nil, orderaccess.Required(ctx)
 		}
-		return nil, orderaccess.PublicError(orderaccess.Verify(ctx, s.uc.Gate, req.GetOrderNo(), "", req.GetQueryPassword(), orderClientIP(ctx)))
+		return nil, orderaccess.PublicError(orderaccess.Verify(ctx, s.uc.Gate, req.GetOrderNo(), "", req.GetQueryPassword(), orderClientIP(ctx), ""))
 	}
 	// 登錄態本人：免查詢密碼（密碼錯與單號不存在對外表現一致的紀律不破壞——
 	// 非本人登錄態不泄露訂單存在性，仍走密碼校驗路徑）
@@ -145,8 +145,9 @@ func (s *StoreOrderService) GetOrder(ctx context.Context, req *storefrontv1.GetO
 		if (o.OrderAccessTokenHash != "" || token != "") && req.GetQueryPassword() == "" {
 			return nil, orderaccess.Required(ctx)
 		} else {
-			// 查詢密碼校驗（三重門之一：設置則必須匹配；錯誤與單號不存在表現一致）
-			if err := orderaccess.Verify(ctx, s.uc.Gate, o.OrderNo, o.QueryPasswordHash, req.GetQueryPassword(), orderClientIP(ctx)); err != nil {
+			// 查詢密碼校驗（三重門之一：設置則必須匹配；錯誤與單號不存在表現一致）。
+			// 遊客單另接受下單聯繫郵箱作為憑證，免密碼、免驗證碼直查。
+			if err := orderaccess.Verify(ctx, s.uc.Gate, o.OrderNo, o.QueryPasswordHash, req.GetQueryPassword(), orderClientIP(ctx), orderaccess.GuestContactEmail(o.UserID, o.Contact, o.GuestContact)); err != nil {
 				return nil, orderaccess.PublicError(err)
 			}
 		}
@@ -268,7 +269,7 @@ func (s *StoreOrderService) ListMyOrders(ctx context.Context, req *storefrontv1.
 
 // ListGuestOrders 遊客按下單聯繫方式查訂單列表（郵箱/手機號）。
 // 安全口徑：僅遊客單（user_id 空）；精簡信息（單號/狀態/金額/時間——無卡密）；
-// 卡密仍需逐單查詢密碼（fetchDelivery 三重門）；查不到返回空列表（防枚舉與
+// 卡密仍需逐單憑證（查詢密碼或下單聯繫郵箱；fetchDelivery 三重門）；查不到返回空列表（防枚舉與
 // 查詢不存在表現一致）；限最近 20 條。
 func (s *StoreOrderService) ListGuestOrders(ctx context.Context, req *storefrontv1.ListGuestOrdersRequest) (*storefrontv1.ListGuestOrdersReply, error) {
 	contact := strings.TrimSpace(req.GetContact())

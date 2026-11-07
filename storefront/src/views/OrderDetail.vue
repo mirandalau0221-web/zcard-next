@@ -9,8 +9,7 @@
     <div v-if="loading" class="card muted" style="padding: 48px; text-align: center;">{{ $t('加載中…') }}</div>
     <div v-else-if="error" class="card" style="padding: 24px;">
       <p class="error">{{ uiText(error) }}</p>
-      <OrderAccessRecovery :order-no="orderNo" @recovered="loadOrder" />
-      <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼') }}</summary><form @submit.prevent="loadOrder"><label>{{ $t('下單時的查詢密碼') }}<input v-model="password" class="input" type="password" autocomplete="off" /></label><button class="btn" type="submit">{{ $t('查詢訂單') }}</button></form></details>
+      <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼或下單郵箱') }}</summary><form @submit.prevent="loadOrder"><label>{{ $t('查詢密碼或下單郵箱') }}<input v-model="password" class="input" type="password" autocomplete="off" /></label><button class="btn" type="submit">{{ $t('查詢訂單') }}</button></form></details>
     </div>
 
     <template v-else-if="order">
@@ -78,7 +77,7 @@
           </div>
         </div>
       </div>
-      <div v-if="order.items.every(i=>i.goods_type==='physical') && getOrderAccessToken(orderNo)" class="card"><p>{{ $t('請保存訂單訪問鏈接，換設備可通過郵箱驗證找回') }}</p><button class="btn secondary" @click="saveAccessLink">{{ copiedLink ? $t('已複製') : $t('複製訂單訪問鏈接') }}</button><p v-if="linkError" class="error" role="alert">{{ linkError }}</p></div>
+      <div v-if="order.items.every(i=>i.goods_type==='physical') && getOrderAccessToken(orderNo)" class="card"><p>{{ $t('請保存訂單訪問鏈接，換設備可用下單郵箱查看訂單') }}</p><button class="btn secondary" @click="saveAccessLink">{{ copiedLink ? $t('已複製') : $t('複製訂單訪問鏈接') }}</button><p v-if="linkError" class="error" role="alert">{{ linkError }}</p></div>
       <OrderReview v-if="isLoggedIn" :order-no="orderNo" />
     </template>
   </div>
@@ -87,7 +86,6 @@
 <script setup lang="ts">
 import { uiText, t as $t, localeTag } from '@/i18n';
 
-import OrderAccessRecovery from '@/components/OrderAccessRecovery.vue';
 import SMSOrder from '@/components/SMSOrder.vue';
 import SocialOrder from '@/components/SocialOrder.vue';
 import { ref, onMounted } from 'vue';

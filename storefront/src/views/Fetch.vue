@@ -3,7 +3,7 @@
     <!-- Hero 搜索區（深藍漸變） -->
     <section class="query-hero">
       <h1 class="query-title">{{ $t('訂單與交付查詢') }}</h1>
-      <p class="query-sub">{{ $t('輸入訂單號查看進度，遊客可通過下單郵箱驗證找回') }}</p>
+      <p class="query-sub">{{ $t('輸入訂單號或下單郵箱查看進度與交付結果') }}</p>
 
       <form class="query-form" @submit.prevent="fetch">
         <div class="query-input-row">
@@ -19,18 +19,17 @@
             {{ loading ? $t('查詢中…') : $t('查詢') }}
           </button>
         </div>
-        <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼') }}</summary><div class="query-pwd-row">
-          <span class="query-pwd-label">{{ $t('查詢密碼') }}</span>
+        <details><summary>{{ $t('虛擬商品或歷史訂單：使用查詢密碼或下單郵箱') }}</summary><div class="query-pwd-row">
+          <span class="query-pwd-label">{{ $t('查詢密碼或下單郵箱') }}</span>
           <input
             v-model="queryPassword"
             type="password"
             class="query-pwd-input"
-            :placeholder="$t('下單時設置的查詢密碼')"
+            :placeholder="$t('查詢密碼或下單郵箱')"
           />
         </div></details>
       </form>
 
-<OrderAccessRecovery :order-no="looksLikeContact(orderNo) ? undefined : orderNo" @recovered="pickOrder" />
       <p v-if="queryPassword" class="query-sub">{{ $t('同一網絡下，同一訂單連續查詢失敗 5 次將鎖定 30 分鐘；驗證成功後重新計數。') }}</p>
       <div v-if="error" class="query-error" role="alert">{{ uiText(error) }}</div>
     </section>
@@ -50,7 +49,7 @@
           <span class="guide-num">2</span>
           <div>
             <b>{{ $t('輸入信息') }}</b>
-            <span class="muted">{{ $t('使用賬戶、訂單訪問鏈接或郵箱驗證碼') }}</span>
+            <span class="muted">{{ $t('使用賬戶、訂單號加查詢密碼或下單郵箱') }}</span>
           </div>
         </div>
         <div class="guide-step">
@@ -69,7 +68,7 @@
         <div class="result-head">
           <div>
             <div class="result-order">{{ $t('找到') }} {{ guestOrders.length }} {{ $t('筆訂單') }}</div>
-            <div class="result-meta"><span class="muted">{{ $t('輸入查詢密碼後點擊對應訂單查看') }}</span></div>
+            <div class="result-meta"><span class="muted">{{ $t('點擊對應訂單查看交付結果') }}</span></div>
           </div>
         </div>
         <div v-for="o in guestOrders" :key="o.order_no" class="guest-order-row">
@@ -103,7 +102,7 @@
         <ShippingDetails v-if="shippingOrder" :order="shippingOrder" :password="queryPassword" @refresh="pickOrder(result.order_no)" />
         <div v-if="physicalOnly" class="card-list">{{ result.status === 'pending_payment' ? $t('訂單尚未付款，請在訂單詳情中繼續支付。') : ['canceled', 'expired', 'refunded'].includes(result.status) ? $t('訂單已關閉或退款，請查看上方配送及取消記錄。') : $t('此訂單通過快遞配送，請查看上方包裹進度。') }}</div>
         <div v-else-if="['paid', 'fulfilling', 'partially_delivered'].includes(result.status)" class="card-list">
-          <p>{{ result.items.length ? $t('已付款，部分商品已發貨，其餘商品正在安排發貨。無需再次支付，也無需註冊；稍後用此訂單號和查詢密碼刷新取貨。') : $t('已付款，商品正在安排發貨。無需再次支付，也無需註冊；稍後用此訂單號和查詢密碼刷新取貨。') }}</p>
+          <p>{{ result.items.length ? $t('已付款，部分商品已發貨，其餘商品正在安排發貨。無需再次支付，也無需註冊；稍後用此訂單號和查詢密碼或下單郵箱刷新取貨。') : $t('已付款，商品正在安排發貨。無需再次支付，也無需註冊；稍後用此訂單號和查詢密碼或下單郵箱刷新取貨。') }}</p>
           <p>{{ $t('人工服務請在訂單詳情查看處理進度，需幫助時憑訂單號聯繫客服。') }}</p>
           <button class="btn btn-primary" :disabled="loading" @click="pickOrder(result.order_no)">{{ $t('刷新發貨結果') }}</button>
         </div>
@@ -124,7 +123,6 @@
 </template>
 
 <script setup lang="ts">
-import OrderAccessRecovery from '@/components/OrderAccessRecovery.vue';
 import { uiText, t as $t, localeTag } from '@/i18n';
 
 import ShippingDetails from '@/components/ShippingDetails.vue';
@@ -181,32 +179,35 @@ async function fetch() {
 
   // 訂單號模式：密碼 + 直接取貨
   if (!queryPassword.value && !getToken() && !getOrderAccessToken(ident)) {
-    error.value = $t("請驗證下單郵箱或使用訂單訪問鏈接");
+    error.value = $t("請輸入查詢密碼或下單郵箱");
     return;
   }
   await pickOrder(ident);
 }
 
-/** 列表/直連取貨：訂單號 + 查詢密碼 → 卡密 */
+/** 列表/直連取貨：訂單號 + 查詢密碼或下單郵箱 → 卡密 */
 async function pickOrder(no: string) {
-  if (!queryPassword.value && !getToken() && !getOrderAccessToken(no)) {
-    error.value = $t("請驗證下單郵箱或使用訂單訪問鏈接");
+  // 下單郵箱本身就是憑證：聯繫方式模式下直接用輸入的郵箱查單，免查詢密碼、免驗證碼。
+  const contactEmail = looksLikeContact(orderNo.value) ? orderNo.value.trim() : '';
+  const credential = queryPassword.value || contactEmail;
+  if (!credential && !getToken() && !getOrderAccessToken(no)) {
+    error.value = $t("請輸入查詢密碼或下單郵箱");
     return;
   }
   loading.value = true;
   error.value = '';
   result.value = null;
   shippingOrder.value = null;
-  const detail = await getOrder(no, queryPassword.value);
+  const detail = await getOrder(no, credential);
   if (detail.error || !detail.data) { loading.value=false; error.value=detail.error || $t('訂單不存在或無權查看'); return; }
   if (detail.data.commerce_version === 1) shippingOrder.value=detail.data;
   if (detail.data.items?.length && detail.data.items.every(i=>i.goods_type==='physical')) {
     result.value={order_no:no,status:detail.data.status,items:[],fetch_count:0};
   } else {
-    const { data, error: err }=await fetchDelivery(no,queryPassword.value);
+    const { data, error: err }=await fetchDelivery(no,credential);
     if(err){loading.value=false;error.value=err;return;}
     result.value=data;
-    if(data)rememberOrderPassword(no,queryPassword.value);
+    if(data)rememberOrderPassword(no,credential);
   }
   loading.value=false;
   guestOrders.value = []; // 取貨成功收起列表

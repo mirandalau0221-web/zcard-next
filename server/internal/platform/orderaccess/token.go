@@ -44,6 +44,15 @@ func ContactEmail(contact, guestContact string) string {
 	return ""
 }
 
+// GuestContactEmail returns the normalized contact email for guest orders only;
+// member orders return "" so email access never applies to them.
+func GuestContactEmail(userID uint64, contact, guestContact string) string {
+	if userID != 0 {
+		return ""
+	}
+	return ContactEmail(contact, guestContact)
+}
+
 // NewToken creates an order-scoped bearer credential with 256 bits of entropy.
 // The raw value belongs only in the buyer's session or an authenticated recovery reply.
 func NewToken() (string, error) {

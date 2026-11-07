@@ -38,7 +38,7 @@ func TestFetchPasswordFeedbackAcrossOrderAndDelivery(t *testing.T) {
 				}
 				e := kerrors.FromError(err)
 				if i < 5 {
-					if e.Code != 404 || e.Metadata["remaining_attempts"] != strconv.Itoa(5-i) || !strings.Contains(e.Message, "还可尝试") {
+					if e.Code != 404 || e.Metadata["remaining_attempts"] != strconv.Itoa(5-i) || !strings.Contains(e.Message, "還可嘗試") {
 						t.Fatalf("attempt %d: %v", i, e)
 					}
 				} else if e.Code != 429 || e.Reason != "order.FETCH_LOCKED" || e.Metadata["retry_after_seconds"] == "" {
@@ -46,7 +46,7 @@ func TestFetchPasswordFeedbackAcrossOrderAndDelivery(t *testing.T) {
 				}
 			}
 			_, err := delivery.FetchDelivery(ctx, &storefrontv1.FetchDeliveryRequest{OrderNo: "LOOKUP", QueryPassword: "correct"})
-			if e := kerrors.FromError(err); e.Code != 429 || !strings.Contains(e.Message, "分钟后重试") {
+			if e := kerrors.FromError(err); e.Code != 429 || !strings.Contains(e.Message, "分鐘後重試") {
 				t.Fatal(e)
 			}
 		})

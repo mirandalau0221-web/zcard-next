@@ -28,17 +28,46 @@ func TestPasswordFailureLockSharedAcrossPorts(t *testing.T) {
 	}
 	gate := &testGate{failures: map[string]int{}}
 	for _, ip := range []string{"127.0.0.1:1001", "127.0.0.1:1002", "127.0.0.1:1003", "127.0.0.1:1004", "127.0.0.1:1005"} {
-		if Verify(ctx, gate, "ORDER", hash, "wrong", ip) == nil {
+		if Verify(ctx, gate, "ORDER", hash, "wrong", ip, "") == nil {
 			t.Fatal("bad password accepted")
 		}
 	}
-	if Verify(ctx, gate, "ORDER", hash, "1234", "127.0.0.1:1003") == nil {
+	if Verify(ctx, gate, "ORDER", hash, "1234", "127.0.0.1:1003", "") == nil {
 		t.Fatal("changing remote port bypassed lock")
 	}
-	if Verify(ctx, gate, "OTHER", hash, "1234", "127.0.0.1:1003") != nil {
+	if Verify(ctx, gate, "OTHER", hash, "1234", "127.0.0.1:1003", "") != nil {
 		t.Fatal("unrelated order locked")
 	}
-	if Verify(ctx, gate, "ORDER", hash, "1234", "127.0.0.2:1003") != nil {
+	if Verify(ctx, gate, "ORDER", hash, "1234", "127.0.0.2:1003", "") != nil {
 		t.Fatal("unrelated peer locked")
+	}
+}
+
+func TestContactEmailAcceptedAsCredential(t *testing.T) {
+	ctx := context.Background()
+	hash, err := crypto.HashPassword("1234")
+	if err != nil {
+		t.Fatal(err)
+	}
+	gate := &testGate{failures: map[string]int{}}
+	// Correct contact email grants access.
+	if Verify(ctx, gate, "ORDER", hash, "buyer@example.com", "127.0.0.1:2001", "buyer@example.com") != nil {
+		t.Fatal("contact email not accepted")
+	}
+	// Email match is case-insensitive.
+	if Verify(ctx, gate, "ORDER", hash, "BUYER@Example.COM", "127.0.0.1:2001", "buyer@example.com") != nil {
+		t.Fatal("contact email match should be case-insensitive")
+	}
+	// Wrong email is rejected and counts as a failure.
+	if Verify(ctx, gate, "ORDER", hash, "other@example.com", "127.0.0.1:2001", "buyer@example.com") == nil {
+		t.Fatal("wrong email accepted")
+	}
+	// Without a contact email on file, an email is just a wrong password.
+	if Verify(ctx, gate, "ORDER", hash, "buyer@example.com", "127.0.0.1:2001", "") == nil {
+		t.Fatal("email accepted without contact email on file")
+	}
+	// Original password still works.
+	if Verify(ctx, gate, "ORDER", hash, "1234", "127.0.0.1:2001", "buyer@example.com") != nil {
+		t.Fatal("original password rejected")
 	}
 }
