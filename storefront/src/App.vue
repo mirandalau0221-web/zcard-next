@@ -102,13 +102,14 @@
     <template v-if="!isInstall && shellReady">
     <footer class="footer">
       <div class="footer-trust">
-        <div v-for="(item, index) in footerTrust" :key="index" class="trust-item">
+        <!-- 在線客服（第 3 項，index 2）連結到店鋪 WhatsApp 客服 https://wa.me/85268111744；其餘為純展示 -->
+        <component :is="index === 2 ? 'a' : 'div'" v-for="(item, index) in footerTrust" :key="index" class="trust-item" :href="index === 2 ? 'https://wa.me/85268111744' : undefined" :target="index === 2 ? '_blank' : undefined" :rel="index === 2 ? 'noopener noreferrer' : undefined">
           <span class="trust-icon" aria-hidden="true">
             <img v-if="item.image" :src="item.image" alt="" @error="item.image = ''" />
             <template v-else>{{ item.icon }}</template>
           </span>
           <div class="trust-copy"><b>{{ item.title }}</b><span class="muted">{{ item.description }}</span></div>
-        </div>
+        </component>
       </div>
       <nav class="footer-mobile-actions" :aria-label="$t('常用服務')">
         <router-link to="/fetch">
