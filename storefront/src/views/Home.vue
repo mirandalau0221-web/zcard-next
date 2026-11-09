@@ -29,7 +29,8 @@
         <div class="hero-points">
           <span>{{ $t('📦 按商品交付') }}</span>
           <span>{{ $t('🛡️ 正品保障') }}</span>
-          <span>{{ $t('💬 在線客服') }}</span>
+          <!-- 在線客服連結到店鋪 WhatsApp 客服 https://wa.me/85268111744 -->
+          <a href="https://wa.me/85268111744" target="_blank" rel="noopener noreferrer">{{ $t('💬 在線客服') }}</a>
         </div>
       </div>
       <span class="hero-icon">🎁</span>
@@ -773,6 +774,7 @@ async function loadTemplateSettings() {
 .hero-banner h1 { font-size: 28px; margin-bottom: 8px; overflow-wrap: anywhere; }
 .hero-banner p { opacity: 0.9; margin-bottom: 14px; }
 .hero-points { display: flex; gap: 14px; font-size: 13px; }
+.hero-points a { color: inherit; text-decoration: none; }
 .hero-icon { font-size: 72px; opacity: 0.35; }
 
 /* ── 公告 ── */
